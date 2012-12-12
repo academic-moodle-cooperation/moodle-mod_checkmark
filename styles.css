@@ -1,0 +1,353 @@
+/*
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/**
+ * CSS for checkmark
+ *
+ * @package       mod
+ * @subpackage    checkmark
+ * @author        Philipp Hager
+ * @copyright     2011 Philipp Hager
+ * @since         Moodle 2.1
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/** General Styles **/
+.path-mod-checkmark .userpicture,.path-mod-checkmark .picture.user,.path-mod-checkmark .picture.teacher
+    {
+    width: 35px;
+    height: 35px;
+    vertical-align: top;
+}
+
+.path-mod-checkmark .feedback .files,.path-mod-checkmark .feedback .grade,.path-mod-checkmark .feedback .outcome,.path-mod-checkmark .feedback .finalgrade
+    {
+    float: right;
+}
+
+.path-mod-checkmark .feedback .disabledfeedback {
+    width: 500px;
+    height: 250px;
+}
+
+.path-mod-checkmark .feedback .from {
+    float: left;
+}
+
+.path-mod-checkmark .files img {
+    margin-right: 4px;
+}
+
+.path-mod-checkmark .files a {
+    white-space: nowrap;
+}
+
+.path-mod-checkmark .late {
+    color: red;
+}
+
+/** Styles for submissions.php **/
+#page-mod-checkmark-submissions fieldset.felement {
+    margin-left: 16%;
+}
+
+#page-mod-checkmark-submissions form#options div {
+    text-align: right;
+    margin-left: auto;
+    margin-right: 20px;
+}
+
+#page-mod-checkmark-submissions .header .commands {
+    display: inline;
+}
+
+#page-mod-checkmark-submissions .picture {
+    width: 35px;
+}
+
+#page-mod-checkmark-submissions .fullname,#page-mod-checkmark-submissions .timemodified,#page-mod-checkmark-submissions .timemarked
+    {
+    text-align: left;
+}
+
+#page-mod-checkmark-submissions .submissions .grade,#page-mod-checkmark-submissions .submissions .outcome,#page-mod-checkmark-submissions .submissions .finalgrade
+    {
+    text-align: right;
+}
+
+#page-mod-checkmark-submissions .submissions .header.noheader
+    {
+    display: none;
+}
+
+#page-mod-checkmark-submissions .qgprefs #optiontable {
+    text-align: right;
+    margin-left: auto;
+}
+
+/** Styles for view.php **/
+#page-mod-checkmark-view #dates {
+    margin: 10px auto;
+}
+
+#page-mod-checkmark-view #checkmark, #page-mod-checkmark-view #checkmarkform {
+    margin: 10px auto;
+}
+
+#page-mod-checkmark-view .feedback {
+    margin: 10px auto;
+}
+
+#page-mod-checkmark-view .feedback .grade {
+    text-align: right;
+}
+
+#page-mod-checkmark-view #online .singlebutton {
+    text-align: center;
+}
+
+#page-mod-checkmark-view #dates .c0 {
+    text-align: right;
+    font-weight: bold;
+}
+
+#page-mod-checkmark-submissions .mform.optionspref .fitem .fitemtitle {
+    width: 25%;
+}
+
+#page-mod-checkmark-submissions .mform.optionspref .fitem .felement {
+    width: 15%;
+    margin-left: 26%;
+}
+
+#page-mod-checkmark-submissions.dir-rtl .mform .fitem .felement {
+    margin-right: 26%;
+    margin-left: 0;
+}
+
+#page-mod-checkmark-submissions .optionspref {
+    width: 100%;
+}
+
+#page-mod-checkmark-submissions .fastgbutton {
+    text-align: center;
+}
+
+#page-mod-checkmark-submissions.dir-rtl .fullname,#page-mod-checkmark-submissions.dir-rtl .timemodified,#page-mod-checkmark-submissions.dir-rtl .timemarked {
+    text-align: right;
+}
+
+#page-mod-checkmark-submissions.dir-rtl .mform.optionspref .fitem .fitemtitle {
+    text-align: left;
+}
+
+#page-mod-checkmark-submissions  .checkboxcontroller {
+    margin-top:1em;
+    margin-left: 1em;
+}
+
+.mod-checkmark-download-link {
+    text-align: right;
+}
+
+/** Styles for checkmark in special **/
+.submissiondetails {
+    text-align: left;
+}
+
+.autogradingform {
+    display: inline;
+    float: left;
+}
+
+.xmloutputform {
+    display: inline;
+    float: right;
+}
+
+.centered {
+    text-align: center;
+}
+
+.uncheckedexample {
+}
+
+.checkedexample {
+    font-weight:bold;
+}
+
+div.examplelist {
+    white-space:nowrap;
+}
+
+div.examplelist .checked {
+    text-decoration: none;
+}
+
+div.examplelist .unchecked {
+    text-decoration: line-through;
+    /*color:#e0e0e0;*/
+    color:#999999;
+}
+
+table.coloredrows {
+    overflow: auto;
+    display:block;
+    margin-left:10px;
+    margin-right:10px;
+}
+
+table.coloredrows .header {
+    white-space:nowrap;
+}
+
+table.coloredrows .r0 {
+    background-color: #f0f0f0;
+    white-space:nowrap
+}
+
+table.coloredrows .r1 {
+    background-color: #fafafa;
+    white-space:nowrap
+}
+
+.scroll_forced {
+/*    overflow: scroll;
+    max-height:500px;
+*/
+    border-width: 1px;
+    border-color: #dddddd;
+    border-style: solid;
+    padding:0px;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.scroll_forced .datapreviewtitle {
+    font-weight: bold;
+    margin-top:1em;
+    margin-left:1em;
+}
+
+.scroll_forced .checkboxcontroller {
+    margin-top:1em;
+    margin-left: 1em;
+}
+
+.early {background-color:#99FF99;}
+.soon {background-color:#FFFF99;}
+.today {background-color:#FFCC99;}
+.tobegraded {background-color:#FFCC99;}
+.allgraded {background-color:#99FF99;}
+.submissionsmissing {background-color:#FFCC99;}
+.allsubmitted {background-color:#99FF99;}
+
+#autogradingfieldset {
+    /*width: 100%;*/
+    margin-top: 2em;
+    padding-top: 1em;
+}
+
+.checkmark.overview.statistics > .details {
+    max-width:44em;
+    white-space:nowrap;
+    overflow:auto;
+    overflow-x:scroll;
+    padding:1em;
+
+    border-top-color: #dddddd;
+    border-right-color: #dddddd;
+    border-bottom-color: #dddddd;
+    border-left-color: #dddddd;
+    border-left-color-ltr-source: physical;
+    border-left-color-rtl-source: physical;
+    border-right-color-ltr-source: physical;
+    border-right-color-rtl-source: physical;
+    border-top-style: solid;
+    border-right-style: solid;
+    border-bottom-style: solid;
+    border-left-style: solid;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+}
+
+.checkmark.overview.statistics > .details .name {
+    display: inline-block;
+    /*padding-left: 1em;*/
+    margin-left: 0px;
+    margin-right: 1em;
+    vertical-align:top;
+    white-space:nowrap;
+}
+.checkmark.overview.statistics > .details .examples {
+    display: inline-block;
+    /*padding-left: 1em;*/
+    margin-right: 1em;
+    vertical-align:top;
+    white-space:nowrap;
+    /*width: 5em;*/
+}
+.checkmark.overview.statistics > .details .grades {
+    display: inline-block;
+    /*padding-left: 1em;*/
+    margin-right: 1em;
+    vertical-align:top;
+    white-space:nowrap;
+    /*width: 5em;*/
+}
+.checkmark.overview.statistics > .details .grade {
+    display: inline-block;
+    /*padding-left: 1em;*/
+    /*padding-right: 1em;*/
+    vertical-align:top;
+    white-space:nowrap;
+    /*width: 10em;*/
+}
+
+.checkmark.overview.statistics > .details .total {
+    font-weight: bold;
+}
+
+input[type="checkbox"] + label {
+    margin-left: 1em;
+    vertical-align: middle;
+}
+
+input[type="checkbox"] {
+    vertical-align: middle;
+}
+
+.clearfloat {
+    clear: both;
+}
+
+.elements_disabled_warning {
+    font-weight: bold;
+}
+
+#page-mod-checkmark-view .reportlink a {
+    background-color: #fcffd8;
+    background-image: none;
+    background-repeat: repeat;
+    background-attachment: scroll;
+    background-position: 0% 0%;
+    background-clip: border-box;
+    background-origin: padding-box;
+    background-size: auto auto;
+}
