@@ -31,6 +31,13 @@
 require_once("../../../config.php");
 require_once($CFG->dirroot."/mod/checkmark/lib.php");
 
+require_login();
+
+if(!is_siteadmin()) {
+    print_error('cannotuseadmin');
+    die;
+}
+
 $starttime = microtime(1);
 $instancecount = 0;
 $submissioncount = 0;
