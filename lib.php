@@ -2657,31 +2657,29 @@ class checkmark_base {
      */
     public function confirm($message, $continue, $cancel = null) {
         global $OUTPUT;
-        if ($continue instanceof single_button) {
-            // ok
-            continue; // supresses codechecker errors
-        } else if (is_string($continue)) {
-            $continue = new single_button(new moodle_url($continue), get_string('continue'),
-                                          'post');
-        } else if ($continue instanceof moodle_url) {
-            $continue = new single_button($continue, get_string('continue'), 'post');
-        } else {
-            throw new coding_exception('The continue param to $OUTPUT->confirm() must be either a'.
-                                       ' URL (str/moodle_url), a single_button instance or null.');
+        if (!($continue instanceof single_button)) {
+            if (is_string($continue)) {
+                $continue = new single_button(new moodle_url($continue), get_string('continue'),
+                                              'post');
+            } else if ($continue instanceof moodle_url) {
+                $continue = new single_button($continue, get_string('continue'), 'post');
+            } else {
+                throw new coding_exception('The continue param to $OUTPUT->confirm() must be either a'.
+                                           ' URL (str/moodle_url), a single_button instance or null.');
+            }
         }
 
-        if ($cancel instanceof single_button) {
-            // ok
-            continue; // supresses codechecker errors
-        } else if (is_string($cancel)) {
-            $cancel = new single_button(new moodle_url($cancel), get_string('cancel'), 'get');
-        } else if ($cancel instanceof moodle_url) {
-            $cancel = new single_button($cancel, get_string('cancel'), 'get');
-        } else if ($cancel == null) {
-            $cancel = null;
-        } else {
-            throw new coding_exception('The cancel param to $OUTPUT->confirm() must be either a'.
-                                       ' URL (str/moodle_url), a single_button instance or null.');
+        if (!($cancel instanceof single_button)) {
+            if (is_string($cancel)) {
+                $cancel = new single_button(new moodle_url($cancel), get_string('cancel'), 'get');
+            } else if ($cancel instanceof moodle_url) {
+                $cancel = new single_button($cancel, get_string('cancel'), 'get');
+            } else if ($cancel == null) {
+                $cancel = null;
+            } else {
+                throw new coding_exception('The cancel param to $OUTPUT->confirm() must be either a'.
+                                           ' URL (str/moodle_url), a single_button instance or null.');
+            }
         }
 
         $output = $OUTPUT->box_start('generalbox', 'notice');
