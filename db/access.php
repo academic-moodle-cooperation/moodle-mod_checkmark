@@ -82,7 +82,6 @@ $capabilities = array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
-            'coursecreator'  => CAP_ALLOW
 )
 ),
 
@@ -96,7 +95,6 @@ $capabilities = array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
-            'coursecreator'  => CAP_ALLOW
 )
 ),
 
