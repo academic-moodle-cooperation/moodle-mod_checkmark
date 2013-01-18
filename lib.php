@@ -29,6 +29,8 @@ defined('MOODLE_INTERNAL') || die;
 require_once($CFG->libdir.'/eventslib.php');
 /** Include formslib.php */
 require_once($CFG->libdir.'/formslib.php');
+/** Include textlib.php **/
+require_once($CFG->libdir.'/textlib.class.php');
 /** Include calendar/lib.php */
 require_once($CFG->dirroot.'/calendar/lib.php');
 
@@ -3242,8 +3244,9 @@ class checkmark_base {
             }
             $pdf->setData($data, $tableheaders, $width, $align, false, $maxrows);
             ob_clean();
-            $filename = $this->transcribe_filename($coursename . '_' . $checkmarkname . '_' .
-                                            get_string('strsubmissions', 'checkmark').'.pdf');
+            $unclean_filename = $coursename . '_' . $checkmarkname . '_' .
+                                get_string('strsubmissions', 'checkmark').'.pdf';
+            $filename = textlib::specialtoascii($unclean_filename);
             $pdf->Output($filename, 'D');
             exit();
         }
@@ -3320,42 +3323,6 @@ EOS;
         $submitlink->_js = $js;
         $submitlink->_onclick = "html_quickform_toggle_checkboxes($groupid); return false;";
         return $hiddenstate."<div>".$submitlink->toHTML()."</div>";
-    }
-
-    /**
-     * Helperfunction to replace ö,ü,ä,ß through their equivalents (oe, ue, ae, sz)
-     *
-     * This function is used to convert the filename of pdf-output to a string without special
-     * characters.
-     * If you have some special transcriptions to add, feel free but mark them as yours!
-     *
-     * @parameter string filename to transcript
-     * @return string transcripted filename
-     */
-    public function transcribe_filename($filename) {
-        $search = array();
-        $replace = array();
-
-        /*standard austrian umlaut replacement - Hager P*/
-        $search[] = 'ä';
-        $replace[] = 'ae';
-        $search[] = 'Ä';
-        $replace[] = 'Ae';
-        $search[] = 'ö';
-        $replace[] = 'oe';
-        $search[] = 'Ö';
-        $replace[] = 'Oe';
-        $search[] = 'ü';
-        $replace[] = 'ue';
-        $search[] = 'ü';
-        $replace[] = 'Ue';
-        $search[] = 'ß';
-        $replace[] = 'sz';
-        /*end*/
-
-        $filename = str_replace($search, $replace, $filename);
-
-        return $filename;
     }
 
     /**
