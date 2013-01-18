@@ -28,8 +28,6 @@
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define('CHECKMARK_DELETEOLD', true);
-
 require_once("../../../config.php");
 require_once($CFG->dirroot."/mod/checkmark/lib.php");
 
@@ -173,20 +171,19 @@ foreach ($assignment_instances_old as $instanceid) {
                            array('instance'=>'0', 'module'=>$new_mod_id));
             echo "....OK".html_writer::end_tag('div');
 
-            if (CHECKMARK_DELETEOLD === true) {
-                //delete old submissions
-                echo html_writer::start_tag('div').
-                     "delete old submissions for {$instance_data->name}";
-                $DB->delete_records("assignment_submissions", array('assignment' => $instanceid));
-                echo "....OK".html_writer::end_tag('div');
+            //delete old submissions
+            echo html_writer::start_tag('div').
+                 "delete old submissions for {$instance_data->name}";
+            $DB->delete_records("assignment_submissions", array('assignment' => $instanceid));
+            echo "....OK".html_writer::end_tag('div');
 
-                //delete old assignment-instance
-                echo html_writer::start_tag('div').
-                     "delete old assignment-instance for {$instance_data->name}";
-                $DB->delete_records("assignment", array('id' => $instanceid));
-                echo "....OK".html_writer::end_tag('div');
-            }
-                 // Assuming the both inserts work, we get to the following line.
+            //delete old assignment-instance
+            echo html_writer::start_tag('div').
+                 "delete old assignment-instance for {$instance_data->name}";
+            $DB->delete_records("assignment", array('id' => $instanceid));
+            echo "....OK".html_writer::end_tag('div');
+
+            // Assuming the both inserts work, we get to the following line.
             $transaction->allow_commit();
         } catch (Exception $e) {
             $transaction->rollback($e);

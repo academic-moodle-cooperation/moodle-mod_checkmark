@@ -23,10 +23,4 @@
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define('CHECKMARK_UPGRADE_FROM_OLD', 1);
-define('CHECKMARK_UPGRADE_DELETE_OLD', 1);
-
-
-if (CHECKMARK_UPGRADE_FROM_OLD) {
-    require_once('./upgradeoldcheckmarks.php');
-}
+require_once('./upgradeoldcheckmarks.php');
