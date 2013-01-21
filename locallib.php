@@ -1222,7 +1222,8 @@ class checkmark {
         }
 
         if (is_null($mailinfo)) {
-            if (optional_param('sesskey', null, PARAM_BOOL)) {
+            //this is no security check, this just tells us if there is posted data
+            if (data_submitted() && confirm_sesskey()) {
                 set_user_preference('checkmark_mailinfo', $mailinfo);
             } else {
                 $mailinfo = get_user_preferences('checkmark_mailinfo', 0);
@@ -1265,6 +1266,11 @@ class checkmark {
                     $col = 'menu';
                     $grading = true;
                 }
+                
+                if (!(data_submitted() && confirm_sesskey())) {
+                    $col = false;
+                }
+                
                 if (!$col) {
                     //both submissioncomment and grade columns collapsed..
                     $this->display_submissions();
@@ -3000,6 +3006,9 @@ class checkmark {
         $mform->addElement('header', 'qgprefs', get_string('optionalsettings', 'checkmark'));
         $mform->addElement('select', 'filter', get_string('show'), $filters);
 
+        $mform->addElement('hidden', 'sesskey');
+        $mform->setDefault('sesskey', sesskey());
+        
         $mform->setDefault('filter', $filter);
 
         $mform->addElement('text', 'perpage', get_string('pagesize', 'checkmark'),
