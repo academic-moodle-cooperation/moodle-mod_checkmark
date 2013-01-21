@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die;
  */
 
 if ($ADMIN->fulltree) {
-    require_once($CFG->dirroot.'/mod/checkmark/lib.php');
 
     $settings->add(new admin_setting_configtext('checkmark_stdexamplecount',
                                                 get_string('strstdexamplecount', 'checkmark'),

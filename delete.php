@@ -61,6 +61,4 @@ require_login($course->id, false, $cm);
 
 /// Load up the required checkmark code
 require($CFG->dirroot.'/mod/checkmark/lib.php');
-$checkmarkinstance = new checkmark($cm->id, $checkmark, $cm, $course);
-
-$checkmarkinstance->delete();   // delete something
+checkmark_delete_instance($checkmark->id);

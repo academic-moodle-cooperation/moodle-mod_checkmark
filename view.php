@@ -24,7 +24,7 @@
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once("../../config.php");
-require_once("lib.php");
+require_once($CFG->dirroot . "/mod/checkmark/locallib.php");
 require_once($CFG->libdir . '/completionlib.php');
 require_once($CFG->libdir . '/plagiarismlib.php');
 $id = optional_param('id', 0, PARAM_INT);  // Course Module ID

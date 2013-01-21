@@ -26,7 +26,7 @@
  */
 echo "Includes...";
 require_once(dirname(__FILE__).'/../../config.php');
-require_once($CFG->dirroot . '/mod/checkmark/lib.php');
+require_once($CFG->dirroot . "/mod/checkmark/locallib.php");
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot.'/mod/checkmark/submission_form.php');
 require_once($CFG->dirroot.'/mod/checkmark/checkmark_pdf.php');
