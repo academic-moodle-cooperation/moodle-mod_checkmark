@@ -29,7 +29,7 @@
  */
 
 require_once("../../../config.php");
-require_once($CFG->dirroot."/mod/checkmark/lib.php");
+require_once($CFG->dirroot."/mod/checkmark/locallib.php");
 
 require_login();
 
