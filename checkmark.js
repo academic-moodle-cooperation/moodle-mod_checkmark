@@ -24,25 +24,6 @@
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-var checkmark = {};
-
-function setNext(){
-    document.getElementById('submitform').mode.value = 'next';
-    document.getElementById('submitform').userid.value = checkmark.nextid;
-}
-
-function saveNext(){
-    document.getElementById('submitform').mode.value = 'saveandnext';
-    document.getElementById('submitform').userid.value = checkmark.nextid;
-    document.getElementById('submitform').saveuserid.value = checkmark.userid;
-    document.getElementById('submitform').menuindex.value = document.getElementById('submitform').grade.selectedIndex;
-}
-
-function initNext(nextid, usserid) {
-    checkmark.nextid = nextid;
-    checkmark.userid = userid;
-}
-
 M.mod_checkmark = {};
 
 M.mod_checkmark.init_tree = function(Y, expand_all, htmlid) {
