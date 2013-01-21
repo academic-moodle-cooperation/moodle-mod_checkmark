@@ -63,6 +63,14 @@
  */
 
 $capabilities = array(
+        'mod/grouptool:addinstance' => array(
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'legacy' => array(
+                        'editingteacher' => CAP_ALLOW,
+                        'manager' => CAP_ALLOW,
+                )
+        ),
 
     'mod/checkmark:view' => array(
 

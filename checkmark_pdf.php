@@ -63,14 +63,14 @@ class checkmark_pdf extends pdf {
     protected $groups = false;
 
     /**
-     * setHeaderData() helper method to set the right texts for page header
+     * setHeaderStrings() helper method to set the right texts for page header
      *
      * @param string $coursename the name of the course
      * @param timestamp $timeavailable time since the checkmark is available
      * @param timemstamp $timedue time due to which students can submit
      * @param string $viewname the checkmark-modulename to view
      */
-    public function setHeaderData($coursename, $checkmarkname, $timeavailable, $timedue,
+    public function setHeaderStrings($coursename, $checkmarkname, $timeavailable, $timedue,
                                   $viewname) {
         $this->header1 = array();
         $this->header1[0] = get_string('course').":";

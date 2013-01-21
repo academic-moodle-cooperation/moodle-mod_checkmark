@@ -3184,7 +3184,7 @@ class checkmark_base {
 
             $viewname = $filters[$filter];
 
-            $pdf->setHeaderData($coursename, $checkmarkname, $timeavailable, $timedue, $viewname);
+            $pdf->setHeaderStrings($coursename, $checkmarkname, $timeavailable, $timedue, $viewname);
 
             $printheader = optional_param('printheader', false, PARAM_BOOL);
 
@@ -4131,7 +4131,7 @@ class mod_checkmark_grading_form extends moodleform {
                                fullname($this->_customdata->teacher, true).'<br/>'.$datestring);
         }
         // buttons
-        $this->add_action_buttons();
+        $this->add_grading_buttons();
 
     }
 
@@ -4216,7 +4216,7 @@ class mod_checkmark_grading_form extends moodleform {
         }
     }
 
-    public function add_action_buttons() {
+    public function add_grading_buttons() {
         $mform =& $this->_form;
         //if there are more to be graded.
         if ($this->_customdata->nextid>0) {
