@@ -1356,10 +1356,8 @@ class checkmark {
             case 'saveandnext':
                 ///We are in pop up. save the current one and go to the next one.
                 //first we save the current changes
-                if ($submission = $this->process_feedback()) {
-                    continue; //prevents codechecker errors
-                }
-
+                $submission = $this->process_feedback();
+                //now we continue straight to with the next one
             case 'next':
                 /// We are currently in pop up, but we want to skip to next one without saving.
                 ///    This turns out to be similar to a single case
