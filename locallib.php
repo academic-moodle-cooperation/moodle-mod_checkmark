@@ -1082,6 +1082,9 @@ class checkmark {
                 }
                 $submission->teacher_id = $USER->id;
                 $submission->timemarked = $time_marked;
+                if(!isset($grades[$current_user->id])) { //prevent strict standard warning
+                    $grades[$current_user->id] = new stdClass();
+                }
                 $grades[$current_user->id]->userid = $current_user->id;
                 $grades[$current_user->id]->rawgrade = $calculated_grade;
                 $grades[$current_user->id]->dategraded = $time_marked;
