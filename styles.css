@@ -165,67 +165,67 @@
 }
 
 /** Styles for checkmark in special **/
-.submissiondetails {
+.path-mod-checkmark .submissiondetails {
     text-align: left;
 }
 
-.autogradingform {
+.path-mod-checkmark .autogradingform {
     display: inline;
     float: left;
 }
 
-.xmloutputform {
+.path-mod-checkmark .xmloutputform {
     display: inline;
     float: right;
 }
 
-.centered {
+.path-mod-checkmark .centered {
     text-align: center;
 }
 
-.uncheckedexample {
+.path-mod-checkmark .uncheckedexample {
 }
 
-.checkedexample {
+.path-mod-checkmark .checkedexample {
     font-weight:bold;
 }
 
-div.examplelist {
+.path-mod-checkmark div.examplelist {
     white-space:nowrap;
 }
 
-div.examplelist .checked {
+.path-mod-checkmark div.examplelist .checked {
     text-decoration: none;
 }
 
-div.examplelist .unchecked {
+.path-mod-checkmark div.examplelist .unchecked {
     text-decoration: line-through;
     /*color:#e0e0e0;*/
     color:#999999;
 }
 
-table.coloredrows {
+.path-mod-checkmark table.coloredrows {
     overflow: auto;
     display:block;
     margin-left:10px;
     margin-right:10px;
 }
 
-table.coloredrows .header {
+.path-mod-checkmark table.coloredrows .header {
     white-space:nowrap;
 }
 
-table.coloredrows .r0 {
+.path-mod-checkmark table.coloredrows .r0 {
     background-color: #f0f0f0;
     white-space:nowrap
 }
 
-table.coloredrows .r1 {
+.path-mod-checkmark table.coloredrows .r1 {
     background-color: #fafafa;
     white-space:nowrap
 }
 
-.scroll_forced {
+.path-mod-checkmark .scroll_forced {
 /*    overflow: scroll;
     max-height:500px;
 */
@@ -237,32 +237,32 @@ table.coloredrows .r1 {
     margin-right:auto;
 }
 
-.scroll_forced .datapreviewtitle {
+.path-mod-checkmark .scroll_forced .datapreviewtitle {
     font-weight: bold;
     margin-top:1em;
     margin-left:1em;
 }
 
-.scroll_forced .checkboxcontroller {
+.path-mod-checkmark .scroll_forced .checkboxcontroller {
     margin-top:1em;
     margin-left: 1em;
 }
 
-.early {background-color:#99FF99;}
-.soon {background-color:#FFFF99;}
-.today {background-color:#FFCC99;}
-.tobegraded {background-color:#FFCC99;}
-.allgraded {background-color:#99FF99;}
-.submissionsmissing {background-color:#FFCC99;}
-.allsubmitted {background-color:#99FF99;}
+.path-mod-checkmark .early {background-color:#99FF99;}
+.path-mod-checkmark .soon {background-color:#FFFF99;}
+.path-mod-checkmark .today {background-color:#FFCC99;}
+.path-mod-checkmark .tobegraded {background-color:#FFCC99;}
+.path-mod-checkmark .allgraded {background-color:#99FF99;}
+.path-mod-checkmark .submissionsmissing {background-color:#FFCC99;}
+.path-mod-checkmark .allsubmitted {background-color:#99FF99;}
 
-#autogradingfieldset {
+.path-mod-checkmark #autogradingfieldset {
     /*width: 100%;*/
     margin-top: 2em;
     padding-top: 1em;
 }
 
-.checkmark.overview.statistics > .details {
+.path-mod-checkmark .checkmark.overview.statistics > .details {
     max-width:44em;
     white-space:nowrap;
     overflow:auto;
@@ -287,7 +287,7 @@ table.coloredrows .r1 {
     border-left-width: 1px;
 }
 
-.checkmark.overview.statistics > .details .name {
+.path-mod-checkmark .checkmark.overview.statistics > .details .name {
     display: inline-block;
     /*padding-left: 1em;*/
     margin-left: 0px;
@@ -295,7 +295,7 @@ table.coloredrows .r1 {
     vertical-align:top;
     white-space:nowrap;
 }
-.checkmark.overview.statistics > .details .examples {
+.path-mod-checkmark .checkmark.overview.statistics > .details .examples {
     display: inline-block;
     /*padding-left: 1em;*/
     margin-right: 1em;
@@ -303,7 +303,7 @@ table.coloredrows .r1 {
     white-space:nowrap;
     /*width: 5em;*/
 }
-.checkmark.overview.statistics > .details .grades {
+.path-mod-checkmark .checkmark.overview.statistics > .details .grades {
     display: inline-block;
     /*padding-left: 1em;*/
     margin-right: 1em;
@@ -311,7 +311,7 @@ table.coloredrows .r1 {
     white-space:nowrap;
     /*width: 5em;*/
 }
-.checkmark.overview.statistics > .details .grade {
+.path-mod-checkmark .checkmark.overview.statistics > .details .grade {
     display: inline-block;
     /*padding-left: 1em;*/
     /*padding-right: 1em;*/
@@ -320,24 +320,24 @@ table.coloredrows .r1 {
     /*width: 10em;*/
 }
 
-.checkmark.overview.statistics > .details .total {
+.path-mod-checkmark .checkmark.overview.statistics > .details .total {
     font-weight: bold;
 }
 
-input[type="checkbox"] + label {
+.path-mod-checkmark input[type="checkbox"] + label {
     margin-left: 1em;
     vertical-align: middle;
 }
 
-input[type="checkbox"] {
+.path-mod-checkmark input[type="checkbox"] {
     vertical-align: middle;
 }
 
-.clearfloat {
+.path-mod-checkmark .clearfloat {
     clear: both;
 }
 
-.elements_disabled_warning {
+.path-mod-checkmark .elements_disabled_warning {
     font-weight: bold;
 }
 
