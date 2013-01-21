@@ -4472,12 +4472,7 @@ EOS;
         $submission->checkmark_id   = $this->checkmark->id;
         $submission->user_id       = $user_id;
         $submission->timecreated = time();
-        // teachers should not be modifying modified date, except offline checkmarks
-        if ($teachermodified) {
-            $submission->timemodified = 0;
-        } else {
-            $submission->timemodified = $submission->timecreated;
-        }
+        $submission->timemodified = $submission->timecreated;
         $submission->checked        = '';
         $submission->grade        = -1;
         $submission->submissioncomment      = '';
@@ -4541,7 +4536,7 @@ EOS;
                 $info->username = fullname($user, true);
                 $info->checkmark = format_string($this->checkmark->name, true);
                 $info->url = $CFG->wwwroot.'/mod/checkmark/submissions.php?id='.$this->cm->id;
-                $info->timeupdated = strftime('%c', $submission->timemodified);
+                $info->timeupdated = userdate('strftimedatetime', $submission->timemodified);
 
                 $postsubject = $strsubmitted.': '.$info->username.' -> '.$this->checkmark->name;
                 $posttext = $this->email_teachers_text($info);
