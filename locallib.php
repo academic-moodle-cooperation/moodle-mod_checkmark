@@ -2478,9 +2478,14 @@ class checkmark {
             }
         }
 
-        $tablecolumns = array('selection', 'picture', 'fullname', 'idnumber');
-        $tableheaders = array('', '', get_string('fullnameuser'),
-                              get_string('str_user_id', 'checkmark'));
+        $tablecolumns = array('selection', 'picture', 'fullname');
+        $tableheaders = array('', '', get_string('fullnameuser'));
+
+        $useridentity = explode(',', $CFG->showuseridentity);
+        foreach($useridentity as $cur) {
+            $tablecolumns[] = $cur;
+            $tableheaders[] = ($cur=='phone1') ? get_string('phone') : get_string($cur);
+        }
         if ($groupmode != NOGROUPS) {
             $tableheaders[] = get_string('group');
             $tablecolumns[] = 'groups';
@@ -2589,8 +2594,9 @@ class checkmark {
         }
 
         $ufields = user_picture::fields('u', array('idnumber'));
+        $useridentityfields = 'u.'.str_replace(',', ',u.', $CFG->showuseridentity);
         if (!empty($users)) {
-            $select = "SELECT $ufields,
+            $select = "SELECT $ufields, $useridentityfields,
                               s.id AS submissionid, s.grade, s.submissioncomment,
                               s.timemodified, s.timemarked ";
             if ($groupmode != NOGROUPS) {
@@ -2654,11 +2660,15 @@ class checkmark {
                                                                'selected', $selectstate, null,
                                                                array('class'=>'checkboxgroup1'));
                         $picture = $OUTPUT->user_picture($auser);
-                        if (!empty($auser->idnumber)) {
-                            $idnumber = html_writer::tag('div', $auser->idnumber,
-                                                         array('id'=>'uid'.$auser->id));
-                        } else {
-                            $idnumber = html_writer::tag('div', '-', array('id'=>'uid'.$auser->id));
+
+                        $useridentity = explode(',', $CFG->showuseridentity);
+                        foreach($useridentity as $cur) {
+                            if (!empty($auser->$cur)) {
+                                $$cur = html_writer::tag('div', $auser->$cur,
+                                                         array('id'=>'u'.$cur.$auser->id));
+                            } else {
+                                $$cur = html_writer::tag('div', '-', array('id'=>'u'.$cur.$auser->id));
+                            }
                         }
 
                         if (isset($auser->groups)) {
@@ -2896,7 +2906,13 @@ class checkmark {
                         $linkurl = $CFG->wwwroot . '/user/view.php?id=' . $auser->id .
                                    '&amp;course=' . $course->id;
                         $userlink = html_writer::tag('a', $linktext, array('href'=>$linkurl));
-                        $row = array($selected_user, $picture, $userlink, $idnumber);
+                        $row = array($selected_user, $picture, $userlink);
+
+                        $useridentity = explode(',', $CFG->showuseridentity);
+                        foreach($useridentity as $cur) {
+                            $row[] = $$cur;
+                        }
+                        
                         if ($groupmode != NOGROUPS) {
                             $row[] = $group;
                         }
@@ -3232,11 +3248,17 @@ class checkmark {
             }
         }
 
-        $tablecolumns = array('selection', 'fullnameuser', 'idnumber');
+        $tablecolumns = array('selection', 'fullnameuser');
         $tableheaders = array('',
-            $this->get_submissions_column_header('fullnameuser', get_string('fullnameuser')),
-            $this->get_submissions_column_header('idnumber',
-                                                 get_string('str_user_id', 'checkmark')));
+            $this->get_submissions_column_header('fullnameuser', get_string('fullnameuser')));
+
+        $useridentity = explode(',', $CFG->showuseridentity);
+        foreach($useridentity as $cur) {
+            $curstring = ($cur=='phone1') ? get_string('phone') : get_string($cur);
+            $tableheaders[] = $this->get_submissions_column_header($cur,
+                                                                   $curstring);
+            $tablecolumns[] = $cur;
+        }
         if ($groupmode != NOGROUPS) {
             $tableheaders[] = $this->get_submissions_column_header('groups', get_string('group'));
             $tablecolumns[] = 'groups';
@@ -3343,7 +3365,8 @@ class checkmark {
         }
 
         if (!empty($users)) {
-            $select = " SELECT $ufields, u.idnumber,
+            $useridentityfields = 'u.'.str_replace(',', ',u.', $CFG->showuseridentity);
+            $select = "SELECT $ufields, $useridentityfields,
                               s.id AS submissionid, s.grade, s.submissioncomment,
                               s.timemodified, s.timemarked ";
             if ($groupmode != NOGROUPS) {
@@ -3425,8 +3448,11 @@ class checkmark {
                                                            $state, null,
                                                            array('class'=>'checkboxgroup2'));
 
-                    $user_id = html_writer::tag('div', $auser->idnumber,
-                                                array('id'=>'uid'.$auser->id));
+                    $useridentity = explode(',', $CFG->showuseridentity);
+                    foreach($useridentity as $cur) {
+                        $$cur = html_writer::tag('div', (!empty($auser->$cur) ? $auser->$cur : '-'),
+                                                    array('id'=>'u'.$cur.$auser->id));
+                    }
 
                     if (empty($auser->submissionid)) {
                         $auser->grade = -1; //no submission yet
@@ -3572,7 +3598,12 @@ class checkmark {
                                          $this->context));
                     $userlink = html_writer::tag('a', $linktext, array('href'=>$linkurl));
 
-                    $row = array($selected_user, $userlink, $user_id);
+                    $row = array($selected_user, $userlink);
+                    
+                    $useridentity = explode(',', $CFG->showuseridentity);
+                    foreach($useridentity as $cur) {
+                        $row[] = $$cur;
+                    }
 
                     if ($groupmode != NOGROUPS) {
                         $row[] = $group;
@@ -3829,11 +3860,19 @@ class checkmark {
             }
         }
 
-        $tableheaders = array(get_string('fullnameuser'),
-                              get_string('str_user_id', 'checkmark'));
+        $tableheaders = array(get_string('fullnameuser'));
         $tablecolumns = array('fullnameuser', 'idnumber');
-        $width = array(50, 25);
-        $align = array('L', 'L');
+        $width = array(50);
+        $align = array('L');
+        
+        $useridentity = explode(',', $CFG->showuseridentity);
+        foreach($useridentity as $cur) {
+            $tableheaders[] = ($cur=='phone1') ? get_string('phone') : get_string($cur);
+            $tablecolumns[] = $cur;
+            $width[] = 25;
+            $align[] = 'L';
+        }
+
         if ($groupmode != NOGROUPS) {
             $width[] = 20;
             $tableheaders[] = get_string('group');
@@ -3939,7 +3978,8 @@ class checkmark {
         }
 
         if (!empty($users)) {
-            $select = "SELECT $ufields, u.idnumber,
+            $useridentityfields = 'u.'.str_replace(',', ',u.', $CFG->showuseridentity);
+            $select = "SELECT $ufields, $useridentityfields,
                               s.id AS submissionid, s.grade, s.submissioncomment,
                               s.timemodified, s.timemarked ";
             if ($groupmode != NOGROUPS) {
@@ -4116,7 +4156,12 @@ class checkmark {
 
                     $fullname = fullname($auser, has_capability('moodle/site:viewfullnames',
                                                                 $this->context));
-                    $row = array($fullname, $user_id);
+                    $row = array($fullname);
+                    
+                    $useridentity = explode(',', $CFG->showuseridentity);
+                    foreach($useridentity as $cur) {
+                        $row[] = !empty($auser->$cur) ? $auser->$cur : '-';
+                    }
 
                     if ($groupmode != NOGROUPS) {
                         $row[] = $group;
