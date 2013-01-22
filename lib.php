@@ -133,8 +133,8 @@ function checkmark_update_instance($checkmark) {
         // get existing grade item
         checkmark_grade_item_update($checkmark);
         
-        if (! $cm = get_coursemodule_from_instance('checkmark', $returnid)) {
-            echo $OUTPUT->notification('invalidinstance('.$returnid.')', 'notifyproblem');
+        if (! $cm = get_coursemodule_from_instance('checkmark', $checkmark->id)) {
+            echo $OUTPUT->notification('invalidinstance('.$checkmark->id.')', 'notifyproblem');
             $link = '';
             $id = null;
             $name = $checkmark->name;
