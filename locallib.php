@@ -1977,15 +1977,28 @@ class checkmark {
             $params['checkmark_id'] = $this->checkmark->id;
 
             if ($groupmode != NOGROUPS) {
-                $getgroupsql = "SELECT grps.courseid, GROUP_CONCAT(DISTINCT grps.name
-                                                                   ORDER BY grps.name ";
+                if (isset($SESSION->checkmark->orderby) && ($SESSION->checkmark->orderby == 'groups')) {
+                    if (isset($SESSION->checkmark->orderdirection)
+                        && $SESSION->checkmark->orderdirection == 'DESC') {
+                        $groupselect = 'MAX(grps.name)';
+                        $grouporder = ' ORDER BY grps.name '.$SESSION->checkmark->orderdirection;
+                    } else {
+                        $groupselect = 'MIN(grps.name)';
+                        $grouporder = ' ORDER BY grps.name ASC';
+                    }
+                } else {
+                    $groupselect = 'MIN(grps.name)';
+                    $grouporder = ' ORDER BY grps.name ASC';
+                }
+                $getgroupsql = "SELECT grps.courseid, ".$groupselect;
                 $params['courseid'] = $this->course->id;
-                $getgroupsql .= " SEPARATOR ', ') AS groups, grpm.userid AS userid
+                $getgroupsql .= " AS groups, grpm.userid AS userid
                              FROM {groups_members} grpm
                              LEFT JOIN {groups} grps
                              ON grps.id = grpm.groupid
                              WHERE grps.courseid = :courseid
-                             GROUP BY grpm.userid";
+                             GROUP BY grpm.userid".
+                             $grouporder;
                 $groupssql = " LEFT JOIN ($getgroupsql) AS grpq ON u.id = grpq.userid ";
             } else {
                 $groupssql = "";
@@ -2572,22 +2585,28 @@ class checkmark {
         }
 
         if ($groupmode != NOGROUPS) {
-            $getgroupsql = "SELECT grps.courseid, GROUP_CONCAT(DISTINCT grps.name
-                                                               ORDER BY grps.name ";
-            if (isset($SESSION->checkmark->orderby) && ($SESSION->checkmark->orderby == 'groups')) {
-                if (isset($SESSION->checkmark->orderdirection)) {
-                    $getgroupsql .= $SESSION->checkmark->orderdirection;
+                if (isset($SESSION->checkmark->orderby) && ($SESSION->checkmark->orderby == 'groups')) {
+                    if (isset($SESSION->checkmark->orderdirection)
+                        && $SESSION->checkmark->orderdirection == 'DESC') {
+                        $groupselect = 'MAX(grps.name)';
+                        $grouporder = ' ORDER BY grps.name '.$SESSION->checkmark->orderdirection;
+                    } else {
+                        $groupselect = 'MIN(grps.name)';
+                        $grouporder = ' ORDER BY grps.name ASC';
+                    }
                 } else {
-                    $getgroupsql .= 'ASC';
+                    $groupselect = 'MIN(grps.name)';
+                    $grouporder = ' ORDER BY grps.name ASC';
                 }
-            }
-            $params['courseid'] = $this->course->id;
-            $getgroupsql .= " SEPARATOR ', ') AS groups, grpm.userid AS userid
-                         FROM {groups_members} grpm
-                         LEFT JOIN {groups} grps
-                         ON grps.id = grpm.groupid
-                         WHERE grps.courseid = :courseid
-                         GROUP BY grpm.userid";
+                $getgroupsql = "SELECT grps.courseid, ".$groupselect;
+                $params['courseid'] = $this->course->id;
+                $getgroupsql .= " AS groups, grpm.userid AS userid
+                             FROM {groups_members} grpm
+                             LEFT JOIN {groups} grps
+                             ON grps.id = grpm.groupid
+                             WHERE grps.courseid = :courseid
+                             GROUP BY grpm.userid".
+                             $grouporder;
             $groupssql = " LEFT JOIN ($getgroupsql) AS grpq ON u.id = grpq.userid ";
         } else {
             $groupssql = "";
@@ -2672,6 +2691,14 @@ class checkmark {
                         }
 
                         if (isset($auser->groups)) {
+                            $groups = groups_get_all_groups($this->course->id, $auser->id, 0, 'g.name');
+                            $auser->groups = '';
+                            foreach($groups as $group) {
+                                if($auser->groups != '') {
+                                    $auser->groups .= ', ';
+                                }
+                                $auser->groups .= $group->name;
+                            }
                             $group = html_writer::tag('div', $auser->groups,
                                                       array('id'=>'gr'.$auser->id));
                         } else {
@@ -3343,21 +3370,28 @@ class checkmark {
         $ufields = user_picture::fields('u');
 
         if ($groupmode != NOGROUPS) {
-            $getgroupsql = "SELECT grps.courseid, GROUP_CONCAT(DISTINCT grps.name
-                                                               ORDER BY grps.name ";
-            if (isset($SESSION->checkmark->orderby) && ($SESSION->checkmark->orderby == 'groups')) {
-                if (isset($SESSION->checkmark->orderdirection)) {
-                    $getgroupsql .= $SESSION->checkmark->orderdirection;
+                if (isset($SESSION->checkmark->orderby) && ($SESSION->checkmark->orderby == 'groups')) {
+                    if (isset($SESSION->checkmark->orderdirection)
+                        && $SESSION->checkmark->orderdirection == 'DESC') {
+                        $groupselect = 'MAX(grps.name)';
+                        $grouporder = ' ORDER BY grps.name '.$SESSION->checkmark->orderdirection;
+                    } else {
+                        $groupselect = 'MIN(grps.name)';
+                        $grouporder = ' ORDER BY grps.name ASC';
+                    }
                 } else {
-                    $getgroupsql .= 'ASC';
+                    $groupselect = 'MIN(grps.name)';
+                    $grouporder = ' ORDER BY grps.name ASC';
                 }
-            }
-            $getgroupsql .= " SEPARATOR ', ') AS groups, grpm.userid AS userid
-                         FROM {groups_members} grpm
-                         LEFT JOIN {groups} grps
-                         ON grps.id = grpm.groupid
-                         WHERE grps.courseid = :courseid
-                         GROUP BY grpm.userid";
+                $getgroupsql = "SELECT grps.courseid, ".$groupselect;
+                $params['courseid'] = $this->course->id;
+                $getgroupsql .= " AS groups, grpm.userid AS userid
+                             FROM {groups_members} grpm
+                             LEFT JOIN {groups} grps
+                             ON grps.id = grpm.groupid
+                             WHERE grps.courseid = :courseid
+                             GROUP BY grpm.userid".
+                             $grouporder;
             $params['courseid'] = $this->course->id;
             $groupssql = " LEFT JOIN ($getgroupsql) AS grpq ON u.id = grpq.userid ";
         } else {
@@ -3421,6 +3455,14 @@ class checkmark {
 
                 foreach ($ausers as $auser) {
                     if (isset($auser->groups)) {
+                        $groups = groups_get_all_groups($this->course->id, $auser->id, 0, 'g.name');
+                        $auser->groups = '';
+                        foreach($groups as $group) {
+                            if($auser->groups != '') {
+                                $auser->groups .= ', ';
+                            }
+                            $auser->groups .= $group->name;
+                        }
                         $group = html_writer::tag('div', $auser->groups,
                                                   array('id'=>'gr'.$auser->id));
                     } else {
@@ -3955,23 +3997,28 @@ class checkmark {
         }
 
         if ($groupmode != NOGROUPS) {
-            $getgroupsql = "SELECT grps.courseid, GROUP_CONCAT(DISTINCT grps.name
-                                                               ORDER BY grps.name ";
-            if (isset($SESSION->checkmark->orderby)
-                    && ($SESSION->checkmark->orderby == 'groups')) {
-                if (isset($SESSION->checkmark->orderdirection)) {
-                    $getgroupsql .= $SESSION->checkmark->orderdirection;
+            if (isset($SESSION->checkmark->orderby) && ($SESSION->checkmark->orderby == 'groups')) {
+                if (isset($SESSION->checkmark->orderdirection)
+                    && $SESSION->checkmark->orderdirection == 'DESC') {
+                    $groupselect = 'MAX(grps.name)';
+                    $grouporder = ' ORDER BY grps.name '.$SESSION->checkmark->orderdirection;
                 } else {
-                    $getgroupsql .= 'ASC';
+                    $groupselect = 'MIN(grps.name)';
+                    $grouporder = ' ORDER BY grps.name ASC';
                 }
+            } else {
+                $groupselect = 'MIN(grps.name)';
+                $grouporder = ' ORDER BY grps.name ASC';
             }
+            $getgroupsql = "SELECT grps.courseid, ".$groupselect;
             $params['courseid'] = $this->course->id;
-            $getgroupsql .= " SEPARATOR ', ') AS groups, grpm.userid AS userid
+            $getgroupsql .= " AS groups, grpm.userid AS userid
                          FROM {groups_members} grpm
                          LEFT JOIN {groups} grps
                          ON grps.id = grpm.groupid
-                         WHERE grps.courseid = :courseid".
-                         " GROUP BY grpm.userid";
+                         WHERE grps.courseid = :courseid
+                         GROUP BY grpm.userid".
+                         $grouporder;
             $groupssql = " LEFT JOIN ($getgroupsql) AS grpq ON u.id = grpq.userid ";
         } else {
             $groupssql = "";
@@ -4032,6 +4079,14 @@ class checkmark {
                                                  $this->checkmark->id, array_keys($ausers));
                 foreach ($ausers as $auser) {
                     if (isset($auser->groups)) {
+                        $groups = groups_get_all_groups($this->course->id, $auser->id, 0, 'g.name');
+                        $auser->groups = '';
+                        foreach($groups as $group) {
+                            if($auser->groups != '') {
+                                $auser->groups .= ', ';
+                            }
+                            $auser->groups .= $group->name;
+                        }
                         $group = shorten_text($auser->groups, 20);
                     } else {
                         $group = '-';

@@ -1381,15 +1381,12 @@ function checkmark_print_overview($courses, &$htmlarray) {
                                           array_merge(array($USER->id), $checkmarkidparams));
 
     // get all users who submitted something, indexed by checkmark_id
-    $chkmrksubsuserids = $DB->get_records_sql("
-            SELECT checkmark_id, GROUP_CONCAT(DISTINCT user_id SEPARATOR ', ') as userids
-            FROM {checkmark_submissions}
-            WHERE checkmark_id $sqlcheckmarkids
-            GROUP BY checkmark_id", $checkmarkidparams);
-    foreach ($chkmrksubsuserids as $chkmrksubs) {
-        $usrids = explode(', ', $chkmrksubs->userids);
-        foreach ($usrids as $usrid) {
-            $usersubmissions[$chkmrksubs->checkmark_id][$usrid] = true;
+    foreach($checkmarkids as $cur_id) {
+        $userids = $DB->get_fieldset_select('checkmark_submissions',
+                                                      'user_id',
+                                                      'checkmark_id = ?', array($cur_id));
+        foreach ($userids as $usrid) {
+            $usersubmissions[$cur_id][$usrid] = true;
         }
     }
 
