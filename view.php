@@ -60,7 +60,7 @@ if ($id) {
 $PAGE->set_url($url);
 require_login($course, true, $cm);
 
-$PAGE->requires->js('/mod/checkmark/checkmark.js');
+$PAGE->requires->js('/mod/checkmark/yui/checkmark/checkmark.js');
 
 require_once($CFG->dirroot."/mod/checkmark/lib.php");
 $checkmarkinstance = new checkmark($cm->id, $checkmark, $cm, $course);
