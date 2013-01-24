@@ -877,8 +877,8 @@ class checkmark {
 
         $jsdata = array(self::DELIMITER);
         $jsmodule = array(
-                    'name'     =>   'checkmark_local',
-                    'fullpath' =>   '/mod/checkmark/checkmark_local.js',
+                    'name'     =>   'mod_checkmark',
+                    'fullpath' =>   '/mod/checkmark/yui/checkmark/checkmark.js',
                     'requires' =>   array('base', 'io', 'node', 'json'),
                     'strings'  =>   array(
         array('yes', 'moodle'),
@@ -886,7 +886,7 @@ class checkmark {
         )
         );
 
-        $PAGE->requires->js_init_call('M.checkmark_local.init_settings', $jsdata, false, $jsmodule);
+        $PAGE->requires->js_init_call('M.mod_checkmark.init_settings', $jsdata, false, $jsmodule);
         $update = optional_param('update', 0, PARAM_INT);
         $cm = empty($update) ? null : get_coursemodule_from_id('', $update, 0, false, MUST_EXIST);
         $submissioncount = empty($update) ? 0 : checkmark_count_real_submissions($cm);

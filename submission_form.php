@@ -116,8 +116,8 @@ class checkmark_submission_form extends moodleform {
         }
 
         $jsmodule = array(
-                    'name'     =>   'checkmark_local',
-                    'fullpath' =>   '/mod/checkmark/checkmark_local.js',
+                    'name'     =>   'mod_checkmark',
+                    'fullpath' =>   '/mod/checkmark/yui/checkmark/checkmark.js',
                     'requires' =>   array('base', 'io', 'node', 'json'),
                     'strings'  =>   array(
         array('yes', 'moodle'),
@@ -125,8 +125,8 @@ class checkmark_submission_form extends moodleform {
         )
         );
 
-        $PAGE->requires->js_init_call('M.checkmark_local.init_submission', $jsdata, false,
-        $jsmodule);
+        $PAGE->requires->js_init_call('M.mod_checkmark.init_submission', $jsdata, false,
+                                      $jsmodule);
 
         // Set data from last submission and hidden fields
         $this->set_data($this->_customdata);
