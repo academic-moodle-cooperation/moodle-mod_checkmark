@@ -3090,18 +3090,30 @@ class checkmark {
         if ($updatepref && confirm_sesskey()) {
             $printperpage = optional_param('printperpage', 0, PARAM_INT);
             $printperpage = ($printperpage <= 0) ? 0 : $printperpage;
-            $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
             set_user_preference('checkmark_printperpage', $printperpage);
+            
+            $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
             set_user_preference('checkmark_filter', $filter);
+            
+            $textsize = optional_param('textsize', 0, PARAM_INT);
+            set_user_preference('checkmark_textsize', $textsize);
+            
+            $pageorientation = optional_param('pageorientation', 0, PARAM_INT);
+            set_user_preference('checkmark_pageorientation', $pageorientation);
+
+            $pageorientation = optional_param('printheader', 0, PARAM_INT);
+            set_user_preference('checkmark_printheader', $pageorientation);            
         }
-        $textsize = optional_param('textsize', 0, PARAM_INT);
-        $pageorientation = optional_param('pageorientation', 0, PARAM_INT);
 
         /* next we get perpage (allow quick grade) params
          * from database
          */
         $printperpage    = get_user_preferences('checkmark_printperpage', 10);
         $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
+        $textsize = get_user_preferences('checkmark_textsize', 0);
+        $pageorientation = get_user_preferences('checkmark_pageorientation', 0);
+        $printheader = get_user_preferences('checkmark_printheader', 1);
+        
         $grading_info = grade_get_grades($this->course->id, 'mod', 'checkmark',
                                          $this->checkmark->id);
 
@@ -3202,7 +3214,7 @@ class checkmark {
                                                    array('class'=>'fitem'));
 
         $printheaderattr = array('name'=>'printheader', 'value'=>'1', 'type'=>'checkbox');
-        if (optional_param('printheader', 1, PARAM_INT)) {
+        if ($printheader) {
             $printheaderattr['checked'] = 'checked';
         }
         $advcheckbox = html_writer::empty_tag('input', array('name'  => 'printheader',
@@ -3782,12 +3794,22 @@ class checkmark {
 
         $updatepref = optional_param('updatepref', 0, PARAM_INT);
 
-        if (isset($_POST['updatepref'])) {
+        if ($updatepref && confirm_sesskey()) {
             $printperpage = optional_param('printperpage', 0, PARAM_INT);
             $printperpage = ($printperpage <= 0) ? 0 : $printperpage;
-            $filter = optional_param('filter', 0, PARAM_INT);
             set_user_preference('checkmark_printperpage', $printperpage);
+            
+            $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
             set_user_preference('checkmark_filter', $filter);
+            
+            $textsize = optional_param('textsize', 0, PARAM_INT);
+            set_user_preference('checkmark_textsize', $textsize);
+            
+            $pageorientation = optional_param('pageorientation', 0, PARAM_INT);
+            set_user_preference('checkmark_pageorientation', $pageorientation);
+
+            $pageorientation = optional_param('printheader', 0, PARAM_INT);
+            set_user_preference('checkmark_printheader', $pageorientation);            
         }
 
         /* next we get perpage (allow quick grade) params
