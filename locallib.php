@@ -886,7 +886,7 @@ class checkmark {
         )
         );
 
-        $PAGE->requires->js_init_call('M.mod_checkmark.init_settings', $jsdata, false, $jsmodule);
+        $PAGE->requires->js_init_call('M.mod_checkmark.init_settings', $jsdata, true, $jsmodule);
         $update = optional_param('update', 0, PARAM_INT);
         $cm = empty($update) ? null : get_coursemodule_from_id('', $update, 0, false, MUST_EXIST);
         $submissioncount = empty($update) ? 0 : checkmark_count_real_submissions($cm);

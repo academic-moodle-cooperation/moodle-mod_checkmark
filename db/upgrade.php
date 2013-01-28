@@ -262,6 +262,22 @@ function xmldb_checkmark_upgrade($oldversion) {
         }
         upgrade_mod_savepoint(true, 2012022300, 'checkmark');
     }
+    
+    // Moodle v2.3 release upgrade line
+    
+    // Moodle v2.4 release upgrade line
+    if ($oldversion < 2013012800) {
+
+        // Changing precision of field grade on table checkmark_submissions to (10)
+        $table = new xmldb_table('checkmark_submissions');
+        $field = new xmldb_field('grade', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'checked');
+
+        // Launch change of precision for field grade
+        $dbman->change_field_precision($table, $field);
+
+        // checkmark savepoint reached
+        upgrade_mod_savepoint(true, 2013012800, 'checkmark');
+    }
 
     return true;
 }
