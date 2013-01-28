@@ -291,6 +291,46 @@ M.mod_checkmark = {
         }
         Y.one(examplegrades_selector).set('value', Y.one(examplegrades_selector).get('value').replace(/[^0-9,]/g, ""));
         return true;
+    },
+
+    /*
+     * init_printsettings(Y) prepares printsettings form for JS-functionality
+     * first make Y accsesible in all other methods of M.mod_checkmark
+     * second register event-listeners for all apropriate elements
+     */
+    init_printsettings: function(Y) {
+        this.Y = Y;
+
+        var combo = new Array();
+        combo[0] = "input[name=\"printoptimum\"]";
+        combo[1] = "input[name=\"printperpage\"]";
+        alert('init!');
+        Y.on('change', function(e, combo) {
+                    alert('Change in Printoptimum!');
+                    // Stop the event's default behavior
+                    e.preventDefault();
+                    // Stop the event from bubbling up the DOM tree
+                    e.stopPropagation();
+                    //deactivate textfield and set to 0 if checkbox is checked
+                    if(M.mod_checkmark.Y.one(combo[0]).get('checked')) {
+                        M.mod_checkmark.Y.one(combo[1]).set('disabled', 'disabled');
+                    } else {
+                        M.mod_checkmark.Y.one(combo[1]).set('disabled', '');
+                    }
+                }, combo[0]);
+        Y.on('change', function(e, combo) {
+                    alert('Change in Printperpage!');
+                    // Stop the event's default behavior
+                    e.preventDefault();
+                    // Stop the event from bubbling up the DOM tree
+                    e.stopPropagation();
+                    //deactivate textfield and set to 0 if checkbox is checked
+                    if(M.mod_checkmark.Y.one(combo[1]).get('value') == 0) {
+                        M.mod_checkmark.Y.one(combo[0]).set('checked', 'checked');
+                    } else {
+                        M.mod_checkmark.Y.one(combo[0]).set('checked', '');
+                    }
+                }, combo[1]);
     }
 };
 

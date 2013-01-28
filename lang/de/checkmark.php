@@ -85,6 +85,7 @@ $string['nosubmission'] = 'Es ist noch keine Abgabe vorhanden.';
 $string['nousers'] = 'Es sind keine Benutzer/innen zur Anzeige vorhanden!';
 $string['numberofexamples'] = 'Beispielanzahl';
 $string['numberofexamples_help'] = 'Anzahl der Beispiele';
+$string['optimum'] = 'optimal';
 $string['printsettingstitle'] = 'Druckeinstellungen';
 $string['strallononepage'] = 'alles auf eine Seite';
 $string['strautograded'] = '[automatisch bewertet]';

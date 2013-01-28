@@ -84,6 +84,7 @@ $string['nosubmission'] = 'No checkmarks have been submitted';
 $string['nousers'] = 'There are no users to be displayed!';
 $string['numberofexamples'] = 'Number of examples';
 $string['numberofexamples_help'] = 'Examplecount in this checkmark.';
+$string['optimum'] = 'optimum';
 $string['printsettingstitle'] = 'Print settings';
 $string['strallononepage'] = 'print all on one page';
 $string['strautograded'] = '[autograded]';

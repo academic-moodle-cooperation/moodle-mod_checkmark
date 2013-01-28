@@ -3104,8 +3104,9 @@ class checkmark {
 
         if ($updatepref && confirm_sesskey()) {
             $printperpage = optional_param('printperpage', 0, PARAM_INT);
-            $printperpage = ($printperpage <= 0) ? 0 : $printperpage;
-            set_user_preference('checkmark_printperpage', $printperpage);
+            $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
+            $printperpage = (($printperpage <= 0) && !$printoptimum) ? 0 : $printperpage;
+            set_user_preference('checkmark_pdfprintperpage', $printperpage);
             
             $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
             set_user_preference('checkmark_filter', $filter);
@@ -3123,7 +3124,12 @@ class checkmark {
         /* next we get perpage (allow quick grade) params
          * from database
          */
-        $printperpage    = get_user_preferences('checkmark_printperpage', 10);
+        $printperpage    = get_user_preferences('checkmark_pdfprintperpage', 0);
+        if($printperpage == 0) {
+            $printoptimum = 1;
+        } else {
+            $printoptimum = 0;
+        }
         $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
         $textsize = get_user_preferences('checkmark_textsize', 0);
         $pageorientation = get_user_preferences('checkmark_pageorientation', 0);
@@ -3201,9 +3207,16 @@ class checkmark {
                            'value' => $printperpage,
                            'type'  => 'text');
         $input = html_writer::empty_tag('input', $inputattr);
+        $advcheckbox = array('name' => 'printoptimum',
+                             'type' => 'checkbox');
+        if($printoptimum || ($printperpage == 0)) {
+            $advcheckbox['checked'] = 'checked';
+        }
+        $optimum = html_writer::empty_tag('input', $advcheckbox).'&nbsp;'.
+                   get_string('optimum', 'checkmark');
         $printperpagehtml = html_writer::tag('div', get_string('pagesize', 'checkmark'),
                                              array('class'=>'fitemtitle')).
-                            html_writer::tag('div', $input, array('class'=>'felement'));
+                            html_writer::tag('div', $input.$optimum, array('class'=>'felement'));
         $printsettingselements .= html_writer::tag('div', $printperpagehtml,
                                                    array('class'=>'fitem'));
 
@@ -3738,6 +3751,16 @@ class checkmark {
                                                                    'method' => 'post'));
         $returnstring .= html_writer::end_tag('div');
         $returnstring .= $OUTPUT->footer();
+        
+        $jsmodule = array(
+            'name'     =>   'mod_checkmark',
+            'fullpath' =>   '/mod/checkmark/yui/checkmark/checkmark.js',
+            'requires' =>   array('base', 'node', 'io', 'event')
+        );
+        $jsdata = null;
+        $PAGE->requires->js_init_call('M.mod_checkmark.init_printsettings', $jsdata, true,
+                                      $jsmodule);
+        
         return $returnstring;
     }
 
@@ -3811,8 +3834,9 @@ class checkmark {
 
         if ($updatepref && confirm_sesskey()) {
             $printperpage = optional_param('printperpage', 0, PARAM_INT);
-            $printperpage = ($printperpage <= 0) ? 0 : $printperpage;
-            set_user_preference('checkmark_printperpage', $printperpage);
+            $printoptimum = optional_param('printoptimum', 0, PARAM_BOOL);
+            $printperpage = (($printperpage <= 0) && !$printoptimum) ? 0 : $printperpage;
+            set_user_preference('checkmark_pdfprintperpage', $printperpage);
             
             $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
             set_user_preference('checkmark_filter', $filter);
@@ -3830,7 +3854,7 @@ class checkmark {
         /* next we get perpage (allow quick grade) params
          * from database
          */
-        $printperpage    = get_user_preferences('checkmark_printperpage', null);
+        $printperpage    = get_user_preferences('checkmark_pdfprintperpage', null);
         $filter = get_user_preferences('checkmark_filter', 0);
         $grading_info = grade_get_grades($this->course->id, 'mod', 'checkmark',
                                          $this->checkmark->id);
