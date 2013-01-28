@@ -1008,7 +1008,22 @@ class checkmark {
 
         // Get all ppl that are allowed to submit checkmarks
         $context = context_module::instance($this->cm->id);
-        list($esql, $params) = get_enrolled_sql($context, 'mod/checkmark:view');
+        // Get groupmode and limit fetched users to current chosen group (or every)
+        if ($groupmode = groups_get_activity_groupmode($this->cm)) {
+            $aag = has_capability('moodle/site:accessallgroups', $context);
+            if ($groupmode == VISIBLEGROUPS or $aag) {
+                // any group in grouping
+                $allowedgroups = groups_get_all_groups($this->cm->course, 0, $this->cm->groupingid);
+            } else {
+                // only assigned groups
+                $allowedgroups = groups_get_all_groups($this->cm->course, $USER->id, $this->cm->groupingid);
+            }
+            $activegroup = groups_get_activity_group($this->cm, true, $allowedgroups);
+        } else {
+            $activegroup = 0;
+        }
+
+        list($esql, $params) = get_enrolled_sql($context, 'mod/checkmark:view', $activegroup);
         switch ($filter) {
             case self::FILTER_SELECTED:
                 //prepare list with selected users
