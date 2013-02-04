@@ -1456,6 +1456,7 @@ function checkmark_print_overview($courses, &$htmlarray) {
             $amount->total = $totalstudents;
             $amount->submitted = $studentsubmissions;
             $submissions->all = $studentsubmissions;
+            $submissions->graded = $submissions->all - $submissions->reqgrading;
             if ($amount->total == $amount->submitted) { //everyone has submitted
                 $submittedclass = 'allsubmitted';
             } else {
@@ -1473,7 +1474,7 @@ function checkmark_print_overview($courses, &$htmlarray) {
                     get_string('submissionsamount', 'checkmark', $amount).'</span><br />';
             if ($submissions->all != 0) {
                 $str .= '(<span class="'.$reqgradingclass.'">'.
-                        get_string('submissionsnotgraded', 'checkmark', $submissions).'</span>)';
+                        get_string('submissionsgraded', 'checkmark', $submissions).'</span>)';
             }
             $str .= '</a>';
             $str .= '</div>';

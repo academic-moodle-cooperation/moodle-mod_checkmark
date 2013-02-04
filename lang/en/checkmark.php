@@ -231,6 +231,7 @@ $string['submissionfeedback'] = 'Submission feedback';
 $string['submissions'] = 'Submissions';
 $string['submissionsamount'] = '{$a->submitted} of {$a->total} students submitted already.';
 $string['submissionsaved'] = 'Your changes have been saved';
+$string['submissionsgraded'] = '{$a->graded} of {$a->all} submissions graded';
 $string['submissionsnotgraded'] = '{$a->reqgrading} of {$a->all} submissions not graded';
 $string['submitcheckmark'] = 'Submit your checkmark using this form';
 $string['submitted'] = 'Submitted';

@@ -233,6 +233,7 @@ $string['submissionfeedback'] = 'Abgabekommentar';
 $string['submissions'] = 'Abgaben';
 $string['submissionsamount'] = '{$a->submitted} von {$a->total} Studierenden haben abgegeben';
 $string['submissionsaved'] = 'Ihre Änderungen wurden gespeichert';
+$string['submissionsgraded'] = '{$a->graded} von {$a->all} Bewertungen erledigt';
 $string['submissionsnotgraded'] = '{$a->reqgrading} von {$a->all} Bewertungen offen';
 $string['submitcheckmark'] = 'Geben Sie Ihre Kreuzerlübung mit diesem Formular ab';
 $string['submitted'] = 'Abgegeben';
