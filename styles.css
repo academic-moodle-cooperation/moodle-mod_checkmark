@@ -251,10 +251,10 @@
 .path-mod-checkmark .early {background-color:#99FF99;}
 .path-mod-checkmark .soon {background-color:#FFFF99;}
 .path-mod-checkmark .today {background-color:#FFCC99;}
-.path-mod-checkmark .tobegraded {background-color:#FFCC99;}
-.path-mod-checkmark .allgraded {background-color:#99FF99;}
-.path-mod-checkmark .submissionsmissing {background-color:#FFCC99;}
-.path-mod-checkmark .allsubmitted {background-color:#99FF99;}
+.path-mod-checkmark .tobegraded, .checkmark .tobegraded {background-color:#FFCC99;}
+.path-mod-checkmark .allgraded, .checkmark .allgraded {background-color:#99FF99;}
+.path-mod-checkmark .submissionsmissing, .checkmark .submissionsmissing {background-color:#FFCC99;}
+.path-mod-checkmark .allsubmitted, .checkmark .allsubmitted {background-color:#99FF99;}
 
 .path-mod-checkmark #autogradingfieldset {
     /*width: 100%;*/
@@ -262,7 +262,7 @@
     padding-top: 1em;
 }
 
-.path-mod-checkmark .checkmark.overview.statistics > .details {
+.checkmark.overview.statistics > .details {
     max-width:44em;
     white-space:nowrap;
     overflow:auto;
@@ -287,7 +287,7 @@
     border-left-width: 1px;
 }
 
-.path-mod-checkmark .checkmark.overview.statistics > .details .name {
+.checkmark.overview.statistics > .details .name {
     display: inline-block;
     /*padding-left: 1em;*/
     margin-left: 0px;
@@ -295,7 +295,8 @@
     vertical-align:top;
     white-space:nowrap;
 }
-.path-mod-checkmark .checkmark.overview.statistics > .details .examples {
+
+.checkmark.overview.statistics > .details .examples {
     display: inline-block;
     /*padding-left: 1em;*/
     margin-right: 1em;
@@ -303,7 +304,8 @@
     white-space:nowrap;
     /*width: 5em;*/
 }
-.path-mod-checkmark .checkmark.overview.statistics > .details .grades {
+
+.checkmark.overview.statistics > .details .grades {
     display: inline-block;
     /*padding-left: 1em;*/
     margin-right: 1em;
@@ -311,7 +313,8 @@
     white-space:nowrap;
     /*width: 5em;*/
 }
-.path-mod-checkmark .checkmark.overview.statistics > .details .grade {
+
+.checkmark.overview.statistics > .details .grade {
     display: inline-block;
     /*padding-left: 1em;*/
     /*padding-right: 1em;*/
@@ -320,7 +323,7 @@
     /*width: 10em;*/
 }
 
-.path-mod-checkmark .checkmark.overview.statistics > .details .total {
+.checkmark.overview.statistics > .details .total {
     font-weight: bold;
 }
 
