@@ -4697,7 +4697,7 @@ EOS;
                 $info->username = fullname($user, true);
                 $info->checkmark = format_string($this->checkmark->name, true);
                 $info->url = $CFG->wwwroot.'/mod/checkmark/submissions.php?id='.$this->cm->id;
-                $info->timeupdated = userdate('strftimedatetime', $submission->timemodified);
+                $info->timeupdated = userdate($submission->timemodified);
 
                 $postsubject = $strsubmitted.': '.$info->username.' -> '.$this->checkmark->name;
                 $posttext = $this->email_teachers_text($info);
