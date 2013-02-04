@@ -1077,17 +1077,17 @@ function checkmark_getsummarystring($submission, $checkmark) {
     $course     = $DB->get_record('course', array('id' => $checkmark->course), '*', MUST_EXIST);
     $cm         = get_coursemodule_from_instance('checkmark', $checkmark->id, $course->id, false,
                                                  MUST_EXIST);
-    $checkmark = new checkmark($cm->instance, $checkmark, $cm);
+    $instance = new checkmark($cm->instance, $checkmark, $cm);
     if (!isset($submission)) {
-        $submission = $checkmark->get_submission($USER->id, false); //get the submission
+        $submission = $instance->get_submission($USER->id, false); //get the submission
     }
 
     if ($submission) {
         $examplestates = explode(checkmark::DELIMITER, $submission->checked);
 
-        if ($checkmark->flexiblenaming) {
-            $examplenames = explode(checkmark::DELIMITER, $checkmark->examplenames);
-            $examplegrades = explode(checkmark::DELIMITER, $checkmark->examplegrades);
+        if ($instance->checkmark->flexiblenaming) {
+            $examplenames = explode(checkmark::DELIMITER, $instance->checkmark->examplenames);
+            $examplegrades = explode(checkmark::DELIMITER, $instance->checkmark->examplegrades);
             for ($i=0; $i<count($examplenames); $i++) {
                 $examplenumber = $i+1;
                 $state = 0;
@@ -1107,10 +1107,10 @@ function checkmark_getsummarystring($submission, $checkmark) {
             }
         } else {
             $i = 0;
-            $points = $checkmark->grade/$checkmark->examplecount;
+            $points = $instance->checkmark->grade/$instance->checkmark->examplecount;
             do {
                 $state = 0;
-                $examplenumber = strval($i+$checkmark->examplestart);
+                $examplenumber = strval($i+$instance->checkmark->examplestart);
                 foreach ($examplestates as $singlestate) {
                     if (intval($singlestate) == ($i+1)) {
                         $state = 1;
@@ -1124,23 +1124,24 @@ function checkmark_getsummarystring($submission, $checkmark) {
                 $max_checked_examples++;
                 $max_checked_grades += $points;
                 $i++;
-            } while ($i<$checkmark->examplecount);
+            } while ($i<$instance->checkmark->examplecount);
         }
     } else {
-        if ($checkmark->flexiblenaming) {
-            $examplegrades = explode(checkmark::DELIMITER, $checkmark->examplegrades);
+        if ($instance->checkmark->flexiblenaming) {
+            $examplegrades = explode(checkmark::DELIMITER, $instance->checkmark->examplegrades);
             $max_checked_examples = count($examplegrades);
             $max_checked_grades = 0;
             for ($i=0; $i<count($examplegrades); $i++) {
                 $max_checked_grades += intval($examplegrades[$i]);
             }
         } else {
-            $max_checked_examples = $checkmark->examplecount;
-            $max_checked_grades = $checkmark->grade;
+            $max_checked_examples = $instance->checkmark->examplecount;
+            $max_checked_grades = $instance->checkmark->grade;
         }
         $checked_examples = 0;
         $checked_grades = 0;
     }
+    $a = new stdClass();
     $a->checked_examples = $checked_examples;
     $a->max_checked_examples = $max_checked_examples;
     $a->checked_grades = $checked_grades;
@@ -1152,25 +1153,25 @@ function checkmark_getsummarystring($submission, $checkmark) {
         //they might have different scales!!
         static $scalegrades = array();
 
-        if ($checkmark->grade >= 0) {    // Normal number
+        if ($instance->checkmark->grade >= 0) {    // Normal number
             if ($submission->grade == -1) {
                 $a->grade = get_string('notgradedyet', 'checkmark');
             } else {
                 $a->grade = get_string('graded', 'checkmark').': '.$submission->grade.
-                            ' / '.$checkmark->grade;
+                            ' / '.$instance->checkmark->grade;
             }
 
         } else {                                // Scale
-            if (empty($scalegrades[$checkmark->id])) {
-                if ($scale = $DB->get_record('scale', array('id'=>-($checkmark->grade)))) {
-                    $scalegrades[$checkmark->id] = make_menu_from_list($scale->scale);
+            if (empty($scalegrades[$instance->checkmark->id])) {
+                if ($scale = $DB->get_record('scale', array('id'=>-($instance->checkmark->grade)))) {
+                    $scalegrades[$instance->checkmark->id] = make_menu_from_list($scale->scale);
                 } else {
                     $a->grade = get_string('notgradedyet', 'checkmark');
                 }
             }
-            if (isset($scalegrades[$checkmark->id][$grade])) {
+            if (isset($scalegrades[$instance->checkmark->id][$grade])) {
                 $a->grade = get_string('graded', 'checkmark').': '.
-                            $scalegrades[$checkmark->id][$submission->grade];
+                            $scalegrades[$instance->checkmark->id][$submission->grade];
             }
         }
     } else {
@@ -1256,6 +1257,7 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
         $checked_examples = 0;
         $checked_grades = 0;
     }
+    $a = new stdClass();
     $a->checked_examples = $checked_examples;
     $a->total_examples = $max_checked_examples;
     $a->checked_grade = $checked_grades;
@@ -1582,10 +1584,10 @@ function checkmark_print_overview($courses, &$htmlarray) {
         $str .= html_writer::end_tag('div');
         $str .= html_writer::end_tag('div');
 
-        if (empty($htmlarray[strval($currentcourse)]['checkmark_id'])) {
-            $htmlarray[strval($currentcourse)]['checkmark_id'] = $str;
+        if (empty($htmlarray[strval($currentcourse)]['checkmark'])) {
+            $htmlarray[strval($currentcourse)]['checkmark'] = $str;
         } else {
-            $htmlarray[strval($currentcourse)]['checkmark_id'] .= $str;
+            $htmlarray[strval($currentcourse)]['checkmark'] .= $str;
         }
     }
 }
