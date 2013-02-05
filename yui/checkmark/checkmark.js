@@ -194,10 +194,10 @@ M.mod_checkmark = {
         //Y.on('keydown', this.stripper, "#id_examplegrades");
         //Y.on('keypress', this.stripper, "#id_examplegrades");
         Y.on('keyup', this.stripper, examplegrades_selector);
-        //if (M.mod_checkmark.Y.one("#id_flexiblenaming").get('checked')) {
-            //if next line is executed manual grade settings get overwritten @ formular-load
+
+        if(M.checkmark_local.Y.one("input[name=allready_submit]").get('Value') == 'no') {
             this.update_settings();
-        //}
+        }
     },
 
     /*

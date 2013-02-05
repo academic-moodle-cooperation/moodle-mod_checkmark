@@ -1161,9 +1161,12 @@ class checkmark {
      * See lib/formslib.php, 'validation' function for details
      */
     public function form_validation($data, $files) {
-        global $CFG;
+        global $CFG, $DB;
         $errors = array();
-        if (!isset($data['flexiblenaming'])) {
+        if($data['allready_submit'] == 'yes') {
+            $data['flexiblenaming'] = $DB->get_field('checkmark', 'flexiblenaming',
+                                                     array('id'=>$data['instance']), MUST_EXIST);
+        } else  if (!isset($data['flexiblenaming'])) {
             $data['flexiblenaming'] = 0;
         }
         if ($data['flexiblenaming'] == 1) {

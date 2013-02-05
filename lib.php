@@ -88,8 +88,10 @@ function checkmark_update_instance($checkmark) {
 
         $checkmark->timemodified = time();
 
-        if (!isset($checkmark->flexiblenaming)) {
+        if (($checkmark->allready_submit != 'yes') && !isset($checkmark->flexiblenaming)) {
             $checkmark->flexiblenaming = 0;
+        } else {
+            unset($checkmark->flexiblenaming);
         }
 
         $checkmark->id = $checkmark->instance;
