@@ -164,13 +164,13 @@ $string['early'] = '{$a} early';
 $string['editmysubmission'] = 'Edit my submission';
 $string['addsubmission'] = 'Add submission';
 $string['emailstudents'] = 'Email alerts to students';
-$string['emailteachermail'] = '{$a->username} has updated their checkmark submission
+$string['emailteachermail'] = '{$a->username} has updated the checkmark submission
 for \'{$a->checkmark}\' at {$a->timeupdated}.
 
 It is available here:
 
     {$a->url}';
-$string['emailteachermailhtml'] = '{$a->username} has updated their checkmark submission
+$string['emailteachermailhtml'] = '{$a->username} has updated the checkmark submission
 for <i>\'{$a->checkmark}\'  at {$a->timeupdated}</i><br /><br />
 It is <a href="{$a->url}">available on the web site</a>.';
 $string['emailteachers'] = 'Email alerts to teachers';
