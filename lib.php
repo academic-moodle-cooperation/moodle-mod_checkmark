@@ -1486,7 +1486,14 @@ function checkmark_print_overview($courses, &$htmlarray) {
             if (isset($mysubmissions[$checkmark->id])) {
 
                 $submission = $mysubmissions[$checkmark->id];
-
+                //check if grade in gradebook is more actual:
+                $grading_info = grade_get_grades($checkmark->course, 'mod', 'checkmark',
+                                                 $checkmark->id, $USER->id);
+                $item = $grading_info->items[0];
+                $grade = $item->grades[$USER->id];
+                if($grading_info->items[0]->grades[$USER->id]->overridden) {
+                    $submission->grade = round($grade->grade, 2);
+                }
                 if ($submission->teacher_id == 0 && $submission->timemarked == 0) {
                     $str .= checkmark_getsummarystring($submission, $checkmark);
                 } else if ($submission->grade <= 0) {
