@@ -205,6 +205,7 @@ $string['newsubmissions'] = 'Checkmarks submitted';
 $string['nocheckmarks'] = 'There are no checkmarks yet';
 $string['noattempts'] = 'No attempts have been made on this checkmark';
 $string['nomoresubmissions'] = 'No further submissions are allowed.';
+$string['nonnegativeintrequired'] = 'Needs to be greater or equal zero (>= 0) and integral';
 $string['notavailableyet'] = 'Sorry, this checkmark is not yet available.<br />Checkmark instructions will be displayed here on the date given below.';
 $string['notgradedyet'] = 'Not graded yet';
 $string['norequiregrading'] = 'There are no checkmarks that require grading';

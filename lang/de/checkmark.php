@@ -207,6 +207,7 @@ $string['newsubmissions'] = 'Kreuzerlübungen wurden eingereicht';
 $string['nocheckmarks'] = 'Es ist derzeit keine Kreuzerlübung vorhanden';
 $string['noattempts'] = 'Es wurde noch kein Versuch bei dieser Kreuzerlübung getätigt';
 $string['nomoresubmissions'] = 'Es sind keine weiteren Abgaben erlaubt.';
+$string['nonnegativeintrequired'] = 'Muss größer oder gleich null (>= 0) und ganzzahlig sein.';
 $string['notavailableyet'] = 'Diese Kreuzerlübung ist leider noch nicht verfügbar.<br />Die Kreuzerlübungsanweisungen werden hier ab dem unten gegebenen Datum gezeigt.';
 $string['notgradedyet'] = 'Noch nicht bewertet';
 $string['norequiregrading'] = 'Es sind keine Kreuzerlübungen vorhanden, die eine Benotung erfordern';

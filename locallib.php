@@ -932,6 +932,7 @@ class checkmark {
         }
 
         $mform->addElement('text', 'examplestart', get_string('firstexamplenumber', 'checkmark'));
+        $mform->setType('examplestart', PARAM_INT);
         $mform->addHelpButton('examplestart', 'firstexamplenumber', 'checkmark');
         $mform->disabledIf('examplestart', 'flexiblenaming', 'checked');
         $mform->disabledIf('examplestart', 'allready_submit', 'eq', 'yes');
@@ -1202,6 +1203,9 @@ class checkmark {
         } else {
             if($data['examplecount'] <= 0) {
                 $errors['examplecount'] = get_string('posintrequired', 'checkmark');
+            }
+            if($data['examplestart'] < 0) {
+                $errors['examplestart'] = get_string('nonnegativeintrequired', 'checkmark');
             }
             //grade has to be examplecount multiplied with an integer
             if (($data['examplecount'] != 0) && ($data['grade']%$data['examplecount'])) {
