@@ -63,7 +63,7 @@
  */
 
 $capabilities = array(
-        'mod/grouptool:addinstance' => array(
+        'mod/checkmark:addinstance' => array(
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_COURSE,
                 'legacy' => array(
