@@ -217,6 +217,7 @@ $string['page-mod-checkmark-view'] = 'Checkmark module main page';
 $string['page-mod-checkmark-submissions'] = 'Checkmark module submission page';
 $string['pagesize'] = 'Submissions shown per page';
 $string['popupinnewwindow'] = 'Open in a popup window';
+$string['posintrequired'] = 'Needs to be greater than zero (> 0) and integral';
 $string['pluginadministration'] = 'Checkmark administration';
 $string['pluginname'] = 'Checkmark';
 $string['preventlate'] = 'Prevent late submissions';

@@ -919,6 +919,7 @@ class checkmark {
         }
         $mform->addElement('text', 'examplecount', get_string('numberofexamples', 'checkmark'),
                            array("id"=>"id_examplecount"));
+        $mform->setType('examplecount', PARAM_INT);
         $mform->addHelpButton('examplecount', 'numberofexamples', 'checkmark');
         $mform->disabledIf('examplecount', 'flexiblenaming', 'checked');
         $mform->disabledIf('examplecount', 'allready_submit', 'eq', 'yes');
@@ -1199,9 +1200,16 @@ class checkmark {
                 $errors['examplegrades'] .= get_string('gradesum_mismatch', 'checkmark', $a);
             }
         } else {
+            if($data['examplecount'] <= 0) {
+                $errors['examplecount'] = get_string('posintrequired', 'checkmark');
+            }
             //grade has to be examplecount multiplied with an integer
-            if ($data['grade']%$data['examplecount']) {
-                $errors['examplecount'] = get_string('grade_mismatch', 'checkmark');
+            if (($data['examplecount'] != 0) && ($data['grade']%$data['examplecount'])) {
+                if(!isset($errors['examplecount'])) {
+                    $errors['examplecount'] = get_string('grade_mismatch', 'checkmark');
+                } else {
+                    $errors['examplecount'] .= get_string('grade_mismatch', 'checkmark');
+                }
                 $errors['grade'] = get_string('grade_mismatch', 'checkmark');
             }
         }
