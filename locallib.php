@@ -879,7 +879,7 @@ class checkmark {
         $jsmodule = array(
                     'name'     =>   'mod_checkmark',
                     'fullpath' =>   '/mod/checkmark/yui/checkmark/checkmark.js',
-                    'requires' =>   array('base', 'io', 'node', 'json'),
+                    'requires' =>   array('base', 'io', 'node', 'json', 'event-valuechange'),
                     'strings'  =>   array(
         array('yes', 'moodle'),
         array('no', 'moodle')

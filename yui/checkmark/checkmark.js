@@ -179,23 +179,29 @@ M.mod_checkmark = {
         var grade_selector = '#grade';
         var flexiblenaming_selector = "#flexiblenaming";
         var examplegrades_selector = "#examplegrades";
+        var examplenames_selector = "#examplenames";
         var examplecount_selector = "#examplecount";
         if (Y.one(grade_selector) == null) {
             //compatibility to pre 2.2
             grade_selector = '#id_grade';
             flexiblenaming_selector = "#id_flexiblenaming";
             examplegrades_selector = "#id_examplegrades";
+            examplenames_selector = "#id_examplenames";
             examplecount_selector = "#id_examplecount";
         }
         Y.on('change', this.update_settings, flexiblenaming_selector);
-        Y.on('change', this.update_settings, examplegrades_selector);
-        Y.on('change', this.update_settings, examplecount_selector);
+        Y.on('valuechange', this.update_settings, examplegrades_selector);
+        Y.on('valuechange', this.update_settings, examplenames_selector);
+        Y.on('valuechange', this.update_settings, examplecount_selector);
+        Y.on('blur', this.update_settings, examplegrades_selector);
+        Y.on('blur', this.update_settings, examplenames_selector);
+        Y.on('blur', this.update_settings, examplecount_selector);
         //Y.on('change', this.update_settings, grade_selector);
         //Y.on('keydown', this.stripper, "#id_examplegrades");
         //Y.on('keypress', this.stripper, "#id_examplegrades");
         Y.on('keyup', this.stripper, examplegrades_selector);
 
-        if(M.checkmark_local.Y.one("input[name=allready_submit]").get('Value') == 'no') {
+        if(M.mod_checkmark.Y.one("input[name=allready_submit]").get('Value') == 'no') {
             this.update_settings();
         }
     },
@@ -213,18 +219,21 @@ M.mod_checkmark = {
         //first we strip everything we don't need :)
         M.mod_checkmark.stripper(null);
 
-        //if non-numeric scales are used or checkmark isn't graded at all, ignore changes
         var grade_selector = '#grade';
         var flexiblenaming_selector = '#flexiblenaming';
         var examplegrades_selector = '#examplegrades';
+        var examplenames_selector = '#examplenames';
         var examplecount_selector = '#examplecount';
         if (M.mod_checkmark.Y.one(grade_selector) == null) {
             //compatibility to pre 2.2
             grade_selector = '#id_grade';
             flexiblenaming_selector = '#id_flexiblenaming';
             examplegrades_selector = '#id_examplegrades';
+            examplenames_selector = '#id_examplenames';
             examplecount_selector = '#id_examplecount';
         }
+
+        //if non-numeric scales are used or checkmark isn't graded at all, ignore changes
         if ((M.mod_checkmark.Y.one(grade_selector).get('value')==0) || (M.mod_checkmark.Y.one(grade_selector).get('value') == -1)) {
             return true;
         }
@@ -234,6 +243,7 @@ M.mod_checkmark = {
             Y.one(examplegrades_selector).set('value', Y.one(examplegrades_selector).get('value').replace(/,{2,}/g, ","));
             //strip trailling and following commata
             Y.one(examplegrades_selector).set('value', Y.one(examplegrades_selector).get('value').replace(/^,*|,*$/g, ""));
+            Y.one(examplenames_selector).set('value', Y.one(examplenames_selector).get('value').replace(/^,*|,*$/g, ""));
             //get string and strip every character except "," (comma) and numerics
             var temp_string = M.mod_checkmark.Y.one(examplegrades_selector).get('value').replace(/[^0-9,]/, "");
             var temp_array = temp_string.split(M.mod_checkmark.dividing_symbol);

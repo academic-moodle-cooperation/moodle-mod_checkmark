@@ -93,7 +93,15 @@ function checkmark_update_instance($checkmark) {
         } else {
             unset($checkmark->flexiblenaming);
         }
-
+        
+        //clean examplenames and examplegrades
+        $checkmark->examplenames = preg_replace('#^,*|,*$#', '',
+                                                $checkmark->examplenames, -1);
+        $checkmark->examplenames = preg_replace('#,{2,}#', ',', $checkmark->examplenames, -1);
+        $checkmark->examplegrades = preg_replace('#^,*|,*$#', '',
+                                                 $checkmark->examplegrades, -1);
+        $checkmark->examplegrades = preg_replace('#,{2,}#', ',', $checkmark->examplegrades, -1);
+                                                 
         $checkmark->id = $checkmark->instance;
 
         $DB->update_record('checkmark', $checkmark);
