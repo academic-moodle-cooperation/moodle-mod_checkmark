@@ -64,6 +64,7 @@ $string['datasettingstitle'] = 'Dateneinstellungen';
 $string['data_settings'] = 'Druckeinstellungen';
 $string['data_preview_help'] = 'Klicken Sie in der Vorschau auf [+] und [-] um die zu druckenden Spalten ein bzw. auszuschalten!';
 $string['data_preview'] = 'Datenvorschau';
+$string['duedatevalidation'] = 'Der Abgabetermin muss nach dem Verfügbarkeitsbeginn liegen.';
 $string['element_disabled'] = 'Folgendes Element ist gesperrt, da bereits Abgaben getätigt wurden.';
 $string['elements_disabled'] = 'Folgende Elemente sind gesperrt, da bereits Abgaben getätigt wurden.';
 $string['examplegrades'] = 'Beispielgewichtungen';

@@ -63,6 +63,7 @@ $string['datasettingstitle'] = 'Data settings';
 $string['data_settings'] = 'Print settings';
 $string['data_preview_help'] = 'Click on [+] or [-] for showing or hiding columns in the print-preview.';
 $string['data_preview'] = 'Data preview';
+$string['duedatevalidation'] = 'Due date must be after the available from date.';
 $string['element_disabled'] = 'The following element is disabled because of existing submissions.';
 $string['elements_disabled'] = 'The following elements are disabled because of existing submissions.';
 $string['examplegrades'] = 'Individual grades';

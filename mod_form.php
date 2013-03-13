@@ -120,6 +120,12 @@ class mod_checkmark_mod_form extends moodleform_mod {
     public function validation($data, $files) {
         // Allow plugin checkmarks to do any extra validation after the form has been submitted
         $errors = parent::validation($data, $files);
+        
+        if ($data['timeavailable'] && $data['timedue']) {
+            if ($data['timeavailable'] > $data['timedue']) {
+                $errors['timedue'] = get_string('duedatevalidation', 'checkmark');
+            }
+        }
         $errors = array_merge($errors, $this->get_checkmark_instance()->form_validation($data,
                                                                                         $files));
         return $errors;
