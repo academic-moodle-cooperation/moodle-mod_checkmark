@@ -54,6 +54,7 @@ $string['autograde_failed'] = 'Automatische Bewertung fehlgeschlagen!';
 $string['autograde_success'] = 'Automatische Bewertung erfolgreich! {$a} Abgabenbewertungen wurden aktualisiert.';
 $string['autograde_confirm'] = 'Sie sind dabei {$a} automatisch zu bewerten. Die bisherigen Bewertungen werden überschrieben! Sind Sie SICHER, dass Sie fortfahren wollen?';
 $string['autograde_notsupported'] = 'Diese Notenskala wird von der automatischen Bewertung nicht unterstützt.';
+$string['autograde_no_users_selected'] = 'Sie haben keine Benutzer zur Bewertung ausgewählt! Selektieren Sie die gewünschten Benutzer per linksseitig vohandener Checkboxen.';
 $string['checkmark_overviewsummary'] = 'Sie haben {$a->checked_examples} / {$a->max_checked_examples} Beispiele ({$a->checked_grades} / {$a->max_checked_grades} Punkte) gekreuzt<br />{$a->grade}<br />';
 $string['checkmark_summary'] = 'Sie haben <span id="examples">{$a->checked}</span> von {$a->total} Beispielen gekreuzt.<br />(<span id="grade">{$a->checkedgrade}</span> von maximal {$a->maxgrade} Punkten)';
 $string['checkmarkstatstitle'] = 'Kursübersicht Kreuzerlübungen';

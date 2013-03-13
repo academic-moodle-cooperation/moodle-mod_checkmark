@@ -2301,8 +2301,13 @@ class checkmark {
                         array_push($selected, $usrid);
                     }
                 }
+                if(!isset($SESSION->checkmark)) {
+                    $SESSION->checkmark = new stdClass();
+                }
+                $SESSION->checkmark->autograde->selected = new stdClass();
                 $SESSION->checkmark->autograde->selected = $selected;
             }
+
             switch ($autograde) {
                 case self::FILTER_SELECTED:
                     if (count($selected) == 1) {
@@ -2320,15 +2325,30 @@ class checkmark {
                     $amount = get_string('autograde_strall', 'checkmark');
                     break;
             }
+            
+            if(isset($selected) && (count($selected) == 0)) {
+                if (!isset($message)) {
+                    $message = '';
+                } else {
+                    $message .= html_writer::empty_tag('br');
+                }
+                //we've got to overwrite the checkboxstate otherwise it would toggle now
+                unset($_POST['checkbox_controller1']);
+                
+                $message .= $OUTPUT->notification(get_string('autograde_no_users_selected',
+                                                             'checkmark'),
+                                                 'notifyproblem');
+            } else {
+                echo $OUTPUT->header();
+                $confirmboxcontent = $OUTPUT->confirm(get_string('autograde_confirm', 'checkmark',
+                                                                 $amount),
+                                                      "submissions.php?id=$id&autograde=".
+                                                      "$autograde&confirm=1", "submissions.php?id=$id");
+                echo $OUTPUT->box($confirmboxcontent, 'generalbox');
+                echo $OUTPUT->footer();
+                exit;
+            }
 
-            echo $OUTPUT->header();
-            $confirmboxcontent = $OUTPUT->confirm(get_string('autograde_confirm', 'checkmark',
-                                                             $amount),
-                                                  "submissions.php?id=$id&autograde=".
-                                                  "$autograde&confirm=1", "submissions.php?id=$id");
-            echo $OUTPUT->box($confirmboxcontent, 'generalbox');
-            echo $OUTPUT->footer();
-            exit;
         } else if ( $autograde != null) {
 
             if (has_capability('mod/checkmark:grade', context_module::instance($this->cm->id))) {
