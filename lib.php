@@ -1209,6 +1209,7 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
     $max_checked_grades = 0;
 
     if ($submission) {
+		require_once $CFG->dirroot.'/mod/checkmark/locallib.php';
         $examplestates = explode(checkmark::DELIMITER, $submission->checked);
 
         if ($checkmark->flexiblenaming) {
@@ -1254,6 +1255,7 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
         }
     } else {
         if ($checkmark->flexiblenaming) {
+			require_once $CFG->dirroot.'/mod/checkmark/locallib.php';
             $examplegrades = explode(checkmark::DELIMITER, $checkmark->examplegrades);
             $max_checked_examples = count($examplegrades);
             $max_checked_grades = 0;
