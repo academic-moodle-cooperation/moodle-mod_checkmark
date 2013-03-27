@@ -1591,7 +1591,7 @@ class checkmark {
                 $columnlink = html_writer::link($CFG->wwwroot.'/mod/checkmark/submissions.php?id='.
                                                 $this->cm->id.'&tsort='.$columnname, $columnstring,
                                                 array('title' => get_string('sortby').' '.
-                                                                 $columnstring));
+                                                                 strip_tags($columnstring)));
             }
             //print order pictogramm
             if (isset($SESSION->checkmark->orderby)
@@ -1615,7 +1615,7 @@ class checkmark {
                                                  $this->cm->id.'&tsort=firstname',
                                                  get_string('firstname'),
                                                  array('title' => get_string('sortby').' '.
-                                                                  get_string('firstname')));
+                                                                  strip_tags(get_string('firstname'))));
             }
             if (isset($SESSION->checkmark->orderby)
                     && ($SESSION->checkmark->orderby == 'firstname')) {
@@ -1639,7 +1639,7 @@ class checkmark {
                                                  $this->cm->id.'&tsort=lastname',
                                                  get_string('lastname'),
                                                  array('title' => get_string('sortby').' '.
-                                                                  get_string('lastname')));
+                                                                  strip_tags(get_string('lastname'))));
             }
             if (isset($SESSION->checkmark->orderby)
                     && ($SESSION->checkmark->orderby == 'lastname')) {
@@ -1669,7 +1669,7 @@ class checkmark {
                                         $this->cm->id.'&tshow='.$columnname,
                                         html_writer::empty_tag('img', $imgattr,
                                                                array('title'=>get_string('show').
-                                                                              ' '.$columnstring)));
+                                                                              ' '.strip_tags($columnstring))));
         } else {
             if (!isset($SESSION->checkmark->columns[$columnname])) {
                 $SESSION->checkmark->columns[$columnname] = new stdClass();
@@ -1682,7 +1682,7 @@ class checkmark {
                                         $this->cm->id.'&thide='.$columnname,
                                         html_writer::empty_tag('img', $imgattr),
                                         array('title' => get_string('hide') . ' ' .
-                                                         $columnstring));
+                                                         strip_tags($columnstring)));
         }
         return $return;
     }
