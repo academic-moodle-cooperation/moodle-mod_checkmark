@@ -1,4 +1,4 @@
-// This file is part of Moodle - http://moodle.org/
+// This file is made for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,10 +16,9 @@
 /**
  * JavaScript-Functionality for checkmark based upon Assignment
  *
- * @package       mod
- * @subpackage    checkmark
- * @author        Philipp Hager
- * @copyright     2011 Philipp Hager
+ * @package       mod_checkmark
+ * @author        Philipp Hager (e0803285@gmail.com)
+ * @copyright     2011 TSC TU Vienna
  * @since         Moodle 2.1
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
