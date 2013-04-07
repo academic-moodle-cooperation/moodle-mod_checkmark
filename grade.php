@@ -27,7 +27,7 @@
 
 require_once("../../config.php");
 
-$id   = required_param('id', PARAM_INT);          // Course module ID
+$id   = required_param('id', PARAM_INT);          // Course module ID!
 
 $PAGE->set_url('/mod/checkmark/grade.php', array('id'=>$id));
 if (! $cm = get_coursemodule_from_id('checkmark', $id)) {

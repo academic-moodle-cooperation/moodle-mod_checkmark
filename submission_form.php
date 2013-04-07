@@ -91,7 +91,7 @@ class checkmark_submission_form extends moodleform {
             } while ($i<$checkmark->examplecount);
         }
 
-        // hidden params
+        // Here come the hidden params!
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
@@ -127,9 +127,9 @@ class checkmark_submission_form extends moodleform {
         $PAGE->requires->js_init_call('M.mod_checkmark.init_submission', $jsdata, false,
                                       $jsmodule);
 
-        // Set data from last submission and hidden fields
+        // Set data from last submission and hidden fields!
         $this->set_data($this->_customdata);
 
-    }                           // Close the function
+    }
 
 }

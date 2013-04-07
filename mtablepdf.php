@@ -28,49 +28,50 @@ require_once($CFG->libdir . '/pdflib.php');
  *
  */
 class MTablePDF extends pdf{
-    const portrait = 'P';
-    const landscape = 'L';
+    const PORTRAIT = 'P';
+    const LANDSCAPE = 'L';
 
-    const fontsize_small = 8;
-    const fontsize_medium = 10;
-    const fontsize_large = 12;
+    const FONTSIZE_SMALL = 8;
+    const FONTSIZE_MEDIUM = 10;
+    const FONTSIZE_LARGE = 12;
 
-    private $orientation = MTablePDF::portrait;
+    private $orientation = self::PORTRAIT;
     private $rowsperpage = 0;
-    private $fontsize = MTablePDF::fontsize_medium;
+    private $fontsize = self::FONTSIZE_MEDIUM;
     private $showheaderfooter = true;
 
     private $columnwidths = array();
-    private $titles = NULL;
+    private $titles = null;
     private $columnformat;
 
     private $data = array();
 
-    public function __construct($orientation,$columnwidths){
+    public function __construct($orientation, $columnwidths) {
         parent::__construct($orientation);
 
         // Set default configuration.
         $this->SetCreator('TUWEL');
         $this->SetMargins(10, 20, 10);
         $this->SetFont('helvetica', '');
-        
+
         $this->columnwidths = $columnwidths;
-        
+
         $this->columnformat = array();
-        for($i=0;$i<count($columnwidths);$i++){
+        for ($i=0; $i<count($columnwidths); $i++) {
             $this->columnformat[] = array();
-            $this->columnformat[$i][] = array("fill"=>0,"align"=>"L");
-            $this->columnformat[$i][] = array("fill"=>1,"align"=>"L");
+            $this->columnformat[$i][] = array("fill"=>0, "align"=>"L");
+            $this->columnformat[$i][] = array("fill"=>1, "align"=>"L");
         }
     }
 
-    public function setColumnFormat($columnformat){
-        if(count($columnformat) != count($this->columnwidths)){
-            echo "Error: Columnformat (" . count($columnformat) . ") count doesnt match column count (" . count($this->columnwidths) . ")";
-            exit();            
+    public function setColumnFormat($columnformat) {
+        if (count($columnformat) != count($this->columnwidths)) {
+            echo "Error: Columnformat (" . count($columnformat) . ")".
+                 " count doesn't match column count (" . count($this->columnwidths) . ")";
+            exit();
         }
-        
-        $this->columnformat = array_merge($this->columnformat,$columnformat);
+
+        $this->columnformat = array_merge($this->columnformat, $columnformat);
     }
 
     /**
@@ -88,10 +89,10 @@ class MTablePDF extends pdf{
      * @param unknown $title6
      * @param unknown $desc6
      */
-    public function setHeaderText($title1,$desc1,$title2,$desc2,$title3,$desc3,
-            $title4,$desc4,$title5,$desc5,$title6,$desc6){
-        $this->header = array($title1,$desc1,$title2,$desc2,$title3,$desc3,
-                $title4,$desc4,$title5,$desc5,$title6,$desc6);
+    public function setHeaderText ($title1, $desc1, $title2, $desc2, $title3, $desc3,
+                                   $title4, $desc4, $title5, $desc5, $title6, $desc6) {
+        $this->header = array($title1, $desc1, $title2, $desc2, $title3, $desc3,
+                              $title4, $desc4, $title5, $desc5, $title6, $desc6);
     }
 
     public function Header() {
@@ -100,7 +101,7 @@ class MTablePDF extends pdf{
         // Title.
 
         $header = $this->header;
-    
+
         if ($this->showheaderfooter) {
 
             $pagewidth = $this->getPageWidth();
@@ -116,41 +117,41 @@ class MTablePDF extends pdf{
             $this->SetFont('', '');
             $this->Cell(31 * $scale, $height, $header[1], $border, false, 'R', 0, '', 1, false/*, 'M', 'M'*/);
             $this->Cell(/*8*/15 * $scale, $height, "", $border, false, 'C', 0, '', 1, false/*, 'M', 'M'*/);
-    
+
             $this->SetFont('', 'B');
             $this->Cell(21 * $scale, $height, $header[2], $border, false, 'L', 0, '', 1, false/*, '1', '0'*/);
             $this->SetFont('', '');
-    
+
             $this->SetFont('', '');
             $this->Cell(41 * $scale, $height, $header[3], $border, false, 'R', 0, '', 1, false/*, '1', '0'*/);
             $this->Cell(/*8*/15 * $scale, $height, "", $border, false, 'C', 0, '', 1, false/*, '1', '0'*/);
-    
+
             $this->SetFont('', 'B');
             $this->Cell(15 * $scale, $height, $header[4], $border, false, 'L', 0, '', 1, false/*, '1', '0'*/);
             $this->SetFont('', '');
             $this->Cell(31 * $scale, $height, $header[5], $border, false, 'R', 0, '', 1, false/*, '1', '0'*/);
-    
+
             $this->Ln();
-    
+
             // Second row.
             $height = 4;
 
             $this->SetFont('', 'B');
             $this->Cell(/*8*/15 * $scale, $height, $header[6], $border, false, 'L', 0, '', 1, false);
-    
+
             $this->SetFont('', '');
             $this->Cell(31 * $scale, $height, $header[7], $border, false, 'R', 0, '', 1, false/*, '1', '0'*/);
             $this->Cell(/*8*/15 * $scale, $height, "", $border, false, 'C', 0, '', 1, false/*, '1', '0'*/);
-    
+
             $this->SetFont('', 'B');
             $this->Cell(21 * $scale, $height, $header[8], $border, false, 'L', 0, '', 1, false/*, '1', '0'*/);
             $this->SetFont('', '');
-    
+
             $this->SetFont('', '');
             $this->Cell(41 * $scale, $height, $header[9], $border, false, 'R', 0, '', 1, false/*, '1', '0'*/);
-    
+
             $this->Cell(/*8*/15 * $scale, $height, "", $border, false, 'C', 0, '', 1, false/*, '1', '0'*/);
-    
+
             $this->SetFont('', 'B');
             $this->Cell(15 * $scale, $height, $header[10], $border, false, 'L', 0, '', 1, false/*, '1', '0'*/);
             $this->SetFont('', '');
@@ -165,12 +166,12 @@ class MTablePDF extends pdf{
      * Sets the titles for the columns in the pdf
      * @param String $titles
      */
-    public function setTitles($titles){
-        if(count($titles) != count($this->columnwidths)){
+    public function setTitles($titles) {
+        if (count($titles) != count($this->columnwidths)) {
             echo "Error: Title count doesnt match column count";
             exit();
         }
-        
+
         $this->titles = $titles;
     }
 
@@ -179,25 +180,25 @@ class MTablePDF extends pdf{
      * @param Char $orientation
      * @return true if ok
      */
-    public function setOrientation($orientation){
-        if($orientation == 'P' || $orientation == 'L'){
+    public function setOrientation($orientation) {
+        if ($orientation == 'P' || $orientation == 'L') {
             $this->orientation = $orientation;
             return true;
         }
-        
+
         return false;
     }
     /**
-    * Defines how many rows are printed on each page
-    * @param int $i > 0
-    * @return true if ok
-    */
-    public function setRowsperPage($rowsperpage){
+     * Defines how many rows are printed on each page
+     * @param int $i > 0
+     * @return true if ok
+     */
+    public function setRowsperPage($rowsperpage) {
         if (is_number($rowsperpage) && $rowsperpage > 0) {
             $this->rowsperpage = $rowsperpage;
             return true;
         }
-        
+
         return false;
     }
 
@@ -206,101 +207,92 @@ class MTablePDF extends pdf{
      * @param array $row
      * @return boolean
      */
-    public function addRow($row){
-        if(count($row) != count($this->columnwidths)){
-            
+    public function addRow($row) {
+        if (count($row) != count($this->columnwidths)) {
             var_dump($row);
-            echo "Error: number of columns from row (" . count($row) . ") doenst match the number defined (" . count($this->columnwidths) . ")";
+            echo "Error: number of columns from row (" . count($row) . ")".
+                 " doesn't match the number defined (" . count($this->columnwidths) . ")";
             return false;
         }
-        
+
         $fastmode = false;
-        foreach($row as $r){
-            if(!is_null($r) && !is_array($r)){
+        foreach ($row as $r) {
+            if (!is_null($r) && !is_array($r)) {
                 $fastmode = true;
             }
         }
-        
-        if($fastmode){
-            //fast mode
+
+        if ($fastmode) {
+            // Fast mode!
             $tmp = array();
-            
-            foreach($row as $idx => $value){
-                if(is_array($value)){
+
+            foreach ($row as $idx => $value) {
+                if (is_array($value)) {
                     echo "Error: if you want to add a row using the fast mode, you cannot pass me an array";
                     exit();
                 }
-                
-                $tmp[] = array("rowspan"=>0,"data"=>$value);
+
+                $tmp[] = array("rowspan"=>0, "data"=>$value);
             }
-            
+
             $row = $tmp;
-        }else{
-            foreach($row as $idx => $value){
-                if(!is_array($value)){
-                    $row[$idx] = array("rowspan"=>0,"data"=>$value);
-                }else if(!isset($value["data"])){
+        } else {
+            foreach ($row as $idx => $value) {
+                if (!is_array($value)) {
+                    $row[$idx] = array("rowspan"=>0, "data"=>$value);
+                } else if (!isset($value["data"])) {
                     echo "Error: you need to set a value for [\"data\"]";
                     exit();
-                }else{
-                    if(!isset($value["rowspan"])){
+                } else {
+                    if (!isset($value["rowspan"])) {
                         $row[$idx]["rowspan"] = 0;
                     }
                 }
             }
         }
-        
-        $this->data[] = $row;
-        
-        return true;
-    }
 
-    /**
-     * Sets the font size
-     * @param unknown $fontsize
-     * @param string $out
-     */
-    public function SetFontSize($fontsize, $out=true) {
-        parent::SetFontSize($fontsize, $out);
+        $this->data[] = $row;
+
+        return true;
     }
 
     /**
      * Define if the header and footer should be printed
      * @param unknown $showheaderfooter
      */
-    public function ShowHeaderFooter($showheaderfooter){
+    public function ShowHeaderFooter($showheaderfooter) {
         $this->showheaderfooter = $showheaderfooter;
     }
 
     /**
      * Generate the pdf
      */
-    public function generate(){
+    public function generate() {
         $pdf = $this;
 
         // Add a page.
         $pdf->setDrawColor(0);
         $pdf->AddPage();
 
-        // calcuate column widths
+        // Calcuate column widths!
         $sum_fix = 0;
         $sum_relativ = 0;
-        
+
         $rowspans = array();
         $allfixed = true;
         $sum = 0;
 
-        foreach($this->columnwidths as $idx => $width){
+        foreach ($this->columnwidths as $idx => $width) {
             $rowspans[] = 0;
-            
+
             $sum += $width['value'];
-            
-            if($width["mode"]=="Fixed"){
+
+            if ($width["mode"]=="Fixed") {
                 $sum_fix += $width['value'];
-            }else if($width["mode"] == "Relativ"){
+            } else if ($width["mode"] == "Relativ") {
                 $sum_relativ += $width['value'];
                 $allfixed = false;
-            }else{
+            } else {
                 echo "ERROR: unvalid columnwidth format";
                 var_dump($width);
                 exit();
@@ -308,19 +300,19 @@ class MTablePDF extends pdf{
         }
 
         $w = array();
-        foreach($this->columnwidths as $idx => $width){
-            if($allfixed){
+        foreach ($this->columnwidths as $idx => $width) {
+            if ($allfixed) {
                 $w[$idx] = round(
                         ($pdf->getPageWidth()-20)/$sum*$width['value']);
-            }else if($width["mode"] == "Fixed"){
+            } else if ($width["mode"] == "Fixed") {
                 $w[$idx] = $width['value'];
-            }else{
+            } else {
                 $w[$idx] = round(
                         ($pdf->getPageWidth()-20-$sum_fix)/$sum_relativ*$width['value']);
             }
         }
 
-        { // print table header
+        if ($this->showheaderfooter) { // Print table header?
             if (isset($this->theadMargins['top'])) {
                 // Restore the original top-margin.
                 $this->tMargin = $this->theadMargins['top'];
@@ -336,7 +328,7 @@ class MTablePDF extends pdf{
                 $prev_rMargin = $this->rMargin;
                 $this->lMargin = $this->pagedim[$this->page]['olm'];
                 $this->rMargin = $this->pagedim[$this->page]['orm'];
-            
+
                 // Colors, line width and bold font.
                 $this->SetFillColor(0xc0, 0xc0, 0xc0);
                 $this->SetTextColor(0);
@@ -376,8 +368,8 @@ class MTablePDF extends pdf{
         $fill = 0;
 
         foreach ($this->data as $rownum => $row) {
-            
-            if($this->rowsperpage && $rownum != 0 && $rownum % $this->rowsperpage == 0){
+
+            if ($this->rowsperpage && $rownum != 0 && $rownum % $this->rowsperpage == 0) {
                 $pdf->addPage();
             }
 
@@ -394,28 +386,28 @@ class MTablePDF extends pdf{
 
                 $colspan = 0;
                 $width = 0;
-                for($i=$key;$i<=$key+$colspan;$i++){
+                for ($i=$key; $i<=$key+$colspan; $i++) {
                     $width+=$w[$i];
                     $row[$i]['rowspan'] = $row[$key]['rowspan']+1;
                 }
 
                 $colspan = 0;
                 $width = 0;
-                for($i=$key;$i<=$key+$colspan;$i++){
+                for ($i=$key; $i<=$key+$colspan; $i++) {
                     $width+=$w[$i];
                 }
-                
 
-                if(!is_null($value['data'])){
+                if (!is_null($value['data'])) {
                     $bottomborder = 'B';
-                    if($value['rowspan'] > 0){
+                    if ($value['rowspan'] > 0) {
                         $rowspans[$key] = $value['rowspan'];
                     }
 
-                    $pdf->Cell($width, ($value['rowspan']+1) * 6, $value['data'], 'LR'.$bottomborder, 0,$cf['align'], $cf['fill'], null, '1', 0);
-                }else{
-                    if($rowspans[$key] > 0){                        
-                        $pdf->Cell($width, ($value['rowspan']+1) * 6, "", 'LR'.$bottomborder, 0,$cf['align'], 0, null, '1', 0);
+                    $pdf->Cell($width, ($value['rowspan']+1) * 6, $value['data'],
+                               'LR'.$bottomborder, 0, $cf['align'], $cf['fill'], null, '1', 0);
+                } else {
+                    if ($rowspans[$key] > 0) {
+                        $pdf->Cell($width, ($value['rowspan']+1) * 6, "", 'LR'.$bottomborder, 0, $cf['align'], 0, null, '1', 0);
                         $rowspans[$key] = $rowspans[$key]-1;
                     }
                 }
@@ -438,8 +430,8 @@ $cellwidth[] = array("mode"=>'Relativ', "value"=>"25");
 $cellwidth[] = array("mode"=>'Relativ', "value"=>"75");
 
 
-$pdf = new MTablePDF(MTablePDF::portrait, $cellwidth);
-//orientation: MTablePDF::portrait or MTablePDF::landscape
+$pdf = new MTablePDF(MTablePDF::PORTRAIT, $cellwidth);
+// Orientation: MTablePDF::PORTRAIT or MTablePDF::LANDSCAPE !
 
 $columnformat = array();
 $columnformat[] = array();

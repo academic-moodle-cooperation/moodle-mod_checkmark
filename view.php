@@ -27,8 +27,8 @@ require_once("../../config.php");
 require_once($CFG->dirroot . "/mod/checkmark/locallib.php");
 require_once($CFG->libdir . '/completionlib.php');
 require_once($CFG->libdir . '/plagiarismlib.php');
-$id = optional_param('id', 0, PARAM_INT);  // Course Module ID
-$a  = optional_param('a', 0, PARAM_INT);   // checkmark ID
+$id = optional_param('id', 0, PARAM_INT);  // Course Module ID?
+$a  = optional_param('a', 0, PARAM_INT);   // Checkmark ID?
 
 $url = new moodle_url('/mod/checkmark/view.php');
 if ($id) {
@@ -65,7 +65,7 @@ $PAGE->requires->js('/mod/checkmark/yui/checkmark/checkmark.js');
 require_once($CFG->dirroot."/mod/checkmark/lib.php");
 $checkmarkinstance = new checkmark($cm->id, $checkmark, $cm, $course);
 
-/// Mark as viewed
+// Mark as viewed!
 $completion=new completion_info($course);
 $completion->set_module_viewed($cm);
 

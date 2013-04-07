@@ -27,7 +27,12 @@ defined('MOODLE_INTERNAL') || die;
 
 $messageproviders = array (
 
-/// Ordinary single forum posts
+/*
+ * Notifications for graded submissions (teacher -> user) and
+ * new submissions (user -> teacher)!
+ *
+ * @todo should we split implement these in two sepparate message providers?
+ */
     'checkmark_updates' => array (
 )
 

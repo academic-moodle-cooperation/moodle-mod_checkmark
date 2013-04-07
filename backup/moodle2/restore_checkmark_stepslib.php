@@ -46,7 +46,7 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
             $paths[] = $submission;
         }
 
-        // Return the paths wrapped into standard activity structure
+        // Return the paths wrapped into standard activity structure!
         return $this->prepare_activity_structure($paths);
     }
 
@@ -61,13 +61,13 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
         $data->timeavailable = $this->apply_date_offset($data->timeavailable);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
 
-        if ($data->grade < 0) { // scale found, get mapping
+        if ($data->grade < 0) { // Scale found, get mapping!
             $data->grade = -($this->get_mappingid('scale', abs($data->grade)));
         }
 
-        // insert the checkmark record
+        // Insert the checkmark record!
         $newitemid = $DB->insert_record('checkmark', $data);
-        // immediately after inserting "activity" record, call this
+        // Immediately after inserting "activity" record, call this!
         $this->apply_activity_instance($newitemid);
     }
 
@@ -86,11 +86,11 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
         $data->teacher_id = $this->get_mappingid('user', $data->teacher_id);
 
         $newitemid = $DB->insert_record('checkmark_submissions', $data);
-        $this->set_mapping('checkmark_submission', $oldid, $newitemid, true); // Going to have files
+        $this->set_mapping('checkmark_submission', $oldid, $newitemid, true); // Going to have files?
     }
 
     protected function after_execute() {
-        // Add checkmark related files, no need to match by itemname (jst intern handled context)
+        // Add checkmark related files, no need to match by itemname (jst intern handled context)!
         $this->add_related_files('mod_checkmark', 'intro', null);
     }
 }

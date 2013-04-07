@@ -24,7 +24,7 @@ defined('MOODLE_INTERNAL') || die;
  * @since         Moodle 2.1
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-///  It must be included from a Moodle page
+//  It must be included from a Moodle page!
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');
 }
@@ -88,12 +88,12 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->addHelpButton('grade', 'grade', 'checkmark');
     }
 
-    // Needed by plugin checkmark if it includes a filemanager element in the settings form
+    // Needed by plugin checkmark if it includes a filemanager element in the settings form!
     public function has_instance() {
         return ($this->_instance != null);
     }
 
-    // Needed by plugin checkmarks if it includes a filemanager element in the settings form
+    // Needed by plugin checkmarks if it includes a filemanager element in the settings form!
     public function get_context() {
         return $this->context;
     }
@@ -111,15 +111,16 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
 
     public function data_preprocessing(&$default_values) {
-        // Allow plugin checkmarks to preprocess form data
-        // (needed if it include any filemanager elements)
+        /* Allow plugin checkmarks to preprocess form data
+         * (needed if it include any filemanager elements)!
+         */
         $this->get_checkmark_instance()->form_data_preprocessing($default_values, $this);
     }
 
     public function validation($data, $files) {
-        // Allow plugin checkmarks to do any extra validation after the form has been submitted
+        // Allow plugin checkmarks to do any extra validation after the form has been submitted!
         $errors = parent::validation($data, $files);
-        
+
         if ($data['timeavailable'] && $data['timedue']) {
             if ($data['timeavailable'] > $data['timedue']) {
                 $errors['timedue'] = get_string('duedatevalidation', 'checkmark');

@@ -31,7 +31,7 @@ require_once($CFG->libdir.'/plagiarismlib.php');
 $id   = optional_param('id', 0, PARAM_INT);          // Course module ID
 $a    = optional_param('a', 0, PARAM_INT);           // checkmark ID
 $mode = optional_param('mode', 'all', PARAM_ALPHA);  // What mode are we in?
-$download = optional_param('download' , 'none', PARAM_ALPHA); //ZIP download asked for?
+$download = optional_param('download' , 'none', PARAM_ALPHA); // ZIP download asked for?
 
 $url = new moodle_url('/mod/checkmark/submissions.php');
 if ($id) {
@@ -67,7 +67,7 @@ require_capability('mod/checkmark:grade', get_context_instance(CONTEXT_MODULE, $
 
 $PAGE->requires->js('/mod/checkmark/yui/checkmark/checkmark.js');
 
-/// Load up the required checkmark code
+// Load up the required checkmark code!
 $checkmarkinstance = new checkmark($cm->id, $checkmark, $cm, $course);
 
 if ($mode !== 'all') {
@@ -89,8 +89,8 @@ if (isset($_POST['autograde_all_submit'])) {
 if ($download == "zip") {
     $checkmarkinstance->download_submissions();
 } else if (isset($_POST['submittoprint'])) {
-    $PAGE->set_pagelayout('popup'); //remove navbars, etc
+    $PAGE->set_pagelayout('popup'); // Remove navbars, etc!
     $checkmarkinstance->submissions_print();
 } else {
-    $checkmarkinstance->submissions($mode);   // Display or process the submissions
+    $checkmarkinstance->submissions($mode);   // Display or process the submissions!
 }

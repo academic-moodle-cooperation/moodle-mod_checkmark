@@ -26,26 +26,26 @@
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.'); //  It must be included from a Moodle page
+    die('Direct access to this script is forbidden.'); // It must be included from a Moodle page!
 }
 
 // Make sure the code being tested is accessible.
-require_once($CFG->dirroot . '/mod/checkmark/lib.php'); // Include the code to test
+require_once($CFG->dirroot . '/mod/checkmark/lib.php'); // Include the code to test!
 
 /** This class contains the test cases for the formular validation. */
 class checkmark_formvalidation_test extends UnitTestCase {
     public function test_countmismatch() {
-        // Setup fixture
+        // Setup fixture!
         $checkmark = new checkmark();
         $data['examplegrades'] = "1,2,3";
         $data['examplenames'] = "1,2";
         $data['grade'] = "6";
         $data['flexiblenaming'] = 1;
 
-        // Exercise SUT
+        // Exercise SUT!
         $errors = $checkmark->form_validation($data, null);
 
-        // Validate outcome
+        // Validate outcome!
         $a->namecount = 2;
         $a->gradecount = 3;
         $this->assertEqual($errors['examplenames'], get_string('count_individuals_mismatch',
@@ -53,46 +53,46 @@ class checkmark_formvalidation_test extends UnitTestCase {
         $this->assertEqual($errors['examplegrades'], get_string('count_individuals_mismatch',
                                                                 'checkmark', $a));
 
-        // Teardown fixture
+        // Teardown fixture!
         $data = null;
         $checkmark = null;
     }
 
     public function test_summismatch() {
-        // Setup fixture
+        // Setup fixture!
         $checkmark = new checkmark();
         $data['examplegrades'] = "1,2,3";
         $data['examplenames'] = "1,2,3";
         $data['grade'] = "5";
         $data['flexiblenaming'] = 1;
 
-        // Exercise SUT
+        // Exercise SUT!
         $errors = $checkmark->form_validation($data, null);
 
-        // Validate outcome
+        // Validate outcome!
         $a->gradesum = 6;
         $a->maxgrade = $data['grade'];
         $this->assertEqual($errors['grade'], get_string('gradesum_mismatch', 'checkmark', $a));
         $this->assertEqual($errors['examplegrades'], get_string('gradesum_mismatch', 'checkmark',
                                                                 $a));
 
-        // Teardown fixture
+        // Teardown fixture!
         $data = null;
         $checkmark = null;
     }
 
     public function test_both_errors() {
-        // Setup fixture
+        // Setup fixture!
         $checkmark = new checkmark();
         $data['examplegrades'] = "1,2,3";
         $data['examplenames'] = "1,2";
         $data['grade'] = "5";
         $data['flexiblenaming'] = 1;
 
-        // Exercise SUT
+        // Exercise SUT!
         $errors = $checkmark->form_validation($data, null);
 
-        // Validate outcome
+        // Validate outcome!
         $a->gradesum = 6;
         $a->maxgrade = $data['grade'];
         $a->gradecount = 3;
@@ -106,49 +106,49 @@ class checkmark_formvalidation_test extends UnitTestCase {
                                                      get_string('gradesum_mismatch', 'checkmark',
                                                                 $a));
 
-        // Teardown fixture
+        // Teardown fixture!
         $data = null;
         $checkmark = null;
     }
 
     public function test_noflexiblenaming() {
-        // Setup fixture
+        // Setup fixture!
         $checkmark = new checkmark();
         $data['examplegrades'] = "1,2,3";
         $data['examplenames'] = "1,2";
         $data['grade'] = "5";
         $data['flexiblenaming'] = 0;
 
-        // Exercise SUT
+        // Exercise SUT!
         $errors = $checkmark->form_validation($data, null);
 
-        // Validate outcome
+        // Validate outcome!
         $this->assertEqual(isset($errors['grade']), false);
         $this->assertEqual(isset($errors['examplenames']), false);
         $this->assertEqual(isset($errors['examplegrades']), false);
 
-        // Teardown fixture
+        // Teardown fixture!
         $data = null;
         $checkmark = null;
     }
 
     public function test_noerror() {
-        // Setup fixture
+        // Setup fixture!
         $checkmark = new checkmark();
         $data['examplegrades'] = "1,2,3";
         $data['examplenames'] = "1,2,3";
         $data['grade'] = "6";
         $data['flexiblenaming'] = 1;
 
-        // Exercise SUT
+        // Exercise SUT!
         $errors = $checkmark->form_validation($data, null);
 
-        // Validate outcome
+        // Validate outcome!
         $this->assertEqual(isset($errors['grade']), false);
         $this->assertEqual(isset($errors['examplenames']), false);
         $this->assertEqual(isset($errors['examplegrades']), false);
 
-        // Teardown fixture
+        // Teardown fixture!
         $data = null;
         $checkmark = null;
     }

@@ -27,7 +27,7 @@ require_once("../../config.php");
 require_once($CFG->dirroot . "/mod/checkmark/locallib.php");
 require_once($CFG->libdir.'/gradelib.php');
 
-$id = required_param('id', PARAM_INT);   // course
+$id = required_param('id', PARAM_INT);   // We need a course!
 
 if (!$course = $DB->get_record('course', array('id'=>$id))) {
     print_error('invalidcourseid');
@@ -84,7 +84,7 @@ foreach ($modinfo->instances['checkmark'] as $cm) {
     $cm->timedue        = $cms[$cm->id]->timedue;
     $cm->idnumber       = $cms[$cm->id]->idnumber;
 
-    //Show dimmed if the mod is hidden
+    // Show dimmed if the mod is hidden!
     $class = $cm->visible ? '' : 'dimmed';
 
     $link = html_writer::tag('a', format_string($cm->name),

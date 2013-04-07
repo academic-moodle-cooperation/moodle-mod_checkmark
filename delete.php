@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,8 +26,8 @@
 require_once('../../config.php');
 require_once('lib.php');
 
-$id = optional_param('id', 0, PARAM_INT);  // Course module ID
-$a  = optional_param('a', 0, PARAM_INT);   // checkmark ID
+$id = optional_param('id', 0, PARAM_INT);  // Course module ID?
+$a  = optional_param('a', 0, PARAM_INT);   // Checkmark ID?
 
 $url = new moodle_url('/mod/checkmark/delete.php');
 if ($id) {
@@ -59,6 +59,6 @@ if ($id) {
 $PAGE->set_url($url);
 require_login($course->id, false, $cm);
 
-/// Load up the required checkmark code
+// Load up the required checkmark code!
 require($CFG->dirroot.'/mod/checkmark/lib.php');
 checkmark_delete_instance($checkmark->id);

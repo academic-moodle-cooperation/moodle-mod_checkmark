@@ -22,46 +22,47 @@ defined('MOODLE_INTERNAL') || die;
  * @since         Moodle 2.1
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-//
-// Capability definitions for the checkmark module.
-//
-// The capabilities are loaded into the database table when the module is
-// installed or updated. Whenever the capability definitions are updated,
-// the module version number should be bumped up.
-//
-// The system has four possible values for a capability:
-// CAP_ALLOW, CAP_PREVENT, CAP_PROHIBIT, and inherit (not set).
-//
-//
-// CAPABILITY NAMING CONVENTION
-//
-// It is important that capability names are unique. The naming convention
-// for capabilities that are specific to modules and blocks is as follows:
-//   [mod/block]/<plugin_name>:<capabilityname>
-//
-// component_name should be the same as the directory name of the mod or block.
-//
-// Core moodle capabilities are defined thus:
-//    moodle/<capabilityclass>:<capabilityname>
-//
-// Examples: mod/forum:viewpost
-//           block/recent_activity:view
-//           moodle/site:deleteuser
-//
-// The variable name for the capability definitions array is $capabilities
 
 /*
- * frontpage -     Alle Nutzer/innen, die auf der Startseite eingeloggt sind
- * user - Alle eingeloggten Nutzer/innen
- * guest -     Gäste haben minimale Rechte und dürfen normalerweise keine Texte eingeben.
- * student - Teilnehmer/innen haben in einem Kurs grundsätzlich weniger Rechte.
- * teacher - Trainer/innen ohne Bearbeitungsrecht dürfen in Kursen unterrichten und
- *           Teilnehmer/innen bewerten, aber sie können nichts verändern
- * editingteacher - Trainer/innen dürfen in einem Kurs alles tun, auch Aktivitäten bearbeiten und
- *                  Teilnehmer/innen beurteilen
- * coursecreator - Kursersteller/innen dürfen neue Kurse anlegen
- * manager - Manager/innen können alle Kurse betreten und bearbeiten, ohne in die Kurse
- *           eingeschrieben zu sein.
+ * Capability definitions for the checkmark module.
+ *
+ * The capabilities are loaded into the database table when the module is
+ * installed or updated. Whenever the capability definitions are updated,
+ * the module version number should be bumped up.
+ *
+ * The system has four possible values for a capability:
+ * CAP_ALLOW, CAP_PREVENT, CAP_PROHIBIT, and inherit (not set).
+ *
+ *
+ * CAPABILITY NAMING CONVENTION
+ *
+ * It is important that capability names are unique. The naming convention
+ * for capabilities that are specific to modules and blocks is as follows:
+ *   [mod/block]/<plugin_name>:<capabilityname>
+ *
+ * component_name should be the same as the directory name of the mod or block.
+ *
+ * Core moodle capabilities are defined thus:
+ *    moodle/<capabilityclass>:<capabilityname>
+ *
+ * Examples: mod/forum:viewpost
+ *           block/recent_activity:view
+ *           moodle/site:deleteuser
+ *
+ * The variable name for the capability definitions array is $capabilities
+ *
+ *
+ * frontpage        Alle Nutzer/innen, die auf der Startseite eingeloggt sind
+ * user             Alle eingeloggten Nutzer/innen
+ * guest            Gäste haben minimale Rechte und dürfen normalerweise keine Texte eingeben.
+ * student          Teilnehmer/innen haben in einem Kurs grundsätzlich weniger Rechte.
+ * teacher          Trainer/innen ohne Bearbeitungsrecht dürfen in Kursen unterrichten und
+ *                      Teilnehmer/innen bewerten, aber sie können nichts verändern
+ * editingteacher   Trainer/innen dürfen in einem Kurs alles tun, auch Aktivitäten bearbeiten und
+ *                      Teilnehmer/innen beurteilen
+ * coursecreator    Kursersteller/innen dürfen neue Kurse anlegen
+ * manager          Manager/innen können alle Kurse betreten und bearbeiten, ohne in die Kurse
+ *                      eingeschrieben zu sein.
  */
 
 $capabilities = array(
@@ -79,7 +80,6 @@ $capabilities = array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
-//            'guest' => CAP_ALLOW,
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
@@ -92,7 +92,6 @@ $capabilities = array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
-//            'guest' => CAP_ALLOW,
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
