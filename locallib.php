@@ -3117,7 +3117,7 @@ class checkmark {
         if ($updatepref && confirm_sesskey()) {
             $printperpage = optional_param('printperpage', 0, PARAM_INT);
             $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
-            $printperpage = (($printperpage <= 0) && !$printoptimum) ? 0 : $printperpage;
+            $printperpage = (($printperpage <= 0) || !$printoptimum) ? 0 : $printperpage;
             set_user_preference('checkmark_pdfprintperpage', $printperpage);
 
             $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
