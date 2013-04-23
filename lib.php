@@ -406,35 +406,15 @@ function checkmark_update_grades($checkmark, $userid=0, $nullifnone=true) {
     global $CFG, $DB;
     require_once($CFG->libdir.'/gradelib.php');
     
-    //tscpr:
-        //this whole thing can be a bit simplified - checkmark_grade_item_update is used with the same parameters
-        /*
-        e.g.
-        $grades = null;
-        if ($checkmark->grade != 0 && $grades = checkmark_get_user_grades($checkmark, $userid)) {
-            foreach ($grades as $k => $v) {
-                if ($v->rawgrade == -1) {
-                    $grades[$k]->rawgrade = null;
-                }
-            }
-        }
-        checkmark_grade_item_update($checkmark, $grades);
-        
-        */
-    if ($checkmark->grade == 0) {
-        checkmark_grade_item_update($checkmark);
-
-    } else if ($grades = checkmark_get_user_grades($checkmark, $userid)) {
+    $grades = null;
+    if ($checkmark->grade != 0 && $grades = checkmark_get_user_grades($checkmark, $userid)) {
         foreach ($grades as $k => $v) {
             if ($v->rawgrade == -1) {
                 $grades[$k]->rawgrade = null;
             }
         }
-        checkmark_grade_item_update($checkmark, $grades);
-
-    } else {
-        checkmark_grade_item_update($checkmark);
     }
+    checkmark_grade_item_update($checkmark, $grades);
 }
 
 /**

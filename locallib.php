@@ -2748,80 +2748,41 @@ class checkmark {
                                                                     array('id'=>'ts'.$auser->id));
                             }
                             // Print grade, dropdown or text!
-                            if ($auser->timemarked > 0) {
-                                $date = userdate($auser->timemarked);
-                                $teachermodified = html_writer::tag('div', $date,
-                                                                    array('id'=>'tt'.$auser->id));
-
-                                if ($final_grade->locked or $final_grade->overridden) {
+                            if ($final_grade->locked or $final_grade->overridden) {
+                                if($auser->timemarked > 0) {
+                                    $date = userdate($auser->timemarked);
+                                    $teachermodified = html_writer::tag('div', $date,
+                                                                        array('id'=>'tt'.$auser->id));
                                     $gradeattr = array('id'    => 'g'.$auser->id,
                                                        'class' => '.$locked_overridden');
                                     $grade = html_writer::tag('div', $final_grade->formatted_grade,
                                                               $gradeattr);
-                                } else if ($quickgrade) {
-                                    //tscpr:
-                                        //the code here is identical to the code in the else, you can combine them, e.g.
-                                        /*
-                                            $date = $auser->timemarked > 0 ? userdate($auser->timemarked) : '-';
-                                            if ($final_grade->locked || $final_grade->overriden) {
-                                                if ($auser->timemarked > 0 ) {
-                                                    code for this case
-                                                } else {
-                                                    code for this case
-                                                }
-                                            } else if ($quickgrade) {
-                                                code for quickgrade
-                                            } else {
-                                                rest of code...
-                                            }
-                                        */
-                                    $attributes = array();
-                                    $attributes['tabindex'] = $tabindex++;
-                                    $mademenu = make_grades_menu($this->checkmark->grade);
-                                    $menu = html_writer::select($mademenu,
-                                                                'menu['.$auser->id.']',
-                                                                $auser->grade,
-                                                                array(-1=>get_string('nograde')),
-                                                                $attributes);
-                                    $oldgradeattr = array('type'  => 'hidden',
-                                                          'name'  => 'oldgrade'.$auser->id,
-                                                          'value' => $auser->grade);
-                                    $oldgrade = html_writer::empty_tag('input', $oldgradeattr);
-                                    $grade = html_writer::tag('div', $menu.$oldgrade,
-                                                              array('id'=>'g'.$auser->id));
                                 } else {
-                                    $grade = html_writer::tag('div',
-                                                              $this->display_grade($auser->grade),
-                                                              array('id'=>'g'.$auser->id));
-                                }
-
-                            } else {
-                                $teachermodified = html_writer::tag('div', '-',
-                                                                    array('id'=>'tt'.$auser->id));
-                                if ($final_grade->locked or $final_grade->overridden) {
+                                    $teachermodified = html_writer::tag('div', '-',
+                                                                        array('id'=>'tt'.$auser->id));
                                     $grade = html_writer::tag('div', $final_grade->formatted_grade,
                                                               array('id'=>'g'.$auser->id,
                                                                     'class'=>$locked_overridden));
-                                } else if ($quickgrade) {
-                                    $attributes = array();
-                                    $attributes['tabindex'] = $tabindex++;
-                                    $mademenu = make_grades_menu($this->checkmark->grade);
-                                    $menu = html_writer::select($mademenu,
-                                                                'menu['.$auser->id.']',
-                                                                $auser->grade,
-                                                                array(-1=>get_string('nograde')),
-                                                                $attributes);
-                                    $inputarr = array('type'  => 'hidden',
+                                }
+                            } else if ($quickgrade) {
+                                $attributes = array();
+                                $attributes['tabindex'] = $tabindex++;
+                                $mademenu = make_grades_menu($this->checkmark->grade);
+                                $menu = html_writer::select($mademenu,
+                                                            'menu['.$auser->id.']',
+                                                            $auser->grade,
+                                                            array(-1=>get_string('nograde')),
+                                                            $attributes);
+                                $oldgradeattr = array('type'  => 'hidden',
                                                       'name'  => 'oldgrade'.$auser->id,
                                                       'value' => $auser->grade);
-                                    $oldgrade = html_writer::empty_tag('input', $inputarr);
-                                    $grade = html_writer::tag('div', $menu.$oldgrade,
-                                                              array('id'=>'g'.$auser->id));
-                                } else {
-                                    $grade = html_writer::tag('div',
-                                                              $this->display_grade($auser->grade),
-                                                              array('id'=>'g'.$auser->id));
-                                }
+                                $oldgrade = html_writer::empty_tag('input', $oldgradeattr);
+                                $grade = html_writer::tag('div', $menu.$oldgrade,
+                                                          array('id'=>'g'.$auser->id));
+                            } else {
+                                $grade = html_writer::tag('div',
+                                                          $this->display_grade($auser->grade),
+                                                          array('id'=>'g'.$auser->id));
                             }
                             // Print Comment!
                             if ($final_grade->locked or $final_grade->overridden) {
@@ -4850,26 +4811,18 @@ EOS;
                 }
                 if ($state) { // Is it checked?
                     $symbol = self::CHECKEDBOX;
-                    $label = get_string('strexample', 'checkmark').' '.$examplenames[$i];
-                    $grade = '('.$examplegrades[$i].' '.$pointsstring.')';
-                    //tscpr:
-                        //same thing here as below, the code differs only in $symbol and classname
-                    $content = html_writer::tag('div', '&nbsp;', array('class'=>'fitemtitle')).
-                               html_writer::tag('div', $symbol.'&nbsp;'.$label.'&nbsp;'.$grade,
-                                                array('class'=>'felement'));
-                    $output .= html_writer::tag('div', $content,
-                                                array('class'=>'fitem checkedexample'));
+                    $class = 'checkedexample';
                 } else {
                     $symbol = self::EMPTYBOX;
-                    $label = get_string('strexample', 'checkmark').' '.$examplenames[$i];
-                    $grade = '('.$examplegrades[$i].' '.$pointsstring.')';
-                    $content = html_writer::tag('div', '&nbsp;', array('class'=>'fitemtitle')).
-                               html_writer::tag('div', $symbol.'&nbsp;'.$label.'&nbsp;'.$grade,
-                                                array('class'=>'felement'));
-                    $output .= html_writer::tag('div', $content,
-                                                array('class'=>'fitem uncheckedexample'));
+                    $class = 'uncheckedexample';
                 }
-
+                $label = get_string('strexample', 'checkmark').' '.$examplenames[$i];
+                $grade = '('.$examplegrades[$i].' '.$pointsstring.')';
+                $content = html_writer::tag('div', '&nbsp;', array('class'=>'fitemtitle')).
+                           html_writer::tag('div', $symbol.'&nbsp;'.$label.'&nbsp;'.$grade,
+                                            array('class'=>'felement'));
+                $output .= html_writer::tag('div', $content,
+                                            array('class'=>'fitem '.$class));
             }
         } else {
             $i = 0;
@@ -4895,26 +4848,18 @@ EOS;
                 }
                 if ($state) { // Is it checked?
                     $symbol = self::CHECKEDBOX;
-                    $label = get_string('strexample', 'checkmark').' '.$examplenumber;
-                    $grade = '('.$points.' '.$pointsstring.')';
-                    $content = html_writer::tag('div', '&nbsp;', array('class'=>'fitemtitle')).
-                               html_writer::tag('div', $symbol.'&nbsp;'.$label.'&nbsp;'.$grade,
-                                                array('class'=>'felement'));
-                    $output .= html_writer::tag('div', $content,
-                                                array('class'=>'fitem checkedexample'));
+                    $class = 'checkedexample';
                 } else {
                     $symbol = self::EMPTYBOX;
-                    //tscpr:
-                        //you can take out everything except the symbol and the class 'checked/uncheckedexample' out of the if and avoid repetition
-                    $label = get_string('strexample', 'checkmark').' '.$examplenumber;
-                    $grade = '('.$points.' '.$pointsstring.')';
-                    
-                    $content = html_writer::tag('div', '&nbsp;', array('class'=>'fitemtitle')).
-                               html_writer::tag('div', $symbol.'&nbsp;'.$label.'&nbsp;'.$grade,
-                                                array('class'=>'felement'));
-                    $output .= html_writer::tag('div', $content,
-                                                array('class'=>'fitem uncheckedexample'));
+                    $class = 'uncheckedexample';
                 }
+                $label = get_string('strexample', 'checkmark').' '.$examplenumber;
+                $grade = '('.$points.' '.$pointsstring.')';
+                $content = html_writer::tag('div', '&nbsp;', array('class'=>'fitemtitle')).
+                           html_writer::tag('div', $symbol.'&nbsp;'.$label.'&nbsp;'.$grade,
+                                            array('class'=>'felement'));
+                $output .= html_writer::tag('div', $content,
+                                            array('class'=>'fitem '.$class));
                 $i++;
             } while ($i<$this->checkmark->examplecount);
         }
