@@ -58,13 +58,10 @@ class checkmark {
     // Used to connect example-names, example-grades, submission-examplenumbers!
     const DELIMITER = ',';
 
-    // UTF-8 box with x-mark = &#x2612; = '☒'!
     // UTF-8 empty box = &#x2610; = '☐'!
-    
-    //tscpr:
-        //is there a speacial reason not to use the utf codes?
-    const EMPTYBOX = '☐';
-    const CHECKEDBOX = '☒';
+    const EMPTYBOX = '&#x2610;';
+    // UTF-8 box with x-mark = &#x2612; = '☒'!
+    const CHECKEDBOX = '&#x2612;';
 
     /** @var object */
     public $cm;
