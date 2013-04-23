@@ -59,6 +59,9 @@ class checkmark {
 
     // UTF-8 box with x-mark = &#x2612; = '☒'!
     // UTF-8 empty box = &#x2610; = '☐'!
+    
+    //tscpr:
+        //is there a speacial reason not to use the utf codes?
     const EMPTYBOX = '☐';
     const CHECKEDBOX = '☒';
 
@@ -111,7 +114,7 @@ class checkmark {
             // Use static functions only!
             return;
         }
-
+        //tscpr: is there a reason it is not part up there by $COURSE and $DB?
         global $CFG;
 
         if ($cm) {
@@ -141,6 +144,9 @@ class checkmark {
         $this->checkmark->cmidnumber = $this->cm->idnumber;
         $this->checkmark->course   = $this->course->id;
 
+        
+        //tscpr:
+            //these strings are used only once or twice in the code, why dont use get_string every time?
         $this->strcheckmark = get_string('modulename', 'checkmark');
         $this->strcheckmarks = get_string('modulenameplural', 'checkmark');
         $this->strsubmissions = get_string('submissions', 'checkmark');
@@ -774,6 +780,8 @@ class checkmark {
         global $CFG;
 
         $submitted = '';
+        //tscpr:
+            //i think according to guidelines it should be $CFG->wwwroot . '/mod/checkmark' with single quotes
         $urlbase = "{$CFG->wwwroot}/mod/checkmark/";
 
         $context = context_module::instance($this->cm->id);
@@ -2425,6 +2433,8 @@ class checkmark {
         $course     = $this->course;
         $checkmark = $this->checkmark;
         $cm         = $this->cm;
+        //tscpr:
+            //you can safely remove $hassubmission, it is not used anywhere
         $hassubmission = false;
 
         $tabindex = 1; // Tabindex for quick grading tabbing; Not working for dropdowns yet!
@@ -2495,6 +2505,8 @@ class checkmark {
         list($esql, $params) = get_enrolled_sql($context, 'mod/checkmark:submit', $currentgroup);
 
         if ($filter == self::FILTER_ALL) {
+            //tscpr:
+                //try to avoid using double quotes and variables inside them
             $sql = "SELECT u.id FROM {user} u ".
                    "LEFT JOIN ($esql) eu ON eu.id=u.id ".
                    "WHERE u.deleted = 0 AND eu.id=u.id ";
@@ -2521,6 +2533,8 @@ class checkmark {
         }
 
         // If groupmembersonly used, remove users who are not in any group!
+        //tscpr:
+            //coding guidelines: and should be &&
         if ($users and !empty($CFG->enablegroupmembersonly) and $cm->groupmembersonly) {
             if ($groupingusers = groups_get_grouping_members($cm->groupingid, 'u.id', 'u.id')) {
                 $users = array_intersect($users, array_keys($groupingusers));
@@ -2772,6 +2786,22 @@ class checkmark {
                                     $grade = html_writer::tag('div', $final_grade->formatted_grade,
                                                               $gradeattr);
                                 } else if ($quickgrade) {
+                                    //tscpr:
+                                        //the code here is identical to the code in the else, you can combine them, e.g.
+                                        /*
+                                            $date = $auser->timemarked > 0 ? userdate($auser->timemarked) : '-';
+                                            if ($final_grade->locked || $final_grade->overriden) {
+                                                if ($auser->timemarked > 0 ) {
+                                                    code for this case
+                                                } else {
+                                                    code for this case
+                                                }
+                                            } else if ($quickgrade) {
+                                                code for quickgrade
+                                            } else {
+                                                rest of code...
+                                            }
+                                        */
                                     $attributes = array();
                                     $attributes['tabindex'] = $tabindex++;
                                     $mademenu = make_grades_menu($this->checkmark->grade);
@@ -3070,7 +3100,8 @@ class checkmark {
         // Mini form for setting user preference!
         echo $returnstring;
         $returnstring = '';
-
+        //tscpr:
+            //you can make this form in a seperate file and handle there the saving of options
         $formaction = new moodle_url('/mod/checkmark/submissions.php', array('id'=>$this->cm->id));
         $mform = new MoodleQuickForm('optionspref', 'post', $formaction, '',
                                      array('class'=>'optionspref'));
@@ -3183,6 +3214,9 @@ class checkmark {
         $formaction = new moodle_url('/mod/checkmark/submissions.php', array('id'=>$this->cm->id,
                                                                              'updatepref'=>1,
                                                                              'sesskey'=>sesskey()));
+        //tscpr:
+            //i think it will be better to use a moodle_form here, even though it will be a lot of work to rewrite it, the code would 
+            //apply the coding standards even more
         $formhtml = "";
 
         $datasettingselements = "";
@@ -3328,6 +3362,8 @@ class checkmark {
         }
 
         // If groupmembersonly used, remove users who are not in any group!
+        //tscpr:
+            //replace the and with && - coding guidelines
         if ($users and !empty($CFG->enablegroupmembersonly) and $cm->groupmembersonly) {
             if ($groupingusers = groups_get_grouping_members($cm->groupingid, 'u.id', 'u.id')) {
                 $users = array_intersect($users, array_keys($groupingusers));
@@ -3548,6 +3584,8 @@ class checkmark {
                     }
 
                     if (!empty($auser->submissionid)) {
+                        //tscpr:
+                            //$hassubmission not used anywhere 
                         $hassubmission = true;
                         // Print examples!
                         $submission = $this->get_submission($auser->id);
@@ -4665,7 +4703,9 @@ EOS;
         $user = $DB->get_record('user', array('id'=>$submission->user_id));
 
         if ($teachers = $this->get_graders($user)) {
-
+            
+            //tscpr:
+                //$strcheckmarks and $strcheckmark are not used
             $strcheckmarks = get_string('modulenameplural', 'checkmark');
             $strcheckmark  = get_string('modulename', 'checkmark');
             $strsubmitted  = get_string('submitted', 'checkmark');
@@ -4847,6 +4887,8 @@ EOS;
                     $symbol = self::CHECKEDBOX;
                     $label = get_string('strexample', 'checkmark').' '.$examplenames[$i];
                     $grade = '('.$examplegrades[$i].' '.$pointsstring.')';
+                    //tscpr:
+                        //same thing here as below, the code differs only in $symbol and classname
                     $content = html_writer::tag('div', '&nbsp;', array('class'=>'fitemtitle')).
                                html_writer::tag('div', $symbol.'&nbsp;'.$label.'&nbsp;'.$grade,
                                                 array('class'=>'felement'));
@@ -4897,8 +4939,11 @@ EOS;
                                                 array('class'=>'fitem checkedexample'));
                 } else {
                     $symbol = self::EMPTYBOX;
+                    //tscpr:
+                        //you can take out everything except the symbol and the class "checked/uncheckedexample" out of the if and avoid repetition
                     $label = get_string('strexample', 'checkmark').' '.$examplenumber;
                     $grade = '('.$points.' '.$pointsstring.')';
+                    
                     $content = html_writer::tag('div', '&nbsp;', array('class'=>'fitemtitle')).
                                html_writer::tag('div', $symbol.'&nbsp;'.$label.'&nbsp;'.$grade,
                                                 array('class'=>'felement'));
@@ -5061,6 +5106,8 @@ EOS;
      * Plugin cron method - do not use $this here, create new checkmark instances if needed.
      * @return void
      */
+    //tscpr:
+        //is there a special reason to leave this function empty and have the manual cron?
     public function cron() {
         // No plugin cron by default - override if needed!
     }
@@ -5178,6 +5225,9 @@ EOS;
 
 }
 
+
+//tscpr:
+    //is there a reason this form is part of the locallib and not in a seperate file?
 class mod_checkmark_grading_form extends moodleform {
 
     public function definition() {
@@ -5324,6 +5374,8 @@ class mod_checkmark_grading_form extends moodleform {
             $buttonarray[] = &$mform->createElement('submit', 'next', get_string('next'));
             $buttonarray[] = &$mform->createElement('cancel');
         } else {
+            //tscpr:
+                //you can take out $buttonarray and the submit button out of the if - it's the same
             $buttonarray=array();
             $buttonarray[] = &$mform->createElement('submit', 'submitbutton',
                                                     get_string('savechanges'));

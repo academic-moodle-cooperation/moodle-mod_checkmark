@@ -200,7 +200,11 @@ function xmldb_checkmark_upgrade($oldversion) {
         if ($dbman->index_exists($table, $index)) {
             $dbman->drop_index($table, $index);
         }
-
+        
+        
+        //tsprc:
+            //is there a special reason to redefine $table everytime?
+        
         // Define index user_id (not unique) to be added to checkmark_submissions!
         $table = new xmldb_table('checkmark_submissions');
         $index = new xmldb_index('user_id', XMLDB_INDEX_NOTUNIQUE, array('user_id'));

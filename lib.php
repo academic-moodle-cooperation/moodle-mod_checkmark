@@ -265,7 +265,8 @@ function checkmark_cron () {
             $starttime = $endtime - 2 * 24 * 3600;   // Two days earlier?
     }
     if ($submissions = checkmark_get_unmailed_submissions($starttime, $endtime)) {
-
+        //tscpr:
+            //not used anywhere(in this function :))
         $realuser = clone($USER);
 
         foreach ($submissions as $key => $submission) {
@@ -342,6 +343,8 @@ function checkmark_cron () {
                              "</p>";
                 $posthtml .= "</font><hr />";
             } else {
+                //tscpr:
+                    //does this mean that if message format is something different from HTML, then an empty email is sent?
                 $posthtml = "";
             }
 
@@ -394,7 +397,8 @@ function checkmark_get_user_grades($checkmark, $userid=0) {
             FROM {user} u, {checkmark_submissions} s
             WHERE u.id = s.user_id AND s.checkmark_id = :aid
             $user";
-
+    //tscpr:
+        //again according to guidelines, better use single quotes and append variables with .
              return $DB->get_records_sql($sql, $params);
 }
 
@@ -407,7 +411,22 @@ function checkmark_get_user_grades($checkmark, $userid=0) {
 function checkmark_update_grades($checkmark, $userid=0, $nullifnone=true) {
     global $CFG, $DB;
     require_once($CFG->libdir.'/gradelib.php');
-
+    
+    //tscpr:
+        //this whole thing can be a bit simplified - checkmark_grade_item_update is used with the same parameters
+        /*
+        e.g.
+        $grades = null;
+        if ($checkmark->grade != 0 && $grades = checkmark_get_user_grades($checkmark, $userid)) {
+            foreach ($grades as $k => $v) {
+                if ($v->rawgrade == -1) {
+                    $grades[$k]->rawgrade = null;
+                }
+            }
+        }
+        checkmark_grade_item_update($checkmark, $grades);
+        
+        */
     if ($checkmark->grade == 0) {
         checkmark_grade_item_update($checkmark);
 
@@ -507,6 +526,8 @@ function checkmark_grade_item_delete($checkmark) {
  * Returns the users with data in one checkmark (students and teachers)
  *
  * @todo: deprecated - to be deleted in 2.2
+ //tscpr:
+    //is there a reason to keep it?
  *
  * @param $checkmarkid int
  * @return array of user objects
