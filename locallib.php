@@ -81,9 +81,9 @@ class checkmark {
     public $context;
 
     /**
-     * Constructor for the base checkmark class
+     * Constructor for the checkmark class
      *
-     * Constructor for the base checkmark class.
+     * Constructor for the checkmark class.
      * If cmid is set create the cm, course, checkmark objects.
      * If the checkmark is hidden and the user is not a teacher then
      * this prints a page header and notice.
@@ -96,14 +96,12 @@ class checkmark {
      * @param object $course usually null, but if we have it we pass it to save db access
      */
     public function __construct($cmid='staticonly', $checkmark=null, $cm=null, $course=null) {
-        global $COURSE, $DB;
+        global $COURSE, $DB, $CFG;
 
         if ($cmid == 'staticonly') {
             // Use static functions only!
             return;
         }
-        //tscpr: is there a reason it is not part up there by $COURSE and $DB?
-        global $CFG;
 
         if ($cm) {
             $this->cm = $cm;
@@ -2506,9 +2504,7 @@ class checkmark {
         }
 
         // If groupmembersonly used, remove users who are not in any group!
-        //tscpr:
-            //coding guidelines: and should be &&
-        if ($users and !empty($CFG->enablegroupmembersonly) and $cm->groupmembersonly) {
+        if ($users && !empty($CFG->enablegroupmembersonly) && $cm->groupmembersonly) {
             if ($groupingusers = groups_get_grouping_members($cm->groupingid, 'u.id', 'u.id')) {
                 $users = array_intersect($users, array_keys($groupingusers));
             }
@@ -3296,9 +3292,7 @@ class checkmark {
         }
 
         // If groupmembersonly used, remove users who are not in any group!
-        //tscpr:
-            //replace the and with && - coding guidelines
-        if ($users and !empty($CFG->enablegroupmembersonly) and $cm->groupmembersonly) {
+        if ($users && !empty($CFG->enablegroupmembersonly) && $cm->groupmembersonly) {
             if ($groupingusers = groups_get_grouping_members($cm->groupingid, 'u.id', 'u.id')) {
                 $users = array_intersect($users, array_keys($groupingusers));
             }

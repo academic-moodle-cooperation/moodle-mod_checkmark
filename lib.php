@@ -339,8 +339,7 @@ function checkmark_cron () {
                 '<p>'.get_string('checkmarkmailhtml', 'checkmark', $checkmarkinfo).'</p>'.
                 '</font><hr />';
             } else {
-                //tscpr:
-                    //does this mean that if message format is something different from HTML, then an empty email is sent?
+                // We don't need HTML-Text if mailformat is plain text. (Plain text is in stdClass::fullmessage)!
                 $posthtml = '';
             }
 
