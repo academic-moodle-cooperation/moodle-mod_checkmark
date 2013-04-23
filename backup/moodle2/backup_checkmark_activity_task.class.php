@@ -56,13 +56,13 @@ class backup_checkmark_activity_task extends backup_activity_task {
     static public function encode_content_links($content) {
         global $CFG;
 
-        $base = preg_quote($CFG->wwwroot, "/");
+        $base = preg_quote($CFG->wwwroot, '/');
 
         // Link to the list of checkmarks!
-        $search="/(".$base."\/mod\/checkmark\/index.php\?id\=)([0-9]+)/";
+        $search='/('.$base.'\/mod\/checkmark\/index.php\?id\=)([0-9]+)/';
         $content= preg_replace($search, '$@CHECKMARKINDEX*$2@$', $content);
         // Link to checkmark view by moduleid!
-        $search="/(".$base."\/mod\/checkmark\/view.php\?id\=)([0-9]+)/";
+        $search='/('.$base.'\/mod\/checkmark\/view.php\?id\=)([0-9]+)/';
         $content= preg_replace($search, '$@CHECKMARKVIEWBYID*$2@$', $content);
 
         return $content;

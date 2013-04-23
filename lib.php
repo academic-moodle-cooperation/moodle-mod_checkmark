@@ -171,7 +171,7 @@ function checkmark_add_instance($checkmark) {
     if (!isset($checkmark->flexiblenaming)) {
         $checkmark->flexiblenaming = 0;
     }
-    $returnid = $DB->insert_record("checkmark", $checkmark);
+    $returnid = $DB->insert_record('checkmark', $checkmark);
     $checkmark->id = $returnid;
 
     if ($checkmark->timedue) {
@@ -209,7 +209,7 @@ function checkmark_add_instance($checkmark) {
 function checkmark_user_outline($course, $user, $mod, $checkmark) {
     global $CFG;
     require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
-    require_once("$CFG->libdir/gradelib.php");
+    require_once('$CFG->libdir/gradelib.php');
     $instance = new checkmark($mod->id, $checkmark, $mod, $course);
     $grades = grade_get_grades($course->id, 'mod', 'checkmark', $checkmark->id, $user->id);
     if (!empty($grades->items[0]->grades)) {
@@ -227,7 +227,7 @@ function checkmark_user_outline($course, $user, $mod, $checkmark) {
 function checkmark_user_complete($course, $user, $mod, $checkmark) {
     global $CFG;
     require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
-    require_once("$CFG->libdir/gradelib.php");
+    require_once('$CFG->libdir/gradelib.php');
 
     $instance = new checkmark($mod->id, $checkmark, $mod, $course);
     $grades = grade_get_grades($course->id, 'mod', 'checkmark', $checkmark->id, $user->id);
@@ -270,45 +270,45 @@ function checkmark_cron () {
         $realuser = clone($USER);
 
         foreach ($submissions as $key => $submission) {
-            $DB->set_field("checkmark_submissions", "mailed", "1", array("id"=>$submission->id));
+            $DB->set_field('checkmark_submissions', 'mailed', '1', array('id'=>$submission->id));
         }
 
         $timenow = time();
 
         foreach ($submissions as $submission) {
 
-            echo "Processing checkmark submission $submission->id\n";
+            echo 'Processing checkmark submission '.$submission->id."\n";
 
-            if (! $user = $DB->get_record("user", array("id"=>$submission->user_id))) {
-                echo "Could not find user $user->id\n";
+            if (! $user = $DB->get_record('user', array('id'=>$submission->user_id))) {
+                echo 'Could not find user '.$user->id."\n";
                 continue;
             }
 
-            if (! $course = $DB->get_record("course", array("id"=>$submission->course))) {
-                echo "Could not find course $submission->course\n";
+            if (! $course = $DB->get_record('course', array('id'=>$submission->course))) {
+                echo 'Could not find course '.$submission->course."\n";
                 continue;
             }
 
             /*
-             * Override the language and timezone of the "current" user, so that
+             * Override the language and timezone of the 'current' user, so that
              * mail is customised for the receiver.
              */
             cron_setup_user($user, $course);
 
             if (!is_enrolled(context_course::instance($submission->course), $user->id)) {
-                echo fullname($user)." not an active participant in " .
+                echo fullname($user).' isn\'t an active participant in ' .
                      format_string($course->shortname) . "\n";
                 continue;
             }
 
-            if (! $teacher = $DB->get_record("user", array("id"=>$submission->teacher_id))) {
-                echo "Could not find teacher $submission->teacher_id\n";
+            if (! $teacher = $DB->get_record('user', array('id'=>$submission->teacher_id))) {
+                echo 'Could not find teacher '.$submission->teacher_id."\n";
                 continue;
             }
 
-            if (! $mod = get_coursemodule_from_instance("checkmark", $submission->checkmark_id,
+            if (! $mod = get_coursemodule_from_instance('checkmark', $submission->checkmark_id,
                                                         $course->id)) {
-                echo "Could not find course module for checkmark id $submission->checkmark_id\n";
+                echo 'Could not find course module for checkmark id '.$submission->checkmark_id."\n";
                 continue;
             }
 
@@ -316,36 +316,35 @@ function checkmark_cron () {
                 continue;
             }
 
-            $strcheckmarks = get_string("modulenameplural", "checkmark");
-            $strcheckmark  = get_string("modulename", "checkmark");
+            $strcheckmarks = get_string('modulenameplural', 'checkmark');
+            $strcheckmark  = get_string('modulename', 'checkmark');
 
             $checkmarkinfo = new stdClass();
             $checkmarkinfo->teacher = fullname($teacher);
             $checkmarkinfo->checkmark = format_string($submission->name, true);
-            $checkmarkinfo->url = "$CFG->wwwroot/mod/checkmark/view.php?id=$mod->id";
+            $checkmarkinfo->url = $CFG->wwwroot.'/mod/checkmark/view.php?id='.$mod->id;
 
-            $postsubject = "$course->shortname: $strcheckmarks: ".
+            $postsubject = $course->shortname.': '.$strcheckmarks.': '.
                            format_string($submission->name, true);
-            $posttext  = "$course->shortname -> $strcheckmarks -> ".
-                         format_string($submission->name, true)."\n";
-            $posttext .= "---------------------------------------------------------------------\n";
-            $posttext .= get_string("checkmarkmail", "checkmark", $checkmarkinfo)."\n";
-            $posttext .= "---------------------------------------------------------------------\n";
+            $posttext  = $course->shortname.' -> '.$strcheckmarks.' -> '.
+                         format_string($submission->name, true)."\n".
+                         "---------------------------------------------------------------------\n".
+                         get_string('checkmarkmail', 'checkmark', $checkmarkinfo)."\n".
+                         "---------------------------------------------------------------------\n";
 
             if ($user->mailformat == 1) {  // HTML!
-                $posthtml = "<p><font face=\"sans-serif\">".
-                "<a href=\"$CFG->wwwroot/course/view.php?id=$course->id\">$course->shortname</a> ".
-                "-><a href=\"$CFG->wwwroot/mod/checkmark/index.php?id=$course->id\">$strcheckmarks".
-                "</a> -><a href=\"$CFG->wwwroot/mod/checkmark/view.php?id=$mod->id\">".
-                format_string($submission->name, true)."</a></font></p>";
-                $posthtml .= "<hr /><font face=\"sans-serif\">";
-                $posthtml .= "<p>".get_string("checkmarkmailhtml", "checkmark", $checkmarkinfo).
-                             "</p>";
-                $posthtml .= "</font><hr />";
+                $posthtml = '<p><font face="sans-serif">'.
+                '<a href="'.$CFG->wwwroot.'/course/view.php?id='.$course->id.'">'.$course->shortname.'</a> '.
+                '-><a href="'.$CFG->wwwroot.'/mod/checkmark/index.php?id='.$course->id.'">'.$strcheckmarks.'</a> '.
+                '-><a href="'.$CFG->wwwroot.'/mod/checkmark/view.php?id='.$mod->id.'">'.
+                format_string($submission->name, true).'</a></font></p>'.
+                '<hr /><font face="sans-serif">'.
+                '<p>'.get_string('checkmarkmailhtml', 'checkmark', $checkmarkinfo).'</p>'.
+                '</font><hr />';
             } else {
                 //tscpr:
                     //does this mean that if message format is something different from HTML, then an empty email is sent?
-                $posthtml = "";
+                $posthtml = '';
             }
 
             $eventdata = new stdClass();
@@ -384,22 +383,20 @@ function checkmark_get_user_grades($checkmark, $userid=0) {
     global $CFG, $DB;
 
     if ($userid) {
-        $user = "AND u.id = :userid";
+        $user = 'AND u.id = :userid';
         $params = array('userid'=>$userid);
     } else {
-        $user = "";
+        $user = '';
     }
     $params['aid'] = $checkmark->id;
 
-    $sql = "SELECT u.id, u.id AS userid, s.grade AS rawgrade, s.submissioncomment AS feedback,
+    $sql = 'SELECT u.id, u.id AS userid, s.grade AS rawgrade, s.submissioncomment AS feedback,
                    s.format AS feedbackformat, s.teacher_id AS usermodified,
                    s.timemarked AS dategraded, s.timemodified AS datesubmitted
             FROM {user} u, {checkmark_submissions} s
-            WHERE u.id = s.user_id AND s.checkmark_id = :aid
-            $user";
-    //tscpr:
-        //again according to guidelines, better use single quotes and append variables with .
-             return $DB->get_records_sql($sql, $params);
+            WHERE u.id = s.user_id AND s.checkmark_id = :aid'.
+            $user;
+    return $DB->get_records_sql($sql, $params);
 }
 
 /**
@@ -449,14 +446,14 @@ function checkmark_update_grades($checkmark, $userid=0, $nullifnone=true) {
 function checkmark_upgrade_grades() {
     global $DB;
 
-    $sql = "SELECT COUNT('x')
+    $sql = 'SELECT COUNT(\'x\')
               FROM {checkmark} a, {course_modules} cm, {modules} m
-             WHERE m.name='checkmark' AND m.id=cm.module AND cm.instance=a.id";
+             WHERE m.name=\'checkmark\' AND m.id=cm.module AND cm.instance=a.id';
     $count = $DB->count_records_sql($sql);
 
-    $sql = "SELECT a.*, cm.idnumber AS cmidnumber, a.course AS course
+    $sql = 'SELECT a.*, cm.idnumber AS cmidnumber, a.course AS course
               FROM {checkmark} a, {course_modules} cm, {modules} m
-             WHERE m.name='checkmark' AND m.id=cm.module AND cm.instance=a.id";
+             WHERE m.name=\'checkmark\' AND m.id=cm.module AND cm.instance=a.id';
     $rs = $DB->get_recordset_sql($sql);
     if ($rs->valid()) {
         // Too much debug output!
@@ -466,7 +463,7 @@ function checkmark_upgrade_grades() {
             $i++;
             upgrade_set_timeout(60*5); // Set up timeout, may also abort execution!
             checkmark_update_grades($checkmark);
-            $pbar->update($i, $count, "Updating checkmark grades ($i/$count).");
+            $pbar->update($i, $count, 'Updating checkmark grades ('.$i.'/'.$count.')');
         }
         upgrade_set_timeout(); // Reset to default timeout!
     }
@@ -536,17 +533,17 @@ function checkmark_get_participants($checkmarkid) {
     global $CFG, $DB;
 
     // Get students!
-    $students = $DB->get_records_sql("SELECT DISTINCT u.id, u.id
+    $students = $DB->get_records_sql('SELECT DISTINCT u.id, u.id
                                         FROM {user} u,
                                              {checkmark_submissions} a
                                        WHERE a.checkmark_id = ? and
-                                             u.id = a.user_id", array($checkmarkid));
+                                             u.id = a.user_id', array($checkmarkid));
     // Get teachers!
-    $teachers = $DB->get_records_sql("SELECT DISTINCT u.id, u.id
+    $teachers = $DB->get_records_sql('SELECT DISTINCT u.id, u.id
                                         FROM {user} u,
                                              {checkmark_submissions} a
                                        WHERE a.checkmark_id = ? and
-                                             u.id = a.teacher_id", array($checkmarkid));
+                                             u.id = a.teacher_id', array($checkmarkid));
 
     // Add teachers to students!
     if ($teachers) {
@@ -642,11 +639,11 @@ function checkmark_refresh_events($course = 0) {
     global $DB;
 
     if ($course == 0) {
-        if (! $checkmarks = $DB->get_records("checkmark")) {
+        if (! $checkmarks = $DB->get_records('checkmark')) {
             return true;
         }
     } else {
-        if (! $checkmarks = $DB->get_records("checkmark", array("course"=>$course))) {
+        if (! $checkmarks = $DB->get_records('checkmark', array('course'=>$course))) {
             return true;
         }
     }
@@ -691,7 +688,7 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
 
     // Do not use log table if possible, it may be huge!
 
-    if (!$submissions = $DB->get_records_sql("
+    if (!$submissions = $DB->get_records_sql('
             SELECT asb.id, asb.timemodified, cm.id AS cmid, asb.user_id,
                  u.firstname, u.lastname, u.email, u.picture
             FROM {checkmark_submissions} asb
@@ -701,8 +698,8 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
                 JOIN {user} u            ON u.id = asb.user_id
             WHERE asb.timemodified > ? AND
                   a.course = ? AND
-                  md.name = 'checkmark'
-            ORDER BY asb.timemodified ASC", array($timestart, $course->id))) {
+                  md.name = \'checkmark\'
+            ORDER BY asb.timemodified ASC', array($timestart, $course->id))) {
         return false;
     }
 
@@ -804,19 +801,19 @@ function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $c
 
     $params = array();
     if ($userid) {
-        $userselect = "AND u.id = :userid";
+        $userselect = 'AND u.id = :userid';
         $params['userid'] = $userid;
     } else {
-        $userselect = "";
+        $userselect = '';
     }
 
     if ($groupid) {
-        $groupselect = "AND gm.groupid = :groupid";
-        $groupjoin   = "JOIN {groups_members} gm ON  gm.userid=u.id";
+        $groupselect = 'AND gm.groupid = :groupid';
+        $groupjoin   = 'JOIN {groups_members} gm ON  gm.userid=u.id';
         $params['groupid'] = $groupid;
     } else {
-        $groupselect = "";
-        $groupjoin   = "";
+        $groupselect = '';
+        $groupjoin   = '';
     }
 
     $params['cminstance'] = $cm->instance;
@@ -824,16 +821,16 @@ function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $c
 
     $userfields = user_picture::fields('u', null, 'userid');
 
-    if (!$submissions = $DB->get_records_sql("SELECT asb.id, asb.timemodified,
+    if (!$submissions = $DB->get_records_sql('SELECT asb.id, asb.timemodified,
                                                 $userfields
                                                 FROM {checkmark_submissions} asb
                                                 JOIN {checkmark} a      ON a.id = asb.checkmark_id
-                                                JOIN {user} u            ON u.id = asb.user_id
-                                                $groupjoin
-                                                WHERE asb.timemodified > :timestart
-                                                   AND a.id = :cminstance
-                                                $userselect $groupselect
-                                                ORDER BY asb.timemodified ASC", $params)) {
+                                                JOIN {user} u            ON u.id = asb.user_id'.
+                                                $groupjoin.
+                                                'WHERE asb.timemodified > :timestart
+                                                   AND a.id = :cminstance'.
+                                                $userselect.' '.$groupselect.
+                                                'ORDER BY asb.timemodified ASC', $params)) {
         return;
     }
 
@@ -940,17 +937,17 @@ function checkmark_print_recent_mod_activity($activity, $courseid, $detail, $mod
 
     echo '<table border="0" cellpadding="3" cellspacing="0" class="checkmark-recent">';
 
-    echo "<tr><td class=\"userpicture\" valign=\"top\">";
-    echo $OUTPUT->user_picture($activity->user);
-    echo "</td><td>";
+    echo '<tr><td class="userpicture" valign="top">'.
+         $OUTPUT->user_picture($activity->user).
+         '</td><td>';
 
     if ($detail) {
         $modname = get_string('modulename', 'checkmark');
         echo '<div class="title">';
-        echo "<img src=\"" . $OUTPUT->pix_url('icon', 'checkmark') . "\" ".
-             "class=\"icon\" alt=\"$modname\">";
-        echo "<a href=\"$CFG->wwwroot/mod/checkmark/view.php?id={$activity->cmid}\"".
-             ">{$activity->name}</a>";
+        echo '<img src="'.$OUTPUT->pix_url('icon', 'checkmark').'"'.
+             'class="icon" alt="'.$modname.'">';
+        echo '<a href="'.$CFG->wwwroot.'/mod/checkmark/view.php?id='.$activity->cmid.'">'.
+             $activity->name.'</a>';
         echo '</div>';
     }
 
@@ -962,11 +959,11 @@ function checkmark_print_recent_mod_activity($activity, $courseid, $detail, $mod
     }
 
     echo '<div class="user">';
-    echo "<a href=\"$CFG->wwwroot/user/view.php?id={$activity->user->id}&amp;course=$courseid\">"
-    ."{$activity->user->fullname}</a>  - ".userdate($activity->timestamp);
+    echo '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$activity->user->id.'&amp;course='.$courseid.'">'.
+         $activity->user->fullname.'</a>  - '.userdate($activity->timestamp);
     echo '</div>';
 
-    echo "</td></tr></table>";
+    echo '</td></tr></table>';
 }
 
 /**
@@ -978,9 +975,10 @@ function checkmark_print_recent_mod_activity($activity, $courseid, $detail, $mod
 function checkmark_log_info($log) {
     global $CFG, $DB;
 
-    return $DB->get_record_sql("SELECT a.name, u.firstname, u.lastname
-                                  FROM {checkmark} a, {user} u
-                                 WHERE a.id = ? AND u.id = ?", array($log->info, $log->userid));
+    return $DB->get_record_sql('SELECT a.name, u.firstname, u.lastname
+                                FROM {checkmark} a, {user} u
+                                WHERE a.id = ?
+                                    AND u.id = ?', array($log->info, $log->userid));
 }
 
 /**
@@ -991,13 +989,13 @@ function checkmark_log_info($log) {
 function checkmark_get_unmailed_submissions($starttime, $endtime) {
     global $CFG, $DB;
 
-    return $DB->get_records_sql("SELECT s.*, a.course, a.name
-                                   FROM {checkmark_submissions} s,
-                                        {checkmark} a
-                                  WHERE s.mailed = 0
-                                        AND s.timemarked <= ?
-                                        AND s.timemarked >= ?
-                                        AND s.checkmark_id = a.id", array($endtime, $starttime));
+    return $DB->get_records_sql('SELECT s.*, a.course, a.name
+                                 FROM {checkmark_submissions} s,
+                                      {checkmark} a
+                                 WHERE s.mailed = 0
+                                     AND s.timemarked <= ?
+                                     AND s.timemarked >= ?
+                                     AND s.checkmark_id = a.id', array($endtime, $starttime));
 }
 
 /**
@@ -1030,11 +1028,11 @@ function checkmark_count_real_submissions($cm, $groupid=0) {
     list($sqluserlist, $userlistparams) = $DB->get_in_or_equal($users);
     $params = array_merge(array($cm->instance), $userlistparams);
 
-    return $DB->count_records_sql("SELECT COUNT('x')
+    return $DB->count_records_sql('SELECT COUNT(\'x\')
                                      FROM {checkmark_submissions}
                                     WHERE checkmark_id = ? AND
                                           timemodified > 0 AND
-                                          user_id ".$sqluserlist, $params);
+                                          user_id '.$sqluserlist, $params);
 }
 
 
@@ -1045,28 +1043,28 @@ function checkmark_count_real_submissions($cm, $groupid=0) {
  * @param $dir string optional specifying the sort direction, defaults to DESC
  * @return array The submission objects indexed by id
  */
-function checkmark_get_all_submissions($checkmark, $sort="", $dir="DESC") {
+function checkmark_get_all_submissions($checkmark, $sort='', $dir='DESC') {
     // Return all checkmark submissions by ENROLLED students (even empty)!
     global $CFG, $DB;
 
-    if ($sort == "lastname" or $sort == "firstname") {
-        $sort = "u.$sort $dir";
+    if ($sort == 'lastname' or $sort == 'firstname') {
+        $sort = 'u.'.$sort.' '.$dir;
     } else if (empty($sort)) {
-        $sort = "a.timemodified DESC";
+        $sort = 'a.timemodified DESC';
     } else {
-        $sort = "a.$sort $dir";
+        $sort = 'a.'.$sort.' '.$dir;
     }
 
-    return $DB->get_records_sql("SELECT a.*
-                                   FROM {checkmark_submissions} a, {user} u
-                                  WHERE u.id = a.user_id
-                                        AND a.checkmark_id = ?
-                               ORDER BY $sort", array($checkmark->id));
+    return $DB->get_records_sql('SELECT a.*
+                                 FROM {checkmark_submissions} a, {user} u
+                                 WHERE u.id = a.user_id
+                                     AND a.checkmark_id = ?
+                                 ORDER BY '.$sort, array($checkmark->id));
 
 }
 
 /**
- * Given a course_module object, this function returns any "extra" information that may be needed
+ * Given a course_module object, this function returns any 'extra' information that may be needed
  * when printing this activity in a course listing.  See get_array_of_activities()
  * in course/lib.php.
  *
@@ -1400,10 +1398,10 @@ function checkmark_print_overview($courses, &$htmlarray) {
      * Build up and array of unmarked submissions indexed by checkmark id/userid
      * for use where the user has grading rights on checkmark!
      */
-    $rs = $DB->get_recordset_sql("SELECT id, checkmark_id, user_id
+    $rs = $DB->get_recordset_sql('SELECT id, checkmark_id, user_id
                             FROM {checkmark_submissions}
                             WHERE teacher_id = 0 AND timemarked = 0
-                            AND checkmark_id $sqlcheckmarkids", $checkmarkidparams);
+                            AND checkmark_id '.$sqlcheckmarkids, $checkmarkidparams);
 
     $unmarkedsubmissions = array();
     foreach ($rs as $rd) {
@@ -1411,9 +1409,9 @@ function checkmark_print_overview($courses, &$htmlarray) {
     }
     $rs->close();
 
-    $rs = $DB->get_recordset_sql("SELECT checkmark_id, count(DISTINCT user_id) as amount
+    $rs = $DB->get_recordset_sql('SELECT checkmark_id, count(DISTINCT user_id) as amount
                                  FROM {checkmark_submissions}
-                                 WHERE checkmark_id $sqlcheckmarkids GROUP BY checkmark_id",
+                                 WHERE checkmark_id '.$sqlcheckmarkids.' GROUP BY checkmark_id',
                                  $checkmarkidparams);
     $submissioncounts = array();
     foreach ($rs as $rd) {
@@ -1422,11 +1420,11 @@ function checkmark_print_overview($courses, &$htmlarray) {
     $rs->close();
 
     // Get all user submissions, indexed by checkmark id!
-    $mysubmissions = $DB->get_records_sql("SELECT checkmark_id, timemarked, teacher_id, grade,
+    $mysubmissions = $DB->get_records_sql('SELECT checkmark_id, timemarked, teacher_id, grade,
                                                   checked
                                       FROM {checkmark_submissions}
-                                      WHERE user_id = ? AND
-                                      checkmark_id $sqlcheckmarkids",
+                                      WHERE user_id = ?
+                                          AND checkmark_id '.$sqlcheckmarkids,
                                           array_merge(array($USER->id), $checkmarkidparams));
 
     // Get all users who submitted something, indexed by checkmark_id!
@@ -1467,8 +1465,8 @@ function checkmark_print_overview($courses, &$htmlarray) {
             $teachers = get_users_by_capability($context, 'mod/checkmark:grade');
             $teacher_submissions = 0;
             $teacher_submissions_graded = 0;
-            $subs  = $DB->get_records("checkmark_submissions",
-                                      array("checkmark_id" => $checkmark->id));
+            $subs  = $DB->get_records('checkmark_submissions',
+                                      array('checkmark_id' => $checkmark->id));
             foreach ($subs as $cur) {
                 if (array_key_exists($cur->user_id, $teachers)) {
                     // Teacher did a submission!
@@ -1584,7 +1582,7 @@ function checkmark_print_overview($courses, &$htmlarray) {
     // Append statistics!
     // First get courses with checkmarks!
 
-    $sql = "SELECT DISTINCT course FROM {checkmark}";
+    $sql = 'SELECT DISTINCT course FROM {checkmark}';
     $courses = $DB->get_fieldset_sql($sql);
     if (!$courses) {
         return;
@@ -1685,11 +1683,11 @@ function checkmark_reset_gradebook($courseid) {
 
     $params = array('courseid'=>$courseid);
 
-    $sql = "SELECT a.*, cm.idnumber as cmidnumber, a.course as courseid
+    $sql = 'SELECT a.*, cm.idnumber as cmidnumber, a.course as courseid
             FROM {checkmark} a, {course_modules} cm, {modules} m
-            WHERE m.name='checkmark' AND m.id=cm.module
+            WHERE m.name=\'checkmark\' AND m.id=cm.module
                                      AND cm.instance=a.id
-                                     AND a.course=:courseid";
+                                     AND a.course=:courseid';
 
     if ($checkmarks = $DB->get_records_sql($sql, $params)) {
         foreach ($checkmarks as $checkmark) {
@@ -1771,8 +1769,8 @@ function checkmark_extend_settings_navigation(settings_navigation $settings,
                                               navigation_node $checkmarknode) {
     global $PAGE, $DB, $USER, $CFG;
 
-    $checkmarkrow = $DB->get_record("checkmark", array("id" => $PAGE->cm->instance));
-    require_once("$CFG->dirroot/mod/checkmark/locallib.php");
+    $checkmarkrow = $DB->get_record('checkmark', array('id' => $PAGE->cm->instance));
+    require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
 
     $checkmarkinstance = new checkmark($PAGE->cm->id, $checkmarkrow, $PAGE->cm, $PAGE->course);
 

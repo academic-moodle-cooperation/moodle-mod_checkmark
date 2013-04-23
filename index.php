@@ -23,8 +23,8 @@
  * @since         Moodle 2.2
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once("../../config.php");
-require_once($CFG->dirroot . "/mod/checkmark/locallib.php");
+require_once('../../config.php');
+require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 require_once($CFG->libdir.'/gradelib.php');
 
 $id = required_param('id', PARAM_INT);   // We need a course!
@@ -36,15 +36,15 @@ if (!$course = $DB->get_record('course', array('id'=>$id))) {
 require_course_login($course);
 $PAGE->set_pagelayout('incourse');
 
-add_to_log($course->id, "checkmark", "view all", "index.php?id=$course->id", "");
+add_to_log($course->id, 'checkmark', 'view all', 'index.php?id=$course->id', '');
 
-$strcheckmarks = get_string("modulenameplural", "checkmark");
-$strcheckmark = get_string("modulename", "checkmark");
+$strcheckmarks = get_string('modulenameplural', 'checkmark');
+$strcheckmark = get_string('modulename', 'checkmark');
 $strsectionname  = get_string('sectionname', 'format_'.$course->format);
-$strname = get_string("name");
-$strduedate = get_string("duedate", "checkmark");
-$strsubmitted = get_string("submitted", "checkmark");
-$strgrade = get_string("grade");
+$strname = get_string('name');
+$strduedate = get_string('duedate', 'checkmark');
+$strsubmitted = get_string('submitted', 'checkmark');
+$strgrade = get_string('grade');
 
 
 $PAGE->set_url('/mod/checkmark/index.php', array('id'=>$course->id));
@@ -54,7 +54,7 @@ $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 
 if (!$cms = get_coursemodules_in_course('checkmark', $course->id, 'cm.idnumber, m.timedue')) {
-    notice(get_string('nocheckmarks', 'checkmark'), "../../course/view.php?id=$course->id");
+    notice(get_string('nocheckmarks', 'checkmark'), '../../course/view.php?id=$course->id');
     die;
 }
 
@@ -75,7 +75,7 @@ if ($usesections) {
     $table->head  = array ($strname, $strduedate, $strsubmitted, $strgrade);
 }
 
-$currentsection = "";
+$currentsection = '';
 
 $modinfo = get_fast_modinfo($course);
 foreach ($modinfo->instances['checkmark'] as $cm) {
@@ -93,13 +93,13 @@ foreach ($modinfo->instances['checkmark'] as $cm) {
                              array('href'=>'view.php?id='.$cm->id,
                                    'class'=>$class));
 
-    $printsection = "";
+    $printsection = '';
     if ($usesections) {
         if ($cm->sectionnum !== $currentsection) {
             if ($cm->sectionnum) {
                 $printsection = get_section_name($course, $sections[$cm->sectionnum]);
             }
-            if ($currentsection !== "") {
+            if ($currentsection !== '') {
                 $table->data[] = 'hr';
             }
             $currentsection = $cm->sectionnum;

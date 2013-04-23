@@ -67,7 +67,7 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
 
         // Insert the checkmark record!
         $newitemid = $DB->insert_record('checkmark', $data);
-        // Immediately after inserting "activity" record, call this!
+        // Immediately after inserting 'activity' record, call this!
         $this->apply_activity_instance($newitemid);
     }
 

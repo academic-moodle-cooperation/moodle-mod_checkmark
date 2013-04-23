@@ -23,15 +23,15 @@
  * @since         Moodle 2.1
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-echo "Includes...";
+echo 'Includes...';
 require_once(dirname(__FILE__).'/../../config.php');
-require_once($CFG->dirroot . "/mod/checkmark/locallib.php");
+require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot.'/mod/checkmark/submission_form.php');
 require_once($CFG->dirroot.'/mod/checkmark/checkmark_pdf.php');
-echo "Cron";
+echo 'Cron';
 if (checkmark_cron()) {
-    echo "Cron finished OK";
+    echo 'Cron finished OK';
 } else {
-    echo "Cron finished not OK";
+    echo 'Cron finished not OK';
 }

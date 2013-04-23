@@ -23,8 +23,8 @@
  * @since         Moodle 2.1
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once("../../config.php");
-require_once($CFG->dirroot . "/mod/checkmark/locallib.php");
+require_once('../../config.php');
+require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 require_once($CFG->libdir . '/completionlib.php');
 require_once($CFG->libdir . '/plagiarismlib.php');
 $id = optional_param('id', 0, PARAM_INT);  // Course Module ID?
@@ -36,22 +36,22 @@ if ($id) {
         print_error('invalidcoursemodule');
     }
 
-    if (! $checkmark = $DB->get_record("checkmark", array("id"=>$cm->instance))) {
+    if (! $checkmark = $DB->get_record('checkmark', array('id'=>$cm->instance))) {
         print_error('invalidid', 'checkmark');
     }
 
-    if (! $course = $DB->get_record("course", array("id"=>$checkmark->course))) {
+    if (! $course = $DB->get_record('course', array('id'=>$checkmark->course))) {
         print_error('coursemisconf', 'checkmark');
     }
     $url->param('id', $id);
 } else {
-    if (!$checkmark = $DB->get_record("checkmark", array("id"=>$a))) {
+    if (!$checkmark = $DB->get_record('checkmark', array('id'=>$a))) {
         print_error('invalidid', 'checkmark');
     }
-    if (! $course = $DB->get_record("course", array("id"=>$checkmark->course))) {
+    if (! $course = $DB->get_record('course', array('id'=>$checkmark->course))) {
         print_error('coursemisconf', 'checkmark');
     }
-    if (! $cm = get_coursemodule_from_instance("checkmark", $checkmark->id, $course->id)) {
+    if (! $cm = get_coursemodule_from_instance('checkmark', $checkmark->id, $course->id)) {
         print_error('invalidcoursemodule');
     }
     $url->param('a', $a);
@@ -62,7 +62,7 @@ require_login($course, true, $cm);
 
 $PAGE->requires->js('/mod/checkmark/yui/checkmark/checkmark.js');
 
-require_once($CFG->dirroot."/mod/checkmark/lib.php");
+require_once($CFG->dirroot.'/mod/checkmark/lib.php');
 $checkmarkinstance = new checkmark($cm->id, $checkmark, $cm, $course);
 
 // Mark as viewed!

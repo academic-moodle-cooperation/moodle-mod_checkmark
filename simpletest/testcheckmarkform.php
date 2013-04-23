@@ -37,9 +37,9 @@ class checkmark_formvalidation_test extends UnitTestCase {
     public function test_countmismatch() {
         // Setup fixture!
         $checkmark = new checkmark();
-        $data['examplegrades'] = "1,2,3";
-        $data['examplenames'] = "1,2";
-        $data['grade'] = "6";
+        $data['examplegrades'] = '1,2,3';
+        $data['examplenames'] = '1,2';
+        $data['grade'] = '6';
         $data['flexiblenaming'] = 1;
 
         // Exercise SUT!
@@ -61,9 +61,9 @@ class checkmark_formvalidation_test extends UnitTestCase {
     public function test_summismatch() {
         // Setup fixture!
         $checkmark = new checkmark();
-        $data['examplegrades'] = "1,2,3";
-        $data['examplenames'] = "1,2,3";
-        $data['grade'] = "5";
+        $data['examplegrades'] = '1,2,3';
+        $data['examplenames'] = '1,2,3';
+        $data['grade'] = '5';
         $data['flexiblenaming'] = 1;
 
         // Exercise SUT!
@@ -84,9 +84,9 @@ class checkmark_formvalidation_test extends UnitTestCase {
     public function test_both_errors() {
         // Setup fixture!
         $checkmark = new checkmark();
-        $data['examplegrades'] = "1,2,3";
-        $data['examplenames'] = "1,2";
-        $data['grade'] = "5";
+        $data['examplegrades'] = '1,2,3';
+        $data['examplenames'] = '1,2';
+        $data['grade'] = '5';
         $data['flexiblenaming'] = 1;
 
         // Exercise SUT!
@@ -114,9 +114,9 @@ class checkmark_formvalidation_test extends UnitTestCase {
     public function test_noflexiblenaming() {
         // Setup fixture!
         $checkmark = new checkmark();
-        $data['examplegrades'] = "1,2,3";
-        $data['examplenames'] = "1,2";
-        $data['grade'] = "5";
+        $data['examplegrades'] = '1,2,3';
+        $data['examplenames'] = '1,2';
+        $data['grade'] = '5';
         $data['flexiblenaming'] = 0;
 
         // Exercise SUT!
@@ -135,9 +135,9 @@ class checkmark_formvalidation_test extends UnitTestCase {
     public function test_noerror() {
         // Setup fixture!
         $checkmark = new checkmark();
-        $data['examplegrades'] = "1,2,3";
-        $data['examplenames'] = "1,2,3";
-        $data['grade'] = "6";
+        $data['examplegrades'] = '1,2,3';
+        $data['examplenames'] = '1,2,3';
+        $data['grade'] = '6';
         $data['flexiblenaming'] = 1;
 
         // Exercise SUT!

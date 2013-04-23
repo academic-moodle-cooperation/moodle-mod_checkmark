@@ -71,22 +71,22 @@ function xmldb_checkmark_upgrade($oldversion) {
     if ($oldversion < 2011122100) {
         $table = new xmldb_table('checkmark');
         $fieldstodrop = array('assignmenttype', 'var3', 'var4', 'var5', 'maxbytes');
-        echo "<hr />dropping fields in table: {$table->name}<br />";
+        echo '<hr />dropping fields in table: '.$table->name.'<br />';
         foreach ($fieldstodrop as $fieldname) {
             $field = new xmldb_field($fieldname);
             if ($dbman->field_exists($table, $field)) {
-                echo "drop field: {$field->name} in table: {$table->name}";
+                echo 'drop field: '.$field->name.' in table: '.$table->name;
                 $dbman->drop_field($table, $field);
-                echo "...OK<br />";
+                echo '...OK<br />';
             } else {
-                echo "field: {$field->name} in table: {$table->name} doesn't exists!<br />";
+                echo 'field: '.$field->name.' in table: '.$table->name.' doesn\'t exists!<br />';
             }
         }
         $fieldstorename = array(
             'course' => 'course_id',
             'var1' => 'examplecount',
             'var2' => 'examplestart');
-        echo "<hr />renaming fields in table: {$table->name}<br />";
+        echo '<hr />renaming fields in table: '.$table->name.'<br />';
         foreach ($fieldstorename as $oldname => $newname) {
             switch ($oldname) {
                 case 'course':
@@ -103,11 +103,11 @@ function xmldb_checkmark_upgrade($oldversion) {
                     break;
             }
             if ($dbman->field_exists($table, $field)) {
-                echo "rename field: {$field->name} in table: {$table->name}";
+                echo 'rename field: '.$field->name.' in table: '.$table->name;
                 $dbman->rename_field($table, $field, $newname);
-                echo " to {$newname}...OK<br />";
+                echo ' to '.$newname.'...OK<br />';
             } else {
-                echo "field: {$field->name} in table: {$table->name} doesn\'t exists!<br />";
+                echo 'field: '.$field->name.' in table: '.$table->name.' doesn\'t exists!<br />';
             }
         }
 
@@ -131,15 +131,15 @@ function xmldb_checkmark_upgrade($oldversion) {
         // Now take care of checkmark_submissions!
         $table = new xmldb_table('checkmark_submissions');
         $fieldstodrop = array('numfiles', 'data2');
-        echo "<hr />dropping fields in table: $table->name<br />";
+        echo '<hr />dropping fields in table: '.$table->name.'<br />';
         foreach ($fieldstodrop as $fieldname) {
             $field = new xmldb_field($fieldname);
             if ($dbman->field_exists($table, $field)) {
-                echo "drop field: $field->name in table: $table->name";
+                echo 'drop field: '.$field->name.' in table: '.$table->name;
                 $dbman->drop_field($table, $field);
-                echo "...OK<br />";
+                echo '...OK<br />';
             } else {
-                echo "field: $field->name in table: $table->name doesn\'t exists!<br />";
+                echo 'field: '.$field->name.' in table: '.$table->name.' doesn\'t exists!<br />';
             }
         }
         $fieldstorename = array(
@@ -147,7 +147,7 @@ function xmldb_checkmark_upgrade($oldversion) {
             'userid' => 'user_id',
             'data1' => 'checked',
             'teacher' => 'teacher_id');
-        echo "<hr />renaming fields in table: {$table->name}<br />";
+        echo '<hr />renaming fields in table: '.$table->name.'<br />';
         foreach ($fieldstorename as $oldname => $newname) {
             switch ($oldname) {
                 case 'assignment':
@@ -168,11 +168,11 @@ function xmldb_checkmark_upgrade($oldversion) {
                     break;
             }
             if ($dbman->field_exists($table, $field)) {
-                echo "rename field: {$field->name} in table: {$table->name}";
+                echo 'rename field: '.$field->name.' in table: '.$table->name;
                 $dbman->rename_field($table, $field, $newname);
-                echo " to {$newname}...OK<br />";
+                echo ' to '.$newname.'...OK<br />';
             } else {
-                echo "field: {$field->name} in table: {$table->name} doesn't exists!<br />";
+                echo 'field: '.$field->name.' in table: '.$table->name.' doesn\'t exists!<br />';
             }
         }
 
@@ -223,11 +223,11 @@ function xmldb_checkmark_upgrade($oldversion) {
                                  XMLDB_NOTNULL, null, '0', 'id');
 
         if ($dbman->field_exists($table, $field)) {
-            echo "rename field: {$field->name} in table: {$table->name}";
+            echo 'rename field: '.$field->name.' in table: '.$table->name;
             $dbman->rename_field($table, $field, $newname);
-            echo " to {$newname}...OK<br />";
+            echo ' to '.$newname.'...OK<br />';
         } else {
-            echo "field: {$field->name} in table: {$table->name} doesn\'t exists!<br />";
+            echo 'field: '.$field->name.' in table: '.$table->name.' doesn\'t exists!<br />';
         }
 
         // Define index course_id (not unique) to be dropped form checkmark!

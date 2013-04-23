@@ -30,7 +30,7 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
-require_once($CFG->dirroot . "/mod/checkmark/locallib.php");
+require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 
 class mod_checkmark_mod_form extends moodleform_mod {
     protected $_checkmarkinstance = null;

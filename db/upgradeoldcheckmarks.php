@@ -24,8 +24,8 @@
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("../../../config.php");
-require_once($CFG->dirroot."/mod/checkmark/locallib.php");
+require_once('../../../config.php');
+require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
 
 require_login();
 
@@ -38,9 +38,9 @@ $starttime = microtime(1);
 $instancecount = 0;
 $submissioncount = 0;
 
-$assignment_mod_id = $DB->get_field_sql("SELECT id FROM {modules} WHERE name = 'assignment'",
+$assignment_mod_id = $DB->get_field_sql('SELECT id FROM {modules} WHERE name = \'assignment\'',
                                         null, IGNORE_MISSING);
-$new_mod_id = $DB->get_field_sql("SELECT id FROM {modules} WHERE name = 'checkmark'", null,
+$new_mod_id = $DB->get_field_sql('SELECT id FROM {modules} WHERE name = \'checkmark\'', null,
                                  MUST_EXIST);
 
 if (!$assignment_mod_id) {
@@ -50,9 +50,9 @@ if (!$assignment_mod_id) {
     exit;
 }
 
-$assignment_instances_old = $DB->get_fieldset_sql("SELECT id
+$assignment_instances_old = $DB->get_fieldset_sql('SELECT id
                                                    FROM {assignment}
-                                                   WHERE assignmenttype = 'checkmark'");
+                                                   WHERE assignmenttype = \'checkmark\'');
 
 if (empty($assignment_instances_old)) {
     // No assignment-checkmark instances found!
@@ -68,9 +68,9 @@ $refreshcourses = array();
 foreach ($assignment_instances_old as $instanceid) {
     $instancecount++;
     // Get data from old assignment-entry!
-    echo html_writer::start_tag('div')."Get Instance-Data";
+    echo html_writer::start_tag('div').'Get Instance-Data';
 
-    $instance_data = $DB->get_record_sql("SELECT * FROM {assignment} WHERE id = ?",
+    $instance_data = $DB->get_record_sql('SELECT * FROM {assignment} WHERE id = ?',
                                          array($instanceid));
 
     if ($instance_data) {
@@ -78,7 +78,7 @@ foreach ($assignment_instances_old as $instanceid) {
             $transaction = $DB->start_delegated_transaction();
 
 
-            echo " from {$instance_data->name}....OK".html_writer::end_tag('div');
+            echo ' from '.$instance_data->name.'....OK'.html_writer::end_tag('div');
 
             /*
              * Course needs refresh - otherwise links to updated activities would still refer
@@ -109,8 +109,8 @@ foreach ($assignment_instances_old as $instanceid) {
 
             // New entry in checkmark with data from old assignment-entry!
             echo html_writer::start_tag('div').'inserted new record in checkmark';
-            $new_instanceid = $DB->insert_record("checkmark", $instance_data, 1);
-            echo "....OK (old=$instanceid / new=$new_instanceid)".html_writer::end_tag('div');
+            $new_instanceid = $DB->insert_record('checkmark', $instance_data, 1);
+            echo '....OK (old='.$instanceid.' / new='.$new_instanceid.')'.html_writer::end_tag('div');
 
             // Event-update!
             $event = new stdClass();
@@ -137,15 +137,15 @@ foreach ($assignment_instances_old as $instanceid) {
             }
 
             // Copy submissions!
-            echo html_writer::start_tag('div')."Get submissions for {$instance_data->name}";
-            $submissions = $DB->get_records_sql("SELECT *
+            echo html_writer::start_tag('div').'Get submissions for '.$instance_data->name;
+            $submissions = $DB->get_records_sql('SELECT *
                                                  FROM {assignment_submissions}
-                                                 WHERE assignment = ?", array($instanceid));
-            echo "....OK".html_writer::end_tag('div');
+                                                 WHERE assignment = ?', array($instanceid));
+            echo '....OK'.html_writer::end_tag('div');
 
             if (is_array($submissions)) {
                 echo html_writer::start_tag('div').
-                     "start to insert submissions for {$instance_data->name}";
+                     'start to insert submissions for '.$instance_data->name;
                 $submissioncount += count($submissions);
                 foreach ($submissions as $currentsubmission) {
                     /*
@@ -161,69 +161,69 @@ foreach ($assignment_instances_old as $instanceid) {
                     $currentsubmission->teacher_id = $currentsubmission->teacher;
                     unset($currentsubmission->teacher);
                     unset($currentsubmission->id);
-                    $DB->insert_record("checkmark_submissions", $currentsubmission);
+                    $DB->insert_record('checkmark_submissions', $currentsubmission);
                 }
-                echo "....OK".html_writer::end_tag('div');
+                echo '....OK'.html_writer::end_tag('div');
             }
             // Set new module and instance-values in course_modules!
             echo html_writer::start_tag('div').
-                 "update course_module entry for {$instance_data->name}";
-            $DB->set_field("course_modules", "instance", '0',
+                 'update course_module entry for '.$instance_data->name;
+            $DB->set_field('course_modules', 'instance', '0',
                            array('instance'=>$instanceid, 'module'  =>$assignment_mod_id));
-            $DB->set_field("course_modules", "module", $new_mod_id,
+            $DB->set_field('course_modules', 'module', $new_mod_id,
                            array('instance'=>'0', 'module'=>$assignment_mod_id));
-            $DB->set_field("course_modules", "instance", $new_instanceid,
+            $DB->set_field('course_modules', 'instance', $new_instanceid,
                            array('instance'=>'0', 'module'=>$new_mod_id));
-            echo "....OK".html_writer::end_tag('div');
+            echo '....OK'.html_writer::end_tag('div');
 
             // Delete old submissions!
             echo html_writer::start_tag('div').
-                 "delete old submissions for {$instance_data->name}";
-            $DB->delete_records("assignment_submissions", array('assignment' => $instanceid));
-            echo "....OK".html_writer::end_tag('div');
+                 'delete old submissions for '.$instance_data->name;
+            $DB->delete_records('assignment_submissions', array('assignment' => $instanceid));
+            echo '....OK'.html_writer::end_tag('div');
 
             // Delete old assignment-instance!
             echo html_writer::start_tag('div').
-                 "delete old assignment-instance for {$instance_data->name}";
-            $DB->delete_records("assignment", array('id' => $instanceid));
-            echo "....OK".html_writer::end_tag('div');
+                 'delete old assignment-instance for '.$instance_data->name;
+            $DB->delete_records('assignment', array('id' => $instanceid));
+            echo '....OK'.html_writer::end_tag('div');
 
             // Assuming the both inserts work, we get to the following line.
             $transaction->allow_commit();
         } catch (Exception $e) {
             $transaction->rollback($e);
             if (empty($refreshcourses)) {
-                echo html_writer::start_tag('div')."rebuilding course cache for all courses";
+                echo html_writer::start_tag('div').'rebuilding course cache for all courses';
                 rebuild_course_cache();
-                echo "....OK".html_writer::end_tag('div');
+                echo '....OK'.html_writer::end_tag('div');
             } else {
                 foreach ($refreshcourses as $key => $currentcourse) {
                     echo html_writer::start_tag('div').
-                         "rebuilding course cache for course with id = $currentcourse";
+                         'rebuilding course cache for course with id = '.$currentcourse;
                     rebuild_course_cache($currentcourse);       // Update course cache!
                     unset($refreshcourses[$key]);
-                    echo "....OK".html_writer::end_tag('div');
+                    echo '....OK'.html_writer::end_tag('div');
                 }
             }
         }
     } else {
-        echo " ....SKIPPED (instance-id $instanceid is no checkmark-assignment)".
+        echo ' ....SKIPPED (instance-id '.$instanceid.' is no checkmark-assignment)'.
              html_writer::end_tag('div');
     }
 
 }
 $midtime = microtime(1);
 if (empty($refreshcourses)) {
-    echo html_writer::start_tag('div')."rebuilding course cache for all courses";
+    echo html_writer::start_tag('div').'rebuilding course cache for all courses';
     rebuild_course_cache();
-    echo "....OK".html_writer::end_tag('div');
+    echo '....OK'.html_writer::end_tag('div');
 } else {
     foreach ($refreshcourses as $currentcourse) {
         echo html_writer::start_tag('div').
-             "rebuilding course cache for course with id = $currentcourse";
+             'rebuilding course cache for course with id = '.$currentcourse;
         rebuild_course_cache($currentcourse);       // Update course cache!
 
-        echo "....OK".html_writer::end_tag('div');
+        echo '....OK'.html_writer::end_tag('div');
     }
 }
 $endtime = microtime(1);

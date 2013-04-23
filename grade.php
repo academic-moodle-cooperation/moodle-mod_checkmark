@@ -25,7 +25,7 @@
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("../../config.php");
+require_once('../../config.php');
 
 $id   = required_param('id', PARAM_INT);          // Course module ID!
 
@@ -34,11 +34,11 @@ if (! $cm = get_coursemodule_from_id('checkmark', $id)) {
     print_error('invalidcoursemodule');
 }
 
-if (! $checkmark = $DB->get_record("checkmark", array("id"=>$cm->instance))) {
+if (! $checkmark = $DB->get_record('checkmark', array('id'=>$cm->instance))) {
     print_error('invalidid', 'checkmark');
 }
 
-if (! $course = $DB->get_record("course", array("id"=>$checkmark->course))) {
+if (! $course = $DB->get_record('course', array('id'=>$checkmark->course))) {
     print_error('coursemisconf', 'checkmark');
 }
 

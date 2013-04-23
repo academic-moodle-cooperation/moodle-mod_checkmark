@@ -24,8 +24,8 @@
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("../../config.php");
-require_once($CFG->dirroot . "/mod/checkmark/locallib.php");
+require_once('../../config.php');
+require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 require_once($CFG->libdir.'/plagiarismlib.php');
 
 $id   = optional_param('id', 0, PARAM_INT);          // Course module ID
@@ -39,22 +39,22 @@ if ($id) {
         print_error('invalidcoursemodule');
     }
 
-    if (! $checkmark = $DB->get_record("checkmark", array("id"=>$cm->instance))) {
+    if (! $checkmark = $DB->get_record('checkmark', array('id'=>$cm->instance))) {
         print_error('invalidid', 'checkmark');
     }
 
-    if (! $course = $DB->get_record("course", array("id"=>$checkmark->course))) {
+    if (! $course = $DB->get_record('course', array('id'=>$checkmark->course))) {
         print_error('coursemisconf', 'checkmark');
     }
     $url->param('id', $id);
 } else {
-    if (!$checkmark = $DB->get_record("checkmark", array("id"=>$a))) {
+    if (!$checkmark = $DB->get_record('checkmark', array('id'=>$a))) {
         print_error('invalidcoursemodule');
     }
-    if (! $course = $DB->get_record("course", array("id"=>$checkmark->course))) {
+    if (! $course = $DB->get_record('course', array('id'=>$checkmark->course))) {
         print_error('coursemisconf', 'checkmark');
     }
-    if (! $cm = get_coursemodule_from_instance("checkmark", $checkmark->id, $course->id)) {
+    if (! $cm = get_coursemodule_from_instance('checkmark', $checkmark->id, $course->id)) {
         print_error('invalidcoursemodule');
     }
     $url->param('a', $a);
@@ -86,7 +86,7 @@ if (isset($_POST['autograde_all_submit'])) {
 }
 
 
-if ($download == "zip") {
+if ($download == 'zip') {
     $checkmarkinstance->download_submissions();
 } else if (isset($_POST['submittoprint'])) {
     $PAGE->set_pagelayout('popup'); // Remove navbars, etc!
