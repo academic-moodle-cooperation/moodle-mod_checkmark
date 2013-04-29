@@ -71,16 +71,6 @@ class checkmark {
     public $course;
     /** @var object */
     public $checkmark;
-    /** @var string */
-    public $strcheckmark;
-    /** @var string */
-    public $strcheckmarks;
-    /** @var string */
-    public $strsubmissions;
-    /** @var string */
-    public $strlastmodified;
-    /** @var string */
-    public $pagetitle;
     /** @var bool */
     public $usehtmleditor;
     /**
@@ -143,16 +133,6 @@ class checkmark {
         // Ensure compatibility with modedit checkmark obj!
         $this->checkmark->cmidnumber = $this->cm->idnumber;
         $this->checkmark->course   = $this->course->id;
-
-        
-        //tscpr:
-            //these strings are used only once or twice in the code, why dont use get_string every time?
-        $this->strcheckmark = get_string('modulename', 'checkmark');
-        $this->strcheckmarks = get_string('modulenameplural', 'checkmark');
-        $this->strsubmissions = get_string('submissions', 'checkmark');
-        $this->strlastmodified = get_string('lastmodified');
-        $this->pagetitle = strip_tags($this->course->shortname.': '.$this->strcheckmark.': '.
-                                      format_string($this->checkmark->name, true));
 
         /*
          * Visibility handled by require_login() with $cm parameter
@@ -608,8 +588,10 @@ class checkmark {
         if ($subpage) {
             $PAGE->navbar->add($subpage);
         }
-
-        $PAGE->set_title($this->pagetitle);
+        
+        $pagetitle = strip_tags($this->course->shortname.': '.get_string('modulename', 'checkmark').': '.
+                                format_string($this->checkmark->name, true));
+        $PAGE->set_title($pagetitle);
         $PAGE->set_heading($this->course->fullname);
 
         echo $OUTPUT->header();
@@ -780,8 +762,6 @@ class checkmark {
         global $CFG;
 
         $submitted = '';
-        //tscpr:
-            //i think according to guidelines it should be $CFG->wwwroot . '/mod/checkmark' with single quotes
         $urlbase = $CFG->wwwroot.'/mod/checkmark/';
 
         $context = context_module::instance($this->cm->id);
@@ -2433,9 +2413,6 @@ class checkmark {
         $course     = $this->course;
         $checkmark = $this->checkmark;
         $cm         = $this->cm;
-        //tscpr:
-            //you can safely remove $hassubmission, it is not used anywhere
-        $hassubmission = false;
 
         $tabindex = 1; // Tabindex for quick grading tabbing; Not working for dropdowns yet!
         add_to_log($course->id, 'checkmark', 'view submission', 'submissions.php?id='.$this->cm->id,
@@ -2505,8 +2482,6 @@ class checkmark {
         list($esql, $params) = get_enrolled_sql($context, 'mod/checkmark:submit', $currentgroup);
 
         if ($filter == self::FILTER_ALL) {
-            //tscpr:
-                //try to avoid using double quotes and variables inside them
             $sql = 'SELECT u.id FROM {user} u '.
                    'LEFT JOIN ('.$esql.') eu ON eu.id=u.id '.
                    'WHERE u.deleted = 0 AND eu.id=u.id ';
@@ -3584,9 +3559,6 @@ class checkmark {
                     }
 
                     if (!empty($auser->submissionid)) {
-                        //tscpr:
-                            //$hassubmission not used anywhere 
-                        $hassubmission = true;
                         // Print examples!
                         $submission = $this->get_submission($auser->id);
                         $checked_examples = explode(self::DELIMITER, $submission->checked);
@@ -3697,7 +3669,6 @@ class checkmark {
                         if ($final_grade->locked or $final_grade->overridden) {
                             $grade = html_writer::tag('div', $final_grade->formatted_grade,
                                                       array('id'=>'g'.$auser->id));
-                            $hassubmission = true;
                         } else {
                             $grade = html_writer::tag('div', '-', array('id'=>'g'.$auser->id));
                         }
@@ -4704,10 +4675,6 @@ EOS;
 
         if ($teachers = $this->get_graders($user)) {
             
-            //tscpr:
-                //$strcheckmarks and $strcheckmark are not used
-            $strcheckmarks = get_string('modulenameplural', 'checkmark');
-            $strcheckmark  = get_string('modulename', 'checkmark');
             $strsubmitted  = get_string('submitted', 'checkmark');
 
             foreach ($teachers as $teacher) {
@@ -4807,7 +4774,7 @@ EOS;
      * @return string
      */
     public function email_teachers_text($info) {
-        $posttext  = format_string($this->course->shortname).' -> '.$this->strcheckmarks.' -> '.
+        $posttext  = format_string($this->course->shortname).' -> '.get_string('modulenameplural', 'checkmark').' -> '.
         format_string($this->checkmark->name)."\n";
         $posttext .= "---------------------------------------------------------------------\n";
         $posttext .= get_string('emailteachermail', 'checkmark', $info)."\n";
@@ -4827,7 +4794,7 @@ EOS;
                      '<a href="'.$CFG->wwwroot.'/course/view.php?id='.$this->course->id.'">'.
                      format_string($this->course->shortname).'</a> ->'.
                      '<a href="'.$CFG->wwwroot.'/mod/checkmark/index.php?id='.
-                     $this->course->id.'">'.$this->strcheckmarks.'</a> ->'.
+                     $this->course->id.'">'.get_string('modulenameplural', 'checkmark').'</a> ->'.
                      '<a href="'.$CFG->wwwroot.'/mod/checkmark/view.php?id='.$this->cm->id.'">'.
                      format_string($this->checkmark->name).'</a></font></p>';
         $posthtml .= '<hr /><font face="sans-serif">';
@@ -5103,16 +5070,6 @@ EOS;
     }
 
     /**
-     * Plugin cron method - do not use $this here, create new checkmark instances if needed.
-     * @return void
-     */
-    //tscpr:
-        //is there a special reason to leave this function empty and have the manual cron?
-    public function cron() {
-        // No plugin cron by default - override if needed!
-    }
-
-    /**
      * Reset all submissions
      */
     public function reset_userdata($data) {
@@ -5167,60 +5124,6 @@ EOS;
         }
 
         return $status;
-    }
-
-    /**
-     *
-     * @param filehandle $bf file handle for xml file to write to
-     * @param mixed $preferences the complete backup preference object
-     *
-     * @return boolean
-     *
-     * @static
-     */
-    public static function backup_one_mod($bf, $preferences, $checkmark) {
-        return true;
-    }
-
-    /**
-     *
-     * @param filehandle $bf file handle for xml file to write to
-     * @param mixed $preferences the complete backup preference object
-     * @param object $submission the checkmark submission db record
-     *
-     * @return boolean
-     *
-     * @static
-     */
-    public static function backup_one_submission($bf, $preferences, $checkmark, $submission) {
-        return true;
-    }
-
-    /**
-     *
-     * @param array  $info the array representing the xml
-     * @param object $restore the restore preferences
-     *
-     * @return boolean
-     *
-     * @static
-     */
-    public static function restore_one_mod($info, $restore, $checkmark) {
-        return true;
-    }
-
-    /**
-     *
-     * @param object $submission the newly created submission
-     * @param array  $info the array representing the xml
-     * @param object $restore the restore preferences
-     *
-     * @return boolean
-     *
-     * @static
-     */
-    public static function restore_one_submission($info, $restore, $checkmark, $submission) {
-        return true;
     }
 
 }

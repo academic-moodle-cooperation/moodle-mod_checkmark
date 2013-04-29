@@ -60,9 +60,7 @@ if (!$cms = get_coursemodules_in_course('checkmark', $course->id, 'cm.idnumber, 
 
 $usesections = course_format_uses_sections($course->format);
 if ($usesections) {
-    //tscpr:
-        // get_all_sections is deprecated. you can replace it with get_fast_modinfo($course->id)->get_section_info_all();
-    $sections = get_all_sections($course->id);
+    $sections = get_fast_modinfo($course->id)->get_section_info_all();
 }
 
 $timenow = time();
@@ -105,10 +103,6 @@ foreach ($modinfo->instances['checkmark'] as $cm) {
             $currentsection = $cm->sectionnum;
         }
     }
-
-    //tscpr:
-        //this is repeated for each mod instance, is it really needed here inside the loop?
-    require_once($CFG->dirroot.'/mod/checkmark/lib.php');
 
     $checkmarkinstance = new checkmark($cm->id, null, $cm, $course);
 

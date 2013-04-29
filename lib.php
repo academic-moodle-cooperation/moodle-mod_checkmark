@@ -265,9 +265,6 @@ function checkmark_cron () {
             $starttime = $endtime - 2 * 24 * 3600;   // Two days earlier?
     }
     if ($submissions = checkmark_get_unmailed_submissions($starttime, $endtime)) {
-        //tscpr:
-            //not used anywhere(in this function :))
-        $realuser = clone($USER);
 
         foreach ($submissions as $key => $submission) {
             $DB->set_field('checkmark_submissions', 'mailed', '1', array('id'=>$submission->id));
@@ -517,42 +514,6 @@ function checkmark_grade_item_delete($checkmark) {
 
     return grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id, 0,
                         null, array('deleted'=>1));
-}
-
-/**
- * Returns the users with data in one checkmark (students and teachers)
- *
- * @todo: deprecated - to be deleted in 2.2
- //tscpr:
-    //is there a reason to keep it?
- *
- * @param $checkmarkid int
- * @return array of user objects
- */
-function checkmark_get_participants($checkmarkid) {
-    global $CFG, $DB;
-
-    // Get students!
-    $students = $DB->get_records_sql('SELECT DISTINCT u.id, u.id
-                                        FROM {user} u,
-                                             {checkmark_submissions} a
-                                       WHERE a.checkmark_id = ? and
-                                             u.id = a.user_id', array($checkmarkid));
-    // Get teachers!
-    $teachers = $DB->get_records_sql('SELECT DISTINCT u.id, u.id
-                                        FROM {user} u,
-                                             {checkmark_submissions} a
-                                       WHERE a.checkmark_id = ? and
-                                             u.id = a.teacher_id', array($checkmarkid));
-
-    // Add teachers to students!
-    if ($teachers) {
-        foreach ($teachers as $teacher) {
-            $students[$teacher->id] = $teacher;
-        }
-    }
-    // Return students array (it contains an array of unique users)!
-    return ($students);
 }
 
 /**
