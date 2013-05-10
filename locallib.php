@@ -690,14 +690,18 @@ class checkmark {
         }
 
         if (!$submission) { // Get submission for this checkmark!
+            $userid = $USER->id;
             $submission = $this->get_submission($USER->id);
+        } else {
+            $userid = $submission->userid;
         }
+        
         // Check if the user can submit?
-        $cansubmit = has_capability('mod/checkmark:submit', $this->context, $USER->id, false);
+        $cansubmit = has_capability('mod/checkmark:submit', $this->context, $userid, false);
         // If not then check if the user still has the view cap and has a previous submission?
         $cansubmit = $cansubmit || (!empty($submission) && has_capability('mod/checkmark:view',
                                                                           $this->context,
-                                                                          $USER->id,
+                                                                          $userid,
                                                                           false));
 
         if (!$cansubmit) {
@@ -706,9 +710,9 @@ class checkmark {
         }
 
         $grading_info = grade_get_grades($this->course->id, 'mod', 'checkmark',
-                                         $this->checkmark->id, $USER->id);
+                                         $this->checkmark->id, $userid);
         $item = $grading_info->items[0];
-        $grade = $item->grades[$USER->id];
+        $grade = $item->grades[$userid];
 
         if ($grade->hidden or $grade->grade === false) { // Hidden or error!
             return;
@@ -2054,8 +2058,8 @@ class checkmark {
             }
         }
 
-        if (isset($submission->teacher) && $submission->teacher) {
-            $teacher = $DB->get_record('user', array('id'=>$submission->teacher));
+        if (isset($submission->teacher_id) && $submission->teacher_id) {
+            $teacher = $DB->get_record('user', array('id'=>$submission->teacher_id));
         } else {
             global $USER;
             $teacher = $USER;
