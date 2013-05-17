@@ -53,7 +53,7 @@ $string['autograde_success'] = 'Autograde successful! {$a} submissions updated.'
 $string['autograde_error'] = 'An error occured during autograding.';
 $string['autograde_confirm'] = 'You are about to update grades and feedback for {$a}. These will be overwritten!';
 $string['autograde_notsupported'] = 'This scale is not supported by automatic grading.';
-$string['autograde_no_users_selected'] = 'You\'ve selected no users to grade! Select them via checkboxes on the left.';
+$string['autograde_no_users_selected'] = 'You have not selected any user to grade. Select the required users via the checkboxes in the left column of the table below.';
 $string['checkmark_overviewsummary'] = 'You\'ve checked {$a->checked_examples} / {$a->max_checked_examples} examples ({$a->checked_grades} / {$a->max_checked_grades} points)<br />{$a->grade}<br />';
 $string['checkmark_summary'] = 'You\'ve checked <span id="examples">{$a->checked}</span> out of {$a->total} examples.<br />(<span id="grade">{$a->checkedgrade}</span> out of a maximum of {$a->maxgrade} points)';
 $string['checkmarkstatstitle'] = 'Courseoverview Checkmark';
