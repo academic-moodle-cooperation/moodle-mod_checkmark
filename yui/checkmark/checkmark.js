@@ -211,10 +211,10 @@ M.mod_checkmark = {
      *
      * @return true if everything's allright (no error handling by now)
      */
-    update_settings: function() {
+    update_settings: function(e) {
         var gradesum = 0;
         var i = 0;
-
+        
         //first we strip everything we don't need :)
         M.mod_checkmark.stripper(null);
 
@@ -241,8 +241,10 @@ M.mod_checkmark = {
             //replace occurences of more than 1 comma in row through a single one...
             Y.one(examplegrades_selector).set('value', Y.one(examplegrades_selector).get('value').replace(/,{2,}/g, ","));
             //strip trailling and following commata
-            Y.one(examplegrades_selector).set('value', Y.one(examplegrades_selector).get('value').replace(/^,*|,*$/g, ""));
-            Y.one(examplenames_selector).set('value', Y.one(examplenames_selector).get('value').replace(/^,*|,*$/g, ""));
+            if (e.type != 'valuechange') {
+                Y.one(examplegrades_selector).set('value', Y.one(examplegrades_selector).get('value').replace(/^,*|,*$/g, ""));
+                Y.one(examplenames_selector).set('value', Y.one(examplenames_selector).get('value').replace(/^,*|,*$/g, ""));
+            }
             //get string and strip every character except "," (comma) and numerics
             var temp_string = M.mod_checkmark.Y.one(examplegrades_selector).get('value').replace(/[^0-9,]/, "");
             var temp_array = temp_string.split(M.mod_checkmark.dividing_symbol);
@@ -313,9 +315,7 @@ M.mod_checkmark = {
         var combo = new Array();
         combo[0] = "input[name=\"printoptimum\"]";
         combo[1] = "input[name=\"printperpage\"]";
-        alert('init!');
         Y.on('change', function(e, combo) {
-                    alert('Change in Printoptimum!');
                     // Stop the event's default behavior
                     e.preventDefault();
                     // Stop the event from bubbling up the DOM tree
@@ -328,7 +328,6 @@ M.mod_checkmark = {
                     }
                 }, combo[0]);
         Y.on('change', function(e, combo) {
-                    alert('Change in Printperpage!');
                     // Stop the event's default behavior
                     e.preventDefault();
                     // Stop the event from bubbling up the DOM tree
