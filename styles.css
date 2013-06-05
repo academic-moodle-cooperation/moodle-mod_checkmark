@@ -154,6 +154,10 @@
     text-align: left;
 }
 
+#page-mod-checkmark-submissions fieldset {
+    margin-bottom: 2em;
+}
+
 #page-mod-checkmark-submissions  .checkboxcontroller {
     margin-top:1em;
     margin-left: 1em;
@@ -233,8 +237,10 @@
     border-color: #dddddd;
     border-style: solid;
     padding:0px;
-    margin-left:auto;
-    margin-right:auto;
+    /*margin-left:auto;
+    margin-right:auto;*/
+    margin-left:10px;
+    margin-right:10px;
 }
 
 .path-mod-checkmark .scroll_forced .datapreviewtitle {
