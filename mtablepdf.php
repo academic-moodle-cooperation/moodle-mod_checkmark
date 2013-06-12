@@ -17,8 +17,7 @@
 // this file contains all the functions that aren't needed by core moodle
 // but start becoming required once we're actually inside the assignment module.
 
-require_once("../../config.php");
-require_once("lib.php");
+require_once($CFG->dirroot . "/config.php");
 
 require_once($CFG->libdir . '/pdflib.php');
 
@@ -388,6 +387,7 @@ class MTablePDF extends pdf{
             }
 
             $numlines = 1;
+            $colspan = 0;
             foreach ($row as $key => $value) {
             	$width = 0;
             	for($i=$key;$i<=$key+$colspan;$i++){
