@@ -3717,16 +3717,20 @@ class checkmark {
                                                                    'action' => $url,
                                                                    'method' => 'post'));
         $returnstring .= html_writer::end_tag('div');
-        $returnstring .= $OUTPUT->footer();
 
         $jsmodule = array(
             'name'     =>   'mod_checkmark',
             'fullpath' =>   '/mod/checkmark/yui/checkmark/checkmark.js',
-            'requires' =>   array('base', 'node', 'io', 'event')
+            'requires' =>   array('base', 'node', 'io', 'event'),
+            'strings'  =>   null
         );
-        $jsdata = null;
+        $jsdata = array(
+            'stdperpage' => $printperpage ? $printperpage : 10
+        );
         $PAGE->requires->js_init_call('M.mod_checkmark.init_printsettings', $jsdata, true,
                                       $jsmodule);
+
+        $returnstring .= $OUTPUT->footer();
 
         return $returnstring;
     }

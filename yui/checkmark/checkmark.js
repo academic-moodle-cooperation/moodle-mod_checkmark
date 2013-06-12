@@ -309,36 +309,59 @@ M.mod_checkmark = {
      * first make Y accsesible in all other methods of M.mod_checkmark
      * second register event-listeners for all apropriate elements
      */
-    init_printsettings: function(Y) {
+    init_printsettings: function(Y, stdperpage) {
         this.Y = Y;
-
         var combo = new Array();
-        combo[0] = "input[name=\"printoptimum\"]";
-        combo[1] = "input[name=\"printperpage\"]";
-        Y.on('change', function(e, combo) {
-                    // Stop the event's default behavior
-                    e.preventDefault();
-                    // Stop the event from bubbling up the DOM tree
-                    e.stopPropagation();
-                    //deactivate textfield and set to 0 if checkbox is checked
-                    if(M.mod_checkmark.Y.one(combo[0]).get('checked')) {
-                        M.mod_checkmark.Y.one(combo[1]).set('disabled', 'disabled');
-                    } else {
-                        M.mod_checkmark.Y.one(combo[1]).set('disabled', '');
-                    }
-                }, combo[0]);
-        Y.on('change', function(e, combo) {
-                    // Stop the event's default behavior
-                    e.preventDefault();
-                    // Stop the event from bubbling up the DOM tree
-                    e.stopPropagation();
-                    //deactivate textfield and set to 0 if checkbox is checked
-                    if(M.mod_checkmark.Y.one(combo[1]).get('value') == 0) {
-                        M.mod_checkmark.Y.one(combo[0]).set('checked', 'checked');
-                    } else {
-                        M.mod_checkmark.Y.one(combo[0]).set('checked', '');
-                    }
-                }, combo[1]);
+        combo[0] = 'input[name=printoptimum]';
+        combo[1] = 'input[name=printperpage]';
+
+        M.mod_checkmark.stdperpage = stdperpage;
+
+        if(M.mod_checkmark.Y.one(combo[0]).get('checked')) {
+            M.mod_checkmark.Y.one(combo[1]).setAttribute('disabled', 'disabled');
+        } else {
+            M.mod_checkmark.Y.one(combo[1]).removeAttribute('disabled');
+        }
+
+        Y.one(combo[1]).on('change', M.mod_checkmark.change_in_perpage, null, combo);
+        Y.one(combo[0]).on('change', M.mod_checkmark.change_in_optimum, null, combo); 
+        return true;
+    },
+    
+    change_in_perpage: function (e, combo) {
+        // Stop the event's default behavior
+        e.preventDefault();
+        // Stop the event from bubbling up the DOM tree
+        e.stopPropagation();
+
+        if(M.mod_checkmark.Y.one(combo[1]).get('value') == 0) {
+            //check checkbox and disable text field
+            M.mod_checkmark.Y.one(combo[0]).set('checked', 'checked');
+            M.mod_checkmark.Y.one(combo[1]).setAttribute('disabled', 'disabled');
+        } else {
+            //save last value, uncheck checkbox and enable textfield if checked/disabled
+            M.mod_checkmark.stdperpage = M.mod_checkmark.Y.one(combo[1]).get('value');
+            M.mod_checkmark.Y.one(combo[0]).set('checked', '');
+            M.mod_checkmark.Y.one(combo[1]).removeAttribute('disabled');
+        }
+    },
+    
+    change_in_optimum: function (e, combo) {
+        // Stop the event's default behavior
+        e.preventDefault();
+        // Stop the event from bubbling up the DOM tree
+        e.stopPropagation();
+
+        if(M.mod_checkmark.Y.one(combo[0]).get('checked')) {
+            //save last value, set to 0 and disable textfield
+            M.mod_checkmark.stdperpage = M.mod_checkmark.Y.one(combo[1]).get('value');
+            M.mod_checkmark.Y.one(combo[1]).set('value', 0);
+            M.mod_checkmark.Y.one(combo[1]).setAttribute('disabled', 'disabled');
+        } else {
+            //restore last value and enable again
+            M.mod_checkmark.Y.one(combo[1]).set('value', M.mod_checkmark.stdperpage);
+            M.mod_checkmark.Y.one(combo[1]).removeAttribute('disabled');
+        }
     }
 };
 
