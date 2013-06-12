@@ -4003,7 +4003,7 @@ class checkmark {
         }
 
         // Get orientation (P/L)!
-        $orientation = optional_param('pageorientation', 0, PARAM_INT) ? MTablePDF::PORTRAIT : MTABLEPDF::LANDSCAPE;
+        $orientation = optional_param('pageorientation', 0, PARAM_INT) ? MTablePDF::PORTRAIT : MTablePDF::LANDSCAPE;
 
         $pdf = new MTablePDF($orientation, $cellwidth);
 
