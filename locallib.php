@@ -662,7 +662,7 @@ class checkmark {
      * @see mod/checkmark/checkmark_base::setup_elements()
      */
     public function setup_elements(&$mform) {
-        global $DB, $CFG, $COURSE, $PAGE, $OUTPUT;
+        global $CFG, $COURSE, $PAGE, $OUTPUT;
 
         $jsdata = array(self::DELIMITER);
         $jsmodule = array(
@@ -685,7 +685,7 @@ class checkmark {
         } else {
             $mform->addElement('hidden', 'allready_submit', 'no');
         }
-        
+        $mform->setType('allready_submit', PARAM_ALPHA);
 
         // Disable manual grading settings if submissions are present!
         $mform->disabledIf('grade', 'allready_submit', 'eq', 'yes');
@@ -742,6 +742,8 @@ class checkmark {
 
         $mform->addElement('text', 'examplenames',
                            get_string('examplenames', 'checkmark').' ('.self::DELIMITER.')');
+        // We clean these by ourselves!
+        $mform->setType('examplenames', 'PARAM_RAW');
         $mform->addHelpButton('examplenames', 'examplenames', 'checkmark');
         if (isset($CFG->checkmark_stdnames)) {
             $mform->setDefault('examplenames', $CFG->checkmark_stdnames);
@@ -756,6 +758,8 @@ class checkmark {
         $mform->addElement('text', 'examplegrades',
                            get_string('examplegrades', 'checkmark').' ('.self::DELIMITER.')',
                            array('id'=>'id_examplegrades'));
+        // We clean these by ourselves!
+        $mform->setType('examplegrades', PARAM_RAW);
         $mform->addHelpButton('examplegrades', 'examplegrades', 'checkmark');
         if (isset($CFG->checkmark_stdgrades)) {
             $mform->setDefault('examplegrades', $CFG->checkmark_stdgrades);
@@ -766,46 +770,6 @@ class checkmark {
         $mform->disabledIf('examplegrades', 'allready_submit', 'eq', 'yes');
         $mform->setAdvanced('examplegrades');
 
-        /* if we update an instance, we have to check the allready saved examples etc
-         * and reconstruct the comma separated lists as well as update the standardvalues
-         * of the fields
-         */
-        if ($update) {
-            $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $cm->instance));
-            $flexiblenaming = false;
-            $oldgrade = false;
-            $oldname = false;
-            foreach($examples as $example) {
-                if(($oldgrade !== false) && ($oldname !== false)) {
-                    if($oldgrade != $example->grade) {
-                        $flexiblenaming = true;
-                    }
-                    if(!is_number($example->name) || intval($example->name) != intval($oldname)+1) {
-                        $flexiblenaming = true;
-                    }
-                    $examplenames .= self::DELIMITER.$example->name;
-                    $examplegrades .= self::DELIMITER.$example->grade;
-                    $oldname = $example->name;
-                    $oldgrade = $example->grade;
-                } else {
-                    $examplenames = $example->name;
-                    $examplegrades = $example->grade;
-                    $oldname = $example->name;
-                    $oldgrade = $example->grade;
-                }
-            }
-            if($flexiblenaming !== true) {
-                $mform->setDefault('examplecount', count($examples) ? count($examples) : $CFG->checkmark_stdexamplecount);
-                reset($examples);
-                $example = current($examples);
-                $mform->setDefault('examplestart', $example->name);
-            } else {
-                $mform->setDefault('examplenames', $examplenames);
-                $mform->setDefault('examplegrades', $examplegrades);
-                $mform->setDefault('flexiblenaming', 'checked');
-            }
-        }
-        
         $course_context = context_course::instance($COURSE->id);
         plagiarism_get_form_elements_module($mform, $course_context);
     }
@@ -956,15 +920,11 @@ class checkmark {
      * @return none
      */
     public function form_data_preprocessing(&$default_values, $form) {
-        global $DB, $CFG;
-
         if (isset($this->checkmark)) {
             if (count_real_submissions() != 0) {
-                echo "OUTPUTTING allready_submit as hidden element with value yes!";
                 $form->addElement('hidden', 'allready_submit', 'yes');
                 $default_values['allready_submit'] = 'yes';
             } else {
-                echo "OUTPUTTING allready_submit as hidden element with value no!";
                 $form->addElement('hidden', 'allready_submit', 'no');
                 $default_values['allready_submit'] = 'no';
             }
