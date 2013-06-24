@@ -57,8 +57,32 @@ function checkmark_delete_instance($id) {
         $fs->delete_area_files($context->id);
     }
 
-    if (! $DB->delete_records('checkmark_submissions', array('checkmark_id'=>$checkmark->id))) {
+    $submissions = $DB->get_fieldset_select('checkmark_submissions', 'id', 'checkmarkid = :checkmarkid', array('checkmarkid'=>$checkmark->id));
+    if(!empty($submissions)) {
+        list($ssql, $sparams) = $DB->get_in_or_equal($submissions, SQL_PARAMS_NAMED);
+    } else {
+        //no dataset should have submissionid = NULL so we can use this for our OR to select whom do delete
+        $ssql = ' = NULL';
+        $sparams = array();
+    }
+    if (! $DB->delete_records('checkmark_submissions', array('checkmarkid'=>$checkmark->id))) {
         $result = false;
+    }
+    
+    $examples = $DB->get_fieldset_select('checkmark_examples', 'id', 'checkmarkid = :checkmarkid', array('checkmarkid'=>$checkmark->id));
+    if(!empty($examples)) {
+        list($esql, $eparams) = $DB->get_in_or_equal($examples, SQL_PARAMS_NAMED);
+    } else {
+        //no dataset should have exampleid = NULL so we can use this for our OR to select whom do delete
+        $esql = ' = NULL';
+        $eparams = array();
+    }
+    if (! $DB->delete_records('checkmark_examples', array('checkmarkid'=>$checkmark->id))) {
+        $result = false;
+    }
+    
+    if(!empty($examples) || !empty($submissions)) {
+        $DB->delete_records_select('checkmark_checks', 'submissionid '.$ssql.' OR exampleid '.$esql, array_merge($sparams, $eparams));
     }
 
     if (! $DB->delete_records('event', array('modulename' => 'checkmark',
@@ -90,11 +114,12 @@ function checkmark_update_instance($checkmark) {
 
     $checkmark->timemodified = time();
 
-    if (($checkmark->allready_submit != 'yes') && !isset($checkmark->flexiblenaming)) {
-        $checkmark->flexiblenaming = 0;
-    } else {
-        unset($checkmark->flexiblenaming);
-    }
+    // if (($checkmark->allready_submit != 'yes') && !isset($checkmark->flexiblenaming)) {
+        // $checkmark->flexiblenaming = 0;
+    // } else {
+        // echo 'Unsetting flexiblenaming!';
+        // unset($checkmark->flexiblenaming);
+    // }
 
     // Clean examplenames and examplegrades!
     $checkmark->examplenames = preg_replace('#^,*|,*$#', '',
@@ -107,6 +132,14 @@ function checkmark_update_instance($checkmark) {
     $checkmark->id = $checkmark->instance;
 
     $DB->update_record('checkmark', $checkmark);
+    
+    if($checkmark->allready_submit != 'yes') {
+        /*
+         * We won't change the examples after someone submitted allready - otherwise he/she would
+         * have submitted other examples than displayed
+         */
+        checkmark_update_examples($checkmark);
+    }
 
     if ($checkmark->timedue) {
         $event = new stdClass();
@@ -171,8 +204,19 @@ function checkmark_add_instance($checkmark) {
     if (!isset($checkmark->flexiblenaming)) {
         $checkmark->flexiblenaming = 0;
     }
+    
+    // Clean examplenames and examplegrades!
+    $checkmark->examplenames = preg_replace('#^,*|,*$#', '',
+                                            $checkmark->examplenames, -1);
+    $checkmark->examplenames = preg_replace('#,{2,}#', ',', $checkmark->examplenames, -1);
+    $checkmark->examplegrades = preg_replace('#^,*|,*$#', '',
+                                             $checkmark->examplegrades, -1);
+    $checkmark->examplegrades = preg_replace('#,{2,}#', ',', $checkmark->examplegrades, -1);
+
     $returnid = $DB->insert_record('checkmark', $checkmark);
     $checkmark->id = $returnid;
+
+    checkmark_update_examples($checkmark);
 
     if ($checkmark->timedue) {
         $event = new stdClass();
@@ -199,6 +243,90 @@ function checkmark_add_instance($checkmark) {
     add_to_log($COURSE->id, 'checkmark', 'add', $link, $name);
 
     return $returnid;
+}
+
+/**
+ * Updates the examples in the DB for this checkmark
+ *
+ * @since MOODLE 2.4
+ * @param $checkmark object containing data from checkmarks mod_form
+ * @global $DB
+ */
+function checkmark_update_examples($checkmark) {
+    global $DB;
+
+    if(!is_object($checkmark)) {
+        //something wrong happened, but this should never happen!
+        throw new coding_exception('The checkmark param to checkmark_update_examples() must be an'.
+                                           ' object containing data from the mod_form.');
+    }
+    
+    $examples = $DB->get_records('checkmark_examples', array('checkmarkid'=>$checkmark->instance));
+    
+    if(!empty($examples)) {
+        list($esql, $eparams) = $DB->get_in_or_equal(array_keys($examples));
+
+        if($DB->record_exists_select('checkmark_checks', 'exampleid '.$esql, $eparams)) {
+            throw new coding_exception('Any alteration of the examples after a submission would break consistency!');
+        }
+    }
+    
+    reset($examples);
+
+    if(empty($checkmark->flexiblenaming)) {
+        //standard-naming
+        $i = $checkmark->examplestart;
+        $grade = $checkmark->grade/$checkmark->examplecount;
+        //first we go through the old examples
+        while($example = current($examples)) {
+            if($i < $checkmark->examplestart+$checkmark->examplecount) {
+                //if there are more new examples replace the old ones with the new ones!
+                $example->name = $i;
+                $example->grade = $grade;
+                $DB->update_record('checkmark_examples', $example);
+            } else {
+                //if there are enough examples delete the rest of the old ones!
+                $DB->delete_records('checkmark_examples', array('id'=>$example->id));
+            }
+            $i++;
+            next($examples);
+        }
+        //add all the new examples if there haven't been enough old ones to update!
+        while($i < $checkmark->examplestart+$checkmark->examplecount) {
+            $example = new stdClass();
+            $example->name = $i;
+            $example->grade = $grade;
+            $example->checkmarkid = $checkmark->instance;
+            $DB->insert_record('checkmark_examples', $example);
+            $i++;
+        }
+    } else {
+        //flexiblenaming
+        $names = explode(checkmark::DELIMITER, $checkmark->examplenames);
+        $grades = explode(checkmark::DELIMITER, $checkmark->examplegrades);
+        reset($examples);
+        foreach($names as $key => $name) {
+            if($next = current($examples)) {
+                // If there's an old example to update, we reuse them!
+                $next->name = $names[$key];
+                $next->grade = $grades[$key];
+                $DB->update_record('checkmark_examples', $next);
+                next($examples);
+            } else {
+                // Or we create new ones if there aren't any old ones left!
+                $example = new stdClass();
+                $example->checkmarkid = $checkmark->id;
+                $example->name = $names[$key];
+                $example->grade = $grades[$key];
+                $DB->insert_record('checkmark_examples', $example);
+                next($examples);
+            }
+        }
+        while($next = current($examples)) { // We delete the rest if there are any old left!
+            $DB->delete_records('checkmark_examples', array('id' => $next->id));
+            next($examples);
+        }
+    }
 }
 
 /**
@@ -276,7 +404,7 @@ function checkmark_cron () {
 
             echo 'Processing checkmark submission '.$submission->id."\n";
 
-            if (! $user = $DB->get_record('user', array('id'=>$submission->user_id))) {
+            if (! $user = $DB->get_record('user', array('id'=>$submission->userid))) {
                 echo 'Could not find user '.$user->id."\n";
                 continue;
             }
@@ -298,14 +426,14 @@ function checkmark_cron () {
                 continue;
             }
 
-            if (! $teacher = $DB->get_record('user', array('id'=>$submission->teacher_id))) {
-                echo 'Could not find teacher '.$submission->teacher_id."\n";
+            if (! $teacher = $DB->get_record('user', array('id'=>$submission->teacherid))) {
+                echo 'Could not find teacher '.$submission->teacherid."\n";
                 continue;
             }
 
-            if (! $mod = get_coursemodule_from_instance('checkmark', $submission->checkmark_id,
+            if (! $mod = get_coursemodule_from_instance('checkmark', $submission->checkmarkid,
                                                         $course->id)) {
-                echo 'Could not find course module for checkmark id '.$submission->checkmark_id."\n";
+                echo 'Could not find course module for checkmark id '.$submission->checkmarkid."\n";
                 continue;
             }
 
@@ -374,6 +502,7 @@ function checkmark_cron () {
  * @param int $checkmarkid id of checkmark
  * @param int $userid optional user id, 0 means all users
  * @return array array of grades, false if none
+ * @todo 2.5 use primarily grades from gradebook!
  */
 function checkmark_get_user_grades($checkmark, $userid=0) {
     global $CFG, $DB;
@@ -387,10 +516,10 @@ function checkmark_get_user_grades($checkmark, $userid=0) {
     $params['aid'] = $checkmark->id;
 
     $sql = 'SELECT u.id, u.id AS userid, s.grade AS rawgrade, s.submissioncomment AS feedback,
-                   s.format AS feedbackformat, s.teacher_id AS usermodified,
+                   s.format AS feedbackformat, s.teacherid AS usermodified,
                    s.timemarked AS dategraded, s.timemodified AS datesubmitted
             FROM {user} u, {checkmark_submissions} s
-            WHERE u.id = s.user_id AND s.checkmark_id = :aid'.
+            WHERE u.id = s.userid AND s.checkmarkid = :aid'.
             $user;
     return $DB->get_records_sql($sql, $params);
 }
@@ -629,13 +758,13 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
     // Do not use log table if possible, it may be huge!
 
     if (!$submissions = $DB->get_records_sql('
-            SELECT asb.id, asb.timemodified, cm.id AS cmid, asb.user_id,
+            SELECT asb.id, asb.timemodified, cm.id AS cmid, asb.userid,
                  u.firstname, u.lastname, u.email, u.picture
             FROM {checkmark_submissions} asb
-                JOIN {checkmark} a      ON a.id = asb.checkmark_id
+                JOIN {checkmark} a      ON a.id = asb.checkmarkid
                 JOIN {course_modules} cm ON cm.instance = a.id
                 JOIN {modules} md        ON md.id = cm.module
-                JOIN {user} u            ON u.id = asb.user_id
+                JOIN {user} u            ON u.id = asb.userid
             WHERE asb.timemodified > ? AND
                   a.course = ? AND
                   md.name = \'checkmark\'
@@ -764,8 +893,8 @@ function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $c
     if (!$submissions = $DB->get_records_sql('SELECT asb.id, asb.timemodified,
                                                 $userfields
                                                 FROM {checkmark_submissions} asb
-                                                JOIN {checkmark} a      ON a.id = asb.checkmark_id
-                                                JOIN {user} u            ON u.id = asb.user_id'.
+                                                JOIN {checkmark} a      ON a.id = asb.checkmarkid
+                                                JOIN {user} u            ON u.id = asb.userid'.
                                                 $groupjoin.
                                                 'WHERE asb.timemodified > :timestart
                                                    AND a.id = :cminstance'.
@@ -935,7 +1064,7 @@ function checkmark_get_unmailed_submissions($starttime, $endtime) {
                                  WHERE s.mailed = 0
                                      AND s.timemarked <= ?
                                      AND s.timemarked >= ?
-                                     AND s.checkmark_id = a.id', array($endtime, $starttime));
+                                     AND s.checkmarkid = a.id', array($endtime, $starttime));
 }
 
 /**
@@ -970,9 +1099,9 @@ function checkmark_count_real_submissions($cm, $groupid=0) {
 
     return $DB->count_records_sql('SELECT COUNT(\'x\')
                                      FROM {checkmark_submissions}
-                                    WHERE checkmark_id = ? AND
+                                    WHERE checkmarkid = ? AND
                                           timemodified > 0 AND
-                                          user_id '.$sqluserlist, $params);
+                                          userid '.$sqluserlist, $params);
 }
 
 
@@ -995,11 +1124,16 @@ function checkmark_get_all_submissions($checkmark, $sort='', $dir='DESC') {
         $sort = 'a.'.$sort.' '.$dir;
     }
 
-    return $DB->get_records_sql('SELECT a.*
-                                 FROM {checkmark_submissions} a, {user} u
-                                 WHERE u.id = a.user_id
-                                     AND a.checkmark_id = ?
-                                 ORDER BY '.$sort, array($checkmark->id));
+    $records = $DB->get_records_sql('SELECT a.*
+                                     FROM {checkmark_submissions} a, {user} u
+                                     WHERE u.id = a.userid
+                                     AND a.checkmarkid = ?
+                                     ORDER BY '.$sort, array($checkmark->id));
+    foreach($records as $key => $record) {
+        $records->checked = $DB->get_records('checkmark_checks', array('submissionid' => $record->id));
+    }
+    
+    return $records;
 
 }
 
@@ -1044,13 +1178,9 @@ function checkmark_get_coursemodule_info($coursemodule) {
  * @return string short summary
  */
 function checkmark_getsummarystring($submission, $checkmark) {
-    GLOBAL $USER, $CFG, $DB;
+    global $USER, $CFG, $DB;
     require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
 
-    $checked_examples = 0;
-    $checked_grades = 0;
-    $max_checked_examples = 0;
-    $max_checked_grades = 0;
     $course     = $DB->get_record('course', array('id' => $checkmark->course), '*', MUST_EXIST);
     $cm         = get_coursemodule_from_instance('checkmark', $checkmark->id, $course->id, false,
                                                  MUST_EXIST);
@@ -1059,118 +1189,22 @@ function checkmark_getsummarystring($submission, $checkmark) {
         $submission = $instance->get_submission($USER->id, false); // Get the submission!
     }
 
-    if ($submission) {
-        $examplestates = explode(checkmark::DELIMITER, $submission->checked);
+    $a = checkmark_getsubmissionstats($submission, $checkmark);
 
-        if ($instance->checkmark->flexiblenaming) {
-            $examplenames = explode(checkmark::DELIMITER, $instance->checkmark->examplenames);
-            $examplegrades = explode(checkmark::DELIMITER, $instance->checkmark->examplegrades);
-            for ($i=0; $i<count($examplenames); $i++) {
-                $examplenumber = $i+1;
-                $state = 0;
-                foreach ($examplestates as $singlestate) {
-                    if (intval($singlestate) == $examplenumber) {
-                        $state = 1;
-                        break;
-                    }
-                }
-
-                if ($state) { // Is it checked?
-                    $checked_examples++;
-                    $checked_grades += intval($examplegrades[$i]);
-                }
-                $max_checked_examples++;
-                $max_checked_grades += intval($examplegrades[$i]);
-            }
-        } else {
-            $i = 0;
-            $points = $instance->checkmark->grade/$instance->checkmark->examplecount;
-            do {
-                $state = 0;
-                $examplenumber = strval($i+$instance->checkmark->examplestart);
-                foreach ($examplestates as $singlestate) {
-                    if (intval($singlestate) == ($i+1)) {
-                        $state = 1;
-                        break;
-                    }
-                }
-                if ($state) { // Is it checked?
-                    $checked_examples++;
-                    $checked_grades += $points;
-                }
-                $max_checked_examples++;
-                $max_checked_grades += $points;
-                $i++;
-            } while ($i<$instance->checkmark->examplecount);
-        }
-    } else {
-        if ($instance->checkmark->flexiblenaming) {
-            $examplegrades = explode(checkmark::DELIMITER, $instance->checkmark->examplegrades);
-            $max_checked_examples = count($examplegrades);
-            $max_checked_grades = 0;
-            for ($i=0; $i<count($examplegrades); $i++) {
-                $max_checked_grades += intval($examplegrades[$i]);
-            }
-        } else {
-            $max_checked_examples = $instance->checkmark->examplecount;
-            $max_checked_grades = $instance->checkmark->grade;
-        }
-        $checked_examples = 0;
-        $checked_grades = 0;
-    }
-    $a = new stdClass();
-    $a->checked_examples = $checked_examples;
-    $a->max_checked_examples = $max_checked_examples;
-    $a->checked_grades = $checked_grades;
-    $a->max_checked_grades = $max_checked_grades;
-    if (!empty($submission->teacher_id) && ($submission->grade != -1)) {
-        global $DB;
-
-        /*
-         * Cache scales for each checkmark
-         * they might have different scales!
-         */
-        static $scalegrades = array();
-
-        if ($instance->checkmark->grade >= 0) {    // Normal number?
-            if ($submission->grade == -1) {
-                $a->grade = get_string('notgradedyet', 'checkmark');
-            } else {
-                $a->grade = get_string('graded', 'checkmark').': '.$submission->grade.
-                            ' / '.$instance->checkmark->grade;
-            }
-
-        } else {                                // Scale?
-            if (empty($scalegrades[$instance->checkmark->id])) {
-                if ($scale = $DB->get_record('scale', array('id'=>-($instance->checkmark->grade)))) {
-                    $scalegrades[$instance->checkmark->id] = make_menu_from_list($scale->scale);
-                } else {
-                    $a->grade = get_string('notgradedyet', 'checkmark');
-                }
-            }
-            if (isset($scalegrades[$instance->checkmark->id][$grade])) {
-                $a->grade = get_string('graded', 'checkmark').': '.
-                            $scalegrades[$instance->checkmark->id][$submission->grade];
-            }
-        }
-    } else {
-        $a->grade = get_string('notgradedyet', 'checkmark');
-    }
     $output = get_string('checkmark_overviewsummary', 'checkmark', $a);
 
     return $output;
 }
 
 /*
- * checkmark_get_summarystring() returns a short statistic over the actual
- * checked examples in this checkmark
- * You've checked out X from a maximum of Y examples. (A out of B points)
+ * checkmark_getsubmissionstats() returns a short statistic over the actual
+ * checked examples in this checkmarksubmission
+ * checked out X of Y examples (A of B points) graded/not graded
  *
- * @return string short summary
+ * @return object submissions statistics data
  */
 function checkmark_getsubmissionstats($submission, $checkmark) {
-
-    GLOBAL $USER, $CFG, $DB;
+    global $USER, $CFG, $DB;
 
     $checked_examples = 0;
     $checked_grades = 0;
@@ -1178,66 +1212,22 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
     $max_checked_grades = 0;
 
     if ($submission) {
-        require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
-        $examplestates = explode(checkmark::DELIMITER, $submission->checked);
-
-        if ($checkmark->flexiblenaming) {
-            $examplenames = explode(checkmark::DELIMITER, $checkmark->examplenames);
-            $examplegrades = explode(checkmark::DELIMITER, $checkmark->examplegrades);
-            for ($i=0; $i<count($examplenames); $i++) {
-                $examplenumber = $i+1;
-                $state = 0;
-                foreach ($examplestates as $singlestate) {
-                    if (intval($singlestate) == $examplenumber) {
-                        $state = 1;
-                        break;
-                    }
-                }
-
-                if ($state) { // Is it checked?
-                    $checked_examples++;
-                    $checked_grades += intval($examplegrades[$i]);
-                }
-                $max_checked_examples++;
-                $max_checked_grades += intval($examplegrades[$i]);
-            }
-        } else {
-            $i = 0;
-            $points = $checkmark->grade/$checkmark->examplecount;
-            do {
-                $state = 0;
-                $examplenumber = strval($i+$checkmark->examplestart);
-                foreach ($examplestates as $singlestate) {
-                    if (intval($singlestate) == ($i+1)) {
-                        $state = 1;
-                        break;
-                    }
-                }
-                if ($state) { // Is it checked?
-                    $checked_examples++;
-                    $checked_grades += $points;
-                }
-                $max_checked_examples++;
-                $max_checked_grades += $points;
-                $i++;
-            } while ($i<$checkmark->examplecount);
+        $max_checked_examples = count($submission->examples);
+        foreach($submission->examples as $example) {
+            $checked_grades += $example->state ? $example->grade : 0;
+            $checked_examples += $example->state ? 1 : 0;
+            $max_checked_grades += $example->grade;
         }
     } else {
-        if ($checkmark->flexiblenaming) {
-            require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
-            $examplegrades = explode(checkmark::DELIMITER, $checkmark->examplegrades);
-            $max_checked_examples = count($examplegrades);
-            $max_checked_grades = 0;
-            for ($i=0; $i<count($examplegrades); $i++) {
-                $max_checked_grades += intval($examplegrades[$i]);
-            }
-        } else {
-            $max_checked_examples = $checkmark->examplecount;
-            $max_checked_grades = $checkmark->grade;
+        $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmark->id));
+        $max_checked_examples = count($examples);
+        foreach($examples as $example) {
+            $max_checked_grades += $example->grade;
         }
         $checked_examples = 0;
         $checked_grades = 0;
     }
+
     $a = new stdClass();
     $a->checked_examples = $checked_examples;
     $a->total_examples = $max_checked_examples;
@@ -1245,8 +1235,7 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
     $a->total_grade = $max_checked_grades;
     $a->name = $checkmark->name;
 
-    if (!empty($submission->teacher_id) && ($submission->grade != -1)) {
-        global $DB;
+    if (!empty($submission->teacherid) && ($submission->grade != -1)) {
 
         /*
          * Cache scales for each checkmark
@@ -1338,42 +1327,52 @@ function checkmark_print_overview($courses, &$htmlarray) {
      * Build up and array of unmarked submissions indexed by checkmark id/userid
      * for use where the user has grading rights on checkmark!
      */
-    $rs = $DB->get_recordset_sql('SELECT id, checkmark_id, user_id
-                            FROM {checkmark_submissions}
-                            WHERE teacher_id = 0 AND timemarked = 0
-                            AND checkmark_id '.$sqlcheckmarkids, $checkmarkidparams);
+    $rs = $DB->get_recordset_sql('SELECT id, checkmarkid, userid
+                                    FROM {checkmark_submissions}
+                                   WHERE teacherid = 0
+                                     AND timemarked = 0
+                                     AND checkmarkid '.$sqlcheckmarkids, $checkmarkidparams);
 
     $unmarkedsubmissions = array();
     foreach ($rs as $rd) {
-        $unmarkedsubmissions[$rd->checkmark_id][$rd->user_id] = $rd->id;
+        $unmarkedsubmissions[$rd->checkmarkid][$rd->userid] = $rd->id;
     }
     $rs->close();
 
-    $rs = $DB->get_recordset_sql('SELECT checkmark_id, count(DISTINCT user_id) as amount
-                                 FROM {checkmark_submissions}
-                                 WHERE checkmark_id '.$sqlcheckmarkids.' GROUP BY checkmark_id',
+    $rs = $DB->get_recordset_sql('SELECT checkmarkid, count(DISTINCT userid) as amount
+                                    FROM {checkmark_submissions}
+                                   WHERE checkmarkid '.$sqlcheckmarkids.' '.
+                               'GROUP BY checkmarkid',
                                  $checkmarkidparams);
     $submissioncounts = array();
     foreach ($rs as $rd) {
-        $submissioncounts[$rd->checkmark_id] = $rd->amount;
+        $submissioncounts[$rd->checkmarkid] = $rd->amount;
     }
     $rs->close();
 
     // Get all user submissions, indexed by checkmark id!
-    $mysubmissions = $DB->get_records_sql('SELECT checkmark_id, timemarked, teacher_id, grade,
-                                                  checked
-                                      FROM {checkmark_submissions}
-                                      WHERE user_id = ?
-                                          AND checkmark_id '.$sqlcheckmarkids,
+    $mysubmissions = $DB->get_records_sql('SELECT checkmarkid, id, timemarked, teacherid, grade
+                                             FROM {checkmark_submissions}
+                                            WHERE userid = ?
+                                              AND checkmarkid '.$sqlcheckmarkids,
                                           array_merge(array($USER->id), $checkmarkidparams));
+    foreach($mysubmissions as $key => $mysubmission) {
+        $sql = 'SELECT exampleid as id, name, grade, state
+                  FROM {checkmark_checks} as chks
+            RIGHT JOIN {checkmark_examples} as ex
+                    ON chks.exampleid = ex.id
+                 WHERE submissionid = :subid';
+        $mysubmissions[$key]->examples = $DB->get_records_sql($sql,
+                                                              array('subid' => $mysubmission->id));
+    }
 
-    // Get all users who submitted something, indexed by checkmark_id!
-    foreach ($checkmarkids as $cur_id) {
+    // Get all users who submitted something, indexed by checkmarkid!
+    foreach ($checkmarkids as $curid) {
         $userids = $DB->get_fieldset_select('checkmark_submissions',
-                                                      'user_id',
-                                                      'checkmark_id = ?', array($cur_id));
+                                                      'userid',
+                                                      'checkmarkid = ?', array($curid));
         foreach ($userids as $usrid) {
-            $usersubmissions[$cur_id][$usrid] = true;
+            $usersubmissions[$curid][$usrid] = true;
         }
     }
 
@@ -1406,13 +1405,13 @@ function checkmark_print_overview($courses, &$htmlarray) {
             $teacher_submissions = 0;
             $teacher_submissions_graded = 0;
             $subs  = $DB->get_records('checkmark_submissions',
-                                      array('checkmark_id' => $checkmark->id));
+                                      array('checkmarkid' => $checkmark->id));
             foreach ($subs as $cur) {
-                if (array_key_exists($cur->user_id, $teachers)) {
+                if (array_key_exists($cur->userid, $teachers)) {
                     // Teacher did a submission!
                     $teacher_submissions++;
 
-                    if ($cur->teacher_id != 0 || $cur->timemarked !=0) {
+                    if ($cur->teacherid != 0 || $cur->timemarked !=0) {
                         $teacher_submissions_graded++;
                     }
                 }
@@ -1464,7 +1463,9 @@ function checkmark_print_overview($courses, &$htmlarray) {
             $str .= '</a>';
             $str .= '</div>';
 
-        } else if (has_capability('mod/checkmark:submit', $context)) {
+        }
+
+        if (has_capability('mod/checkmark:submit', $context)) {
             $str .= '<div class="details">';
             if (isset($mysubmissions[$checkmark->id])) {
 
@@ -1477,7 +1478,7 @@ function checkmark_print_overview($courses, &$htmlarray) {
                 if ($grading_info->items[0]->grades[$USER->id]->overridden) {
                     $submission->grade = round($grade->grade, 2);
                 }
-                if ($submission->teacher_id == 0 && $submission->timemarked == 0) {
+                if ($submission->teacherid == 0 && $submission->timemarked == 0) {
                     $str .= checkmark_getsummarystring($submission, $checkmark);
                 } else if ($submission->grade <= 0) {
                     $str .= checkmark_getsummarystring($submission, $checkmark);

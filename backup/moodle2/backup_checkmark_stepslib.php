@@ -39,32 +39,51 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         // Define each element separated!
         $checkmark = new backup_nested_element('checkmark', array('id'), array(
             'name', 'intro', 'introformat', 'resubmit', 'preventlate', 'emailteachers',
-            'examplecount', 'examplestart', 'timedue', 'timeavailable', 'grade',
-            'timemodified', 'examplenames', 'examplegrades', 'flexiblenaming'));
+            'timedue', 'timeavailable', 'grade','timemodified'));
 
         $submissions = new backup_nested_element('submissions');
 
         $submission = new backup_nested_element('submission', array('id'), array(
-            'user_id', 'timecreated', 'timemodified', 'checked', 'grade', 'submissioncomment',
-            'format', 'teacher_id', 'timemarked', 'mailed'));
+            'userid', 'timecreated', 'timemodified', 'grade', 'submissioncomment',
+            'format', 'teacherid', 'timemarked', 'mailed'));
+            
+        $examples = new backup_nested_element('examples');
+        
+        $example = new backup_nested_element('example', array('id'), array('checkmarkid', 'name', 'grade'));
+        
+        $checks = new backup_nested_element('checks');
+        
+        $check = new backup_nested_element('check', array('id'), array('checkmarkid', 'submissionid', 'state'));
 
         // Now build the tree!
         $checkmark->add_child($submissions);
         $submissions->add_child($submission);
+        $checkmark->add_child($examples);
+        $examples->add_child($example);
+        //second level
+        //$example->add_child($checks);
+        $submission->add_child($checks);
+        $checks->add_child($check);
 
         // Define sources!
         $checkmark->set_source_table('checkmark', array('id' => backup::VAR_ACTIVITYID));
+        
+        $example->set_source_table('checkmark_examples',
+                                    array('checkmarkid' => backup::VAR_PARENTID));
 
         // All the rest of elements only happen if we are including user info!
         if ($userinfo) {
             $submission->set_source_table('checkmark_submissions',
-                                          array('checkmark_id' => backup::VAR_PARENTID));
+                                          array('checkmarkid' => backup::VAR_PARENTID));
+            $check->set_source_table('checkmark_checks',
+                                      array('submissionid' => backup::VAR_PARENTID));
         }
 
         // Define id annotations!
         $checkmark->annotate_ids('scale', 'grade');
-        $submission->annotate_ids('user', 'user_id');
-        $submission->annotate_ids('user', 'teacher_id');
+        $submission->annotate_ids('user', 'userid');
+        $submission->annotate_ids('user', 'teacherid');
+        $check->annotate_ids('checkmark_examples', 'exampleid');
 
         // Define file annotations!
         $checkmark->annotate_files('mod_checkmark', 'intro', null); // This file area has no itemid!

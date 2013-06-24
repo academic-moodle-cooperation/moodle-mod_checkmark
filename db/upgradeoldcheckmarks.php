@@ -152,13 +152,13 @@ foreach ($assignment_instances_old as $instanceid) {
                      * Convert standard-assignment-fields to checkmark fields
                      * and set right references!
                      */
-                    $currentsubmission->checkmark_id = $new_instanceid;
+                    $currentsubmission->checkmarkid = $new_instanceid;
                     unset($currentsubmission->assignment);
-                    $currentsubmission->user_id = $currentsubmission->userid;
+                    $currentsubmission->userid = $currentsubmission->userid;
                     unset($currentsubmission->user);
                     $currentsubmission->checked = $currentsubmission->data1;
                     unset($currentsubmission->data1);
-                    $currentsubmission->teacher_id = $currentsubmission->teacher;
+                    $currentsubmission->teacherid = $currentsubmission->teacher;
                     unset($currentsubmission->teacher);
                     unset($currentsubmission->id);
                     $DB->insert_record('checkmark_submissions', $currentsubmission);

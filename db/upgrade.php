@@ -279,8 +279,209 @@ function xmldb_checkmark_upgrade($oldversion) {
         // Checkmark savepoint reached!
         upgrade_mod_savepoint(true, 2013012800, 'checkmark');
     }
+    
+    if ($oldversion < 2013061000) {
+        //adding 2 new tables to store examples and (un)checked-examples
+        // Define table checkmark_examples to be created
+        $table = new xmldb_table('checkmark_examples');
+
+        // Adding fields to table checkmark_examples
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('checkmarkid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('name', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('grade', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '10');
+
+        // Adding keys to table checkmark_examples
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('checkmarkid', XMLDB_KEY_FOREIGN, array('checkmarkid'), 'checkmark', array('id'));
+
+        // Conditionally launch create table for checkmark_examples
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        
+                // Define table checkmark_checks to be created
+        $table = new xmldb_table('checkmark_checks');
+
+        // Adding fields to table checkmark_checks
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('exampleid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('submissionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('state', XMLDB_TYPE_INTEGER, '4', null, null, null, null);
+
+        // Adding keys to table checkmark_checks
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('exampleid', XMLDB_KEY_FOREIGN, array('exampleid'), 'checkmark_examples', array('id'));
+        $table->add_key('submissionid', XMLDB_KEY_FOREIGN, array('submissionid'), 'checkmark_submissions', array('id'));
+
+        // Conditionally launch create table for checkmark_checks
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        
+        // Rename field checkmarkid on table checkmark_submissions to NEWNAMEGOESHERE
+        $table = new xmldb_table('checkmark_submissions');
+        $field = new xmldb_field('checkmark_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
+        // Define key checkmarkid (foreign) to be dropped form checkmark_submissions
+        $key = new xmldb_key('checkmark_id', XMLDB_KEY_FOREIGN, array('checkmark_id'), 'checkmark', array('id'));
+        // Launch drop key checkmarkid
+        $dbman->drop_key($table, $key);
+        // Launch rename field checkmarkid
+        if($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'checkmarkid');
+        }
+        $key = new xmldb_key('checkmarkid', XMLDB_KEY_FOREIGN, array('checkmarkid'), 'checkmark', array('id'));
+        // Launch add key checkmarkid
+        $dbman->add_key($table, $key);
+        
+        // Rename field userid on table checkmark_submissions to NEWNAMEGOESHERE
+        $field = new xmldb_field('user_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'checkmarkid');
+        // Define index user_id (not unique) to be dropped form checkmark_submissions
+        $index = new xmldb_index('user_id', XMLDB_INDEX_NOTUNIQUE, array('user_id'));
+        // Conditionally launch drop index mailed
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+        // Launch rename field userid
+        if($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'userid');
+        }
+        $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+        // Launch add key userid
+        $dbman->add_key($table, $key);
+
+        // Rename field teacherid on table checkmark_submissions to NEWNAMEGOESHERE
+        $field = new xmldb_field('teacher_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'format');
+        // Launch rename field teacherid
+        if($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'teacherid');
+        }
+        // Define key teacherid (foreign) to be added to checkmark_submissions
+        $key = new xmldb_key('teacherid', XMLDB_KEY_FOREIGN, array('teacherid'), 'user', array('id'));
+        // Launch add key teacherid
+        $dbman->add_key($table, $key);
+        
+        //copy all old settings to the new tables
+        //after the development of the new DB-functions we can delete the old fields
+        
+        //get all checkmarks and copy on a per instance basics
+        $checkmarks = $DB->get_records('checkmark');
+
+        $pbar = new progress_bar('checkmarkupgradeDB', 500, true);
+        $i=0;
+        $count = $DB->count_records_sql('SELECT count(\'x\') FROM {checkmark_submissions}');
+        $count += count($checkmarks);
+        foreach($checkmarks as $checkmarkid => $checkmark) {
+            //create entries for checkmark examples
+            $ids = array();
+            $pbar->update($i, $count, "migrate instance ".$checkmark->name);
+            if($checkmark->flexiblenaming) {
+                //flexible naming
+                $names = explode(",", $checkmark->examplenames);
+                $grades = explode(",", $checkmark->examplegrades);
+                $examplecount = count($names);
+                foreach($names as $key => $name) {
+                    $data = new stdClass();
+                    $data->checkmarkid = $checkmark->id;
+                    $data->name = $names[$key];
+                    $data->grade = $grades[$key];
+                    if(!$ids[$key+1] = $DB->insert_record('checkmark_examples', $data)) {
+                        echo $OUTPUT->notification('Error migrating instance '.$checkmark->id.' > Example '.$name.' ('.$grades[$key].')', 'notifyproblem');
+                    } else {
+                        echo $OUTPUT->notification('Success migrating instance '.$checkmark->id.' > Example '.$name.' ('.$grades[$key].')', 'notifysuccess');
+                    }
+                }
+            } else {
+                //standard naming
+                $examplecount = $checkmark->examplecount;
+                $data = new stdClass();
+                $data->grade = $checkmark->grade/$checkmark->examplecount;
+                $key = 1;
+                for($i=$checkmark->examplestart; $i<$checkmark->examplestart+$checkmark->examplecount; $i++) {
+                    $data->checkmarkid = $checkmark->id;
+                    $data->name = $i;
+                    if(!$ids[$key] = $DB->insert_record('checkmark_examples', $data)) {
+                        echo $OUTPUT->notification('Error migrating instance '.$checkmark->id.' > Example '.$data->name.' ('.$data->grade.')', 'notifyproblem');
+                    } else {
+                        echo $OUTPUT->notification('Success migrating instance '.$checkmark->id.' > Example '.$data->name.' ('.$data->grade.')', 'notifysuccess');
+                    }
+                    $key++;
+                }
+            }
+            $i++;
+            $pbar->update($i, $count, "migrate submissions for instance ".$checkmark->name);
+            
+            //get all submissions for this instance
+            $submissions = $DB->get_records('checkmark_submissions', array('checkmarkid'=>$checkmark->id));
+            $j = 1;
+            foreach($submissions as $key => $submission) {
+                $pbar->update($i, $count, "migrate submission ".$j." for instance ".$checkmark->name);
+                $j++;
+                $checked_examples = explode(',', $submission->checked);
+                for($k=1;$k<=$examplecount;$k++) {
+                    $data = new stdClass();
+                    $data->exampleid = $ids[$k];
+                    $data->submissionid = $submission->id;
+                    if(in_array($k, $checked_examples)) {
+                        $data->state = 1;
+                    } else {
+                        $data->state = 0;
+                    }
+                    $DB->insert_record('checkmark_checks', $data);
+                }
+                $i++;
+            }
+
+            unset($ids);
+        }
+        
+        $pbar->update($count, $count, "migration complete!");
+
+        // checkmark savepoint reached
+        upgrade_mod_savepoint(true, 2013061000, 'checkmark');
+    }
+    
+    if($oldversion < 2013062000) {
+
+        // Define field checked to be dropped from checkmark_submissions
+        $table = new xmldb_table('checkmark_submissions');
+        $field = new xmldb_field('checked');
+        // Conditionally launch drop field checked
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Define field examplecount to be dropped from checkmark
+        $table = new xmldb_table('checkmark');
+        $field = new xmldb_field('examplecount');
+        // Conditionally launch drop field examplecount
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+        $field = new xmldb_field('examplestart');
+        // Conditionally launch drop field examplestart
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+        $field = new xmldb_field('examplenames');
+        // Conditionally launch drop field examplenames
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+        $field = new xmldb_field('examplegrades');
+        // Conditionally launch drop field examplegrades
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+        $field = new xmldb_field('flexiblenaming');
+        // Conditionally launch drop field flexiblenaming
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+        
+        upgrade_mod_savepoint(true, 2013062000, 'checkmark');
+    }
 
     return true;
 }
-
 

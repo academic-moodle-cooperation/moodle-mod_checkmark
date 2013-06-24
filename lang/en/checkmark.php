@@ -54,8 +54,8 @@ $string['autograde_error'] = 'An error occured during autograding.';
 $string['autograde_confirm'] = 'You are about to update grades and feedback for {$a}. These will be overwritten!';
 $string['autograde_notsupported'] = 'This scale is not supported by automatic grading.';
 $string['autograde_no_users_selected'] = 'You have not selected any user to grade. Select the required users via the checkboxes in the left column of the table below.';
-$string['checkmark_overviewsummary'] = 'You\'ve checked {$a->checked_examples} / {$a->max_checked_examples} examples ({$a->checked_grades} / {$a->max_checked_grades} points)<br />{$a->grade}<br />';
-$string['checkmark_summary'] = 'You\'ve checked <span id="examples">{$a->checked}</span> out of {$a->total} examples.<br />(<span id="grade">{$a->checkedgrade}</span> out of a maximum of {$a->maxgrade} points)';
+$string['checkmark_overviewsummary'] = 'You\'ve checked {$a->checked_examples} / {$a->total_examples} examples ({$a->checked_grade} / {$a->total_grade} points)<br />{$a->grade}<br />';
+$string['checkmark_summary'] = 'You\'ve checked <span id="examples">{$a->checked_examples}</span> out of {$a->total_examples} examples.<br />(<span id="grade">{$a->checked_grade}</span> out of a maximum of {$a->total_grade} points)';
 $string['checkmarkstatstitle'] = 'Courseoverview Checkmark';
 $string['checkmark:view_preview'] = 'Preview';
 $string['count_individuals_mismatch'] = 'The amount of individual names({$a->namecount}) doesn\'t match the amount of individual grades({$a->gradecount})!';
@@ -122,7 +122,7 @@ $string['strsum'] = 'Sum';
 $string['strtextsize'] = 'Textsize';
 $string['strvalidmsgtime'] = 'Duration of message validity';
 $string['strvalidmsgtimedesc'] = 'Amount of days after which grading notifications to users won\'t be sent anymore.';
-$string['str_user_id'] = 'Student ID';
+$string['str_userid'] = 'Student ID';
 /*
  * End of Block for checkmark specific strings
  */

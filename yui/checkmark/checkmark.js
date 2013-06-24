@@ -53,35 +53,22 @@ M.mod_checkmark = {
      * @param var2                starting number for examples (flexiblenaming=0) or array with examplegrades (flexiblenaming=1)
      * @return    true if everything's ok (no error-handling implemented)
      */
-    init_submission:    function(Y, flexiblenaming, var1, var2, grade) {
+    init_submission:    function(Y, examples) {
             // ensure that data is accessible from all methods of M.mod_checkmark
             this.Y = Y;
-            this.flexiblenaming = flexiblenaming;
-            this.var1 = var1;
-            this.var2 = var2;
-            this.grade = grade;
+            this.examples = examples;
 
-            var i = 0;
             var id_fieldname = null;
-            var example_count = 0;
 
-            if (flexiblenaming) {
-                example_count = this.var1.length;    //example count = number of example-names
-            } else {
-                example_count = this.var1;    //example count is allready given
-            }
-
-            i = 1;
-            do {
+            for (var key in examples) {
                 //@since Moodle 2.2.1
-                id_fieldname = 'input#example'.concat(i.toString());
+                id_fieldname = 'input#example'.concat(key.toString());
                 if (Y.one(id_fieldname) == null) {
                     //Compatibility to pre 2.2
-                    id_fieldname = 'input#id_example'.concat(i.toString());
+                    id_fieldname = 'input#id_example'.concat(key.toString());
                 }
                 Y.on('click', this.update_summary, id_fieldname);    //register event listener
-                i++;
-            } while (i <= example_count);
+            }
 
             //register event-listener on reset-button to ensure proper data to be displayed on form-reset
             Y.on('click', this.reset_submission_form, "#id_resetbutton");
@@ -103,47 +90,22 @@ M.mod_checkmark = {
         var examples_new=0;
         var grade_new=0;
         //defining local variables improves readability
-        var var1 = M.mod_checkmark.var1;
-        var var2 = M.mod_checkmark.var2;
-        var grade = M.mod_checkmark.grade;
-        var flexiblenaming = M.mod_checkmark.flexiblenaming;
+        var examples = M.mod_checkmark.examples;
 
-        if (flexiblenaming) {
-            //calculate values using flexible naming (var1 = names[], var2 = grades[])
-            for (var i=0; i<var1.length; i++) {
-                var number = i+1;
-                if (M.mod_checkmark.Y.one("input#example".concat(number.toString())) == null) {
-                    //compatibility to pre 2.2
-                    var is_checked = M.mod_checkmark.Y.one("input#id_example".concat(number.toString())).get('checked');
-                } else {
-                    var is_checked = M.mod_checkmark.Y.one("input#example".concat(number.toString())).get('checked');
-                }
-
-                if (is_checked) {
-                    examples_new++;
-                    grade_new += parseInt(var2[i]);
-                }
+        //calculate values using flexible naming (var1 = names[], var2 = grades[])
+        for (var key in examples) {
+            if (M.mod_checkmark.Y.one("input#example".concat(key.toString())) == null) {
+                //compatibility to pre 2.2
+                var is_checked = M.mod_checkmark.Y.one("input[type=checkbox]#id_example".concat(key.toString())).get('checked');
+            } else {
+                var is_checked = M.mod_checkmark.Y.one("input[type=checkbox]#example".concat(key.toString())).get('checked');
             }
-        } else {
-            //calculate values using standard naming/grading (var1 = amount, var2 = start number)
-            var count = 0;
-            var i=0;
-            var pointsperex = parseFloat(grade) / parseFloat(var1);
-            for (i=1; i<=var1; i++) {
-                if (M.mod_checkmark.Y.one("input#example"+i.toString()+'.checkboxgroup1') == null) {
-                    //compatibility to pre 2.2
-                    var is_checked = M.mod_checkmark.Y.one("input#id_example"+i.toString()+'.checkboxgroup1').get('checked');
-                }
-                else {
-                    var is_checked = M.mod_checkmark.Y.one("input#example"+i.toString()+'.checkboxgroup1').get('checked');
-                }
-                if (is_checked == 1) {
-                    count++;
-                }
+            if (is_checked) {
+                examples_new++;
+                grade_new += parseInt(examples[key].grade);
             }
-            examples_new = count;
-            grade_new = count*pointsperex;
         }
+
         M.mod_checkmark.Y.one("span#examples").setContent(examples_new.toString());
         M.mod_checkmark.Y.one("span#grade").setContent(grade_new.toString());
         //doesn't work with "this.Y.one(~~~)" - why???

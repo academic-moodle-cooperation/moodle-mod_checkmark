@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/checkmark/db" VERSION="20130128" COMMENT="XMLDB file for Moodle mod/checkmark"
+<XMLDB PATH="mod/checkmark/db" VERSION="20130620" COMMENT="XMLDB file for Moodle mod/checkmark"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -13,16 +13,11 @@
         <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="intro" NEXT="resubmit"/>
         <FIELD NAME="resubmit" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="introformat" NEXT="preventlate"/>
         <FIELD NAME="preventlate" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="resubmit" NEXT="emailteachers"/>
-        <FIELD NAME="emailteachers" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="preventlate" NEXT="examplecount"/>
-        <FIELD NAME="examplecount" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="emailteachers" NEXT="examplestart"/>
-        <FIELD NAME="examplestart" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="examplecount" NEXT="timedue"/>
-        <FIELD NAME="timedue" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="examplestart" NEXT="timeavailable"/>
+        <FIELD NAME="emailteachers" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="preventlate" NEXT="timedue"/>
+        <FIELD NAME="timedue" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="emailteachers" NEXT="timeavailable"/>
         <FIELD NAME="timeavailable" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timedue" NEXT="grade"/>
         <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timeavailable" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="grade" NEXT="examplenames"/>
-        <FIELD NAME="examplenames" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" PREVIOUS="timemodified" NEXT="examplegrades"/>
-        <FIELD NAME="examplegrades" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" PREVIOUS="examplenames" NEXT="flexiblenaming"/>
-        <FIELD NAME="flexiblenaming" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="examplegrades"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="grade"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -31,30 +26,56 @@
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="checkmark_submissions" COMMENT="Info about submitted checkmarks" PREVIOUS="checkmark">
+    <TABLE NAME="checkmark_submissions" COMMENT="Info about submitted checkmarks" PREVIOUS="checkmark" NEXT="checkmark_examples">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="checkmark_id"/>
-        <FIELD NAME="checkmark_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="user_id"/>
-        <FIELD NAME="user_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="checkmark_id" NEXT="timecreated"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="user_id" NEXT="timemodified"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="checkmarkid"/>
+        <FIELD NAME="checkmarkid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="checkmarkid" NEXT="timecreated"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="timemodified"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timecreated" NEXT="checked"/>
         <FIELD NAME="checked" TYPE="text" NOTNULL="false" SEQUENCE="false" PREVIOUS="timemodified" NEXT="grade"/>
         <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="checked" NEXT="submissioncomment"/>
         <FIELD NAME="submissioncomment" TYPE="text" NOTNULL="true" SEQUENCE="false" PREVIOUS="grade" NEXT="format"/>
-        <FIELD NAME="format" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="submissioncomment" NEXT="teacher_id"/>
-        <FIELD NAME="teacher_id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="format" NEXT="timemarked"/>
-        <FIELD NAME="timemarked" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="teacher_id" NEXT="mailed"/>
+        <FIELD NAME="format" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="submissioncomment" NEXT="teacherid"/>
+        <FIELD NAME="teacherid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="format" NEXT="timemarked"/>
+        <FIELD NAME="timemarked" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="teacherid" NEXT="mailed"/>
         <FIELD NAME="mailed" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timemarked"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="checkmark_id"/>
-        <KEY NAME="checkmark_id" TYPE="foreign" FIELDS="checkmark_id" REFTABLE="checkmark" REFFIELDS="id" PREVIOUS="primary"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="checkmarkid"/>
+        <KEY NAME="checkmarkid" TYPE="foreign" FIELDS="checkmarkid" REFTABLE="checkmark" REFFIELDS="id" PREVIOUS="primary" NEXT="userid"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="checkmarkid" NEXT="teacherid"/>
+        <KEY NAME="teacherid" TYPE="foreign" FIELDS="teacherid" REFTABLE="user" REFFIELDS="id" PREVIOUS="userid"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="user_id" UNIQUE="false" FIELDS="user_id" NEXT="mailed"/>
-        <INDEX NAME="mailed" UNIQUE="false" FIELDS="mailed" PREVIOUS="user_id" NEXT="timemarked"/>
+        <INDEX NAME="mailed" UNIQUE="false" FIELDS="mailed" NEXT="timemarked"/>
         <INDEX NAME="timemarked" UNIQUE="false" FIELDS="timemarked" PREVIOUS="mailed"/>
       </INDEXES>
+    </TABLE>
+    <TABLE NAME="checkmark_examples" COMMENT="1 entry per example containing name and exampleweight (replaces old comma separated lists in checkmarks table)" PREVIOUS="checkmark_submissions" NEXT="checkmark_checks">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="checkmarkid"/>
+        <FIELD NAME="checkmarkid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="text" NOTNULL="true" SEQUENCE="false" PREVIOUS="checkmarkid" NEXT="grade"/>
+        <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="10" SEQUENCE="false" PREVIOUS="name"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="checkmarkid"/>
+        <KEY NAME="checkmarkid" TYPE="foreign" FIELDS="checkmarkid" REFTABLE="checkmark" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="checkmark_checks" COMMENT="Saves the state of the examples (checked/unchecked) for the submissions" PREVIOUS="checkmark_examples">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="exampleid"/>
+        <FIELD NAME="exampleid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="submissionid"/>
+        <FIELD NAME="submissionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="exampleid" NEXT="state"/>
+        <FIELD NAME="state" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false" PREVIOUS="submissionid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="exampleid"/>
+        <KEY NAME="exampleid" TYPE="foreign" FIELDS="exampleid" REFTABLE="checkmark_examples" REFFIELDS="id" PREVIOUS="primary" NEXT="submissionid"/>
+        <KEY NAME="submissionid" TYPE="foreign" FIELDS="submissionid" REFTABLE="checkmark_submissions" REFFIELDS="id" PREVIOUS="exampleid"/>
+      </KEYS>
     </TABLE>
   </TABLES>
 </XMLDB>

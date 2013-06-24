@@ -39,40 +39,8 @@ class checkmark_submission_form extends moodleform {
 
         $mform =& $this->_form; // Don't forget the underscore!
 
-        $checkmark = $DB->get_record('checkmark',
-        array('id'=>$this->_customdata->checkmarkid),
-                                      '*', MUST_EXIST);
-
-        if ( $checkmark->flexiblenaming ) {
-
-            $examplenames = explode(checkmark::DELIMITER,
-            $checkmark->examplenames);
-            $examplegrades = explode(checkmark::DELIMITER,
-            $checkmark->examplegrades);
-
-            for ($i=0; $i<count($examplenames); $i++) {
-                $examplenumber = strval($i+1);
-                $name = 'example'.$examplenumber;
-                switch ($examplegrades[$i]) {
-                    case '1':
-                        $pointsstring = get_string('strpoint', 'checkmark');
-                    break;
-                    case '2':
-                    default:
-                        $pointsstring = get_string('strpoints', 'checkmark');
-                    break;
-                }
-
-                $mform->addElement('checkbox', $name, null,
-                                   get_string('strexample', 'checkmark').
-                                   ' '.$examplenames[$i].' ('.$examplegrades[$i].' '.
-                                   $pointsstring.')',
-                                   array('id'=>$name));
-            }
-        } else {
-            $i = 0;
-            $points = $checkmark->grade/$checkmark->examplecount;
-            switch ($points) {
+        foreach($this->_customdata->examples as $key => $example) {
+            switch ($example->grade) {
                 case '1':
                     $pointsstring = get_string('strpoint', 'checkmark');
                 break;
@@ -81,15 +49,15 @@ class checkmark_submission_form extends moodleform {
                     $pointsstring = get_string('strpoints', 'checkmark');
                 break;
             }
-            do {
-                $examplenumber = strval($i+$checkmark->examplestart);
-                $mform->addElement('advcheckbox', 'example'.strval($i+1), null,
-                                   get_string('strexample', 'checkmark').' '.$examplenumber.' ('.
-                                   $points.' '.$pointsstring.')',
-                                   array('id'=>'example'.strval($i+1), 'group'=>'1'), array(0, 1));
-                 $i++;
-            } while ($i<$checkmark->examplecount);
+            
+            $mform->addElement('advcheckbox', 'example'.$key, null,
+                               get_string('strexample', 'checkmark').' '.$example->name.' ('.
+                               $example->grade.' '.$pointsstring.')',
+                               array('id'=>'example'.$key, 'group'=>'1'), array(0, 1));
         }
+        $checkmark = $DB->get_record('checkmark',
+        array('id'=>$this->_customdata->checkmarkid),
+                                      '*', MUST_EXIST);
 
         // Here come the hidden params!
         $mform->addElement('hidden', 'id');
@@ -100,29 +68,23 @@ class checkmark_submission_form extends moodleform {
 
         $buttonarray=array();
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton',
-        get_string('savechanges'));
+                                                get_string('savechanges'));
         $buttonarray[] = &$mform->createElement('reset', 'resetbutton', get_string('revert'));
         $buttonarray[] = &$mform->createElement('cancel');
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');
 
-        if ($checkmark->flexiblenaming) {
-            $jsdata = array( intval($checkmark->flexiblenaming), $examplenames, $examplegrades,
-                             intval($checkmark->grade));
-        } else {
-            $jsdata = array(intval($checkmark->flexiblenaming), intval($checkmark->examplecount),
-            intval($checkmark->examplestart), intval($checkmark->grade));
-        }
+        $jsdata = array($this->_customdata->examples);
 
         $jsmodule = array(
                     'name'     =>   'mod_checkmark',
                     'fullpath' =>   '/mod/checkmark/yui/checkmark/checkmark.js',
                     'requires' =>   array('base', 'io', 'node', 'json'),
                     'strings'  =>   array(
-        array('yes', 'moodle'),
-        array('no', 'moodle')
-        )
-        );
+                                        array('yes', 'moodle'),
+                                        array('no', 'moodle')
+                                    )
+                    );
 
         $PAGE->requires->js_init_call('M.mod_checkmark.init_submission', $jsdata, false,
                                       $jsmodule);
