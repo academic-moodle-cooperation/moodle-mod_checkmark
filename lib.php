@@ -374,10 +374,6 @@ function checkmark_user_complete($course, $user, $mod, $checkmark) {
  */
 function checkmark_cron () {
     global $CFG, $USER, $DB;
-    require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
-
-    $ass = new checkmark();
-    $ass->cron();
 
     /*
      * Notices older than 2 days will not be mailed.  This is to avoid the problem where
