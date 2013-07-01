@@ -315,7 +315,7 @@ function checkmark_update_examples($checkmark) {
             } else {
                 // Or we create new ones if there aren't any old ones left!
                 $example = new stdClass();
-                $example->checkmarkid = $checkmark->id;
+                $example->checkmarkid = $checkmark->instance;
                 $example->name = $names[$key];
                 $example->grade = $grades[$key];
                 $DB->insert_record('checkmark_examples', $example);
