@@ -3926,14 +3926,10 @@ class checkmark {
                 $grading_info = grade_get_grades($this->course->id, 'mod', 'checkmark',
                                                  $this->checkmark->id, array_keys($ausers));
                 foreach ($ausers as $auser) {
-                    if (!$this->column_is_hidden('fullname')) {
+                    if (!$this->column_is_hidden('fullnameuser')) {
                         $fullname = fullname($auser, has_capability('moodle/site:viewfullnames',
                                              $this->context));
                         $row[] = $fullname;
-                    }
-
-                    if (!$this->column_is_hidden('idnumber')) {
-                        $userid = $auser->idnumber;
                     }
 
                     $useridentity = explode(',', $CFG->showuseridentity);
