@@ -931,6 +931,29 @@ class checkmark {
         }
     }
 
+    public function get_flexiblenaming($instanceid) {
+        global $DB;
+        if($instanceid == 0) {
+            return false;
+        }
+        $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $instanceid));
+
+        $oldname = null;
+        $oldgrade = null;
+        $flexiblenaming = false;
+        foreach($examples as $key => $example) {
+            if(($oldname != null) && ($oldgrade != null)) {
+                if ((intval($oldname+1) != intval($example->name))
+                    || (intval($oldgrade) != intval($example->grade))) {
+                    $flexiblenaming = true;
+                }
+            }
+            $oldname = $example->name;
+            $oldgrade = $example->grade;
+        }
+        return $flexiblenaming;
+    }
+    
     /**
      * Any extra validation checks needed for the settings
      *
@@ -940,8 +963,7 @@ class checkmark {
         global $CFG, $DB;
         $errors = array();
         if ($data['allready_submit'] == 'yes') {
-            $data['flexiblenaming'] = $DB->get_field('checkmark', 'flexiblenaming',
-                                                     array('id'=>$data['instance']), MUST_EXIST);
+            $data['flexiblenaming'] = $this->get_flexiblenaming($data['instance']);
         } else if (!isset($data['flexiblenaming'])) {
             $data['flexiblenaming'] = 0;
         }
