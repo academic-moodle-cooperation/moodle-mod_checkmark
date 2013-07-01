@@ -141,7 +141,7 @@ class checkmark {
         $this->checkmark->examples = $this->get_examples($this->checkmark);
     }
 
-    public function get_examples($checkmark) {
+    public static function get_examples($checkmark) {
         global $DB;
         if(!is_object($checkmark)) {
             $id = $checkmark;
@@ -659,7 +659,6 @@ class checkmark {
     /**
      * Defines additional elements for the setup-form for checkmarks
      *
-     * @see mod/checkmark/checkmark_base::setup_elements()
      */
     public function setup_elements(&$mform) {
         global $CFG, $COURSE, $PAGE, $OUTPUT;

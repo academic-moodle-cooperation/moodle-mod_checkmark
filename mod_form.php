@@ -115,6 +115,46 @@ class mod_checkmark_mod_form extends moodleform_mod {
          * (needed if it include any filemanager elements)!
          */
         $this->get_checkmark_instance()->form_data_preprocessing($default_values, $this);
+        
+
+        if($default_values['instance']) {
+            $examples = checkmark::get_examples($default_values['instance']);
+            $flexiblenaming = false;
+            $oldname = null;
+            $oldgrade = null;
+            $names = '';
+            $grades = '';
+            $examplestart = '';
+            $examplecount = count($examples);
+            foreach($examples as $key => $example) {
+                if(($oldname == null) && ($oldgrade == null)) {
+                    $oldname = $example->name;
+                    $oldgrade = $example->grade;
+                    $names = $example->name;
+                    $grades = $example->grade;
+                    $examplestart = $example->name;
+
+                } else {
+                    if( (intval($oldname)+1 != intval($example->name))
+                        || (intval($oldgrade) != intval($example->grade))) {
+                            $flexiblenaming = true;
+                    }
+                    $names .= checkmark::DELIMITER.$example->name;
+                    $grades .= checkmark::DELIMITER.$example->grade;
+                }
+                $oldgrade = $example->grade;
+                $oldname = $example->name;
+            }
+            if($flexiblenaming) {
+                $default_values['examplegrades'] = $grades;
+                $default_values['examplenames'] = $names;
+                $default_values['flexiblenaming'] = true;
+            } else {
+                $default_values['flexiblenaming'] = false;
+                $default_values['examplestart'] = $examplestart;
+                $default_values['examplecount'] = $examplecount;
+            }
+        }
     }
 
     public function validation($data, $files) {
