@@ -53,15 +53,14 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         
         $checks = new backup_nested_element('checks');
         
-        $check = new backup_nested_element('check', array('id'), array('checkmarkid', 'submissionid', 'state'));
+        $check = new backup_nested_element('check', array('id'), array('checkmarkid', 'submissionid', 'exampleid', 'state'));
 
         // Now build the tree!
-        $checkmark->add_child($submissions);
-        $submissions->add_child($submission);
         $checkmark->add_child($examples);
         $examples->add_child($example);
+        $checkmark->add_child($submissions);
+        $submissions->add_child($submission);
         //second level
-        //$example->add_child($checks);
         $submission->add_child($checks);
         $checks->add_child($check);
 
@@ -83,7 +82,7 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         $checkmark->annotate_ids('scale', 'grade');
         $submission->annotate_ids('user', 'userid');
         $submission->annotate_ids('user', 'teacherid');
-        $check->annotate_ids('checkmark_examples', 'exampleid');
+        $check->annotate_ids('checkmark_example', 'exampleid');
 
         // Define file annotations!
         $checkmark->annotate_files('mod_checkmark', 'intro', null); // This file area has no itemid!
