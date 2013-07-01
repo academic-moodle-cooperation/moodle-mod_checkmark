@@ -147,7 +147,7 @@ Kreuzerlübungsabgabe für \'<i>{$a->checkmark}</i>\' gegeben.<br /><br />
 Sie können sie als Anhang an ihre <a href="{$a->url}">Abgabe</a> einsehen.';
 $string['checkmarkmailsmall'] = '{$a->teacher} hat eine Rückmeldung zu ihrer
 Kreuzerlübungsabgabe für \'{$a->checkmark}\' gegeben. Sie können sie als Anhang an ihre Abgabe einsehen.';
-$string['checkmarkname'] = 'Kreuzerlübung';
+$string['checkmarkname'] = 'Name der Kreuzerlübung';
 $string['checkmark:submit'] = 'Kreuzerlübung abgeben';
 $string['checkmarksubmission'] = 'Kreuzerlübungsabgaben';
 $string['checkmark:view'] = 'Zeige Kreuzerlübung';

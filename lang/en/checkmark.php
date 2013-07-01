@@ -146,7 +146,7 @@ checkmark submission for \'<i>{$a->checkmark}</i>\'<br /><br />
 You can see it appended to your <a href="{$a->url}">checkmark submission</a>.';
 $string['checkmarkmailsmall'] = '{$a->teacher} posted feedback on your
 checkmark submission for \'{$a->checkmark}\' You can see it appended to your submission';
-$string['checkmarkname'] = 'Checkmark';
+$string['checkmarkname'] = 'Checkmark name';
 $string['checkmark:submit'] = 'Submit checkmark';
 $string['checkmarksubmission'] = 'Checkmark submissions';
 $string['checkmark:view'] = 'View checkmark';
