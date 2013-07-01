@@ -214,7 +214,7 @@ function checkmark_add_instance($checkmark) {
     $checkmark->examplegrades = preg_replace('#,{2,}#', ',', $checkmark->examplegrades, -1);
 
     $returnid = $DB->insert_record('checkmark', $checkmark);
-    $checkmark->id = $returnid;
+    $checkmark->instance = $returnid;
 
     checkmark_update_examples($checkmark);
 
@@ -601,7 +601,10 @@ function checkmark_grade_item_update($checkmark, $grades=null) {
         $params['reset'] = true;
         $grades = null;
     }
-
+    if(!isset($checkmark->id)) {
+        $checkmark->id = $checkmark->instance;
+    }
+    
     return grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id, 0,
                         $grades, $params);
 }

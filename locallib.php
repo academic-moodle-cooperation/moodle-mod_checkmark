@@ -743,7 +743,7 @@ class checkmark {
         $mform->addElement('text', 'examplenames',
                            get_string('examplenames', 'checkmark').' ('.self::DELIMITER.')');
         // We clean these by ourselves!
-        $mform->setType('examplenames', 'PARAM_RAW');
+        $mform->setType('examplenames', PARAM_RAW);
         $mform->addHelpButton('examplenames', 'examplenames', 'checkmark');
         if (isset($CFG->checkmark_stdnames)) {
             $mform->setDefault('examplenames', $CFG->checkmark_stdnames);
