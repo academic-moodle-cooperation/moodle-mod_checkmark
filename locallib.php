@@ -714,10 +714,8 @@ class checkmark {
         $mform->disabledIf('examplecount', 'allready_submit', 'eq', 'yes');
         if (isset($CFG->checkmark_stdexamplecount)) {
             $mform->setDefault('examplecount', $CFG->checkmark_stdexamplecount);
-            $mform->setDefault('grade', $CFG->checkmark_stdexamplecount);
         } else {
             $mform->setDefault('examplecount', '10');
-            $mform->setDefault('grade', '10');
         }
 
         $mform->addElement('text', 'examplestart', get_string('firstexamplenumber', 'checkmark'));

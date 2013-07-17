@@ -84,9 +84,14 @@ class mod_checkmark_mod_form extends moodleform_mod {
     }
 
     public function standard_grading_coursemodule_elements() {
+        global $CFG;
         $mform =& $this->_form;
         parent::standard_grading_coursemodule_elements();
         $mform->addHelpButton('grade', 'grade', 'checkmark');
+        if(isset($CFG->checkmark_stdexamplecount)
+            && (100%$CFG->checkmark_stdexamplecount)) {
+            $mform->setDefault('grade', $CFG->checkmark_stdexamplecount);
+        }
         $mform->setExpanded('modstandardgrade');
     }
 
