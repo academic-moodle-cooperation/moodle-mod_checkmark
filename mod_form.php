@@ -70,6 +70,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $typetitle = get_string('modulename', 'checkmark');
 
         $mform->addElement('header', 'typedesc', $typetitle);
+        $mform->setExpanded('typedesc');
 
         $mform->addElement('hidden', 'course', optional_param('course', 0, PARAM_INT));
 
@@ -86,6 +87,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform =& $this->_form;
         parent::standard_grading_coursemodule_elements();
         $mform->addHelpButton('grade', 'grade', 'checkmark');
+        $mform->setExpanded('modstandardgrade');
     }
 
     // Needed by plugin checkmark if it includes a filemanager element in the settings form!
