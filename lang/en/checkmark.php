@@ -37,9 +37,9 @@ $string['autograde_custom'] = 'Grade selected users';
 $string['autograde_req'] = 'Grade ungraded';
 $string['autograde_str'] = 'Autograding';
 $string['autograde_str_help'] = 'Autograding calculates users grades according to points per example and checked examples. It adds the points for each checked example and uses this as the users grade.'.
-                                '<ul><li>grade all submissions - grades all present submissions (for this instance). Does NOT add empty submissions.</li>'.
+                                '<ul><li>grade selected users - grades just these users, which are checked in the list. If a user hasn\'t submitted anything, a empty submission get\'s added.</li>'.
                                     '<li>grade who needs grading - grades every submission which is more up to date than the corresponding grading</li>'.
-                                    '<li>grade selected users - grades just these users, which are checked in the list. If a user hasn\'t submitted anything, a empty submission get\'s added.</li></ul><br />'.
+                                    '<li>grade all submissions - grades all present submissions (for this instance). Does NOT add empty submissions.</li></ul><br />'.
                                     'The grade gets calculated based on chosen examplegrades and checked examples:'.
                                     '<ul><li>standard-grading: here each example is equally weighted (integral grade per example). The grade is calculated by multiplication of the sum of checked examples with the quotient of checkmark-grade and checkmark-count.</li>'.
                                         '<li>individual example-weights: the grade is the sum of examplegrades for each checked example (according to instance-settings).</li></ul>';

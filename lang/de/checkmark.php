@@ -34,10 +34,10 @@ $string['autograde_custom'] = 'Ausgewählte bewerten';
 $string['autograde_req'] = 'Nichtbewertete bewerten';
 $string['autograde_str'] = 'Automatische Bewertung';
 $string['autograde_str_help'] = 'Die automatische Bewertung berechnet die Noten der Abgaben anhand der Punkte der gekreuzten Beispiele.<br />'.
-                                '<ul><li>Alle Abgaben bewerten - hier werden alle bereits übermittelten Abgaben bewertet</li>'.
+                                '<ul><li>Ausgewählte bewerten - hier werden all jene Datensätze bewertet, die links per Häckchen ausgewählt wurden. Falls noch keine Abgabe vorhanden ist,'.
+                                        ' wird eine leere Abgabe hinzugefügt.</li>'.
                                     '<li>Nichtbewertete Bewerten - hier werden alle Abgaben bewertet, deren Abgabedatum aktueller als die letzte Bewertung ist</li>'.
-                                    '<li>Ausgewählte bewerten - hier werden all jene Datensätze bewertet, die links per Häckchen ausgewählt wurden. Falls noch keine Abgabe vorhanden ist,'.
-                                        ' wird eine leere Abgabe hinzugefügt.</li></ul><br />'.
+                                    '<li>Alle Abgaben bewerten - hier werden alle bereits übermittelten Abgaben bewertet</li></ul><br />'.
                                     'Die Punkteberechnung erfolgt aufgrund der eingestellten Beispielbewertungen sowie der angekreuzten Beispiele:'.
                                     '<ul><li>Standard-Bewertungen: hier wird jedes Beispiel gleich gewichtet (ganzzahlige Punkteanzahl pro Beispiel).'.
                                             ' Die Bewertung ergibt sich aus der Summe der gekreuzten Beispiele multipliziert mit dem Quotienten aus Gesamtbewertung und Beispielanzahl.</li>'.
