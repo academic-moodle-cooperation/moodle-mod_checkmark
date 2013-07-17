@@ -40,6 +40,8 @@ class mod_checkmark_grading_form extends moodleform {
         $mform->setType('userid', PARAM_INT);
         $mform->addElement('hidden', 'nextid', $this->_customdata->nextid);
         $mform->setType('nextid', PARAM_INT);
+        $mform->addElement('hidden', 'previousid', $this->_customdata->previousid);
+        $mform->setType('previousid', PARAM_INT);
         $mform->addElement('hidden', 'id', $this->_customdata->cm->id);
         $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'sesskey', sesskey());
@@ -160,6 +162,11 @@ class mod_checkmark_grading_form extends moodleform {
     public function add_grading_buttons() {
         $mform =& $this->_form;
         $buttonarray=array();
+        if ($this->_customdata->previousid>0) {
+            $buttonarray[] = &$mform->createElement('submit', 'previous', get_string('previous'));
+            $buttonarray[] = &$mform->createElement('submit', 'saveandprevious',
+                                                    get_string('saveandprevious', 'checkmark'));
+        }
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton',
                                                 get_string('savechanges'));
         // If there are more to be graded.

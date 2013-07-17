@@ -1049,8 +1049,14 @@ class checkmark {
         if (optional_param('next', null, PARAM_BOOL)) {
             $mode='next';
         }
+        if (optional_param('previous', null, PARAM_BOOL)) {
+            $mode = 'previous';
+        }
         if (optional_param('saveandnext', null, PARAM_BOOL)) {
             $mode='saveandnext';
+        }
+        if (optional_param('saveandprevious', null, PARAM_BOOL)) {
+            $mode = 'saveandprevious';
         }
 
         if (is_null($mailinfo)) {
@@ -1203,6 +1209,28 @@ class checkmark {
                 $id = required_param('id', PARAM_INT);
                 $offset = (int)$offset+1;
                 redirect('submissions.php?id='.$id.'&userid='. $nextid . '&filter='.$filter.
+                         '&mode=single&offset='.$offset);
+                break;
+
+            case 'saveandprevious':
+                /*
+                 * We are in pop up. save the current one and go to the next one.
+                 * first we save the current changes!
+                 */
+                $submission = $this->process_feedback();
+                // Now we continue straight to with the next one!
+            case 'previous':
+                /*
+                 * We are currently in pop up, but we want to skip to next one without saving.
+                 * This turns out to be similar to a single case!
+                 * The URL used is for the next submission.
+                 */
+                $offset = required_param('offset', PARAM_INT);
+                $previousid = required_param('previousid', PARAM_INT);
+                $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
+                $id = required_param('id', PARAM_INT);
+                $offset = (int)$offset-1;
+                redirect('submissions.php?id='.$id.'&userid='. $previousid . '&filter='.$filter.
                          '&mode=single&offset='.$offset);
                 break;
 
@@ -1860,9 +1888,18 @@ class checkmark {
             if (!empty($sort)) {
                 $sort = 'ORDER BY '.$sort;
             }
-
-            $auser = $DB->get_records_sql($select.$sql.$sort, $params, $offset, 2);
-            if (is_array($auser) && count($auser)>1) {
+            if($offset >= 1) {
+                $auser = $DB->get_records_sql($select.$sql.$sort, $params, $offset-1, 3);
+                $previoususer = current($auser);
+                $previousid = $previoususer->id;
+                $more_existent = is_array($auser) && (count($auser)>2);
+                next($auser);   //reset array to last position
+            } else {
+                $auser = $DB->get_records_sql($select.$sql.$sort, $params, $offset, 2);
+                $more_existent = is_array($auser) && (count($auser)>1);
+                $previousid = 0;
+            }
+            if ($more_existent) {
                 $nextuser = next($auser);
                 // Calculate user status!
                 $nextuser->status = ($nextuser->timemarked > 0)
@@ -1897,6 +1934,7 @@ class checkmark {
         $mformdata->grade = $this->checkmark->grade;
         $mformdata->gradingdisabled = $gradingdisabled;
         $mformdata->nextid = $nextid;
+        $mformdata->previousid = $previousid;
         $mformdata->submissioncomment= $submission->submissioncomment;
         $mformdata->submissioncommentformat= FORMAT_HTML;
         $mformdata->submission_content= $this->print_user_submission($user->id, true);

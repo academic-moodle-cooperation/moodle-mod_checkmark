@@ -89,6 +89,7 @@ $string['numberofexamples'] = 'Number of examples';
 $string['numberofexamples_help'] = 'Examplecount in this checkmark.';
 $string['optimum'] = 'optimum';
 $string['printsettingstitle'] = 'Print settings';
+$string['saveandprevious'] = 'Save and show previous';
 $string['strallononepage'] = 'print all on one page';
 $string['strautograded'] = '[autograded]';
 $string['strexample'] = 'example';
