@@ -708,7 +708,8 @@ class checkmark {
         }
         $mform->addElement('text', 'examplecount', get_string('numberofexamples', 'checkmark'),
                            array('id'=>'id_examplecount'));
-        $mform->setType('examplecount', PARAM_INT);
+        //we're going to clean them by ourselves...
+        $mform->setType('examplecount', PARAM_RAW);
         $mform->addHelpButton('examplecount', 'numberofexamples', 'checkmark');
         $mform->disabledIf('examplecount', 'flexiblenaming', 'checked');
         $mform->disabledIf('examplecount', 'allready_submit', 'eq', 'yes');
@@ -719,7 +720,8 @@ class checkmark {
         }
 
         $mform->addElement('text', 'examplestart', get_string('firstexamplenumber', 'checkmark'));
-        $mform->setType('examplestart', PARAM_INT);
+        //we're going to clean them by ourselves...
+        $mform->setType('examplestart', PARAM_RAW);
         $mform->addHelpButton('examplestart', 'firstexamplenumber', 'checkmark');
         $mform->disabledIf('examplestart', 'flexiblenaming', 'checked');
         $mform->disabledIf('examplestart', 'allready_submit', 'eq', 'yes');
@@ -996,10 +998,14 @@ class checkmark {
                 $errors['examplegrades'] .= get_string('gradesum_mismatch', 'checkmark', $a);
             }
         } else {
-            if ($data['examplecount'] <= 0) {
+            if (($data['examplecount'] <= 0) || !is_numeric($data['examplecount'])) {
                 $errors['examplecount'] = get_string('posintrequired', 'checkmark');
+            } else {
+                if ($data['examplecount'] > 100) {
+                    $errors['examplecount'] = get_string('posintst100required', 'checkmark');
+                }
             }
-            if ($data['examplestart'] < 0) {
+            if ($data['examplestart'] < 0 || !is_numeric($data['examplestart'])) {
                 $errors['examplestart'] = get_string('nonnegativeintrequired', 'checkmark');
             }
             // Grade has to be examplecount multiplied with an integer!

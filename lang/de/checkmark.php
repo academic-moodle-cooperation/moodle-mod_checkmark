@@ -223,6 +223,7 @@ $string['page-mod-checkmark-submissions'] = 'Kreuzerlübungsmodul Abgabenseite';
 $string['pagesize'] = 'Abgaben pro Seite';
 $string['popupinnewwindow'] = 'Öffne Pop-up in neuem Fenster';
 $string['posintrequired'] = 'Muss größer als 0 (> 0) und ganzzahlig sein';
+$string['posintst100required'] = 'Muss im Intervall [0,100] liegen (0 <= X <= 100) sowie ganzzahlig sein';
 $string['pluginadministration'] = 'Kreuzerlübungsverwaltung';
 $string['pluginname'] = 'Kreuzerlübung';
 $string['preventlate'] = 'Verspätete Abgaben verhindern';
