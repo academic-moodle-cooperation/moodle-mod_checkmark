@@ -40,11 +40,11 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('checkmark_stdnames',
                                                 get_string('strstdnames', 'checkmark'),
                                                 get_string('strstdnamesdesc', 'checkmark'),
-                                                '1,2,3,4,5,6,7,8,9,10'));
+                                                'a,b,c,d,e,f'));
     $settings->add(new admin_setting_configtext('checkmark_stdgrades',
                                                 get_string('strstdgrades', 'checkmark'),
                                                 get_string('strstdgradesdesc', 'checkmark'),
-                                                '10,10,10,10,10,10,10,10,10,10'));
+                                                '10,10,20,20,20,20'));
     $settings->add(new admin_setting_configtext('checkmark_validmsgtime',
                                                 get_string('strvalidmsgtime', 'checkmark'),
                                                 get_string('strvalidmsgtimedesc', 'checkmark'),
