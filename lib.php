@@ -42,7 +42,7 @@ function checkmark_delete_instance($id) {
     }
 
     if (! $cm = get_coursemodule_from_instance('checkmark', $checkmark->id)) {
-        echo $OUTPUT->notification('invalidinstance('.$returnid.')', 'notifyproblem');
+        echo $OUTPUT->notification('invalidinstance(CMID='.$cm->id.' CheckmarkID='.$checkmark->id.')', 'notifyproblem');
         $id = null;
     } else {
         $id = $cm->id;
