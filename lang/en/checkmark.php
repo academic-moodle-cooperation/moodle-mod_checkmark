@@ -66,6 +66,7 @@ $string['data_preview'] = 'Data preview';
 $string['duedatevalidation'] = 'Due date must be after the available from date.';
 $string['element_disabled'] = 'The following element is disabled because of existing submissions.';
 $string['elements_disabled'] = 'The following elements are disabled because of existing submissions.';
+$string['end_of_submission_for'] = 'End of submission for {$a}';
 $string['examplegrades'] = 'Individual grades';
 $string['examplegrades_help'] = 'Defines the weight of every example. These will be separated by the delimiter given in parentheses.';
 $string['examplenames'] = 'Individual names';

@@ -147,7 +147,7 @@ function checkmark_update_instance($checkmark) {
         if ($event->id = $DB->get_field('event', 'id', array('modulename' => 'checkmark',
                                                              'instance'   => $checkmark->id))) {
 
-            $event->name        = $checkmark->name;
+            $event->name        = get_string('end_of_submission_for', 'checkmark', $checkmark->name);
             $event->description = format_module_intro('checkmark', $checkmark,
                                                       $checkmark->coursemodule);
             $event->timestart   = $checkmark->timedue;
@@ -156,7 +156,7 @@ function checkmark_update_instance($checkmark) {
             $calendarevent->update($event);
         } else {
             $event = new stdClass();
-            $event->name        = $checkmark->name;
+            $event->name        = get_string('end_of_submission_for', 'checkmark', $checkmark->name);
             $event->description = format_module_intro('checkmark', $checkmark,
                                                       $checkmark->coursemodule);
             $event->courseid    = $checkmark->course;
@@ -220,7 +220,7 @@ function checkmark_add_instance($checkmark) {
 
     if ($checkmark->timedue) {
         $event = new stdClass();
-        $event->name        = $checkmark->name;
+        $event->name        = get_string('end_of_submission_for', 'checkmark', $checkmark->name);
         $event->description = format_module_intro('checkmark', $checkmark,
                                                   $checkmark->coursemodule);
         $event->courseid    = $checkmark->course;
