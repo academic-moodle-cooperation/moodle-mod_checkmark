@@ -4063,7 +4063,7 @@ class checkmark {
             }
         }
 
-        $pdf->generate();
+        $pdf->generate($this->course->shortname . '-' . $this->checkmark->name);
         exit();
     }
 

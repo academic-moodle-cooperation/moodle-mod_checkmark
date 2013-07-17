@@ -23,7 +23,7 @@ require_once($CFG->libdir . '/pdflib.php');
 
 /**
  * @author Andreas Windbichler
- * @version 11.06.2013
+ * @version 11.07.2013
  *
  */
 class MTablePDF extends pdf{
@@ -261,16 +261,16 @@ class MTablePDF extends pdf{
      * @param string $out
      */
     public function SetFontSize($fontsize, $out=true) {
-    	if($fontsize <= MTablePDF::FONTSIZE_SMALL){
-    		$fontsize = MTablePDF::FONTSIZE_SMALL;
-    	}else if($fontsize > MTablePDF::FONTSIZE_SMALL && $fontsize < MTablePDF::FONTSIZE_LARGE){
-    		$fontsize = MTablePDF::FONTSIZE_MEDIUM;
-    	}else if($fontsize >= MTablePDF::FONTSIZE_LARGE){
-    		$fontsize = MTablePDF::FONTSIZE_LARGE;
-    	}
-    	
-    	$this->fontsize = $fontsize;
-    	
+        if($fontsize <= MTablePDF::FONTSIZE_SMALL){
+            $fontsize = MTablePDF::FONTSIZE_SMALL;
+        }else if($fontsize > MTablePDF::FONTSIZE_SMALL && $fontsize < MTablePDF::FONTSIZE_LARGE){
+            $fontsize = MTablePDF::FONTSIZE_MEDIUM;
+        }else if($fontsize >= MTablePDF::FONTSIZE_LARGE){
+            $fontsize = MTablePDF::FONTSIZE_LARGE;
+        }
+        
+        $this->fontsize = $fontsize;
+        
         parent::SetFontSize($fontsize, $out);
     }
 
@@ -285,7 +285,7 @@ class MTablePDF extends pdf{
     /**
      * Generate the pdf
      */
-    public function generate(){
+    public function generate($filename = ''){
         $pdf = $this;
 
         // Add a page.
@@ -389,34 +389,34 @@ class MTablePDF extends pdf{
         
         // calculate line heights for not rowspanned fields
         foreach ($this->data as $rownum => $row) {
-        	$maxnumlines = 1;
-        	
-        	foreach ($row as $key => $value){
-        		if($value['rowspan'] == 0 && !is_null($value['data'])){
-	        		$this->data[$rownum][$key]['numlines'] = $this->getNumLines($value['data'],$w[$key]);
-	        		$maxnumlines = max($maxnumlines,$this->data[$rownum][$key]['numlines']);
-        		}
-        	}
-        	
-        	$rowheights[$rownum] = $maxnumlines;        	
+            $maxnumlines = 1;
+            
+            foreach ($row as $key => $value){
+                if($value['rowspan'] == 0 && !is_null($value['data'])){
+                    $this->data[$rownum][$key]['numlines'] = $this->getNumLines($value['data'],$w[$key]);
+                    $maxnumlines = max($maxnumlines,$this->data[$rownum][$key]['numlines']);
+                }
+            }
+            
+            $rowheights[$rownum] = $maxnumlines;            
         }
         
         // add heights to rows for fields wich are rowspanned but still need more space
         foreach($this->data as $rownum => $row){
-        	foreach($row as $key => $value){
-        		if($value['rowspan'] != 0 && !is_null($value['data'])){
-        			$lineheight = $this->getNumLines($value['data'],$w[$key]);
-        			
-        			$lines = 0;
-        			for($i = $rownum; $i <= $rownum+ $value['rowspan'];$i++){
-        				$lines += $rowheights[$i];
-        			}
-        			
-        			if($lineheight > $lines){
-        				$rowheights[$rownum] += $lineheight - $lines - 1;
-        			}
-        		}
-        	}
+            foreach($row as $key => $value){
+                if($value['rowspan'] != 0 && !is_null($value['data'])){
+                    $lineheight = $this->getNumLines($value['data'],$w[$key]);
+                    
+                    $lines = 0;
+                    for($i = $rownum; $i <= $rownum+ $value['rowspan'];$i++){
+                        $lines += $rowheights[$i];
+                    }
+                    
+                    if($lineheight > $lines){
+                        $rowheights[$rownum] += $lineheight - $lines - 1;
+                    }
+                }
+            }
         }
         
         $cellsize = $pdf->FontSizePt/2;
@@ -428,117 +428,117 @@ class MTablePDF extends pdf{
         
         $fsize = ceil($this->getFontSize());
         if($fsize == 3){
-        	$fsize = MTablePDF::FONTSIZE_SMALL;
+            $fsize = MTablePDF::FONTSIZE_SMALL;
         }else if($fsize == 4){
-        	$fsize = MTablePDF::FONTSIZE_MEDIUM;
+            $fsize = MTablePDF::FONTSIZE_MEDIUM;
         }else if($fsize == 5){
-        	$fsize = MTablePDF::FONTSIZE_LARGE;
+            $fsize = MTablePDF::FONTSIZE_LARGE;
         }
         
         $spaceonpage = array();
 
         if($this->fontsize == MTablePDF::FONTSIZE_SMALL){
-        	if($this->orientation == MTablePDF::PORTRAIT){
-        		$spaceonpage[0] = 62;
-        		$spaceonpage[1] = 64;
-        	}else{
-        		$spaceonpage[0] = 40;
-        		$spaceonpage[1] = 42;
-        	}
+            if($this->orientation == MTablePDF::PORTRAIT){
+                $spaceonpage[0] = 62;
+                $spaceonpage[1] = 64;
+            }else{
+                $spaceonpage[0] = 40;
+                $spaceonpage[1] = 42;
+            }
 
         }else if($this->fontsize == MTablePDF::FONTSIZE_MEDIUM){
-        	if($this->orientation == MTablePDF::PORTRAIT){
-        		$spaceonpage[0] = 49;
-        		$spaceonpage[1] = 51;
-        	}else{
-        		$spaceonpage[0] = 32;
-        		$spaceonpage[1] = 33;
-        	}
+            if($this->orientation == MTablePDF::PORTRAIT){
+                $spaceonpage[0] = 49;
+                $spaceonpage[1] = 51;
+            }else{
+                $spaceonpage[0] = 32;
+                $spaceonpage[1] = 33;
+            }
 
         }else if($this->fontsize == MTablePDF::FONTSIZE_LARGE){
-        	if($this->orientation == MTablePDF::PORTRAIT){
-        		$spaceonpage[0] = 41;
-        		$spaceonpage[1] = 42;
-        	}else{
-        		$spaceonpage[0] = 27;
-        		$spaceonpage[1] = 28;
-        	}
+            if($this->orientation == MTablePDF::PORTRAIT){
+                $spaceonpage[0] = 41;
+                $spaceonpage[1] = 42;
+            }else{
+                $spaceonpage[0] = 27;
+                $spaceonpage[1] = 28;
+            }
         }else{
-        	echo "Error: an unexpected error occured on line " . __LINE__ . ". Please report this to your administrator.";
-        	exit();
+            echo "Error: an unexpected error occured on line " . __LINE__ . ". Please report this to your administrator.";
+            exit();
         }
         
         $forcebreakonnextpage = false;
         
         // now the generating of the page
-        foreach ($this->data as $rownum => $row) {        	
-        	$spanned = 0;
-        	$dontbreak = false;
-        	foreach($row as $key => $value){
-        		if($value['rowspan'] > $spanned){
-        			$spanned = $value['rowspan'];
-        		}
-        		
-        		if(is_null($value['data'])){
-        			$dontbreak = true;
-        		}
-        	}
-        	
-        	$fullrows += $rowheights[$rownum];
-        	
-        	$spannedheight = 0;
-        	for($i=$rownum+1;$i<$rownum+$spanned;$i++){
-        		$spannedheight = $rowheights[$i];
-        	}
-        	
-       	
+        foreach ($this->data as $rownum => $row) {            
+            $spanned = 0;
+            $dontbreak = false;
+            foreach($row as $key => $value){
+                if($value['rowspan'] > $spanned){
+                    $spanned = $value['rowspan'];
+                }
+                
+                if(is_null($value['data'])){
+                    $dontbreak = true;
+                }
+            }
+            
+            $fullrows += $rowheights[$rownum];
+            
+            $spannedheight = 0;
+            for($i=$rownum+1;$i<$rownum+$spanned;$i++){
+                $spannedheight = $rowheights[$i];
+            }
+            
+           
 
 
-        	if($this->getPage() == 1){
-        		$spaceleft = $spaceonpage[0];
-        	}else{
-        		$spaceleft = $spaceonpage[1];
-        	}
-        	
-        	
-        	
-        	if($forcebreakonnextpage){
-        	// break because there had to be allready a break but we couldnt
-        		if(!$dontbreak){
-        			$pdf->addPage();
-        			$fullrows = $rowheights[$rownum];
-        			$forcebreakonnextpage = false;
-        			
-        		}      		
-        	// break because of fixed rows per page
-        	}else if($this->rowsperpage && $this->rowsperpage > 0 && $rownum != 0 && $rownum % $this->rowsperpage == 0){
-        		if(!$dontbreak){
-                	$pdf->addPage();
-                	$fullrows = $rowheights[$rownum];
-        		}else{
-        			$forcebreakonnextpage = true;
-        		}
+            if($this->getPage() == 1){
+                $spaceleft = $spaceonpage[0];
+            }else{
+                $spaceleft = $spaceonpage[1];
+            }
+            
+            
+            
+            if($forcebreakonnextpage){
+            // break because there had to be allready a break but we couldnt
+                if(!$dontbreak){
+                    $pdf->addPage();
+                    $fullrows = $rowheights[$rownum];
+                    $forcebreakonnextpage = false;
+                    
+                }              
+            // break because of fixed rows per page
+            }else if($this->rowsperpage && $this->rowsperpage > 0 && $rownum != 0 && $rownum % $this->rowsperpage == 0){
+                if(!$dontbreak){
+                    $pdf->addPage();
+                    $fullrows = $rowheights[$rownum];
+                }else{
+                    $forcebreakonnextpage = true;
+                }
             // break because there is no more space on current page
             }else if($this->rowsperpage && $this->rowsperpage > 0 && $fullrows + $spannedheight > $spaceleft){
-            	if(!$dontbreak){
-            		$pdf->addPage();
-            		$fullrows = $rowheights[$rownum];
-            	}else{
-        			$forcebreakonnextpage = true;
-        		}
-        	// make optimal page breaks
+                if(!$dontbreak){
+                    $pdf->addPage();
+                    $fullrows = $rowheights[$rownum];
+                }else{
+                    $forcebreakonnextpage = true;
+                }
+            // make optimal page breaks
             }else{
-        		if($fullrows + $spannedheight > $spaceleft){
-        			if(!$dontbreak){
-        				$pdf->addPage();
-        				$fullrows = $rowheights[$rownum];
-        			}else{
-        				$forcebreakonnextpage = true;
-        			}
-        		}
-        		
-        	}
-        	
+                if($fullrows + $spannedheight > $spaceleft){
+                    if(!$dontbreak){
+                        $pdf->addPage();
+                        $fullrows = $rowheights[$rownum];
+                    }else{
+                        $forcebreakonnextpage = true;
+                    }
+                }
+                
+            }
+            
             if ($rownum == count($this->data)-1) {
                 $bottomborder = 'B';
             } else {
@@ -560,34 +560,44 @@ class MTablePDF extends pdf{
                     
                     $numlines = 0;
                     for($i = $rownum; $i <= $rownum + $value['rowspan'];$i++){
-                    	$numlines += $rowheights[$i];
+                        $numlines += $rowheights[$i];
                     }
                     
                                        
                     if($debug){
-                    	$debuginfo = $spanned . '/' . $value['rowspan'] . '/' . $numlines . '/';
-                    	
-	                    $value['data'] =  $debuginfo . substr($value['data'],0,strlen($value['data'])-(strlen($debuginfo)));
+                        $debuginfo = $spanned . '/' . $value['rowspan'] . '/' . $numlines . '/';
+                        
+                        $value['data'] =  $debuginfo . substr($value['data'],0,strlen($value['data'])-(strlen($debuginfo)));
                     }
                     
                     
                     $pdf->MultiCell($w[$key],$numlines * $cellsize, $value['data'], 'LR'.$bottomborder, $cf['align'], $cf['fill'], 0, '', '', true, '0');
                     
                 }else if($rowspans[$key] > 0){
-                   	if($debug){
-                   		$value['data'] = $value['rowspan'] . "/_";
-                   	}
+                       if($debug){
+                           $value['data'] = $value['rowspan'] . "/_";
+                       }
 
-                   	$numlines = $rowheights[$rownum];
- 	
-					$pdf->Cell($w[$key],$numlines * $cellsize, $value['data'],'LR',0,false,0,'','',true,'0');                        
-					$rowspans[$key] = $rowspans[$key]-1;
+                       $numlines = $rowheights[$rownum];
+     
+                    $pdf->Cell($w[$key],$numlines * $cellsize, $value['data'],'LR',0,false,0,'','',true,'0');                        
+                    $rowspans[$key] = $rowspans[$key]-1;
                 }
             }
             $pdf->Ln();
             $fill=!$fill;
         }
 
-        $pdf->Output();
+        
+        if($filename != ''){
+            if(substr($filename,strlen($filename)-4) != ".pdf"){
+                $filename .= '.pdf';
+            }
+            
+            $filename = clean_filename($filename);
+            $pdf->Output($filename, 'D');
+        }else{
+            $pdf->Output();
+        }        
     }
 }
