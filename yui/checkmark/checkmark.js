@@ -211,7 +211,9 @@ M.mod_checkmark = {
             var temp_string = M.mod_checkmark.Y.one(examplegrades_selector).get('value').replace(/[^0-9,]/, "");
             var temp_array = temp_string.split(M.mod_checkmark.dividing_symbol);
             for (i=0; i<temp_array.length; i++) {
-                gradesum += parseInt(temp_array[i]);
+                if(temp_array[i].replace(/[^\d]/g, "") != "") {
+                    gradesum += parseInt(temp_array[i].replace(/[^\d]/g, ""));
+                }
             }
         } else {
             //calculate gradesum using example-amount (each example counts 1 point)
