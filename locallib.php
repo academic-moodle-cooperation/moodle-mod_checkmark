@@ -3729,7 +3729,7 @@ class checkmark {
         foreach ($this->checkmark->examples as $key => $example) {
             if (!$this->column_is_hidden('example'.$key)) {
                 $cellwidth[] = array('mode'=>'Relativ', 'value'=>'10');
-                $tableheaders[] = $example->name."\n(".$example->grade.'P)';
+                $tableheaders[] = $example->name." (".$example->grade.'P)';
                 $tablecolumns[] = 'example'.$key;
                 $columnformat[] = array(array('align'=>'C'));
             }
