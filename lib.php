@@ -1136,35 +1136,6 @@ function checkmark_get_all_submissions($checkmark, $sort='', $dir='DESC') {
 
 }
 
-/**
- * Given a course_module object, this function returns any 'extra' information that may be needed
- * when printing this activity in a course listing.  See get_array_of_activities()
- * in course/lib.php.
- *
- * @param $coursemodule object The coursemodule object (record).
- * @return object An object on information that the courses will know about
- *                (most noticeably, an icon).
- *
- */
-function checkmark_get_coursemodule_info($coursemodule) {
-    global $CFG, $DB;
-    require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
-
-    if (! $checkmark = $DB->get_record('checkmark', array('id'=>$coursemodule->instance),
-                                       'id, name')) {
-        return false;
-    }
-
-    $instance = new checkmark('staticonly');
-    if ($result = $instance->get_coursemodule_info($coursemodule)) {
-        return $result;
-    } else {
-        $info = new stdClass();
-        $info->name = $checkmark->name;
-        return $info;
-    }
-}
-
 /*
  ******************** OTHER GENERAL FUNCTIONS FOR checkmarks  ***********************
  */
@@ -1694,8 +1665,10 @@ function checkmark_supports($feature) {
         case FEATURE_GRADE_OUTCOMES:          return true;
         case FEATURE_GRADE_HAS_GRADE:         return true;
         case FEATURE_BACKUP_MOODLE2:          return true;
+        case FEATURE_IDNUMBER:                return true;
+        case FEATURE_SHOW_DESCRIPTION:        return true;
 
-        default: return null;
+        default: return false;
     }
 }
 
