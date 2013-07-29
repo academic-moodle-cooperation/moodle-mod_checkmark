@@ -239,13 +239,13 @@ M.mod_checkmark = {
                 return true;
             }
         }
-        if ((gradesum <= 100) && (gradesum >= 0)) {
+        if ((gradesum <= 100) && (gradesum > 0)) {
             if (M.mod_checkmark.Y.one(grade_selector.concat(" > [value=\'".concat(gradesum.toString()).concat("\']"))) == null) {
                 //alert('M.mod_checkmark.Y.one('.concat(grade_selector).concat(" > [value=\'".concat(gradesum.toString()).concat("\']")).concat(') is null'));
                 M.mod_checkmark.Y.one(grade_selector.concat(" > [value=\'-1\']")).set('selected', true);
             }
             M.mod_checkmark.Y.one(grade_selector.concat(" > [value=\'"+gradesum.toString()+"\']")).set('selected', true);
-        } else {
+        } else if (gradesum < 0) {
             M.mod_checkmark.Y.one(grade_selector.concat(" > [value=\'-1\']")).set('selected', true);
         }
         //index = M.mod_checkmark.Y.one("#id_grade > [value="+gradesum+"]").get('index');
