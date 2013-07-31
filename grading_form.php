@@ -161,11 +161,10 @@ class mod_checkmark_grading_form extends moodleform {
 
     public function add_grading_buttons() {
         $mform =& $this->_form;
-        $buttonarray=array();
+        $buttonarray = array();
+        $buttonarray2 = array();
         if ($this->_customdata->previousid>0) {
-            $buttonarray[] = &$mform->createElement('submit', 'previous', get_string('previous'));
-            $buttonarray[] = &$mform->createElement('submit', 'saveandprevious',
-                                                    get_string('saveandprevious', 'checkmark'));
+            $buttonarray2[] = &$mform->createElement('submit', 'previous', get_string('previous'));
         }
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton',
                                                 get_string('savechanges'));
@@ -173,10 +172,11 @@ class mod_checkmark_grading_form extends moodleform {
         if ($this->_customdata->nextid>0) {
             $buttonarray[] = &$mform->createElement('submit', 'saveandnext',
                                                     get_string('saveandnext'));
-            $buttonarray[] = &$mform->createElement('submit', 'next', get_string('next'));
+            $buttonarray2[] = &$mform->createElement('submit', 'next', get_string('next'));
         }
         $buttonarray[] = &$mform->createElement('cancel');
         $mform->addGroup($buttonarray, 'grading_buttonar', '', array(' '), false);
+        $mform->addGroup($buttonarray2, 'grading_buttonar2', '', array(' '), false);
         $mform->closeHeaderBefore('grading_buttonar');
         $mform->setType('grading_buttonar', PARAM_RAW);
     }
