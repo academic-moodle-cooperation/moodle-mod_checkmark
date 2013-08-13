@@ -360,82 +360,125 @@ function xmldb_checkmark_upgrade($oldversion) {
         $key = new xmldb_key('teacherid', XMLDB_KEY_FOREIGN, array('teacherid'), 'user', array('id'));
         // Launch add key teacherid
         $dbman->add_key($table, $key);
-        
+
         //copy all old settings to the new tables
         //after the development of the new DB-functions we can delete the old fields
         
         //get all checkmarks and copy on a per instance basics
         $checkmarks = $DB->get_records('checkmark');
-
-        $pbar = new progress_bar('checkmarkupgradeDB', 500, true);
-        $i=0;
-        $count = $DB->count_records_sql('SELECT count(\'x\') FROM {checkmark_submissions}');
-        $count += count($checkmarks);
+        
+        /*
+         * @todo performance upgrade: INSERT INTO tbl_name (col_A,col_B) VALUES (1,2,3), (4,5,6), (7,8,9)
+         */
+        
+        $pbar = new progress_bar('checkmarkupgradeInstances', 500, true);
+        $pbar2 = new progress_bar('checkmarkupgradeSubmissions', 500, true);
+        $instancecount=0;
+        $countinstances = count($checkmarks);
+        $ids = array();
+        $params = array();
+        unset($sql);
         foreach($checkmarks as $checkmarkid => $checkmark) {
             //create entries for checkmark examples
-            $ids = array();
-            $pbar->update($i, $count, "migrate instance ".$checkmark->name);
+            $ids[$checkmarkid] = array();
+            @$pbar->update($instancecount, $countinstances, 'migrate instance '.$checkmark->name);
+            $present = $DB->get_fieldset_select('checkmark_examples', 'name',
+                                                'checkmarkid = :checkmarkid',
+                                                array('checkmarkid'=>$checkmark->id));
             if($checkmark->flexiblenaming) {
                 //flexible naming
-                $names = explode(",", $checkmark->examplenames);
-                $grades = explode(",", $checkmark->examplegrades);
-                $examplecount = count($names);
-                foreach($names as $key => $name) {
-                    $data = new stdClass();
-                    $data->checkmarkid = $checkmark->id;
-                    $data->name = $names[$key];
-                    $data->grade = $grades[$key];
-                    if(!$ids[$key+1] = $DB->insert_record('checkmark_examples', $data)) {
-                        echo $OUTPUT->notification('Error migrating instance '.$checkmark->id.' > Example '.$name.' ('.$grades[$key].')', 'notifyproblem');
+                $names = explode(',', $checkmark->examplenames);
+                $grades = explode(',', $checkmark->examplegrades);
+                foreach ($names as $key => $name) {
+                    if (in_array($name, $present)) {
+                        //skip some examples if they have allready been inserted
+                        continue;
+                    }
+                    $params['id'.$checkmarkid.'_'.$key] = $checkmark->id;
+                    $params['name'.$checkmarkid.'_'.$key] = $names[$key];
+                    $params['grade'.$checkmarkid.'_'.$key] = empty($grades[$key]) ? 0 : $grades[$key];
+                    if (!isset($sql)) {
+                        $sql = 'INSERT INTO {checkmark_examples} (checkmarkid, name, grade)
+                                     VALUES (:id'.$checkmarkid.'_'.$key.', :name'.$checkmarkid.'_'.$key.', :grade'.$checkmarkid.'_'.$key.')';
                     } else {
-                        echo $OUTPUT->notification('Success migrating instance '.$checkmark->id.' > Example '.$name.' ('.$grades[$key].')', 'notifysuccess');
+                        $sql .= ', (:id'.$checkmarkid.'_'.$key.', :name'.$checkmarkid.'_'.$key.', :grade'.$checkmarkid.'_'.$key.')';
                     }
                 }
             } else {
                 //standard naming
                 $examplecount = $checkmark->examplecount;
-                $data = new stdClass();
-                $data->grade = $checkmark->grade/$checkmark->examplecount;
-                $key = 1;
+                if($checkmark->grade <= 100 && $checkmark->grade >= 0) {
+                    $grade = $checkmark->grade/$checkmark->examplecount;
+                } else {
+                    $grade = 0;
+                }
                 for($i=$checkmark->examplestart; $i<$checkmark->examplestart+$checkmark->examplecount; $i++) {
-                    $data->checkmarkid = $checkmark->id;
-                    $data->name = $i;
-                    if(!$ids[$key] = $DB->insert_record('checkmark_examples', $data)) {
-                        echo $OUTPUT->notification('Error migrating instance '.$checkmark->id.' > Example '.$data->name.' ('.$data->grade.')', 'notifyproblem');
-                    } else {
-                        echo $OUTPUT->notification('Success migrating instance '.$checkmark->id.' > Example '.$data->name.' ('.$data->grade.')', 'notifysuccess');
+                    if (in_array($i, $present)) {
+                        //skip some examples if they have allready been inserted
+                        continue;
                     }
-                    $key++;
+                    $params['id'.$checkmarkid.'_'.$i] = $checkmark->id;
+                    $params['name'.$checkmarkid.'_'.$i] = $i;
+                    $params['grade'.$checkmarkid.'_'.$i] = $grade;
+                    if(!isset($sql)) {
+                        $sql = 'INSERT INTO {checkmark_examples} (checkmarkid, name, grade)
+                                     VALUES (:id'.$checkmarkid.'_'.$i.', :name'.$checkmarkid.'_'.$i.', :grade'.$checkmarkid.'_'.$i.')';
+                    } else {
+                        $sql .= ', (:id'.$checkmarkid.'_'.$i.', :name'.$checkmarkid.'_'.$i.', :grade'.$checkmarkid.'_'.$i.')';
+                    }
                 }
             }
-            $i++;
-            $pbar->update($i, $count, "migrate submissions for instance ".$checkmark->name);
-            
-            //get all submissions for this instance
-            $submissions = $DB->get_records('checkmark_submissions', array('checkmarkid'=>$checkmark->id));
-            $j = 1;
-            foreach($submissions as $key => $submission) {
-                $pbar->update($i, $count, "migrate submission ".$j." for instance ".$checkmark->name);
-                $j++;
-                $checked_examples = explode(',', $submission->checked);
-                for($k=1;$k<=$examplecount;$k++) {
-                    $data = new stdClass();
-                    $data->exampleid = $ids[$k];
-                    $data->submissionid = $submission->id;
-                    if(in_array($k, $checked_examples)) {
-                        $data->state = 1;
-                    } else {
-                        $data->state = 0;
-                    }
-                    $DB->insert_record('checkmark_checks', $data);
-                }
-                $i++;
+            if(isset($sql)) {
+                $DB->execute($sql, $params);
+                unset($sql);
+                $params = array();
             }
 
-            unset($ids);
+            $instancecount++;
+            $ids = $DB->get_fieldset_sql('SELECT id
+                                            FROM {checkmark_examples}
+                                           WHERE checkmarkid = :checkmarkid',
+                                         array('checkmarkid'=>$checkmark->id));
+            $examplecount = count($ids);
+            //get all submissions for this instance
+            $submissions = $DB->get_records('checkmark_submissions', array('checkmarkid'=>$checkmark->id));
+            $subcounter = 1;
+            $submissionscount = count($submissions);
+            @$pbar2->update(0, $submissionscount, "migrate submissions for instance ".$checkmark->name);
+            foreach($submissions as $key => $submission) {
+                @$pbar2->update($subcounter, $submissionscount, "migrate submission ".$subcounter." for instance ".$checkmark->name);
+                $subcounter++;
+                $checked_examples = explode(',', $submission->checked);
+                $records_present = $DB->count_records('checkmark_checks', array('submissionid' => $submission->id));
+                $present = $DB->get_fieldset_select('checkmark_checks', 'exampleid', 'submissionid = ?', array($submission->id));
+                for($k=1;$k<=$examplecount;$k++) {
+                    if(in_array($ids[$k-1], $present)) {
+                        continue;   //skip allready migrated!
+                    }
+                    if(empty($sql)) {
+                        $sql = 'INSERT INTO {checkmark_checks} (exampleid, submissionid, state)
+                                     VALUES (:ex'.$ids[$k-1].'_'.$submission->id.', :sub'.$ids[$k-1].'_'.$submission->id.', :state'.$ids[$k-1].'_'.$submission->id.')';
+                    } else {
+                        $sql .= ', (:ex'.$ids[$k-1].'_'.$submission->id.', :sub'.$ids[$k-1].'_'.$submission->id.', :state'.$ids[$k-1].'_'.$submission->id.')';
+                    }
+                    $params['ex'.$ids[$k-1].'_'.$submission->id]  =  $ids[$k-1];
+                    $params['sub'.$ids[$k-1].'_'.$submission->id] = $submission->id;
+                    if(in_array($k, $checked_examples)) {
+                        $params['state'.$ids[$k-1].'_'.$submission->id] = 1;
+                    } else {
+                        $params['state'.$ids[$k-1].'_'.$submission->id] = 0;
+                    }
+                }
+                if(!empty($sql)) {
+                    $DB->execute($sql, $params);
+                    unset($sql);
+                    $params = array();
+                }
+            }
         }
-        
-        $pbar->update($count, $count, "migration complete!");
+
+        $pbar->update($intancecount, $instancecount, "migration complete!");
+        $pbar2->update($intancecount, $instancecount, "migration complete!");
 
         // checkmark savepoint reached
         upgrade_mod_savepoint(true, 2013061000, 'checkmark');
