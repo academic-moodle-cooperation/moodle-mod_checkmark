@@ -2950,149 +2950,43 @@ class checkmark {
         return $returnstring;
     }
 
-    public function print_preview_tab($message='', $outputtabs='') {
-        global $SESSION, $CFG, $DB, $USER, $OUTPUT, $PAGE;
-        require_once($CFG->libdir.'/gradelib.php');
-
-        /*
-         * First we check to see if the form has just been submitted
-         * to request user_preference updates!
-         */
-        $returnstring = '';
-
-        $filters = array(self::FILTER_ALL             => get_string('all'),
-        self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
-        self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
-
-        $updatepref = optional_param('updatepref', 0, PARAM_INT);
-
-        if ($updatepref && confirm_sesskey()) {
-            $printperpage = optional_param('printperpage', 0, PARAM_INT);
-            $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
-            $printperpage = (($printperpage <= 0) || !$printoptimum) ? 0 : $printperpage;
-            set_user_preference('checkmark_pdfprintperpage', $printperpage);
-
-            $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
-            set_user_preference('checkmark_filter', $filter);
-
-            $textsize = optional_param('textsize', 0, PARAM_INT);
-            set_user_preference('checkmark_textsize', $textsize);
-
-            $pageorientation = optional_param('pageorientation', 0, PARAM_INT);
-            set_user_preference('checkmark_pageorientation', $pageorientation);
-
-            $pageorientation = optional_param('printheader', 0, PARAM_INT);
-            set_user_preference('checkmark_printheader', $pageorientation);
-        }
-
-        /*
-         * Next we get perpage (allow quick grade) params
-         * from database!
-         */
-        $printperpage    = get_user_preferences('checkmark_pdfprintperpage', 0);
-        if ($printperpage == 0) {
-            $printoptimum = 1;
-        } else {
-            $printoptimum = 0;
-        }
-        $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
-        $textsize = get_user_preferences('checkmark_textsize', 0);
-        $pageorientation = get_user_preferences('checkmark_pageorientation', 0);
-        $printheader = get_user_preferences('checkmark_printheader', 1);
-
-        $grading_info = grade_get_grades($this->course->id, 'mod', 'checkmark',
-                                         $this->checkmark->id);
-
+    /*
+     * Either returns html_table_object or raw data for pdf/xls/ods/etc.
+     *
+     */
+    public function get_print_data($cm, $filter, $ids=0, $dataonly=false) {
+        global $DB, $CFG, $OUTPUT;
         if (!empty($CFG->enableoutcomes) and !empty($grading_info->outcomes)) {
             $uses_outcomes = true;
         } else {
             $uses_outcomes = false;
         }
-
-        // Some shortcuts to make the code read better!
-
-        $course     = $this->course;
-        $checkmark = $this->checkmark;
-        $cm         = $this->cm;
-        $hassubmission = false;
-
-        $tabindex = 1; // Tabindex for quick grading tabbing; Not working for dropdowns yet!
-        add_to_log($this->checkmark->course, 'checkmark', 'view print-preview',
-                   'submissions.php?id='.$this->cm->id, $this->checkmark->id, $this->cm->id);
-
-        $PAGE->set_title(format_string($this->checkmark->name, true));
-        $PAGE->set_heading($this->course->fullname);
-        $returnstring .= $OUTPUT->header();
-
-        $returnstring .= $outputtabs;
-
-        // Form to manage print-settings!
-        $returnstring .= html_writer::start_tag('div', array('class'=>'usersubmissions'));
-        $formaction = new moodle_url('/mod/checkmark/submissions.php', array('id'=>$this->cm->id,
-                                                                             'sesskey'=>sesskey()));
-        $mform = new MoodleQuickForm('optionspref', 'post', $formaction, '', array('class'=>'combinedprintpreviewform'));
-
-        $mform->addElement('hidden', 'updatepref');
-        $mform->setDefault('updatepref', 1);
-        $mform->addElement('header', 'data_settings_header', get_string('datasettingstitle', 'checkmark'));
-        $mform->addElement('select', 'filter', get_string('show'),  $filters);
-        $mform->setDefault('filter', $filter);
-
+    
         /*
          * Check to see if groups are being used in this checkmark
          * find out current groups mode!
          */
         $groupmode = groups_get_activity_groupmode($cm);
         $currentgroup = groups_get_activity_group($cm, true);
-        $mform->addElement('html', $this->moodleform_groups_print_activity_menu($cm, true));
-        $mform->addElement('html', $this->print_moodleform_initials_bar());
-        $mform->addElement('submit', 'submitdataview', get_string('strrefreshdata', 'checkmark'));
-        $mform->addElement('header', 'print_settings_header', get_string('printsettingstitle', 'checkmark'));
-        $mform->setExpanded('print_settings_header');
-
-		// submissions per page        
-        $pppgroup = array();
-        $pppgroup[] = &$mform->createElement('text', 'printperpage',get_string('pagesize', 'checkmark'), array('size'=>3));
-        $pppgroup[] = &$mform->createElement('advcheckbox','printoptimum', get_string('optimum','checkmark'),get_string('optimum','checkmark'), array("group"=> 1));
-        $mform->addGroup($pppgroup, 'printperpagegrp',get_string('pagesize', 'checkmark'), array(' '), false);
-        $mform->setDefault('printperpage',$printperpage);
-        $mform->setDefault('printoptimum',$printoptimum);
-        $mform->disabledIf('printperpage', 'printoptimum','checked');
-
-        $textsizes = array(  0=>get_string('strsmall', 'checkmark'),
-                             1=>get_string('strmedium', 'checkmark'),
-                             2=>get_string('strlarge', 'checkmark'));
-        $mform->addElement('select', 'textsize', get_string('strtextsize', 'checkmark'),  $textsizes);
-
-        $pageorientations = array(  0=>get_string('strlandscape', 'checkmark'),
-                                    1=>get_string('strportrait', 'checkmark')   );
-        $mform->addElement('select', 'pageorientation', get_string('strpageorientation', 'checkmark'),  $pageorientations);
-
-        $mform->addElement('advcheckbox', 'printheader', get_string('strprintheader', 'checkmark'));
-        $mform->addHelpButton('printheader', 'strprintheader', 'checkmark');
-        $mform->setDefault('printheader', 1);
-
-        $mform->addElement('submit', 'submittoprint', get_string('strprint', 'checkmark'));
-
-        $mform->addElement('header', 'data_preview_header', get_string('datapreviewtitle', 'checkmark'));
-        $mform->addHelpButton('data_preview_header', 'datapreviewtitle', 'checkmark');
-
-        // Hook to allow plagiarism plugins to update status/print links.
-        plagiarism_update_status($this->course, $this->cm);
-
-        if (!empty($message)) {
-            $returnstring .= $message;   // Display messages here if any!
-        }
-
+        
         $context = context_module::instance($cm->id);
+        $course = $DB->get_record('course', array('id'=>$cm->course));
 
         // Get all ppl that are allowed to submit checkmarks!
         list($esql, $params) = get_enrolled_sql($context, 'mod/checkmark:submit', $currentgroup);
 
-        if ($filter == self::FILTER_ALL) {
+        if (!empty($usrlst)) {
+            list($sqluserids, $userparams) = $DB->get_in_or_equal($usrlst, SQL_PARAMS_NAMED, 'user');
+            $params = array_merge_recursive($params, $userparams);
+            $sqluserids = ' AND u.id '.$sqluserids;
+        } else {
+            $sqluserids = '';
+        }
+        
+        if ($filter == self::FILTER_SELECTED) {
             $sql = 'SELECT u.id FROM {user} u '.
                    'LEFT JOIN ('.$esql.') eu ON eu.id=u.id '.
-                   'WHERE u.deleted = 0 AND eu.id=u.id ';
+                   'WHERE 1'.$sqluserids;
         } else {
             $wherefilter = '';
             if ($filter == self::FILTER_SUBMITTED) {
@@ -3106,7 +3000,7 @@ class checkmark {
                    'LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid) ' .
                    'WHERE u.deleted = 0 AND eu.id=u.id '.
                    'AND s.checkmarkid = :checkmarkid '.
-                   $wherefilter;
+                   $sqluserids.' '.$wherefilter;
         }
 
         $users = $DB->get_records_sql($sql, $params);
@@ -3121,52 +3015,106 @@ class checkmark {
             }
         }
 
-        $tablecolumns = array('selection', 'fullnameuser');
-        $tableheaders = array('',
-            $this->get_submissions_column_header('fullnameuser', get_string('fullnameuser')));
-
+        $cellwidth = array();
+        $columnformat = array();
+        $tableheaders = array();
+        $tablecolumns = array();
         $useridentity = explode(',', $CFG->showuseridentity);
-        foreach ($useridentity as $cur) {
-            $curstring = ($cur=='phone1') ? get_string('phone') : get_string($cur);
-            $tableheaders[] = $this->get_submissions_column_header($cur,
-                                                                   $curstring);
-            $tablecolumns[] = $cur;
-        }
-        if ($groupmode != NOGROUPS) {
-            $tableheaders[] = $this->get_submissions_column_header('groups', get_string('group'));
-            $tablecolumns[] = 'groups';
-        }
-        // Dynamically add examples!
-        foreach ($this->checkmark->examples as $key => $example) {
-            $tablecolumns[] = 'example'.$key;
-            $tableheaders[] = $this->get_submissions_column_header('example'.$key,
-                                                                   $example->name.
-                                                                   html_writer::empty_tag('br').
-                                                                   '('.$example->grade.' P)');
-        }
-        $tablecolumns[] = 'grade';
-        $tableheaders[] = $this->get_submissions_column_header('grade', get_string('grade'));
-        $tablecolumns[] = 'comment';
-        $tableheaders[] = $this->get_submissions_column_header('comment',
-                                                               get_string('comment', 'checkmark'));
-        if ($uses_outcomes) {
-            $tablecolumns[] = 'outcome'; // No sorting based on outcomes column!
-            $tableheaders[] = $this->get_submissions_column_header('outcome', get_string('outcome',
-                                                                   'grades'));
-        }
+        if (!empty($dataonly)) {
+            if (!$this->column_is_hidden('fullnameuser')) {
+                $tableheaders[] = get_string('fullnameuser');
+                $tablecolumns[] = 'fullnameuser';
+                $cellwidth = array(array('mode'=>'Fixed', 'value'=>'50'));
+                $columnformat[] = array(array('align'=>'L'));
+            }
+            foreach ($useridentity as $cur) {
+                if (!$this->column_is_hidden($cur)) {
+                    $tableheaders[] = ($cur=='phone1') ? get_string('phone') : get_string($cur);
+                    $tablecolumns[] = $cur;
+                    $cellwidth[] = array('mode'=>'Fixed', 'value'=>'25');
+                    $columnformat[] = array(array('align'=>'L'));
+                }
+            }
+            if (($groupmode != NOGROUPS) && !$this->column_is_hidden('groups')) {
+                $cellwidth[] = array('mode'=>'Fixed', 'value'=>'20');
+                $tableheaders[] = get_string('group');
+                $tablecolumns[] = 'groups';
+                $columnformat[] = array(array('align'=>'L'));
+            }
+            // Dynamically add examples!
+            foreach ($this->checkmark->examples as $key => $example) {
+                if (!$this->column_is_hidden('example'.$key)) {
+                    $cellwidth[] = array('mode'=>'Relativ', 'value'=>'10');
+                    $tableheaders[] = $example->name." (".$example->grade.'P)';
+                    $tablecolumns[] = 'example'.$key;
+                    $columnformat[] = array(array('align'=>'C'));
+                }
+            }
+            if (!$this->column_is_hidden('grade')) {
+                $cellwidth[] = array('mode'=>'Fixed', 'value'=>'20');
+                $tableheaders[] = get_string('grade');
+                $tablecolumns[] = 'grade';
+                $columnformat[] = array(array('align'=>'R'));
+            }
+            if (!$this->column_is_hidden('comment')) {
+                $cellwidth[] = array('mode'=>'Fixed', 'value'=>'30');
+                $tableheaders[] = get_string('comment', 'checkmark');
+                $tablecolumns[] = 'comment';
+                $columnformat[] = array(array('align'=>'L'));
+            }
+            if ($uses_outcomes && !$this->column_is_hidden('outcome')) {
+                $cellwidth[] = array('mode'=>'Fixed', 'value'=>'50');
+                $columnformat[] = array(array('align'=>'L'));
+                $tableheaders[] = get_string('outcome', 'grades');
+                $tablecolumns[] = 'outcome';
+            }
 
-        $table = new html_table();
-        if (!isset($table->attributes)) {
-            $table->attributes = array('class' => 'coloredrows');
-        } else if (!isset($table->attributes['class'])) {
-            $table->attributes['class'] = 'coloredrows';
         } else {
-            $table->attributes['class'] .= ' coloredrows';
-        }
+            $tablecolumns = array('selection', 'fullnameuser');
+            $tableheaders = array('',
+                                  $this->get_submissions_column_header('fullnameuser',
+                                                                       get_string('fullnameuser')));
+            foreach ($useridentity as $cur) {
+                $curstring = ($cur=='phone1') ? get_string('phone') : get_string($cur);
+                $tableheaders[] = $this->get_submissions_column_header($cur,
+                                                                       $curstring);
+                $tablecolumns[] = $cur;
+            }
+            if ($groupmode != NOGROUPS) {
+                $tableheaders[] = $this->get_submissions_column_header('groups', get_string('group'));
+                $tablecolumns[] = 'groups';
+            }
+            // Dynamically add examples!
+            foreach ($this->checkmark->examples as $key => $example) {
+                $tablecolumns[] = 'example'.$key;
+                $tableheaders[] = $this->get_submissions_column_header('example'.$key,
+                                                                       $example->name.
+                                                                       html_writer::empty_tag('br').
+                                                                       '('.$example->grade.' P)');
+            }
+            $tablecolumns[] = 'grade';
+            $tableheaders[] = $this->get_submissions_column_header('grade', get_string('grade'));
+            $tablecolumns[] = 'comment';
+            $tableheaders[] = $this->get_submissions_column_header('comment',
+                                                                   get_string('comment', 'checkmark'));
+            if ($uses_outcomes) {
+                $tablecolumns[] = 'outcome'; // No sorting based on outcomes column!
+                $tableheaders[] = $this->get_submissions_column_header('outcome', get_string('outcome',
+                                                                       'grades'));
+            }
+            $table = new html_table();
+            if (!isset($table->attributes)) {
+                $table->attributes = array('class' => 'coloredrows');
+            } else if (!isset($table->attributes['class'])) {
+                $table->attributes['class'] = 'coloredrows';
+            } else {
+                $table->attributes['class'] .= ' coloredrows';
+            }
 
-        $table->colclasses = $tablecolumns;
-        // Instead of the strings a array of html_table_cells can be set as head!
-        $table->head = $tableheaders;
+            $table->colclasses = $tablecolumns;
+            // Instead of the strings a array of html_table_cells can be set as head!
+            $table->head = $tableheaders;
+        }
 
         // Construct the SQL!
         $conditions = array();
@@ -3267,23 +3215,88 @@ class checkmark {
             $grademenu = make_grades_menu($this->checkmark->grade);
 
             if (!empty($ausers)) {
+                $row = array();
                 $grading_info = grade_get_grades($this->course->id, 'mod', 'checkmark',
                                                  $this->checkmark->id, array_keys($ausers));
 
+                if (optional_param('nosubmit_checkbox_controller2', 0, PARAM_BOOL)) {
+                    $state = optional_param('checkbox_controller2', true, PARAM_INT);
+                } else {
+                    $state = 1;
+                }
                 foreach ($ausers as $auser) {
-                    if (isset($auser->groups)) {
-                        $groups = groups_get_all_groups($this->course->id, $auser->id, 0, 'g.name');
-                        $auser->groups = '';
-                        foreach ($groups as $group) {
-                            if ($auser->groups != '') {
-                                $auser->groups .= ', ';
-                            }
-                            $auser->groups .= $group->name;
+
+                    // Calculate user status!
+                    $auser->status = ($auser->timemarked > 0)
+                                     && ($auser->timemarked >= $auser->timemodified);
+
+                    if (empty($dataonly)) {
+                        $selected_user = html_writer::checkbox('selecteduser'.$auser->id, 'selected',
+                                                               $state, null,
+                                                               array('class'=>'checkboxgroup2'));
+                        $row[] = $selected_user;
+                    }
+
+                    if (!$this->column_is_hidden('fullnameuser')) {
+                        $fullname = fullname($auser, has_capability('moodle/site:viewfullnames',
+                                             $this->context));
+                        if (!empty($dataonly)) {
+                            $row[] = $fullname;
+                        } else {
+                            $linkurl = $CFG->wwwroot.'/user/view.php?id='.$auser->id.
+                                       '&amp;course='.$course->id;
+                            $userlink = html_writer::tag('a', $fullname, array('href'=>$linkurl));
+
+                            $row[] = $userlink;
                         }
-                        $group = html_writer::tag('div', $auser->groups,
-                                                  array('id'=>'gr'.$auser->id));
-                    } else {
-                        $group = html_writer::tag('div', '-', array('id'=>'gr'.$auser->id));
+                    } else if (empty($dataonly)) {
+                        $row[] = ' ';
+                    }
+
+                    $useridentity = explode(',', $CFG->showuseridentity);
+                    foreach ($useridentity as $cur) {
+                        if (!$this->column_is_hidden($cur)) {
+                            if (empty($dataonly)) {
+                                $$cur = html_writer::tag('div', (!empty($auser->$cur) ? $auser->$cur : '-'),
+                                                            array('id'=>'u'.$cur.$auser->id));
+                                $row[] = $$cur;
+                            } else {
+                                $row[] = !empty($auser->$cur) ? $auser->$cur : '-';
+                            }
+                        } else if (empty($dataonly)) {
+                            $row[] = ' ';
+                        }
+                    }
+
+                    if (!$this->column_is_hidden('groups') && ($groupmode != NOGROUPS)) {
+                        if (isset($auser->groups)) {
+                            $groups = groups_get_all_groups($this->course->id, $auser->id, 0, 'g.name');
+                            $auser->groups = '';
+                            foreach ($groups as $group) {
+                                if ($auser->groups != '') {
+                                    $auser->groups .= ', ';
+                                }
+                                $auser->groups .= $group->name;
+                            }
+                            if(!empty($dataonly)) {
+                                $group = shorten_text($auser->groups, 20);
+                                $row[] = $group;
+                            } else if (empty($dataonly)) {
+                                $group = html_writer::tag('div', $auser->groups,
+                                                          array('id'=>'gr'.$auser->id));
+                                $row[] = $group;
+                            }
+                        } else {
+                            if(!empty($dataonly)) {
+                                $group = '-';
+                                $row[] = $group;
+                            } else if (empty($dataonly)) {
+                                $group = html_writer::tag('div', '-', array('id'=>'gr'.$auser->id));
+                                $row[] = $group;
+                            }
+                        }
+                    } else if (($groupmode != NOGROUPS) && empty($dataonly)) {
+                        $row[] = ' ';
                     }
 
                     $final_grade = $grading_info->items[0]->grades[$auser->id];
@@ -3294,105 +3307,134 @@ class checkmark {
                     if ($final_grade->overridden) {
                         $locked_overridden = 'overridden';
                     }
-
-                    // Calculate user status!
-                    $auser->status = ($auser->timemarked > 0)
-                                     && ($auser->timemarked >= $auser->timemodified);
-                    if (optional_param('nosubmit_checkbox_controller2', 0, PARAM_BOOL)) {
-                        $state = optional_param('checkbox_controller2', true, PARAM_INT);
-                    } else {
-                        $state = 1;
-                    }
-                    $selected_user = html_writer::checkbox('selecteduser'.$auser->id, 'selected',
-                                                           $state, null,
-                                                           array('class'=>'checkboxgroup2'));
-
-                    $useridentity = explode(',', $CFG->showuseridentity);
-                    foreach ($useridentity as $cur) {
-                        $$cur = html_writer::tag('div', (!empty($auser->$cur) ? $auser->$cur : '-'),
-                                                    array('id'=>'u'.$cur.$auser->id));
-                    }
-
                     if (empty($auser->submissionid)) {
-                        $auser->grade = -1; // No submission yet!
+                        $auser->grade = -1;
                     }
-
+                    
                     if (!empty($auser->submissionid)) {
+                        $hassubmission = true;
                         // Print examples!
                         $submission = $this->get_submission($auser->id);
+                        $examples = array();
                         foreach($submission->examples as $key => $example) {
                             $columnname = 'example'.$key;
-                            if (isset($SESSION->checkmark->columns[$columnname])) {
-                                $vis = $SESSION->checkmark->columns[$columnname]->visibility;
+                            if ($this->column_is_hidden($columnname)) {
+                                if(empty($dataonly)) {
+                                    $examples[$key] = '&nbsp;';
+                                    $row[] = $examples[$key];
+                                }
                             } else {
-                                $vis = 1;
-                            }
-                            if ($vis == 0) {
-                                $examples[$key] = '&nbsp;';
-                            } else {
-                                $symbol = $example->state ? self::CHECKEDBOX : self::EMPTYBOX;
-                                $examples[$key] = html_writer::tag('div', $symbol,
-                                                                   array('id'=>'ex'.$auser->id.
-                                                                               '_'.$key));
+                                if (!empty($dataonly)) {
+                                    $examples[$key] = $example->state ? 'X' : ' ';
+                                } else {
+                                    $symbol = $example->state ? self::CHECKEDBOX : self::EMPTYBOX;
+                                    $examples[$key] = html_writer::tag('div', $symbol,
+                                                                       array('id'=>'ex'.$auser->id.
+                                                                                   '_'.$key));
+                                }
+                                $row[] = $examples[$key];
                             }
                         }
 
                         // Print grade or text!
-                        if ($final_grade->locked || $final_grade->overridden) {
-                            $grade = html_writer::tag('div', $final_grade->formatted_grade,
-                                                      array('id'=>'g'.$auser->id,
-                                                            'class'=>$locked_overridden));
-                        } else {
-                            $grade = html_writer::tag('div', $this->display_grade($auser->grade),
-                                                      array('id'=>'g'.$auser->id));
+                        if (!$this->column_is_hidden('grade')) {
+                            if ($final_grade->locked || $final_grade->overridden) {
+                                if (!empty($dataonly)) {
+                                    $grade = ''.$final_grade->formatted_grade;
+                                } else {
+                                    $grade = html_writer::tag('div', $final_grade->formatted_grade,
+                                                              array('id'=>'g'.$auser->id,
+                                                                    'class'=>$locked_overridden));
+                                }
+                            } else {
+                                if (!empty($dataonly)) {
+                                    $grade = $this->display_grade($auser->grade);
+                                } else {
+                                    $grade = html_writer::tag('div', $this->display_grade($auser->grade),
+                                                              array('id'=>'g'.$auser->id));
+                                }
+                            }
+                            $row[] = $grade;
+                        } else if (empty($dataonly)) {
+                            $row[] = ' ';
                         }
-                        // Print Comment!
-                        if ($final_grade->locked || $final_grade->overridden) {
-                            $shortcom = shorten_text(strip_tags($final_grade->str_feedback), 15);
-                            $comment = html_writer::tag('div', $shortcom,
-                                                        array('id'=>'com'.$auser->id));
-
-                        } else {
-                            $shortcom = shorten_text(strip_tags($auser->submissioncomment), 15);
-                            $comment = html_writer::tag('div', $shortcom,
-                                                        array('id'=>'com'.$auser->id));
+                        
+                        if (!$this->column_is_hidden('comment')) {
+                            // Print Comment!
+                            if ($final_grade->locked || $final_grade->overridden) {
+                                if (!empty($dataonly)) {
+                                    $comment = shorten_text(strip_tags($final_grade->str_feedback), 15);
+                                } else {
+                                    $shortcom = shorten_text(strip_tags($final_grade->str_feedback), 15);
+                                    $comment = html_writer::tag('div', $shortcom,
+                                                                array('id'=>'com'.$auser->id));
+                                }
+                            } else {
+                                if (!empty($dataonly)) {
+                                    $comment = shorten_text(strip_tags($auser->submissioncomment), 15);
+                                } else {
+                                    $shortcom = shorten_text(strip_tags($auser->submissioncomment), 15);
+                                    $comment = html_writer::tag('div', $shortcom,
+                                                                array('id'=>'com'.$auser->id));
+                                }
+                            }
+                            $row[] = $comment;
+                        } else if (empty($dataonly)) {
+                            $row[] = ' ';
                         }
                     } else {
-                        $studentmodified = html_writer::tag('div', '&nbsp;',
-                                                            array('id'=>'ts'.$auser->id));
-                        $teachermodified = html_writer::tag('div', '&nbsp;',
-                                                            array('id'=>'tt'.$auser->id));
-                        $status = html_writer::tag('div', '&nbsp;', array('id'=>'st'.$auser->id));
-
                         foreach($this->checkmark->examples as $key => $example) {
                             $columnname = 'example'.$key;
-                            if (isset($SESSION->checkmark->columns[$columnname])) {
-                                $vis = $SESSION->checkmark->columns[$columnname]->visibility;
-                            } else {
-                                $vis = 1;
-                            }
-                            if ($vis == 0) {
-                                $examples[$key] = '&nbsp;';
-                            } else {
-                                $examples[$key] = html_writer::tag('div', self::EMPTYBOX,
-                                                                   array('id'=>'ex'.$auser->id.
-                                                                               '_'.$key));
+                            if (!$this->column_is_hidden($columnname)) {
+                                if (!empty($dataonly)) {
+                                    $examples[$key] = ' ';
+                                } else {
+                                    $examples[$key] = html_writer::tag('div', self::EMPTYBOX,
+                                                                       array('id'=>'ex'.$auser->id.
+                                                                                   '_'.$key));
+                                }
+                                $row[] = $examples[$key];
+                            } else if (empty($dataonly)) {
+                                $row[] = '&nbsp;';
                             }
                         }
 
-                        if ($final_grade->locked or $final_grade->overridden) {
-                            $grade = html_writer::tag('div', $final_grade->formatted_grade,
-                                                      array('id'=>'g'.$auser->id));
-                        } else {
-                            $grade = html_writer::tag('div', '-', array('id'=>'g'.$auser->id));
+                        if (!$this->column_is_hidden('grade')) {
+                            if ($final_grade->locked or $final_grade->overridden) {
+                                if (!empty($dataonly)) {
+                                    $grade = $final_grade->formatted_grade;
+                                    $hassubmission = true;
+                                } else {
+                                    $grade = html_writer::tag('div', $final_grade->formatted_grade,
+                                                              array('id'=>'g'.$auser->id));
+                                }
+                            } else {
+                                if (!empty($dataonly)) {
+                                    $grade = '-';
+                                } else {
+                                    $grade = html_writer::tag('div', '-', array('id'=>'g'.$auser->id));
+                                }
+                            }
+                            $row[] = $grade;
                         }
 
-                        if ($final_grade->locked or $final_grade->overridden) {
-                            $comment = html_writer::tag('div', $final_grade->str_feedback,
-                                                        array('id'=>'com'.$auser->id));
-                        } else {
-                            $comment = html_writer::tag('div', '&nbsp;',
-                                                        array('id'=>'com'.$auser->id));
+                        if (!$this->column_is_hidden('comment')) {
+                            if ($final_grade->locked or $final_grade->overridden) {
+                                if(!empty($dataonly)) {
+                                    $comment = $final_grade->str_feedback;
+                                } else {
+                                    $comment = html_writer::tag('div', $final_grade->str_feedback,
+                                                                array('id'=>'com'.$auser->id));
+                                }
+                            } else {
+                                if (!empty($dataonly)) {
+                                    $comment = ' ';
+                                } else {
+                                    $comment = html_writer::tag('div', '&nbsp;',
+                                                                array('id'=>'com'.$auser->id));
+                                }
+                            }
+                            $row[] = $comment;
                         }
                     }
 
@@ -3402,66 +3444,182 @@ class checkmark {
                         $auser->status = 1;
                     }
 
-                    $linkurl = $CFG->wwwroot.'/user/view.php?id='.$auser->id.
-                               '&amp;course='.$course->id;
-                    $linktext = fullname($auser, has_capability('moodle/site:viewfullnames',
-                                         $this->context));
-                    $userlink = html_writer::tag('a', $linktext, array('href'=>$linkurl));
-
-                    $row = array($selected_user, $userlink);
-
-                    $useridentity = explode(',', $CFG->showuseridentity);
-                    foreach ($useridentity as $cur) {
-                        $row[] = $$cur;
+                    if (!empty($dataonly)) {
+                        $data[] = $row;
+                    } else {
+                        $table->data[] = $row;
                     }
-
-                    if ($groupmode != NOGROUPS) {
-                        $row[] = $group;
-                    }
-
-                    foreach ($this->checkmark->examples as $key => $example) {
-                        $row[] = $examples[$key];
-                    }
-
-                    $row[] = $grade;
-                    $row[] = $comment;
-
-                    // Hide all data in hidden columns!
-                    foreach ($tablecolumns as $key => $columnname) {
-                        if ($this->column_is_hidden($columnname)) {
-                            $row[$key] = '';
-                        }
-                    }
-                    $table->data[] = $row;
                 }
-                $help_icon = new help_icon('data_preview', 'checkmark');
-                $tablehtml = html_writer::start_tag('div', array('class' => 'fcontainer scroll_forced',
-                                                                 'id'    => 'table_begin'));
-                $tablehtml .= html_writer::tag('div', get_string('data_preview', 'checkmark').
-                                                      $OUTPUT->render($help_icon),
-                        array('class' => 'datapreviewtitle')).
-                        html_writer::tag('div', $this->add_checkbox_controller(2, null, null, 1),
-                                         array('class' => 'checkboxcontroller')).
-                        html_writer::table($table);
-                $tablehtml .= html_writer::end_tag('div');
+                if (empty($dataonly)) {
+                    $help_icon = new help_icon('data_preview', 'checkmark');
+                    $tablehtml = html_writer::start_tag('div', array('class' => 'fcontainer scroll_forced',
+                                                                     'id'    => 'table_begin'));
+                    $tablehtml .= html_writer::tag('div', get_string('data_preview', 'checkmark').
+                                                          $OUTPUT->render($help_icon),
+                                                   array('class' => 'datapreviewtitle')).
+                                  html_writer::tag('div', $this->add_checkbox_controller(2, null, null, 1),
+                                                   array('class' => 'checkboxcontroller')).
+                                  html_writer::table($table);
+                    $tablehtml .= html_writer::end_tag('div');
+                }
             } else {
-                $tablehtml = $OUTPUT->box($OUTPUT->notification(get_string('nostudentsmatching',
-                                                                           'checkmark'),
-                                                                'notifyproblem'), 'generalbox');
+                if (empty($dataonly)) {
+                    $tablehtml = $OUTPUT->box($OUTPUT->notification(get_string('nostudentsmatching',
+                                                                               'checkmark'),
+                                                                    'notifyproblem'), 'generalbox');
+                }
             }
 
         } else {
-            if ($filter == self::FILTER_SUBMITTED) {
-                $tablehtml = html_writer::tag('div', get_string('nosubmisson', 'checkmark'),
-                                              array('class'=>'nosubmisson'));
-            } else if ($filter == self::FILTER_REQUIRE_GRADING) {
-                $tablehtml = html_writer::tag('div', get_string('norequiregrading', 'checkmark'),
-                                              array('class'=>'norequiregrading'));
+            if (empty($dataonly)) {
+                if ($filter == self::FILTER_SUBMITTED) {
+                    $tablehtml = html_writer::tag('div', get_string('nosubmisson', 'checkmark'),
+                                                  array('class'=>'nosubmisson'));
+                } else if ($filter == self::FILTER_REQUIRE_GRADING) {
+                    $tablehtml = html_writer::tag('div', get_string('norequiregrading', 'checkmark'),
+                                                  array('class'=>'norequiregrading'));
+                } else {
+                    $tablehtml = html_writer::tag('div', get_string('nostudents', 'checkmark'),
+                                                  array('class'=>'norequiregrading'));
+                }
             } else {
-                $tablehtml = html_writer::tag('div', get_string('nostudents', 'checkmark'),
-                                              array('class'=>'norequiregrading'));
+                return array(array(), array(), array(), array(), array());
             }
         }
+
+        if (!empty($dataonly)) {
+            return array($tablecolumns, $tableheaders, $data, $columnformat, $cellwidth);
+        } else {
+            return $tablehtml;
+        }
+    }
+    
+    public function print_preview_tab($message='', $outputtabs='') {
+        global $SESSION, $CFG, $DB, $USER, $OUTPUT, $PAGE;
+        require_once($CFG->libdir.'/gradelib.php');
+
+        /*
+         * First we check to see if the form has just been submitted
+         * to request user_preference updates!
+         */
+        $returnstring = '';
+
+        $filters = array(self::FILTER_ALL             => get_string('all'),
+                         self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
+                         self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
+
+        $updatepref = optional_param('updatepref', 0, PARAM_INT);
+
+        if ($updatepref && confirm_sesskey()) {
+            $printperpage = optional_param('printperpage', 0, PARAM_INT);
+            $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
+            $printperpage = (($printperpage <= 0) || !$printoptimum) ? 0 : $printperpage;
+            set_user_preference('checkmark_pdfprintperpage', $printperpage);
+
+            $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
+            set_user_preference('checkmark_filter', $filter);
+
+            $textsize = optional_param('textsize', 0, PARAM_INT);
+            set_user_preference('checkmark_textsize', $textsize);
+
+            $pageorientation = optional_param('pageorientation', 0, PARAM_INT);
+            set_user_preference('checkmark_pageorientation', $pageorientation);
+
+            $pageorientation = optional_param('printheader', 0, PARAM_INT);
+            set_user_preference('checkmark_printheader', $pageorientation);
+        }
+
+        /*
+         * Next we get perpage (allow quick grade) params
+         * from database!
+         */
+        $printperpage    = get_user_preferences('checkmark_pdfprintperpage', 0);
+        if ($printperpage == 0) {
+            $printoptimum = 1;
+        } else {
+            $printoptimum = 0;
+        }
+        $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
+        $textsize = get_user_preferences('checkmark_textsize', 0);
+        $pageorientation = get_user_preferences('checkmark_pageorientation', 0);
+        $printheader = get_user_preferences('checkmark_printheader', 1);
+
+        $grading_info = grade_get_grades($this->course->id, 'mod', 'checkmark',
+                                         $this->checkmark->id);
+
+
+        // Some shortcuts to make the code read better!
+
+        $course     = $this->course;
+        $checkmark = $this->checkmark;
+        $cm         = $this->cm;
+        $hassubmission = false;
+
+        $tabindex = 1; // Tabindex for quick grading tabbing; Not working for dropdowns yet!
+        add_to_log($this->checkmark->course, 'checkmark', 'view print-preview',
+                   'submissions.php?id='.$this->cm->id, $this->checkmark->id, $this->cm->id);
+
+        $PAGE->set_title(format_string($this->checkmark->name, true));
+        $PAGE->set_heading($this->course->fullname);
+        $returnstring .= $OUTPUT->header();
+
+        $returnstring .= $outputtabs;
+
+        // Form to manage print-settings!
+        $returnstring .= html_writer::start_tag('div', array('class'=>'usersubmissions'));
+        $formaction = new moodle_url('/mod/checkmark/submissions.php', array('id'=>$this->cm->id,
+                                                                             'sesskey'=>sesskey()));
+        $mform = new MoodleQuickForm('optionspref', 'post', $formaction, '', array('class'=>'combinedprintpreviewform'));
+
+        $mform->addElement('hidden', 'updatepref');
+        $mform->setDefault('updatepref', 1);
+        $mform->addElement('header', 'data_settings_header', get_string('datasettingstitle', 'checkmark'));
+        $mform->addElement('select', 'filter', get_string('show'),  $filters);
+        $mform->setDefault('filter', $filter);
+
+        $mform->addElement('html', $this->moodleform_groups_print_activity_menu($cm, true));
+        $mform->addElement('html', $this->print_moodleform_initials_bar());
+        $mform->addElement('submit', 'submitdataview', get_string('strrefreshdata', 'checkmark'));
+        $mform->addElement('header', 'print_settings_header', get_string('printsettingstitle', 'checkmark'));
+        $mform->setExpanded('print_settings_header');
+
+		// submissions per page        
+        $pppgroup = array();
+        $pppgroup[] = &$mform->createElement('text', 'printperpage',get_string('pagesize', 'checkmark'), array('size'=>3));
+        $pppgroup[] = &$mform->createElement('advcheckbox','printoptimum', get_string('optimum','checkmark'),get_string('optimum','checkmark'), array("group"=> 1));
+        $mform->addGroup($pppgroup, 'printperpagegrp',get_string('pagesize', 'checkmark'), array(' '), false);
+        $mform->setDefault('printperpage',$printperpage);
+        $mform->setDefault('printoptimum',$printoptimum);
+        $mform->disabledIf('printperpage', 'printoptimum','checked');
+
+        $textsizes = array(  0=>get_string('strsmall', 'checkmark'),
+                             1=>get_string('strmedium', 'checkmark'),
+                             2=>get_string('strlarge', 'checkmark'));
+        $mform->addElement('select', 'textsize', get_string('strtextsize', 'checkmark'),  $textsizes);
+
+        $pageorientations = array(  0=>get_string('strlandscape', 'checkmark'),
+                                    1=>get_string('strportrait', 'checkmark')   );
+        $mform->addElement('select', 'pageorientation', get_string('strpageorientation', 'checkmark'),  $pageorientations);
+
+        $mform->addElement('advcheckbox', 'printheader', get_string('strprintheader', 'checkmark'));
+        $mform->addHelpButton('printheader', 'strprintheader', 'checkmark');
+        $mform->setDefault('printheader', 1);
+
+        $mform->addElement('submit', 'submittoprint', get_string('strprint', 'checkmark'));
+
+        $mform->addElement('header', 'data_preview_header', get_string('data_preview', 'checkmark'));
+        $mform->addHelpButton('data_preview_header', 'data_preview', 'checkmark');
+
+        // Hook to allow plagiarism plugins to update status/print links.
+        plagiarism_update_status($this->course, $this->cm);
+
+        if (!empty($message)) {
+            $returnstring .= $message;   // Display messages here if any!
+        }
+
+        $tablehtml = html_writer::tag('div',
+                                      $this->get_print_data($cm, $filter),
+                                      array('class'=>'clearfix collapsible'));
 
         ob_start();
         $mform->display();
@@ -3472,7 +3630,7 @@ class checkmark {
         
         $formhtml = substr($content, 0, $pos);
         
-        $formhtml .= html_writer::tag('div', $tablehtml, array('class'=>'clearfix collapsible'));
+        $formhtml .= $tablehtml;
         $formhtml .= html_writer::end_tag('form');
         $returnstring .= $formhtml.html_writer::end_tag('div');
 
@@ -3576,6 +3734,9 @@ class checkmark {
         $grading_info = grade_get_grades($this->course->id, 'mod', 'checkmark',
                                          $this->checkmark->id);
 
+        $groupmode = groups_get_activity_groupmode($this->cm);
+        $currentgroup = groups_get_activity_group($this->cm, true);
+                                         
         if (!empty($CFG->enableoutcomes) and !empty($grading_info->outcomes)) {
             $uses_outcomes = true;
         } else {
@@ -3593,17 +3754,7 @@ class checkmark {
         add_to_log($course->id, 'checkmark', 'export pdf', 'submissions.php?id='.$this->cm->id,
                    $this->checkmark->id, $this->cm->id);
 
-        /*
-         * Check to see if groups are being used in this checkmark
-         * find out current groups mode!
-         */
-        $groupmode = groups_get_activity_groupmode($cm);
-        $currentgroup = groups_get_activity_group($cm, true);
-
         $context = context_module::instance($cm->id);
-
-        // Get all ppl that are allowed to submit checkmarks!
-        list($esql, $params) = get_enrolled_sql($context, 'mod/checkmark:submit', $currentgroup);
 
         $selected = array();
         // We shall not access $_POST directly @todo don't access $_POST directly!
@@ -3614,40 +3765,10 @@ class checkmark {
                 array_push($selected, $usrid);
             }
         }
+
         $usrlst = $selected;
 
-        if (!empty($usrlst)) {
-            list($sqluserids, $userparams) = $DB->get_in_or_equal($usrlst, SQL_PARAMS_NAMED, 'user');
-            $params = array_merge_recursive($params, $userparams);
-
-            switch ($filter) {
-                case self::FILTER_SELECTED:
-                    $sql = 'SELECT u.id FROM {user} u '.
-                           'WHERE u.deleted = 0'.
-                           ' AND u.id '.$sqluserids;
-                    break;
-                case self::FILTER_REQUIRE_GRADING:
-                    $wherefilter = ' AND (s.timemarked < s.timemodified OR s.grade = -1) ';
-                    $sql = 'SELECT u.id FROM {user} u '.
-                           'LEFT JOIN ('.$esql.') eu ON eu.id=u.id '.
-                           'LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid) ' .
-                           'WHERE u.deleted = 0 AND eu.id=u.id '.
-                           'AND s.checkmarkid = :checkmarkid'.
-                           'AND u.id '.$sqluserids.
-                           $wherefilter;
-                           $params['checkmarkid'] = $this->checkmark->id;
-                    break;
-                case self::FILTER_ALL:
-                default:
-                    $sql = 'SELECT u.id FROM {user} u '.
-                           'LEFT JOIN ('.$esql.') eu ON eu.id=u.id '.
-                           'WHERE u.deleted = 0 AND eu.id=u.id '.
-                           'AND u.id '.$sqluserids;
-                    break;
-            }
-
-            $users = $DB->get_records_sql($sql, $params);
-        } else {
+        if (empty($usrlst)) {
             echo $OUTPUT->header();
             $url = new moodle_url($PAGE->url);
             $button = new single_button($url, get_string('continue'));
@@ -3657,84 +3778,14 @@ class checkmark {
             echo $OUTPUT->footer();
             exit();
         }
-        if (!empty($users)) {
-            $users = array_keys($users);
-        }
-
-        // If groupmembersonly used, remove users who are not in any group!
-        if ($users and !empty($CFG->enablegroupmembersonly) and $cm->groupmembersonly) {
-            if ($groupingusers = groups_get_grouping_members($cm->groupingid, 'u.id', 'u.id')) {
-                $users = array_intersect($users, array_keys($groupingusers));
-            }
-        }
-
-        $tableheaders = array();
-        $tablecolumns = array();
-        $cellwidth = array();
-        $columnformat = array();
-        if (!$this->column_is_hidden('fullnameuser')) {
-            $tableheaders[] = get_string('fullnameuser');
-            $tablecolumns[] = 'fullnameuser';
-            $cellwidth = array(array('mode'=>'Fixed', 'value'=>'50'));
-            $columnformat[] = array(array('align'=>'L'));
-        }
-
-        $useridentity = explode(',', $CFG->showuseridentity);
-        foreach ($useridentity as $cur) {
-            if (!$this->column_is_hidden($cur)) {
-                $tableheaders[] = ($cur=='phone1') ? get_string('phone') : get_string($cur);
-                $tablecolumns[] = $cur;
-                $cellwidth[] = array('mode'=>'Fixed', 'value'=>'25');
-                $columnformat[] = array(array('align'=>'L'));
-            }
-        }
-
-        if (($groupmode != NOGROUPS) && !$this->column_is_hidden('groups')) {
-            $cellwidth[] = array('mode'=>'Fixed', 'value'=>'20');
-            $tableheaders[] = get_string('group');
-            $tablecolumns[] = 'groups';
-            $columnformat[] = array(array('align'=>'L'));
-        }
-        // Dynamically add examples!
-        foreach ($this->checkmark->examples as $key => $example) {
-            if (!$this->column_is_hidden('example'.$key)) {
-                $cellwidth[] = array('mode'=>'Relativ', 'value'=>'10');
-                $tableheaders[] = $example->name." (".$example->grade.'P)';
-                $tablecolumns[] = 'example'.$key;
-                $columnformat[] = array(array('align'=>'C'));
-            }
-        }
-        if (!$this->column_is_hidden('grade')) {
-            $cellwidth[] = array('mode'=>'Fixed', 'value'=>'20');
-            $tableheaders[] = get_string('grade');
-            $tablecolumns[] = 'grade';
-            $columnformat[] = array(array('align'=>'R'));
-        }
-        if (!$this->column_is_hidden('comment')) {
-            $cellwidth[] = array('mode'=>'Fixed', 'value'=>'30');
-            $tableheaders[] = get_string('comment', 'checkmark');
-            $tablecolumns[] = 'comment';
-            $columnformat[] = array(array('align'=>'L'));
-        }
-        if ($uses_outcomes && !$this->column_is_hidden('outcome')) {
-            $cellwidth[] = array('mode'=>'Fixed', 'value'=>'50');
-            $columnformat[] = array(array('align'=>'L'));
-            $tableheaders[] = get_string('outcome', 'grades');
-            $tablecolumns[] = 'outcome';
-        }
-
-        // Hide all data in hidden columns!
-        foreach ($tablecolumns as $key => $columnname) {
-            if ($this->column_is_hidden($columnname)) {
-                unset($tableheaders[$key]);
-                unset($cellwidth[$key]);
-                unset($columnformat[$key]);
-            }
-        }
 
         // Get orientation (P/L)!
         $orientation = optional_param('pageorientation', 0, PARAM_INT) ? MTablePDF::PORTRAIT : MTablePDF::LANDSCAPE;
 
+        //get data!
+        $printdata = $this->get_print_data($cm, $filter, $usrlst, true);
+        list($columns, $tableheaders, $data, $columnformat, $cellwidth) = $printdata;
+        
         $pdf = new MTablePDF($orientation, $cellwidth);
 
         $coursename = $this->course->fullname;
@@ -3767,10 +3818,6 @@ class checkmark {
 
         $pdf->ShowHeaderFooter($printheader);
 
-        $pdf->setColumnFormat($columnformat);
-
-        $pdf->setTitles($tableheaders);
-
         $textsize = optional_param('textsize', 1, PARAM_INT);
         switch ($textsize) {
             case '0':
@@ -3788,248 +3835,20 @@ class checkmark {
             $pdf->setRowsperPage($printperpage);
         }
 
-        // Construct the SQL!
-        /*
-         * replaces the old get_sql_where();
-         */
-        $conditions = array();
-        $params = array();
-
-        if (1 || isset($table->colclasses['fullname'])) {
-            static $i = 0;
-            $i++;
-
-            if (!empty($SESSION->checkmark->ifirst)) {
-                $conditions[] = $DB->sql_like('firstname', ':ifirstc'.$i, false, false);
-                $params['ifirstc'.$i] = $SESSION->checkmark->ifirst.'%';
-            }
-            if (!empty($SESSION->checkmark->ilast)) {
-                $conditions[] = $DB->sql_like('lastname', ':ilastc'.$i, false, false);
-                $params['ilastc'.$i] = $SESSION->checkmark->ilast.'%';
-            }
-        }
-
-        list($where, $params) = array(implode(' AND ', $conditions), $params);
-        /*
-         * end of replacement for get_sql_where();
-         */
-
-        $sort = '';
-        $ufields = user_picture::fields('u');
-
-        if ($where) {
-            $where .= ' AND ';
-        }
-
-        if ($filter == self::FILTER_SUBMITTED) {
-            $where .= 's.timemodified > 0 AND ';
-        } else if ($filter == self::FILTER_REQUIRE_GRADING) {
-            $where .= 's.timemarked < s.timemodified AND ';
-        }
-
-        if ($groupmode != NOGROUPS) {
-            if (isset($SESSION->checkmark->orderby) && ($SESSION->checkmark->orderby == 'groups')) {
-                if (isset($SESSION->checkmark->orderdirection)
-                    && $SESSION->checkmark->orderdirection == 'DESC') {
-                    $groupselect = 'MAX(grps.name)';
-                    $grouporder = ' ORDER BY grps.name '.$SESSION->checkmark->orderdirection;
-                } else {
-                    $groupselect = 'MIN(grps.name)';
-                    $grouporder = ' ORDER BY grps.name ASC';
-                }
-            } else {
-                $groupselect = 'MIN(grps.name)';
-                $grouporder = ' ORDER BY grps.name ASC';
-            }
-            $getgroupsql = 'SELECT grps.courseid, '.$groupselect;
-            $params['courseid'] = $this->course->id;
-            $getgroupsql .= '      AS groups, grpm.userid AS userid
-                              FROM {groups_members} grpm
-                         LEFT JOIN {groups} grps
-                                ON grps.id = grpm.groupid
-                             WHERE grps.courseid = :courseid
-                          GROUP BY grpm.userid'.
-                         $grouporder;
-            $groupssql = ' LEFT JOIN ('.$getgroupsql.') AS grpq ON u.id = grpq.userid ';
-        } else {
-            $groupssql = '';
-        }
-
-        if (!empty($users)) {
-            $useridentityfields = 'u.'.str_replace(',', ',u.', $CFG->showuseridentity);
-            $select = 'SELECT '.$ufields.', '.$useridentityfields.',
-                              s.id AS submissionid, s.grade, s.submissioncomment,
-                              s.timemodified, s.timemarked ';
-            if ($groupmode != NOGROUPS) {
-                    $select .= ', groups ';
-            }
-            $params['checkmarkid'] = $this->checkmark->id;
-
-            list($sqluserids, $userparams) = $DB->get_in_or_equal($usrlst, SQL_PARAMS_NAMED, 'user');
-            $params = array_merge_recursive($params, $userparams);
-
-            $sql = 'FROM {user} u '.
-                   'LEFT JOIN {checkmark_submissions} s ON u.id = s.userid
-                    AND s.checkmarkid = :checkmarkid '.
-                   $groupssql.
-                   ' WHERE '.$where.' u.id '.$sqluserids;
-
-            if (isset($SESSION->checkmark->orderby)) {
-                $sort = ' ORDER BY '.
-                        $SESSION->checkmark->orderby;
-                if (isset($SESSION->checkmark->orderdirection)
-                    && ($SESSION->checkmark->orderdirection == 'DESC')) {
-                    $sort .= ' DESC';
-                } else {
-                    $sort .= ' ASC';
-                }
-                if (($groupmode == NOGROUPS) && ($SESSION->checkmark->orderby == 'groups')) {
-                    unset($SESSION->checkmark->orderby);
-                    $sort = '';
-                }
-            }
-
-            $ausers = $DB->get_records_sql($select.$sql.$sort, $params);
-
-            if ($ausers !== false) {
-                $row = array();
-                $grading_info = grade_get_grades($this->course->id, 'mod', 'checkmark',
-                                                 $this->checkmark->id, array_keys($ausers));
-                foreach ($ausers as $auser) {
-                    if (!$this->column_is_hidden('fullnameuser')) {
-                        $fullname = fullname($auser, has_capability('moodle/site:viewfullnames',
-                                             $this->context));
-                        $row[] = $fullname;
-                    }
-
-                    $useridentity = explode(',', $CFG->showuseridentity);
-                    foreach ($useridentity as $cur) {
-                        if (!$this->column_is_hidden($cur)) {
-                            $row[] = !empty($auser->$cur) ? $auser->$cur : '-';
-                        }
-                    }
-
-                    if (!$this->column_is_hidden('groups') && ($groupmode != NOGROUPS)) {
-                        if (isset($auser->groups)) {
-                            $groups = groups_get_all_groups($this->course->id, $auser->id, 0, 'g.name');
-                            $auser->groups = '';
-                            foreach ($groups as $group) {
-                                if ($auser->groups != '') {
-                                    $auser->groups .= ', ';
-                                }
-                                $auser->groups .= $group->name;
-                            }
-                            $group = shorten_text($auser->groups, 20);
-                        } else {
-                            $group = '-';
-                        }
-
-                        $row[] = $group;
-                    }
-
-                    if (!$this->column_is_hidden('grade')) {
-                        $final_grade = $grading_info->items[0]->grades[$auser->id];
-                        $grademax = $grading_info->items[0]->grademax;
-                        $final_grade->formatted_grade = round($final_grade->grade, 2).
-                                                        ' / '.round($grademax, 2);
-                        $locked_overridden = 'locked';
-                        if ($final_grade->overridden) {
-                            $locked_overridden = 'overridden';
-                        }
-
-                        if (empty($auser->submissionid)) {
-                            $auser->grade = -1; // No submission yet!
-                        }
-                    }
-
-                    if (!empty($auser->submissionid)) {
-                        $hassubmission = true;
-                        // Print examples!
-                        $submission = $this->get_submission($auser->id);
-                        $examples = array();
-                        foreach ($submission->examples as $key => $example) {
-                                $colname = 'example'.$key;
-                                if (isset($SESSION->checkmark->columns[$colname])
-                                    && ($SESSION->checkmark->columns[$colname]->visibility == 0)) {
-                                    $examples[$key] = ' ';
-                                } else {
-                                    if($example->state) {
-                                        $examples[$key] = 'X';
-                                    } else {
-                                        $examples[$key] = ' ';
-                                }
-                            }
-                        }
-
-                        if (!$this->column_is_hidden('grade')) {
-                            // Print grade or text!
-                            if ($final_grade->locked or $final_grade->overridden) {
-                                $grade = ''.$final_grade->formatted_grade;
-                            } else {
-                                $grade = $this->display_grade($auser->grade);
-                            }
-                        }
-
-                        if (!$this->column_is_hidden('comment')) {
-                            // Print Comment!
-                            if ($final_grade->locked or $final_grade->overridden) {
-                                $comment = shorten_text(strip_tags($final_grade->str_feedback), 15, 1);
-
-                            } else {
-                                $comment = shorten_text(strip_tags($auser->submissioncomment), 15, 1);
-                            }
-                        }
-                    } else {
-                        $studentmodified = ' ';
-                        $teachermodified = ' ';
-                        $status          = ' ';
-
-                        foreach ($this->checkmark->examples as $key => $example) {
-                            $examples[$key] = ' ';
-                        }
-
-                        if (!$this->column_is_hidden('grade')) {
-                            if ($final_grade->locked or $final_grade->overridden) {
-                                $grade = $final_grade->formatted_grade;
-                                $hassubmission = true;
-                            } else {
-                                $grade = '-';
-                            }
-                        }
-
-                        if (!$this->column_is_hidden('comment')) {
-                            if ($final_grade->locked or $final_grade->overridden) {
-                                $comment = $final_grade->str_feedback;
-                            } else {
-                                $comment = ' ';
-                            }
-                        }
-                    }
-
-                    foreach($examples as $key => $example) {
-                        if (!$this->column_is_hidden('example'.$key)) {
-                            $row[] = $examples[$key];
-                        }
-                    }
-
-                    if (!$this->column_is_hidden('grade')) {
-                        $row[] = $grade;
-                    }
-                    if (!$this->column_is_hidden('comment')) {
-                        $row[] = $comment;
-                    }
-
-                    $pdf->addRow($row);
-                    unset($row);
-                }
+        //if data
+        if (count($data)) {
+            $pdf->setColumnFormat($columnformat);
+            $pdf->setTitles($tableheaders); 
+            foreach($data as $row) {
+                $pdf->addRow($row);
             }
         } else {
             if ($filter == self::FILTER_REQUIRE_GRADING) {
-                $data = array('', get_string('norequiregrading', 'checkmark'), '');
-                $tableheaders = array(' ', ' ', ' ');
+                $pdf->addRow(array('', get_string('norequiregrading', 'checkmark'), ''));
+                $pdf->setTitles(array(' ', ' ', ' '));
             } else {
-                $data = array('', get_string('nosubmisson', 'checkmark'), '');
-                $tableheaders = array(' ', ' ', ' ');
+                $pdf->addRow(array('', get_string('nosubmisson', 'checkmark'), ''));
+                $pdf->setTitles(array(' ', ' ', ' '));
             }
         }
 
