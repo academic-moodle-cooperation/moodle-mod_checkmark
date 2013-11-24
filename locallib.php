@@ -2961,7 +2961,10 @@ class checkmark {
         } else {
             $uses_outcomes = false;
         }
-    
+
+        $summary_abs = get_user_preferences('checkmark_sumabs', 1);
+        $summary_rel = get_user_preferences('checkmark_sumrel', 1);
+
         /*
          * Check to see if groups are being used in this checkmark
          * find out current groups mode!
@@ -3050,6 +3053,12 @@ class checkmark {
                     $columnformat[] = array(array('align'=>'C'));
                 }
             }
+            if (!$this->column_is_hidden('summary') && !empty($summary_abs) || !empty($summary_rel)) {
+                $cellwidth[] = array('mode'=>'Fixed', 'value'=>'10');
+                $tableheaders[] = get_string('checkmarks', 'checkmark');
+                $tablecolumns[] = 'summary';
+                $columnformat[] = array(array('align'=>'L'));
+            }
             if (!$this->column_is_hidden('grade')) {
                 $cellwidth[] = array('mode'=>'Fixed', 'value'=>'20');
                 $tableheaders[] = get_string('grade');
@@ -3091,6 +3100,12 @@ class checkmark {
                                                                        $example->name.
                                                                        html_writer::empty_tag('br').
                                                                        '('.$example->grade.' P)');
+            }
+            if (!empty($summary_abs) || !empty($summary_rel)) {
+                $tableheaders[] = $this->get_submissions_column_header('summary',
+                                                                       get_string('checkmarks',
+                                                                                  'checkmark'));
+                $tablecolumns[] = 'summary';
             }
             $tablecolumns[] = 'grade';
             $tableheaders[] = $this->get_submissions_column_header('grade', get_string('grade'));
@@ -3179,7 +3194,7 @@ class checkmark {
             $useridentityfields = 'u.'.str_replace(',', ',u.', $CFG->showuseridentity);
             $select = 'SELECT '.$ufields.', '.$useridentityfields.',
                               s.id AS submissionid, s.grade, s.submissioncomment,
-                              s.timemodified, s.timemarked ';
+                              s.timemodified, s.timemarked, 100 * COUNT( DISTINCT cchks.id ) / COUNT( DISTINCT gchks.id ) AS summary, COUNT( DISTINCT gchks.id ) AS maxchecks, COUNT( DISTINCT cchks.id ) AS checks ';
             if ($groupmode != NOGROUPS) {
                     $select .= ', groups ';
             }
@@ -3190,9 +3205,12 @@ class checkmark {
 
             $sql = 'FROM {user} AS u '.
                    'LEFT JOIN {checkmark_submissions} AS s ON u.id = s.userid
-                    AND s.checkmarkid = :checkmarkid '.
+                    AND s.checkmarkid = :checkmarkid 
+                    LEFT JOIN {checkmark_checks} AS gchks ON gchks.submissionid = s.id
+                    LEFT JOIN {checkmark_checks} AS cchks ON cchks.submissionid = s.id AND cchks.state = 1 '.
                    $groupssql.
-                   'WHERE '.$where.'u.id '.$sqluserids;
+                   'WHERE '.$where.'u.id '.$sqluserids.'
+                    GROUP BY s.id';
 
             if (isset($SESSION->checkmark->orderby)) {
                 $sort = ' ORDER BY '.$SESSION->checkmark->orderby;
@@ -3334,6 +3352,27 @@ class checkmark {
                                 }
                                 $row[] = $examples[$key];
                             }
+                        }
+
+                        if (!$this->column_is_hidden('summary') && (!empty($summary_abs) || !empty($summary_rel))) {
+                            if (!empty($summary_abs) && !empty($summary_rel)) {
+                                //both values
+                                $summary = $auser->checks.'/'.$auser->maxchecks.' ('.
+                                           round($auser->summary, 2).'%)';
+                            } else if (!empty($summary_abs)) {
+                                //summary abs
+                                $summary = $auser->checks.'/'.$auser->maxchecks;
+                            } else {
+                                //summary rel
+                                $summary = round($auser->summary, 2).'%';
+                            }
+                            if (!empty($dataonly)) {
+                                $row[] = $summary;
+                            } else {
+                                $row[] = html_writer::tag('div', $summary, array('id'=>'sum'.$auser->id));
+                            }
+                        } else if (empty($dataonly)) {
+                            $row[] = '&nbsp;';
                         }
 
                         // Print grade or text!
@@ -3527,6 +3566,11 @@ class checkmark {
 
             $pageorientation = optional_param('printheader', 0, PARAM_INT);
             set_user_preference('checkmark_printheader', $pageorientation);
+            
+            $summary_abs = optional_param('sumabs', 0, PARAM_INT);
+            set_user_preference('checkmark_sumabs', $summary_abs);
+            $summary_rel = optional_param('sumrel', 0, PARAM_INT);
+            set_user_preference('checkmark_sumrel', $summary_rel);
         }
 
         /*
@@ -3543,7 +3587,9 @@ class checkmark {
         $textsize = get_user_preferences('checkmark_textsize', 0);
         $pageorientation = get_user_preferences('checkmark_pageorientation', 0);
         $printheader = get_user_preferences('checkmark_printheader', 1);
-
+        $summary_abs = get_user_preferences('checkmark_sumabs', 1);
+        $summary_rel = get_user_preferences('checkmark_sumrel', 1);
+        
         $grading_info = grade_get_grades($this->course->id, 'mod', 'checkmark',
                                          $this->checkmark->id);
 
@@ -3604,6 +3650,13 @@ class checkmark {
         $mform->addElement('advcheckbox', 'printheader', get_string('strprintheader', 'checkmark'));
         $mform->addHelpButton('printheader', 'strprintheader', 'checkmark');
         $mform->setDefault('printheader', 1);
+
+        $summarygrp = array();
+        $summarygrp[] = &$mform->createElement('advcheckbox', 'sumabs', '', get_string('summary_abs', 'checkmark'), array('group'=> 3));
+        $summarygrp[] = &$mform->createElement('advcheckbox', 'sumrel', '', get_string('summary_rel', 'checkmark'), array('group'=> 3));
+        $mform->addGroup($summarygrp, 'summarygrp',get_string('checksummary', 'checkmark'), array('<br />'), false);
+        $mform->setDefault('sumabs', $summary_abs);
+        $mform->setDefault('sumrel', $summary_rel);
 
         $mform->addElement('submit', 'submittoprint', get_string('strprint', 'checkmark'));
 
@@ -3719,6 +3772,11 @@ class checkmark {
             $textsize = optional_param('textsize', 0, PARAM_INT);
             set_user_preference('checkmark_textsize', $textsize);
 
+            $summary_abs = optional_param('sumabs', 0, PARAM_INT);
+            set_user_preference('checkmark_sumabs', $summary_abs);
+            $summary_rel = optional_param('sumrel', 0, PARAM_INT);
+            set_user_preference('checkmark_sumrel', $summary_rel);
+            
             $pageorientation = optional_param('pageorientation', 0, PARAM_INT);
             set_user_preference('checkmark_pageorientation', $pageorientation);
 
@@ -3731,6 +3789,9 @@ class checkmark {
          */
         $printperpage    = get_user_preferences('checkmark_pdfprintperpage', null);
         $filter = get_user_preferences('checkmark_filter', 0);
+        $summary_abs = get_user_preferences('checkmark_sumabs', 1);
+        $summary_rel = get_user_preferences('checkmark_sumrel', 1);
+
         $grading_info = grade_get_grades($this->course->id, 'mod', 'checkmark',
                                          $this->checkmark->id);
 
