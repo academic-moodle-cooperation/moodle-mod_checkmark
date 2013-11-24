@@ -3029,19 +3029,14 @@ class checkmark {
         // Form to manage print-settings!
         $returnstring .= html_writer::start_tag('div', array('class'=>'usersubmissions'));
         $formaction = new moodle_url('/mod/checkmark/submissions.php', array('id'=>$this->cm->id,
-                                                                             'updatepref'=>1,
                                                                              'sesskey'=>sesskey()));
-        //tscpr:
-            //i think it will be better to use a moodle_form here, even though it will be a lot of work to rewrite it, the code would 
-            //apply the coding standards even more
-        $formhtml = '';
+        $mform = new MoodleQuickForm('optionspref', 'post', $formaction, '', array('class'=>'combinedprintpreviewform'));
 
-        $datasettingselements = '';
-
-        $select = html_writer::tag('div', get_string('show'), array('class'=>'fitemtitle')).
-                  html_writer::tag('div', html_writer::select($filters, 'filter', $filter, false),
-                                   array('class'=>'felement'));
-        $datasettingselements .= html_writer::tag('div', $select, array('class'=>'fitem'));
+        $mform->addElement('hidden', 'updatepref');
+        $mform->setDefault('updatepref', 1);
+        $mform->addElement('header', 'data_settings_header', get_string('datasettingstitle', 'checkmark'));
+        $mform->addElement('select', 'filter', get_string('show'),  $filters);
+        $mform->setDefault('filter', $filter);
 
         /*
          * Check to see if groups are being used in this checkmark
@@ -3049,97 +3044,38 @@ class checkmark {
          */
         $groupmode = groups_get_activity_groupmode($cm);
         $currentgroup = groups_get_activity_group($cm, true);
-        $datasettingselements .= $this->moodleform_groups_print_activity_menu($cm, true);
+        $mform->addElement('html', $this->moodleform_groups_print_activity_menu($cm, true));
+        $mform->addElement('html', $this->print_moodleform_initials_bar());
+        $mform->addElement('submit', 'submitdataview', get_string('strrefreshdata', 'checkmark'));
+        $mform->addElement('header', 'print_settings_header', get_string('printsettingstitle', 'checkmark'));
+        $mform->setExpanded('print_settings_header');
 
-        $datasettingselements .= $this->print_moodleform_initials_bar();
-
-        $button = html_writer::tag('button', get_string('strrefreshdata', 'checkmark'),
-                                   array('type'  => 'submit',
-                                         'name'  => 'submitdataview',
-                                         'value' => 'true'));
-        $submit = html_writer::tag('div', '&nbsp;', array('class'=>'fitemtitle')).
-                  html_writer::tag('div', $button, array('class'=>'felement'));
-        $datasettingselements .= html_writer::tag('div', $submit, array('class'=>'fitem'));
-        $datasettingselements = html_writer::tag('legend',
-                                                 get_string('datasettingstitle', 'checkmark')).
-                                html_writer::tag('div', $datasettingselements,
-                                                 array('class'=>'fcontainer'));
-
-        $formhtml .= html_writer::tag('fieldset', $datasettingselements,
-                                      array('name'  => 'data_settings_header',
-                                            'class' => 'clearfix'));
-
-        $printsettingselements = '';
-
-        // Using zero for autopaging!
-        $inputattr = array('size'  => 3,
-                           'name'  => 'printperpage',
-                           'value' => $printperpage,
-                           'type'  => 'text');
-        $input = html_writer::empty_tag('input', $inputattr);
-        $advcheckbox = array('name' => 'printoptimum',
-                             'type' => 'checkbox');
-        if ($printoptimum || ($printperpage == 0)) {
-            $advcheckbox['checked'] = 'checked';
-        }
-        $optimum = html_writer::empty_tag('input', $advcheckbox).'&nbsp;'.
-                   get_string('optimum', 'checkmark');
-        $printperpagehtml = html_writer::tag('div', get_string('pagesize', 'checkmark'),
-                                             array('class'=>'fitemtitle')).
-                            html_writer::tag('div', $input.$optimum, array('class'=>'felement'));
-        $printsettingselements .= html_writer::tag('div', $printperpagehtml,
-                                                   array('class'=>'fitem'));
+		// submissions per page        
+        $pppgroup = array();
+        $pppgroup[] = &$mform->createElement('text', 'printperpage',get_string('pagesize', 'checkmark'), array('size'=>3));
+        $pppgroup[] = &$mform->createElement('advcheckbox','printoptimum', get_string('optimum','checkmark'),get_string('optimum','checkmark'), array("group"=> 1));
+        $mform->addGroup($pppgroup, 'printperpagegrp',get_string('pagesize', 'checkmark'), array(' '), false);
+        $mform->setDefault('printperpage',$printperpage);
+        $mform->setDefault('printoptimum',$printoptimum);
+        $mform->disabledIf('printperpage', 'printoptimum','checked');
 
         $textsizes = array(  0=>get_string('strsmall', 'checkmark'),
                              1=>get_string('strmedium', 'checkmark'),
                              2=>get_string('strlarge', 'checkmark'));
-
-        $select = html_writer::select($textsizes, 'textsize', $textsize, false);
-        $textsizehtml = html_writer::tag('div', get_string('strtextsize', 'checkmark'),
-                                         array('class'=>'fitemtitle')).
-                        html_writer::tag('div', $select, array('class'=>'felement'));
-        $printsettingselements .= html_writer::tag('div', $textsizehtml, array('class'=>'fitem'));
+        $mform->addElement('select', 'textsize', get_string('strtextsize', 'checkmark'),  $textsizes);
 
         $pageorientations = array(  0=>get_string('strlandscape', 'checkmark'),
                                     1=>get_string('strportrait', 'checkmark')   );
-        $select = html_writer::select($pageorientations, 'pageorientation', $pageorientation,
-                                      false);
-        $pageorientationhtml = html_writer::tag('div',
-                                                get_string('strpageorientation', 'checkmark'),
-                                                array('class'=>'fitemtitle')).
-                               html_writer::tag('div', $select, array('class'=>'felement'));
-        $printsettingselements .= html_writer::tag('div', $pageorientationhtml,
-                                                   array('class'=>'fitem'));
+        $mform->addElement('select', 'pageorientation', get_string('strpageorientation', 'checkmark'),  $pageorientations);
 
-        $printheaderattr = array('name'=>'printheader', 'value'=>'1', 'type'=>'checkbox');
-        if ($printheader) {
-            $printheaderattr['checked'] = 'checked';
-        }
-        $advcheckbox = html_writer::empty_tag('input', array('name'  => 'printheader',
-                                                             'value' => '0',
-                                                             'type'  => 'hidden')).
-                       html_writer::empty_tag('input', $printheaderattr);
-        $printheaderhtml = html_writer::tag('div', get_string('strprintheader', 'checkmark').
-                                                   $OUTPUT->help_icon('strprintheader',
-                                                                      'checkmark'),
-                                            array('class'=>'fitemtitle')).
-                           html_writer::tag('div', $advcheckbox, array('class'=>'felement'));
-        $printsettingselements .= html_writer::tag('div', $printheaderhtml,
-                                                   array('class'=>'fitem'));
+        $mform->addElement('advcheckbox', 'printheader', get_string('strprintheader', 'checkmark'));
+        $mform->addHelpButton('printheader', 'strprintheader', 'checkmark');
+        $mform->setDefault('printheader', 1);
 
-        $button = html_writer::tag('button', get_string('strprint', 'checkmark'),
-                                   array('name'  => 'submittoprint',
-                                         'type'  => 'submit',
-                                         'value' => 'true'));
-        $submithtml = html_writer::tag('div', '&nbsp;', array('class'=>'fitemtitle')).
-                      html_writer::tag('div', $button, array('class'=>'felement'));
-        $printsettingselements .= html_writer::tag('div', $submithtml, array('class'=>'fitem'));
-        $printsettingselements = html_writer::tag('legend',
-                                                  get_string('printsettingstitle', 'checkmark')).
-                                 html_writer::tag('div', $printsettingselements,
-                                                  array('class'=>'fcontainer'));
-        $formhtml .= html_writer::tag('fieldset', $printsettingselements,
-                                      array('name'=>'print_settings_header', 'class'=>'clearfix'));
+        $mform->addElement('submit', 'submittoprint', get_string('strprint', 'checkmark'));
+
+        $mform->addElement('header', 'data_preview_header', get_string('datapreviewtitle', 'checkmark'));
+        $mform->addHelpButton('data_preview_header', 'datapreviewtitle', 'checkmark');
 
         // Hook to allow plagiarism plugins to update status/print links.
         plagiarism_update_status($this->course, $this->cm);
@@ -3499,7 +3435,7 @@ class checkmark {
                     $table->data[] = $row;
                 }
                 $help_icon = new help_icon('data_preview', 'checkmark');
-                $tablehtml = html_writer::start_tag('div', array('class' => 'scroll_forced',
+                $tablehtml = html_writer::start_tag('div', array('class' => 'fcontainer scroll_forced',
                                                                  'id'    => 'table_begin'));
                 $tablehtml .= html_writer::tag('div', get_string('data_preview', 'checkmark').
                                                       $OUTPUT->render($help_icon),
@@ -3527,26 +3463,18 @@ class checkmark {
             }
         }
 
-        $tablehtml = html_writer::tag('div', $tablehtml, array('class'=>'fcontainer'));
-        $formhtml .= html_writer::tag('div', $tablehtml, array('class'=>'clearfix'));
-        $formhtml .= html_writer::input_hidden_params($formaction);
-        $url = $formaction->out_omit_querystring($formaction);
-        $returnstring .= html_writer::tag('form', $formhtml, array('class'  => 'mform',
-                                                                   'action' => $url,
-                                                                   'method' => 'post'));
-        $returnstring .= html_writer::end_tag('div');
-
-        $jsmodule = array(
-            'name'     =>   'mod_checkmark',
-            'fullpath' =>   '/mod/checkmark/yui/checkmark/checkmark.js',
-            'requires' =>   array('base', 'node', 'io', 'event'),
-            'strings'  =>   null
-        );
-        $jsdata = array(
-            'stdperpage' => $printperpage ? $printperpage : 10
-        );
-        $PAGE->requires->js_init_call('M.mod_checkmark.init_printsettings', $jsdata, true,
-                                      $jsmodule);
+        ob_start();
+        $mform->display();
+        $content = ob_get_contents();
+        ob_end_clean();
+        
+        $pos = strrpos($content, '<fieldset');
+        
+        $formhtml = substr($content, 0, $pos);
+        
+        $formhtml .= html_writer::tag('div', $tablehtml, array('class'=>'clearfix collapsible'));
+        $formhtml .= html_writer::end_tag('form');
+        $returnstring .= $formhtml.html_writer::end_tag('div');
 
         $returnstring .= $OUTPUT->footer();
 

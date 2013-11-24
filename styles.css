@@ -154,7 +154,7 @@
     text-align: left;
 }
 
-#page-mod-checkmark-submissions fieldset {
+#page-mod-checkmark-submissions fieldset.clearfix.collapsible {
     margin-bottom: 2em;
 }
 
@@ -229,18 +229,11 @@
 }
 
 .path-mod-checkmark .scroll_forced {
-/*    overflow: scroll;
-    max-height:500px;
-*/
     overflow:auto;
     border-width: 1px;
     border-color: #dddddd;
     border-style: solid;
     padding:0px;
-    /*margin-left:auto;
-    margin-right:auto;*/
-    margin-left:10px;
-    margin-right:10px;
 }
 
 .path-mod-checkmark .scroll_forced .datapreviewtitle {
