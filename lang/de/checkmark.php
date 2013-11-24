@@ -222,6 +222,7 @@ $string['page-mod-checkmark-x'] = 'Jede Kreuzerlübungsmodulseite';
 $string['page-mod-checkmark-view'] = 'Kreuzerlübungsmodul Haupseite';
 $string['page-mod-checkmark-submissions'] = 'Kreuzerlübungsmodul Abgabenseite';
 $string['pagesize'] = 'Abgaben pro Seite';
+$string['pagesize_help'] = 'Wenn in Ihrem Kurs sehr viele Teilnehmer/innen eingeschrieben sind, können Sie mittels der Einstellung "Optimal" die Aufteilung der Listeneinträge pro Seite entsprechend der gewählten Schriftgröße und Seitenausrichtung optimieren.';
 $string['popupinnewwindow'] = 'Öffne Pop-up in neuem Fenster';
 $string['posintrequired'] = 'Muss größer als 0 (> 0) und ganzzahlig sein';
 $string['posintst100required'] = 'Muss im Intervall [0,100] liegen (0 <= X <= 100) sowie ganzzahlig sein';

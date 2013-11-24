@@ -3631,9 +3631,10 @@ class checkmark {
 
 		// submissions per page        
         $pppgroup = array();
-        $pppgroup[] = &$mform->createElement('text', 'printperpage',get_string('pagesize', 'checkmark'), array('size'=>3));
+        $pppgroup[] = &$mform->createElement('text', 'printperpage', get_string('pagesize', 'checkmark'), array('size'=>3));
         $pppgroup[] = &$mform->createElement('advcheckbox','printoptimum', get_string('optimum','checkmark'),get_string('optimum','checkmark'), array("group"=> 1));
         $mform->addGroup($pppgroup, 'printperpagegrp',get_string('pagesize', 'checkmark'), array(' '), false);
+        $mform->addHelpButton('printperpagegrp', 'pagesize', 'checkmark');
         $mform->setDefault('printperpage',$printperpage);
         $mform->setDefault('printoptimum',$printoptimum);
         $mform->disabledIf('printperpage', 'printoptimum','checked');

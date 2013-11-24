@@ -220,6 +220,7 @@ $string['page-mod-checkmark-x'] = 'Every checkmark module page';
 $string['page-mod-checkmark-view'] = 'Checkmark module main page';
 $string['page-mod-checkmark-submissions'] = 'Checkmark module submission page';
 $string['pagesize'] = 'Submissions shown per page';
+$string['pagesize_help'] = 'Choose "Optimum" to optimize the distribution of list entries according to the chosen textsize and page orientation, if there are plenty of participants registered in your course.';
 $string['popupinnewwindow'] = 'Open in a popup window';
 $string['posintrequired'] = 'Needs to be greater than zero (> 0) and integral';
 $string['pluginadministration'] = 'Checkmark administration';
