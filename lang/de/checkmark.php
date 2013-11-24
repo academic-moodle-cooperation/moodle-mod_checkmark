@@ -24,9 +24,12 @@ defined('MOODLE_INTERNAL') || die;
  * @since         Moodle 2.1
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-/*
- * Block for checkmark-specific strings
- */
+$string['checkmark:addinstance'] = 'Kreuzerlübung anlegen';
+$string['checkmark:grade'] = 'Kreuzerlübung benoten';
+$string['checkmark:submit'] = 'Kreuzerlübung abgeben';
+$string['checkmark:view'] = 'Zeige Kreuzerlübung';
+$string['checkmark:view_preview'] = 'Vorschau ansehen';
+ 
 $string['activateindividuals'] = 'Individualfunktionen aktivieren';
 $string['strassignment'] = 'Aufgabe';
 $string['autograde_all'] = 'Alle Abgaben bewerten';
@@ -57,7 +60,6 @@ $string['autograde_no_users_selected'] = 'Sie haben keinen Benutzer zur Bewertun
 $string['checkmark_overviewsummary'] = 'Sie haben {$a->checked_examples} / {$a->total_examples} Beispiele ({$a->checked_grade} / {$a->total_grade} Punkte) gekreuzt<br />{$a->grade}<br />';
 $string['checkmark_summary'] = 'Sie haben <span id="examples">{$a->checked_examples}</span> von {$a->total_examples} Beispielen gekreuzt.<br />(<span id="grade">{$a->checked_grade}</span> von maximal {$a->total_grade} Punkten)';
 $string['checkmarkstatstitle'] = 'Kursübersicht Kreuzerlübungen';
-$string['checkmark:view_preview'] = 'Vorschau ansehen';
 $string['count_individuals_mismatch'] = 'Die Anzahl der Beispielnamen({$a->namecount}) stimmt nicht mit der Anzahl der Beispielgewichtungen({$a->gradecount}) überein!';
 $string['datasettingstitle'] = 'Dateneinstellungen';
 $string['data_settings'] = 'Druckeinstellungen';
@@ -136,7 +138,6 @@ $string['allowresubmit'] = 'Erneute Abgabe erlauben';
 $string['allowresubmit_help'] = 'Wenn aktiviert, ist es Studierenden erlaubt, nach der Benotung erneut (für eine erneute Benotung) abzugeben.';
 $string['alreadygraded'] = 'Ihre Abgabe wurde bereits benotet und erneutes Abgeben ist daher nicht erlaubt.';
 $string['checkmarkdetails'] = 'Kreuzerlübungsdetails';
-$string['checkmark:grade'] = 'Kreuzerlübung benoten';
 $string['checkmarkmail'] = '{$a->teacher} hat eine Rückmeldung bezüglich ihrer
 Kreuzerlübungsabgabe für \'{$a->checkmark}\' gepostet.
 
@@ -149,9 +150,7 @@ Sie können sie als Anhang an ihre <a href="{$a->url}">Abgabe</a> einsehen.';
 $string['checkmarkmailsmall'] = '{$a->teacher} hat eine Rückmeldung zu ihrer
 Kreuzerlübungsabgabe für \'{$a->checkmark}\' gegeben. Sie können sie als Anhang an ihre Abgabe einsehen.';
 $string['checkmarkname'] = 'Name der Kreuzerlübung';
-$string['checkmark:submit'] = 'Kreuzerlübung abgeben';
 $string['checkmarksubmission'] = 'Kreuzerlübungsabgaben';
-$string['checkmark:view'] = 'Zeige Kreuzerlübung';
 $string['availabledate'] = 'Verfügbar von';
 $string['cannotviewcheckmark'] = 'Sie können diese Kreuzerlübung nicht betrachten';
 $string['comment'] = 'Kommentar';

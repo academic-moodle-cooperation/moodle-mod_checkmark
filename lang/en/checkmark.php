@@ -25,11 +25,12 @@ defined('MOODLE_INTERNAL') || die;
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['checkmark:addinstance'] = 'Add Checkmarkinstance';
+$string['checkmark:grade'] = 'Grade checkmark';
+$string['checkmark:submit'] = 'Submit checkmark';
+$string['checkmark:view'] = 'View checkmark';
+$string['checkmark:view_preview'] = 'Preview';
 
-
-/*
- * Block for checkmark-specific strings
- */
 $string['activateindividuals'] = 'Activate individual function';
 $string['strassignment'] = 'Assignment';
 $string['autograde_all'] = 'Grade all submissions';
@@ -57,7 +58,6 @@ $string['autograde_no_users_selected'] = 'You have not selected any user to grad
 $string['checkmark_overviewsummary'] = 'You\'ve checked {$a->checked_examples} / {$a->total_examples} examples ({$a->checked_grade} / {$a->total_grade} points)<br />{$a->grade}<br />';
 $string['checkmark_summary'] = 'You\'ve checked <span id="examples">{$a->checked_examples}</span> out of {$a->total_examples} examples.<br />(<span id="grade">{$a->checked_grade}</span> out of a maximum of {$a->total_grade} points)';
 $string['checkmarkstatstitle'] = 'Courseoverview Checkmark';
-$string['checkmark:view_preview'] = 'Preview';
 $string['count_individuals_mismatch'] = 'The amount of individual names({$a->namecount}) doesn\'t match the amount of individual grades({$a->gradecount})!';
 $string['datasettingstitle'] = 'Data settings';
 $string['data_settings'] = 'Print settings';
@@ -136,7 +136,6 @@ $string['allowresubmit'] = 'Allow resubmitting';
 $string['allowresubmit_help'] = 'If enabled, students will be allowed to resubmit checkmarks after they have been graded (to be regraded).';
 $string['alreadygraded'] = 'Your submission has already been graded and resubmission is not allowed.';
 $string['checkmarkdetails'] = 'Checkmark details';
-$string['checkmark:grade'] = 'Grade checkmark';
 $string['checkmarkmail'] = '{$a->teacher} posted feedback on your
 checkmark submission for \'{$a->checkmark}\'
 
@@ -149,9 +148,7 @@ You can see it appended to your <a href="{$a->url}">checkmark submission</a>.';
 $string['checkmarkmailsmall'] = '{$a->teacher} posted feedback on your
 checkmark submission for \'{$a->checkmark}\' You can see it appended to your submission';
 $string['checkmarkname'] = 'Checkmark name';
-$string['checkmark:submit'] = 'Submit checkmark';
 $string['checkmarksubmission'] = 'Checkmark submissions';
-$string['checkmark:view'] = 'View checkmark';
 $string['availabledate'] = 'Available from';
 $string['cannotviewcheckmark'] = 'You can not view this checkmark';
 $string['comment'] = 'Comment';
