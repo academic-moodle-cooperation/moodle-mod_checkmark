@@ -1258,6 +1258,7 @@ function checkmark_print_overview($courses, &$htmlarray) {
 
     $checkmarkids = array();
     $closedids = array();
+    $overids = array();
 
     // Do checkmark_base::isopen() here without loading the whole thing for speed!
     foreach ($checkmarks as $key => $checkmark) {
@@ -1265,18 +1266,24 @@ function checkmark_print_overview($courses, &$htmlarray) {
         if ($checkmark->timedue) {
             if ($checkmark->preventlate) {
                 $isopen = ($checkmark->timeavailable <= $time && $time <= $checkmark->timedue);
+                $isover = ($checkmark->timeavailable <= $time && $time >= $checkmark->timedue);
             } else {
                 $isopen = ($checkmark->timeavailable <= $time);
             }
+        } else {
+            $isopen = ($checkmark->timeavailable <= $time);
         }
-        if (empty($isopen) || empty($checkmark->timedue)) { // Is it not open or is it never closed?
+        if (empty($isopen)) { // Closed?
+            if(!empty($isover)) {
+                $overids[] = $checkmark->id;
+            }
             $closedids[] = $checkmark->id;
         } else {
             $checkmarkids[] = $checkmark->id;
         }
     }
 
-    if (empty($checkmarkids) || (count($checkmarkids) == 0)) {
+    if (empty($checkmarkids) && empty($overids)) {
         // No checkmarks to look at - we're done!
         return;
     }
@@ -1291,7 +1298,7 @@ function checkmark_print_overview($courses, &$htmlarray) {
     $strreviewed = get_string('reviewed', 'checkmark');
 
     // NOTE: we do all possible database work here *outside* of the loop to ensure this scales!
-    list($sqlcheckmarkids, $checkmarkidparams) = $DB->get_in_or_equal($checkmarkids);
+    list($sqlcheckmarkids, $checkmarkidparams) = $DB->get_in_or_equal(array_merge($checkmarkids, $overids));
 
     /*
      * Build up and array of unmarked submissions indexed by checkmark id/userid
@@ -1360,7 +1367,7 @@ function checkmark_print_overview($courses, &$htmlarray) {
                '<a '.($checkmark->visible ? '':' class="dimmed"').
                'title="'.$strcheckmark.'" href="'.$CFG->wwwroot.
                '/mod/checkmark/view.php?id='.$checkmark->coursemodule.'">'.
-        $checkmark->name.'</a></div>';
+               $checkmark->name.'</a></div>';
         if ($checkmark->timedue) {
             $str .= '<div class="info">'.$strduedate.': '.userdate($checkmark->timedue).'</div>';
         } else {
@@ -1483,9 +1490,11 @@ function checkmark_print_overview($courses, &$htmlarray) {
         }
         $str .= '</div>';
         if (empty($htmlarray[$checkmark->course]['checkmark'])
-                 && !in_array($checkmark->id, $closedids)) {
+            && (in_array($checkmark->id, $checkmarkids)
+                || in_array($checkmark->id, $overids))) {
             $htmlarray[$checkmark->course]['checkmark'] = $str;
-        } else if (!in_array($checkmark->id, $closedids)) {
+        } else if (in_array($checkmark->id, $checkmarkids)
+                   || in_array($checkmark->id, $overids)) {
             $htmlarray[$checkmark->course]['checkmark'] .= $str;
         }
     }
@@ -1502,7 +1511,7 @@ function checkmark_print_overview($courses, &$htmlarray) {
         $str = '';
         $context = context_course::instance(intval($currentcourse));
         if (has_capability('mod/checkmark:grade', $context)) {
-            continue; // Skip for teachers view!
+            //continue; // Skip for teachers view!
         }
         $str .= html_writer::start_tag('div', array('class'=>'checkmark overview statistics')).
                 html_writer::tag('div', get_string('checkmarkstatstitle', 'checkmark'),
