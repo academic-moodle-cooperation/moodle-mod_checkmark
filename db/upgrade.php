@@ -538,7 +538,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         // Get a list with future cut-off-dates of positive preventlate-stati
         // of all checkmarks
         $cutoffs = $DB->get_records_menu('checkmark',array('preventlate' => 1),
-                                         'id ASC','id, duedate');
+                                         'id ASC','id, timedue');
         
         // Rename field preventlate on table checkmark to cutoffdate.
         $field = new xmldb_field('preventlate', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'resubmit');
