@@ -36,7 +36,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
     protected $_checkmarkinstance = null;
 
     public function definition() {
-        global $CFG, $DB;
+        global $CFG, $DB, $COURSE, $PAGE, $OUTPUT;
         $mform =& $this->_form;
 
         $checkmarkinstance = new checkmark();
@@ -88,7 +88,115 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         $mform->addElement('hidden', 'course', optional_param('course', 0, PARAM_INT));
 
-        $checkmarkinstance->setup_elements($mform);
+
+        $jsdata = array(checkmark::DELIMITER);
+        $jsmodule = array(
+                    'name'     =>   'mod_checkmark',
+                    'fullpath' =>   '/mod/checkmark/yui/checkmark/checkmark.js',
+                    'requires' =>   array('base', 'io', 'node', 'json', 'event-valuechange'),
+                    'strings'  =>   array(
+        array('yes', 'moodle'),
+        array('no', 'moodle')
+        )
+        );
+
+        $PAGE->requires->js_init_call('M.mod_checkmark.init_settings', $jsdata, true, $jsmodule);
+        $update = optional_param('update', 0, PARAM_INT);
+        $cm = empty($update) ? null : get_coursemodule_from_id('', $update, 0, false, MUST_EXIST);
+        $submissioncount = empty($update) ? 0 : checkmark_count_real_submissions($cm);
+
+        if ($submissioncount) {
+            $mform->addElement('hidden', 'allready_submit', 'yes');
+        } else {
+            $mform->addElement('hidden', 'allready_submit', 'no');
+        }
+        $mform->setType('allready_submit', PARAM_ALPHA);
+
+        // Disable manual grading settings if submissions are present!
+        $mform->disabledIf('grade', 'allready_submit', 'eq', 'yes');
+        $mform->disabledIf('gradecat', 'allready_submit', 'eq', 'yes');
+
+        $ynoptions = array( 0 => get_string('no'), 1 => get_string('yes'));
+
+        $mform->addElement('select', 'resubmit', get_string('allowresubmit', 'checkmark'),
+                           $ynoptions);
+        $mform->addHelpButton('resubmit', 'allowresubmit', 'checkmark');
+        $mform->setDefault('resubmit', 0);
+
+        $mform->addElement('select', 'emailteachers', get_string('emailteachers', 'checkmark'),
+                           $ynoptions);
+        $mform->addHelpButton('emailteachers', 'emailteachers', 'checkmark');
+        $mform->setDefault('emailteachers', 0);
+
+        if (!empty($update) && $submissioncount) {
+            $mform->addElement('html', '<div class="elements_disabled_warning">'.
+                                       get_string('elements_disabled', 'checkmark').'</div>');
+        }
+        $mform->addElement('text', 'examplecount', get_string('numberofexamples', 'checkmark'),
+                           array('id'=>'id_examplecount'));
+        //we're going to clean them by ourselves...
+        $mform->setType('examplecount', PARAM_RAW);
+        $mform->addHelpButton('examplecount', 'numberofexamples', 'checkmark');
+        $mform->disabledIf('examplecount', 'flexiblenaming', 'checked');
+        $mform->disabledIf('examplecount', 'allready_submit', 'eq', 'yes');
+        if (isset($CFG->checkmark_stdexamplecount)) {
+            $mform->setDefault('examplecount', $CFG->checkmark_stdexamplecount);
+        } else {
+            $mform->setDefault('examplecount', '10');
+        }
+
+        $mform->addElement('text', 'examplestart', get_string('firstexamplenumber', 'checkmark'));
+        //we're going to clean them by ourselves...
+        $mform->setType('examplestart', PARAM_RAW);
+        $mform->addHelpButton('examplestart', 'firstexamplenumber', 'checkmark');
+        $mform->disabledIf('examplestart', 'flexiblenaming', 'checked');
+        $mform->disabledIf('examplestart', 'allready_submit', 'eq', 'yes');
+        if (isset($CFG->checkmark_stdexamplestart)) {
+            $mform->setDefault('examplestart', $CFG->checkmark_stdexamplestart);
+        } else {
+            $mform->setDefault('examplestart', '1');
+        }
+
+        $mform->addElement('checkbox', 'flexiblenaming', get_string('flexiblenaming', 'checkmark'),
+                           get_string('activateindividuals', 'checkmark'),
+                           array('id'=>'id_flexiblenaming'));
+        $mform->addHelpButton('flexiblenaming', 'flexiblenaming', 'checkmark');
+
+        $mform->disabledIf('flexiblenaming', 'allready_submit', 'eq', 'yes');
+        $mform->setAdvanced('flexiblenaming');
+
+        $mform->addElement('text', 'examplenames',
+                           get_string('examplenames', 'checkmark').' ('.checkmark::DELIMITER.')');
+        // We clean these by ourselves!
+        $mform->setType('examplenames', PARAM_RAW);
+        $mform->addHelpButton('examplenames', 'examplenames', 'checkmark');
+        if (isset($CFG->checkmark_stdnames)) {
+            $mform->setDefault('examplenames', $CFG->checkmark_stdnames);
+        } else {
+            $mform->setDefault('examplenames', '1,2,3,4,5,6,7,8,9,10');
+        }
+
+        $mform->disabledIf('examplenames', 'flexiblenaming', 'notchecked');
+        $mform->disabledIf('examplenames', 'allready_submit', 'eq', 'yes');
+        $mform->setAdvanced('examplenames');
+
+        $mform->addElement('text', 'examplegrades',
+                           get_string('examplegrades', 'checkmark').' ('.checkmark::DELIMITER.')',
+                           array('id'=>'id_examplegrades'));
+        // We clean these by ourselves!
+        $mform->setType('examplegrades', PARAM_RAW);
+        $mform->addHelpButton('examplegrades', 'examplegrades', 'checkmark');
+        if (isset($CFG->checkmark_stdgrades)) {
+            $mform->setDefault('examplegrades', $CFG->checkmark_stdgrades);
+        } else {
+            $mform->setDefault('examplegrades', '10,10,10,10,10,10,10,10,10,10');
+        }
+        $mform->disabledIf('examplegrades', 'flexiblenaming', 'notchecked');
+        $mform->disabledIf('examplegrades', 'allready_submit', 'eq', 'yes');
+        $mform->setAdvanced('examplegrades');
+
+        $course_context = context_course::instance($COURSE->id);
+        plagiarism_get_form_elements_module($mform, $course_context);
 
         $this->standard_grading_coursemodule_elements();
 
