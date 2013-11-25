@@ -3125,7 +3125,6 @@ class checkmark {
             $grademenu = make_grades_menu($this->checkmark->grade);
 
             if (!empty($ausers)) {
-                $row = array();
                 $grading_info = grade_get_grades($this->course->id, 'mod', 'checkmark',
                                                  $this->checkmark->id, array_keys($ausers));
 
@@ -3135,7 +3134,7 @@ class checkmark {
                     $state = 1;
                 }
                 foreach ($ausers as $auser) {
-
+                    $row = array();
                     // Calculate user status!
                     $auser->status = ($auser->timemarked > 0)
                                      && ($auser->timemarked >= $auser->timemodified);
