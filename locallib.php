@@ -2505,7 +2505,7 @@ class checkmark {
                             if ($auser->timemodified > 0) {
                                 $content = $this->print_student_answer($auser->id).
                                            userdate($auser->timemodified);
-                                if ($auser->timemodified >= $this->checkmark->duedate) {
+                                if ($auser->timemodified >= $this->checkmark->timedue) {
                                     $content .= $this->display_lateness($auser->timemodified);
                                 }
                                 $studentmodified = html_writer::tag('div', $content,
