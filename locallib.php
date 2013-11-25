@@ -445,7 +445,9 @@ class checkmark {
     public function view_intro() {
         global $OUTPUT;
         echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
-        echo format_module_intro('checkmark', $this->checkmark, $this->cm->id);
+        if(!empty($this->checkmark->intro)) {
+            echo format_module_intro('checkmark', $this->checkmark, $this->cm->id);
+        }
         echo $OUTPUT->box_end();
         plagiarism_print_disclosure($this->cm->id);
     }

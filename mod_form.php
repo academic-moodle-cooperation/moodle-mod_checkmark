@@ -52,7 +52,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         }
         $mform->addRule('name', null, 'required', null, 'client');
 
-        $this->add_intro_editor(true, get_string('description', 'checkmark'));
+        $this->add_intro_editor($CFG->checkmark_requiremodintro, get_string('description', 'checkmark'));
 
         $mform->addElement('date_time_selector', 'timeavailable',
                            get_string('availabledate', 'checkmark'), array('optional'=>true));
