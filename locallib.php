@@ -3441,23 +3441,28 @@ class checkmark {
         $updatepref = optional_param('updatepref', 0, PARAM_INT);
 
         if ($updatepref && confirm_sesskey()) {
-            $printperpage = optional_param('printperpage', 0, PARAM_INT);
-            $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
-            $printperpage = (($printperpage <= 0) || !$printoptimum) ? 0 : $printperpage;
-            set_user_preference('checkmark_pdfprintperpage', $printperpage);
+            $format = optional_param('format', self::CHECKMARK_PDF, PARAM_INT);
+            set_user_preference('checkmark_format', $format);
+            if($format == self::CHECKMARK_PDF) {
+                $printperpage = optional_param('printperpage', 0, PARAM_INT);
+                $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
+                var_dump($printperpage);
+                $printperpage = (($printperpage <= 0) || $printoptimum) ? 0 : $printperpage;
+                set_user_preference('checkmark_pdfprintperpage', $printperpage);
+
+                $textsize = optional_param('textsize', 0, PARAM_INT);
+                set_user_preference('checkmark_textsize', $textsize);
+
+                $pageorientation = optional_param('pageorientation', 0, PARAM_INT);
+                set_user_preference('checkmark_pageorientation', $pageorientation);
+
+                $pageorientation = optional_param('printheader', 0, PARAM_INT);
+                set_user_preference('checkmark_printheader', $pageorientation);
+            }
 
             $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
             set_user_preference('checkmark_filter', $filter);
 
-            $textsize = optional_param('textsize', 0, PARAM_INT);
-            set_user_preference('checkmark_textsize', $textsize);
-
-            $pageorientation = optional_param('pageorientation', 0, PARAM_INT);
-            set_user_preference('checkmark_pageorientation', $pageorientation);
-
-            $pageorientation = optional_param('printheader', 0, PARAM_INT);
-            set_user_preference('checkmark_printheader', $pageorientation);
-            
             $summary_abs = optional_param('sumabs', 0, PARAM_INT);
             set_user_preference('checkmark_sumabs', $summary_abs);
             $summary_rel = optional_param('sumrel', 0, PARAM_INT);
@@ -3475,6 +3480,7 @@ class checkmark {
             $printoptimum = 0;
         }
         $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
+        $format = get_user_preferences('checkmark_format', self::CHECKMARK_PDF);
         $textsize = get_user_preferences('checkmark_textsize', 0);
         $pageorientation = get_user_preferences('checkmark_pageorientation', 0);
         $printheader = get_user_preferences('checkmark_printheader', 1);
@@ -3528,6 +3534,7 @@ class checkmark {
                          self::CHECKMARK_CSV_TAB  => 'CSV (tab)',
                          self::CHECKMARK_CSV_SC   => 'CSV (;)');
         $mform->addElement('select', 'format', get_string('format', 'checkmark'), $formats);
+        $mform->setDefault('format', $format);
         
 		// submissions per page        
         $pppgroup = array();
@@ -3538,19 +3545,24 @@ class checkmark {
         $mform->setDefault('printperpage',$printperpage);
         $mform->setDefault('printoptimum',$printoptimum);
         $mform->disabledIf('printperpage', 'printoptimum','checked');
+        $mform->disabledIf('printperpage', 'format', 'neq', self::CHECKMARK_PDF);
+        $mform->disabledIf('printoptimum', 'format', 'neq', self::CHECKMARK_PDF);
 
         $textsizes = array(  0=>get_string('strsmall', 'checkmark'),
                              1=>get_string('strmedium', 'checkmark'),
                              2=>get_string('strlarge', 'checkmark'));
         $mform->addElement('select', 'textsize', get_string('pdftextsize', 'checkmark'),  $textsizes);
+        $mform->disabledIf('textsize', 'format', 'neq', self::CHECKMARK_PDF);
 
         $pageorientations = array(  0=>get_string('strlandscape', 'checkmark'),
                                     1=>get_string('strportrait', 'checkmark')   );
         $mform->addElement('select', 'pageorientation', get_string('pdfpageorientation', 'checkmark'),  $pageorientations);
+        $mform->disabledIf('pageorientation', 'format', 'neq', self::CHECKMARK_PDF);
 
         $mform->addElement('advcheckbox', 'printheader', get_string('pdfprintheader', 'checkmark'));
         $mform->addHelpButton('printheader', 'pdfprintheader', 'checkmark');
         $mform->setDefault('printheader', 1);
+        $mform->disabledIf('printheader', 'format', 'neq', self::CHECKMARK_PDF);
 
         $summarygrp = array();
         $summarygrp[] = &$mform->createElement('advcheckbox', 'sumabs', '', get_string('summary_abs', 'checkmark'), array('group'=> 3));
@@ -3662,27 +3674,30 @@ class checkmark {
         $updatepref = optional_param('updatepref', 0, PARAM_INT);
 
         if ($updatepref && confirm_sesskey()) {
-            $printperpage = optional_param('printperpage', 0, PARAM_INT);
-            $printoptimum = optional_param('printoptimum', 0, PARAM_BOOL);
-            $printperpage = (($printperpage <= 0) || $printoptimum) ? 0 : $printperpage;
-            set_user_preference('checkmark_pdfprintperpage', $printperpage);
+            $format = optional_param('format', self::CHECKMARK_PDF, PARAM_INT);
+            if($format == self::CHECKMARK_PDF) {
+                $printperpage = optional_param('printperpage', 0, PARAM_INT);
+                $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
+                $printperpage = (($printperpage <= 0) || $printoptimum) ? 0 : $printperpage;
+                set_user_preference('checkmark_pdfprintperpage', $printperpage);
+
+                $textsize = optional_param('textsize', 0, PARAM_INT);
+                set_user_preference('checkmark_textsize', $textsize);
+
+                $pageorientation = optional_param('pageorientation', 0, PARAM_INT);
+                set_user_preference('checkmark_pageorientation', $pageorientation);
+
+                $pageorientation = optional_param('printheader', 0, PARAM_INT);
+                set_user_preference('checkmark_printheader', $pageorientation);
+            }
 
             $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
             set_user_preference('checkmark_filter', $filter);
-
-            $textsize = optional_param('textsize', 0, PARAM_INT);
-            set_user_preference('checkmark_textsize', $textsize);
 
             $summary_abs = optional_param('sumabs', 0, PARAM_INT);
             set_user_preference('checkmark_sumabs', $summary_abs);
             $summary_rel = optional_param('sumrel', 0, PARAM_INT);
             set_user_preference('checkmark_sumrel', $summary_rel);
-            
-            $pageorientation = optional_param('pageorientation', 0, PARAM_INT);
-            set_user_preference('checkmark_pageorientation', $pageorientation);
-
-            $pageorientation = optional_param('printheader', 0, PARAM_INT);
-            set_user_preference('checkmark_printheader', $pageorientation);
         }
 
         /* next we get perpage (allow quick grade) params
