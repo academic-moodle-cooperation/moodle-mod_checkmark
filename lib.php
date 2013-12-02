@@ -1271,15 +1271,18 @@ function checkmark_print_overview($courses, &$htmlarray) {
     // Do checkmark_base::isopen() here without loading the whole thing for speed!
     foreach ($checkmarks as $key => $checkmark) {
         $time = time();
-        if ($checkmark->timedue) {
-            if ($checkmark->preventlate) {
-                $isopen = ($checkmark->timeavailable <= $time && $time <= $checkmark->timedue);
-                $isover = ($checkmark->timeavailable <= $time && $time >= $checkmark->timedue);
+        if ($checkmark->cutoffdate) {
+            $isopen = ($checkmark->timeavailable <= $time && $time <= $checkmark->cutoffdate);
+            if ($checkmark->timedue) {
+                $isover = ($time >= $checkmark->timedue || $time >= $checkmark->cutoffdate);
             } else {
-                $isopen = ($checkmark->timeavailable <= $time);
+                $isover = ($time >= $checkmark->cutoffdate);
             }
         } else {
             $isopen = ($checkmark->timeavailable <= $time);
+            if ($checkmark->timedue) {
+                $isover = ($time >= $checkmark->timedue);
+            }
         }
         if (empty($isopen)) { // Closed?
             if(!empty($isover)) {

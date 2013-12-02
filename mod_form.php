@@ -54,18 +54,32 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         $this->add_intro_editor($CFG->checkmark_requiremodintro, get_string('description', 'checkmark'));
 
-        $mform->addElement('date_time_selector', 'timeavailable',
-                           get_string('availabledate', 'checkmark'), array('optional'=>true));
-        $mform->setDefault('timeavailable', strtotime('now', time()));
-        $mform->addElement('date_time_selector', 'timedue', get_string('duedate', 'checkmark'),
-                           array('optional'=>true));
+        $mform->addElement('header', 'availability', get_string('availability', 'assign'));
+        $mform->setExpanded('availability', true);
+
+        $name = get_string('availabledate', 'checkmark');
+        $options = array('optional'=>true);
+        $mform->addElement('date_time_selector', 'timeavailable', $name, $options);
+        $mform->addHelpButton('timeavailable', 'availabledate', 'checkmark');
+        $mform->setDefault('timeavailable', time());
+
+        $name = get_string('duedate', 'checkmark');
+        $mform->addElement('date_time_selector', 'timedue', $name, array('optional'=>true));
+        $mform->addHelpButton('timedue', 'duedate', 'checkmark');
         $mform->setDefault('timedue', date('U', strtotime('+1week 23:55', time())));
 
-        $ynoptions = array( 0 => get_string('no'), 1 => get_string('yes'));
+        $name = get_string('cutoffdate', 'checkmark');
+        $mform->addElement('date_time_selector', 'cutoffdate', $name, array('optional'=>true));
+        $mform->addHelpButton('cutoffdate', 'cutoffdate', 'checkmark');
+        $mform->setDefault('cutoffdate', date('U', strtotime('+1week 23:55', time())));
 
-        $mform->addElement('select', 'preventlate', get_string('preventlate', 'checkmark'),
-                           $ynoptions);
-        $mform->setDefault('preventlate', 0);
+        $name = get_string('alwaysshowdescription', 'checkmark');
+        $mform->addElement('advcheckbox', 'alwaysshowdescription', $name);
+        $mform->addHelpButton('alwaysshowdescription', 'alwaysshowdescription', 'checkmark');
+        $mform->setDefault('alwaysshowdescription', 1);
+        $mform->disabledIf('alwaysshowdescription', 'timeavailable[enabled]', 'notchecked');
+        
+        $ynoptions = array( 0 => get_string('no'), 1 => get_string('yes'));
 
         $typetitle = get_string('modulename', 'checkmark');
 
@@ -170,7 +184,17 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         if ($data['timeavailable'] && $data['timedue']) {
             if ($data['timeavailable'] > $data['timedue']) {
-                $errors['timedue'] = get_string('duedatevalidation', 'checkmark');
+                $errors['timedue'] = get_string('duedatevalidation', 'assign');
+            }
+        }
+        if ($data['timedue'] && $data['cutoffdate']) {
+            if ($data['timedue'] > $data['cutoffdate']) {
+                $errors['cutoffdate'] = get_string('cutoffdatevalidation', 'assign');
+            }
+        }
+        if ($data['timeavailable'] && $data['cutoffdate']) {
+            if ($data['timeavailable'] > $data['cutoffdate']) {
+                $errors['cutoffdate'] = get_string('cutoffdatefromdatevalidation', 'assign');
             }
         }
         $errors = array_merge($errors, $this->get_checkmark_instance()->form_validation($data,

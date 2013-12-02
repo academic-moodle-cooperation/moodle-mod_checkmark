@@ -2615,7 +2615,7 @@ class checkmark {
                             if ($auser->timemodified > 0) {
                                 $content = $this->print_student_answer($auser->id).
                                            userdate($auser->timemodified);
-                                if ($this->checkmark->preventlate == 0) {
+                                if ($auser->timemodified >= $this->checkmark->duedate) {
                                     $content .= $this->display_lateness($auser->timemodified);
                                 }
                                 $studentmodified = html_writer::tag('div', $content,
@@ -4425,16 +4425,25 @@ EOS;
     /**
      * Returns true if the student is allowed to submit
      *
-     * Checks that the checkmark has started and, if the option to prevent late
-     * submissions is set, also checks that the checkmark has not yet closed.
+     * Checks that the checkmark has started and, cut-off-date or duedate hasn't
+     * passed already.
      * @return boolean
      */
     public function isopen() {
         $time = time();
-        if ($this->checkmark->preventlate && $this->checkmark->timedue) {
-            return ($this->checkmark->timeavailable <= $time && $time <= $this->checkmark->timedue);
+
+        if (!$this->checkmark->timeavailable) {
+            if (!$this->checkmark->cutoffdate) {
+                return ($this->checkmark->timeavailable <= $time);
+            } else {
+                return ($this->checkmark->timeavailable <= $time && $time <= $this->checkmark->cutoffdate);
+            }
         } else {
-            return ($this->checkmark->timeavailable <= $time);
+            if (!$this->checkmark->cutoffdate) {
+                return true;
+            } else {
+                return ($time <= $this->checkmark->cutoffdate);
+            }
         }
     }
 

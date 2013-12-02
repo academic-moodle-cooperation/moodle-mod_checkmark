@@ -38,8 +38,9 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         $userinfo = $this->get_setting_value('userinfo');
         // Define each element separated!
         $checkmark = new backup_nested_element('checkmark', array('id'), array(
-            'name', 'intro', 'introformat', 'resubmit', 'preventlate', 'emailteachers',
-            'timedue', 'timeavailable', 'grade','timemodified'));
+            'name', 'intro', 'introformat', 'alwaysshowdescription', 'resubmit',
+            'cutoffdate', 'emailteachers', 'timedue', 'timeavailable', 'grade',
+            'timemodified'));
 
         $submissions = new backup_nested_element('submissions');
 

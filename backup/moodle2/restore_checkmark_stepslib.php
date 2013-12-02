@@ -69,6 +69,16 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
         $data->timeavailable = $this->apply_date_offset($data->timeavailable);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
 
+        if (!isset($data->cutoffdate)) {
+            $data->cutoffdate = 0;
+        }
+
+        if (!empty($data->preventlate)) {
+            $data->cutoffdate = $data->timedue;
+        } else {
+            $data->cutoffdate = $this->apply_date_offset($data->cutoffdate);
+        }
+        
         if ($data->grade < 0) { // Scale found, get mapping!
             $data->grade = -($this->get_mappingid('scale', abs($data->grade)));
         }

@@ -524,6 +524,39 @@ function xmldb_checkmark_upgrade($oldversion) {
         
         upgrade_mod_savepoint(true, 2013062000, 'checkmark');
     }
+    
+    if ($oldversion < 2013112500) {
+        $table = new xmldb_table('checkmark');
+
+        // Define field alwaysshowdescription to be added to checkmark.
+        $field = new xmldb_field('alwaysshowdescription', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'introformat');
+        // Conditionally launch add field alwaysshowdescription.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Get a list with future cut-off-dates of positive preventlate-stati
+        // of all checkmarks
+        $cutoffs = $DB->get_records_menu('checkmark',array('preventlate' => 1),
+                                         'id ASC','id, duedate');
+        
+        // Rename field preventlate on table checkmark to cutoffdate.
+        $field = new xmldb_field('preventlate', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'resubmit');
+        // Launch rename field cutoffdate.
+        $dbman->rename_field($table, $field, 'cutoffdate');
+        
+        // Changing precision of field cutoffdate on table checkmark to (10).
+        $field = new xmldb_field('cutoffdate', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'resubmit');
+        // Launch change of precision for field cutoffdate.
+        $dbman->change_field_precision($table, $field);
+
+        // Set Cut-Off-Date for all Instances right (those with no cut-off-date are already allright)
+        foreach ($cutoffs as $id => $cutoff) {
+            $DB->set_field('checkmark', 'cutoffdate', $cutoff, array('id'=>$id));
+        }
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2013112500, 'checkmark');
+    }
 
     return true;
 }
