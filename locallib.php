@@ -3522,6 +3522,14 @@ class checkmark {
 
         $mform->addElement('html', $this->moodleform_groups_print_activity_menu($cm, true));
         $mform->addElement('html', $this->print_moodleform_initials_bar());
+        
+        $summarygrp = array();
+        $summarygrp[] = &$mform->createElement('advcheckbox', 'sumabs', '', get_string('summary_abs', 'checkmark'), array('group'=> 3));
+        $summarygrp[] = &$mform->createElement('advcheckbox', 'sumrel', '', get_string('summary_rel', 'checkmark'), array('group'=> 3));
+        $mform->addGroup($summarygrp, 'summarygrp',get_string('checksummary', 'checkmark'), array('<br />'), false);
+        $mform->setDefault('sumabs', $summary_abs);
+        $mform->setDefault('sumrel', $summary_rel);
+        
         $mform->addElement('submit', 'submitdataview', get_string('strrefreshdata', 'checkmark'));
         $mform->addElement('header', 'print_settings_header', get_string('printsettingstitle', 'checkmark'));
         $mform->setExpanded('print_settings_header');
@@ -3535,6 +3543,8 @@ class checkmark {
                          self::CHECKMARK_CSV_SC   => 'CSV (;)');
         $mform->addElement('select', 'format', get_string('format', 'checkmark'), $formats);
         $mform->setDefault('format', $format);
+        
+        $mform->addElement('static', 'pdf-settings', get_string('pdfsettings', 'checkmark'));
         
 		// submissions per page        
         $pppgroup = array();
@@ -3563,13 +3573,6 @@ class checkmark {
         $mform->addHelpButton('printheader', 'pdfprintheader', 'checkmark');
         $mform->setDefault('printheader', 1);
         $mform->disabledIf('printheader', 'format', 'neq', self::CHECKMARK_PDF);
-
-        $summarygrp = array();
-        $summarygrp[] = &$mform->createElement('advcheckbox', 'sumabs', '', get_string('summary_abs', 'checkmark'), array('group'=> 3));
-        $summarygrp[] = &$mform->createElement('advcheckbox', 'sumrel', '', get_string('summary_rel', 'checkmark'), array('group'=> 3));
-        $mform->addGroup($summarygrp, 'summarygrp',get_string('checksummary', 'checkmark'), array('<br />'), false);
-        $mform->setDefault('sumabs', $summary_abs);
-        $mform->setDefault('sumrel', $summary_rel);
 
         $mform->addElement('submit', 'submittoprint', get_string('strprint', 'checkmark'));
 

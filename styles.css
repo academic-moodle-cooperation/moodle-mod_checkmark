@@ -247,6 +247,10 @@
     margin-left: 1em;
 }
 
+.path-mod-checkmark #id_print_settings_header .fstaticlabel label {
+    font-weight:bold;
+}
+
 .path-mod-checkmark .early {background-color:#99FF99;}
 .path-mod-checkmark .soon {background-color:#FFFF99;}
 .path-mod-checkmark .today {background-color:#FFCC99;}
