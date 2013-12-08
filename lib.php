@@ -374,6 +374,37 @@ function checkmark_user_complete($course, $user, $mod, $checkmark) {
 }
 
 /**
+ * Add a get_coursemodule_info function in case any checkmark type wants to add 'extra' information
+ * for the course (see resource).
+ *
+ * Given a course_module object, this function returns any "extra" information that may be needed
+ * when printing this activity in a course listing.  See get_array_of_activities() in course/lib.php.
+ *
+ * @param stdClass $coursemodule The coursemodule object (record).
+ * @return cached_cm_info An object on information that the courses
+ *                        will know about (most noticeably, an icon).
+ */
+function checkmark_get_coursemodule_info($coursemodule) {
+    global $CFG, $DB;
+
+    $dbparams = array('id'=>$coursemodule->instance);
+    $fields = 'id, name, alwaysshowdescription, timeavailable, intro, introformat';
+    if (! $checkmark = $DB->get_record('checkmark', $dbparams, $fields)) {
+        return false;
+    }
+
+    $result = new cached_cm_info();
+    $result->name = $checkmark->name;
+    if ($coursemodule->showdescription) {
+        if ($checkmark->alwaysshowdescription || time() > $checkmark->allowregistrationsfromdate) {
+            // Convert intro to html. Do not filter cached version, filters run at display time.
+            $result->content = format_module_intro('checkmark', $checkmark, $coursemodule->id, false);
+        }
+    }
+    return $result;
+}
+
+/**
  * Function to be run periodically according to the moodle cron
  *
  * Finds all checkmark notifications that have yet to be mailed out, and mails them
