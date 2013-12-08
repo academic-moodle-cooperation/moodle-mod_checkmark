@@ -56,12 +56,6 @@ class checkmark {
     const FILTER_REQUIRE_GRADING = 3;
     const FILTER_SELECTED = 4;
     
-    const CHECKMARK_PDF     = 1;
-    const CHECKMARK_XLSX    = 2;
-    const CHECKMARK_XLS     = 3;
-    const CHECKMARK_ODS     = 4;
-    const CHECKMARK_CSV_TAB = 5;
-    const CHECKMARK_CSV_SC  = 6;
     // Used to connect example-names, example-grades, submission-examplenumbers!
     const DELIMITER = ',';
 
@@ -3427,6 +3421,7 @@ class checkmark {
     public function print_preview_tab($message='', $outputtabs='') {
         global $SESSION, $CFG, $DB, $USER, $OUTPUT, $PAGE;
         require_once($CFG->libdir.'/gradelib.php');
+        require_once($CFG->dirroot.'/mod/checkmark/mtablepdf.php');
 
         /*
          * First we check to see if the form has just been submitted
@@ -3441,9 +3436,9 @@ class checkmark {
         $updatepref = optional_param('updatepref', 0, PARAM_INT);
 
         if ($updatepref && confirm_sesskey()) {
-            $format = optional_param('format', self::CHECKMARK_PDF, PARAM_INT);
+            $format = optional_param('format', MTablePDF::OUTPUT_FORMAT_PDF, PARAM_INT);
             set_user_preference('checkmark_format', $format);
-            if($format == self::CHECKMARK_PDF) {
+            if($format == MTablePDF::OUTPUT_FORMAT_PDF) {
                 $printperpage = optional_param('printperpage', 0, PARAM_INT);
                 $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
                 var_dump($printperpage);
@@ -3480,7 +3475,7 @@ class checkmark {
             $printoptimum = 0;
         }
         $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
-        $format = get_user_preferences('checkmark_format', self::CHECKMARK_PDF);
+        $format = get_user_preferences('checkmark_format', MTablePDF::OUTPUT_FORMAT_PDF);
         $textsize = get_user_preferences('checkmark_textsize', 0);
         $pageorientation = get_user_preferences('checkmark_pageorientation', 0);
         $printheader = get_user_preferences('checkmark_printheader', 1);
@@ -3535,12 +3530,12 @@ class checkmark {
         $mform->setExpanded('print_settings_header');
 
         //format
-        $formats = array(self::CHECKMARK_PDF      => 'PDF',
-                         self::CHECKMARK_XLSX     => 'XLSX',
-                         self::CHECKMARK_XLS      => 'XLS',
-                         self::CHECKMARK_ODS      => 'ODS',
-                         self::CHECKMARK_CSV_TAB  => 'CSV (tab)',
-                         self::CHECKMARK_CSV_SC   => 'CSV (;)');
+        $formats = array(MTablePDF::OUTPUT_FORMAT_PDF        => 'PDF',
+                         MTablePDF::OUTPUT_FORMAT_XLSX       => 'XLSX',
+                         MTablePDF::OUTPUT_FORMAT_XLS        => 'XLS',
+                         MTablePDF::OUTPUT_FORMAT_ODS        => 'ODS',
+                         MTablePDF::OUTPUT_FORMAT_CSV_COMMA  => 'CSV (;)',
+                         MTablePDF::OUTPUT_FORMAT_CSV_TAB    => 'CSV (tab)');
         $mform->addElement('select', 'format', get_string('format', 'checkmark'), $formats);
         $mform->setDefault('format', $format);
         
@@ -3555,24 +3550,24 @@ class checkmark {
         $mform->setDefault('printperpage',$printperpage);
         $mform->setDefault('printoptimum',$printoptimum);
         $mform->disabledIf('printperpage', 'printoptimum','checked');
-        $mform->disabledIf('printperpage', 'format', 'neq', self::CHECKMARK_PDF);
-        $mform->disabledIf('printoptimum', 'format', 'neq', self::CHECKMARK_PDF);
+        $mform->disabledIf('printperpage', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->disabledIf('printoptimum', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
 
         $textsizes = array(  0=>get_string('strsmall', 'checkmark'),
                              1=>get_string('strmedium', 'checkmark'),
                              2=>get_string('strlarge', 'checkmark'));
         $mform->addElement('select', 'textsize', get_string('pdftextsize', 'checkmark'),  $textsizes);
-        $mform->disabledIf('textsize', 'format', 'neq', self::CHECKMARK_PDF);
+        $mform->disabledIf('textsize', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
 
         $pageorientations = array(  0=>get_string('strlandscape', 'checkmark'),
                                     1=>get_string('strportrait', 'checkmark')   );
         $mform->addElement('select', 'pageorientation', get_string('pdfpageorientation', 'checkmark'),  $pageorientations);
-        $mform->disabledIf('pageorientation', 'format', 'neq', self::CHECKMARK_PDF);
+        $mform->disabledIf('pageorientation', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
 
         $mform->addElement('advcheckbox', 'printheader', get_string('pdfprintheader', 'checkmark'));
         $mform->addHelpButton('printheader', 'pdfprintheader', 'checkmark');
         $mform->setDefault('printheader', 1);
-        $mform->disabledIf('printheader', 'format', 'neq', self::CHECKMARK_PDF);
+        $mform->disabledIf('printheader', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
 
         $mform->addElement('submit', 'submittoprint', get_string('strprint', 'checkmark'));
 
@@ -3677,8 +3672,8 @@ class checkmark {
         $updatepref = optional_param('updatepref', 0, PARAM_INT);
 
         if ($updatepref && confirm_sesskey()) {
-            $format = optional_param('format', self::CHECKMARK_PDF, PARAM_INT);
-            if($format == self::CHECKMARK_PDF) {
+            $format = optional_param('format', MTablePDF::OUTPUT_FORMAT_PDF, PARAM_INT);
+            if($format == MTablePDF::OUTPUT_FORMAT_PDF) {
                 $printperpage = optional_param('printperpage', 0, PARAM_INT);
                 $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
                 $printperpage = (($printperpage <= 0) || $printoptimum) ? 0 : $printperpage;
@@ -3786,324 +3781,60 @@ class checkmark {
             $grpname = '-';
         }
 
-        switch(required_param('format', PARAM_INT)) {
-            case self::CHECKMARK_XLSX:
-                $this->get_xlsx($columns, $tableheaders, $data);
-            break;
-            case self::CHECKMARK_XLS:
-                $this->get_xls($columns, $tableheaders, $data);
-            break;
-            case self::CHECKMARK_ODS:
-                $this->get_ods($columns, $tableheaders, $data);
-            break;
-            case self::CHECKMARK_CSV_TAB:
-                $this->get_csv($columns, $tableheaders, $data, "\t");
-            break;
-            case self::CHECKMARK_CSV_SC:
-                $this->get_csv($columns, $tableheaders, $data, ';');
-            break;
-            default:
-            case self::CHECKMARK_PDF:
-                $pdf = new MTablePDF($orientation, $cellwidth);
+        $pdf = new MTablePDF($orientation, $cellwidth);
 
-                $pdf->setHeaderText(get_string('course').':', $coursename,
-                                    get_string('availabledate', 'checkmark').':', userdate($timeavailable),
-                                    get_string('strprintpreview', 'checkmark'), $viewname,
-                                    // Second header row!
-                                    get_string('strassignment', 'checkmark').':', $checkmarkname,
-                                    get_string('duedate', 'checkmark').':', userdate($timedue),
-                                    get_string('groups') . ':', $grpname);
+        $pdf->setHeaderText(get_string('course').':', $coursename,
+                            get_string('availabledate', 'checkmark').':', userdate($timeavailable),
+                            get_string('strprintpreview', 'checkmark'), $viewname,
+                            // Second header row!
+                            get_string('strassignment', 'checkmark').':', $checkmarkname,
+                            get_string('duedate', 'checkmark').':', userdate($timedue),
+                            get_string('groups') . ':', $grpname);
 
-                $pdf->ShowHeaderFooter($printheader);
+        $pdf->ShowHeaderFooter($printheader);
 
-                $textsize = optional_param('textsize', 1, PARAM_INT);
-                switch ($textsize) {
-                    case '0':
-                        $pdf->SetFontSize(MTablePDF::FONTSIZE_SMALL);
-                        break;
-                    case '1':
-                        $pdf->SetFontSize(MTablePDF::FONTSIZE_MEDIUM);
-                        break;
-                    case '2':
-                        $pdf->SetFontSize(MTablePDF::FONTSIZE_LARGE);
-                        break;
-                }
-
-                if (is_number($printperpage) && $printperpage != 0) {
-                    $pdf->setRowsperPage($printperpage);
-                }
-
-                //if data
-                if (count($data)) {
-                    $pdf->setColumnFormat($columnformat);
-                    $pdf->setTitles($tableheaders); 
-                    foreach($data as $row) {
-                        $pdf->addRow($row);
-                    }
-                } else {
-                    if ($filter == self::FILTER_REQUIRE_GRADING) {
-                        $pdf->addRow(array('', get_string('norequiregrading', 'checkmark'), ''));
-                        $pdf->setTitles(array(' ', ' ', ' '));
-                    } else {
-                        $pdf->addRow(array('', get_string('nosubmisson', 'checkmark'), ''));
-                        $pdf->setTitles(array(' ', ' ', ' '));
-                    }
-                }
-
-                $pdf->generate($this->course->shortname . '-' . $this->checkmark->name);
-            break;
+        $textsize = optional_param('textsize', 1, PARAM_INT);
+        switch ($textsize) {
+            case '0':
+                $pdf->SetFontSize(MTablePDF::FONTSIZE_SMALL);
+                break;
+            case '1':
+                $pdf->SetFontSize(MTablePDF::FONTSIZE_MEDIUM);
+                break;
+            case '2':
+                $pdf->SetFontSize(MTablePDF::FONTSIZE_LARGE);
+                break;
         }
+
+        if (is_number($printperpage) && $printperpage != 0) {
+            $pdf->setRowsperPage($printperpage);
+        }
+
+        //if data
+        if (count($data)) {
+            $pdf->setColumnFormat($columnformat);
+            $pdf->setTitles($tableheaders); 
+            foreach($data as $row) {
+                $pdf->addRow($row);
+            }
+        } else {
+            if ($filter == self::FILTER_REQUIRE_GRADING) {
+                $pdf->addRow(array('', get_string('norequiregrading', 'checkmark'), ''));
+                $pdf->setTitles(array(' ', ' ', ' '));
+            } else {
+                $pdf->addRow(array('', get_string('nosubmisson', 'checkmark'), ''));
+                $pdf->setTitles(array(' ', ' ', ' '));
+            }
+        }
+        
+        $pdf->setOutputFormat(optional_param('format',
+                                             MTablePDF::OUTPUT_FORMAT_PDF,
+                                             PARAM_INT));
+
+        $pdf->generate($this->course->shortname . '-' . $this->checkmark->name);
         exit();
     }
-    
-    /**
-     * fills workbook (either XLS or ODS) with data
-     *
-     * @param MoodleExcelWorkbook $workbook workbook to put data into
-     */
-    public function fill_workbook(&$workbook, $columns, $tableheaders, $data) {
-        global $DB;
-        if (is_a($workbook, 'MoodleExcelWorkbook')) {
-            $column_width = array( 53.6, 82.4); // Unit: mm!
-        } else {
-            $column_width = array(386, 594); // Unit: px!
-        }
-        $time = time();
-        $time = userdate($time);
-        $worksheet = $workbook->add_worksheet($time);
 
-        $hidden = false;
-        $worksheet->set_column(0, 0, $column_width[0], null, $hidden);
-        $worksheet->set_column(1, 1, $column_width[1], null, $hidden);
-        
-        $filters = array(self::FILTER_ALL             => get_string('all'),
-                         self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
-                         self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
-        $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
-        $filter = $filters[$filter];
-
-        $groupmode = groups_get_activity_groupmode($this->cm);
-        $currentgroup = groups_get_activity_group($this->cm, true);
-
-        if ($groupmode != NOGROUPS) {
-            if ($currentgroup == "") {
-                $grpname = get_string('all', 'checkmark');
-            } else {
-                $grpname = groups_get_group_name($currentgroup);
-            }
-        } else {
-            $grpname = '-';
-        }
-        $course = $DB->get_record('course', array('id'=>$this->cm->course));
-
-        $headline_prop = array(    'size' => 12,
-                'bold' => 1,
-                'HAlign' => 'center',
-                'bottom' => 1,
-                'VAlign' => 'vcenter');
-        $headline_format = $workbook->add_format($headline_prop);
-        $headline_format->set_left(1);
-        $headline_format->set_align('center');
-        $headline_format->set_align('vcenter');
-        $headline_first = $workbook->add_format($headline_prop);
-        $headline_first->set_align('center');
-        $headline_first->set_align('vcenter');
-        unset($headline_prop['bottom']);
-        $hdrleft = $workbook->add_format($headline_prop);
-        $hdrleft->set_align('right');
-        $hdrleft->set_align('vcenter');
-        unset($headline_prop['bold']);
-        $hdrright = $workbook->add_format($headline_prop);
-        $hdrright->set_align('left');
-        $hdrright->set_align('vcenter');
-
-        $text_prop = array(   'size' => 10,
-                'align' => 'left');
-        $text = $workbook->add_format($text_prop);
-        $text->set_left(1);
-        $text->set_align('vcenter');
-        $text_first = $workbook->add_format($text_prop);
-        $text_first->set_align('vcenter');
-        
-        //write header
-        $line = 0;
-        $worksheet->write_string($line, 0, get_string('course'), $hdrleft);
-        $worksheet->write_string($line, 1, format_string($course->fullname), $hdrright);
-        $line++;
-        $worksheet->write_string($line, 0, get_string('availabledate', 'checkmark'), $hdrleft);
-        $worksheet->write_string($line, 1, userdate($this->checkmark->timeavailable), $hdrright);
-        $line++;
-        $worksheet->write_string($line, 0, get_string('filter', 'checkmark').'*', $hdrleft);
-        $worksheet->write_string($line, 1, $filter, $hdrright);
-        $line++;
-        $worksheet->write_string($line, 0, get_string('checkmarkname', 'checkmark'), $hdrleft);
-        $worksheet->write_string($line, 1, $this->checkmark->name, $hdrright);
-        $line++;
-        $worksheet->write_string($line, 0, get_string('duedate', 'checkmark'), $hdrleft);
-        $worksheet->write_string($line, 1, userdate($this->checkmark->timedue), $hdrright);
-        $line++;
-        $worksheet->write_string($line, 0, get_string('groups'), $hdrleft);
-        $worksheet->write_string($line, 1, $grpname, $hdrright);
-        $line++;
-        $worksheet->write_string($line, 0, get_string('cutoffdate', 'checkmark'), $hdrleft);
-        $worksheet->write_string($line, 1, userdate($this->checkmark->cutoffdate), $hdrright);
-        $line++;
-        $line++;
-        $i = 0;
-        $first = true;
-        foreach ($tableheaders as $key => $header) {
-            if($first) {
-                $worksheet->write_string($line, $i, $header, $headline_first);
-                $first = false;
-            } else {
-                $worksheet->write_string($line, $i, $header, $headline_format);
-                $first = false;
-            }
-            $i++;
-        }
-        foreach($data as $row) {
-            $first = true;
-            $line++;
-            $i = 0;
-            foreach ($row as $key => $column) {
-                if($first) {
-                    $worksheet->write_string($line, $i, $column, $text_first);
-                    $first = false;
-                } else {
-                    $worksheet->write_string($line, $i, $column, $text);
-                }
-                $i++;
-            }
-        }
-    }
-    
-    public function get_xls($columns, $tableheaders, $data) {
-        global $CFG;
-
-        require_once($CFG->libdir . "/excellib.class.php");
-
-        $coursename = $this->course->fullname;
-        $timeavailable = $this->checkmark->timeavailable;
-        $checkmarkname = $this->checkmark->name;
-        $timedue = $this->checkmark->timedue;
-        $cutoffdate = $this->checkmark->cutoffdate;
-
-        $filename = $coursename.'_'.$checkmarkname.'_'.userdate(time());
-
-        $workbook = new MoodleExcelWorkbook("-");
-
-        $this->fill_workbook($workbook, $columns, $tableheaders, $data);
-
-        $workbook->send($filename.'.ods');
-        $workbook->close();
-    }
-    
-    public function get_xlsx($columns, $tableheaders, $data) {
-        global $CFG;
-
-        require_once($CFG->libdir . "/excellib.class.php");
-
-        $coursename = $this->course->fullname;
-        $timeavailable = $this->checkmark->timeavailable;
-        $checkmarkname = $this->checkmark->name;
-        $timedue = $this->checkmark->timedue;
-        $cutoffdate = $this->checkmark->cutoffdate;
-
-        $filename = $coursename.'_'.$checkmarkname.'_'.userdate(time());
-
-        $workbook = new MoodleExcelWorkbook("-", 'Excel2007');
-
-        $this->fill_workbook($workbook, $columns, $tableheaders, $data);
-
-        $workbook->send($filename.'.ods');
-        $workbook->close();
-    }
-    
-    public function get_ods($columns, $tableheaders, $data) {
-        global $CFG;
-
-        require_once($CFG->libdir . "/odslib.class.php");
-
-        $coursename = $this->course->fullname;
-        $timeavailable = $this->checkmark->timeavailable;
-        $checkmarkname = $this->checkmark->name;
-        $timedue = $this->checkmark->timedue;
-        $cutoffdate = $this->checkmark->cutoffdate;
-
-        $filename = $coursename.'_'.$checkmarkname.'_'.userdate(time());
-
-        $workbook = new MoodleODSWorkbook("-");
-
-        $this->fill_workbook($workbook, $columns, $tableheaders, $data);
-
-        $workbook->send($filename.'.ods');
-        $workbook->close();
-    }
-    public function get_csv($columns, $tableheaders, $data, $sep = "\t") {
-        global $DB;
-        ob_start();
-        $return = "";
-        $lines = array();
-
-        $filters = array(self::FILTER_ALL             => get_string('all'),
-                         self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
-                         self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
-        $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
-        $filter = $filters[$filter];
-
-        $groupmode = groups_get_activity_groupmode($this->cm);
-        $currentgroup = groups_get_activity_group($this->cm, true);
-
-        if ($groupmode != NOGROUPS) {
-            if ($currentgroup == "") {
-                $grpname = get_string('all', 'checkmark');
-            } else {
-                $grpname = groups_get_group_name($currentgroup);
-            }
-        } else {
-            $grpname = ' - ';
-        }
-        $course = $DB->get_record('course', array('id'=>$this->cm->course));
-
-        $lines[] = get_string('course').':'.$sep.format_string($course->fullname);
-        $lines[] = get_string('checkmarkname', 'checkmark').':'.$sep.$this->checkmark->name;
-        $lines[] = get_string('availabledate', 'checkmark').':'.$sep.userdate($this->checkmark->timeavailable);
-        $lines[] = get_string('duedate', 'checkmark').':'.$sep.userdate($this->checkmark->timedue);
-        $lines[] = get_string('cutoffdate', 'checkmark').':'.$sep.userdate($this->checkmark->cutoffdate);
-        $lines[] = get_string('filter', 'checkmark').'*:'.$sep.$filter;
-        $lines[] = get_string('groups').':'.$sep.$grpname;
-        $lines[] = '';
-
-        $lines[] = join($sep, $tableheaders);
-
-        foreach($data as $row) {
-            // Prevent from beeing mistaken for -0 if - is the value
-            if(in_array('-', $row)) {
-                foreach($row as $col => $in) {
-                    $row[$col] = ($in == '-') ? ' - ' : $in;
-                }
-            }
-            $lines[] = join($sep, $row);
-        }
-
-        $filecontent = implode("\n", $lines);
-
-        $coursename = $this->course->fullname;
-        $checkmark = $this->checkmark->timeavailable;
-        $checkmarkname = $this->checkmark->name;
-        $timedue = $this->checkmark->timedue;
-        $cutoffdate = $this->checkmark->cutoffdate;
-
-        $filename = $coursename.'_'.$checkmarkname.'_'.userdate(time());
-        ob_clean();
-        header('Content-Type: text/plain');
-        header('Content-Length: ' . strlen($filecontent));
-        header('Content-Disposition: attachment; filename="'.$filename.'.csv"; filename*="'.
-               rawurlencode($filename).'.csv"');
-        header('Content-Transfer-Encoding: binary');
-        header('Content-Encoding: utf-8');
-        echo $filecontent;
-    }
     /**
      * Renders a link to select/deselect all checkboxes of a group
      *
