@@ -852,7 +852,7 @@ class checkmark {
         } else if (!isset($data['flexiblenaming'])) {
             $data['flexiblenaming'] = 0;
         }
-        if ($data['flexiblenaming'] == 1) {
+        if ($data['flexiblenaming'] == 1 && (intval($data['grade']) > 0)) {
             // Check if amount of examplenames equals amount of examplegrades?
 
             $grades = explode(self::DELIMITER, $data['examplegrades']);
@@ -883,7 +883,7 @@ class checkmark {
                 $errors['grade'] = get_string('gradesum_mismatch', 'checkmark', $a);
                 $errors['examplegrades'] .= get_string('gradesum_mismatch', 'checkmark', $a);
             }
-        } else {
+        } else if (intval($data['grade']) > 0) {
             if (($data['examplecount'] <= 0) || !is_numeric($data['examplecount'])) {
                 $errors['examplecount'] = get_string('posintrequired', 'checkmark');
             } else {
@@ -2075,6 +2075,11 @@ class checkmark {
                 $message .= $OUTPUT->notification(get_string('autograde_no_users_selected',
                                                              'checkmark'),
                                                  'notifyproblem');
+            } else if (($this->checkmark->grade <= 0)) {
+                // No autograde possible if no numeric grades are selected!
+                $message .= $OUTPUT->notification(get_string('autograde_non_numeric_grades',
+                                                             'checkmark'),
+                                                 'notifyproblem');
             } else {
                 echo $OUTPUT->header();
                 $confirmboxcontent = $OUTPUT->confirm(get_string('autograde_confirm', 'checkmark',
@@ -2087,8 +2092,12 @@ class checkmark {
             }
 
         } else if ( $autograde != null) {
-
-            if (has_capability('mod/checkmark:grade', context_module::instance($this->cm->id))) {
+            if (($this->checkmark->grade <= 0)) {
+                // No autograde possible if no numeric grades are selected!
+                $message .= $OUTPUT->notification(get_string('autograde_non_numeric_grades',
+                                                             'checkmark'),
+                                                 'notifyproblem');
+            } else if (has_capability('mod/checkmark:grade', context_module::instance($this->cm->id))) {
                 $result = $this->autograde_submissions($autograde);
                 if (!isset($message)) {
                     $message = '';
@@ -2764,35 +2773,43 @@ class checkmark {
             $returnstring .= html_writer::tag('div', $savefeedback,
                                               array('class'=>'fastgbutton optionspref'));
         }
+
         $autograde_fieldset = html_writer::tag('legend',
                                                $OUTPUT->help_icon('autograde_str', 'checkmark').
                                                get_string('autogradebuttonstitle', 'checkmark',
                                                           $checkmark->name));
-        $autograde_custom = html_writer::empty_tag('input',
-                                                   array('type'  => 'submit',
-                                                         'name'  => 'autograde_custom_submit',
-                                                         'value' => get_string('autograde_custom',
-                                                                               'checkmark')));
-        $autograde_fieldset .= html_writer::tag('div', $autograde_custom,
-                                                array('class'=>'autogradingform'));
-        $autograde_req = html_writer::empty_tag('input',
+        if (($this->checkmark->grade <= 0)) {
+            // No autograde possible if no numeric grades are selected!
+            $autograde_fieldset .= $OUTPUT->notification(get_string('autograde_non_numeric_grades',
+                                                                   'checkmark'),
+                                                        'notifyproblem');
+        } else {
+            $autograde_custom = html_writer::empty_tag('input',
+                                                       array('type'  => 'submit',
+                                                             'name'  => 'autograde_custom_submit',
+                                                             'value' => get_string('autograde_custom',
+                                                                                   'checkmark')));
+            $autograde_fieldset .= html_writer::tag('div', $autograde_custom,
+                                                    array('class'=>'autogradingform'));
+            $autograde_req = html_writer::empty_tag('input',
+                                                    array('type'  => 'submit',
+                                                          'name'  => 'autograde_req_submit',
+                                                          'value' => get_string('autograde_req',
+                                                                                'checkmark')));
+            $autograde_fieldset .= html_writer::tag('div', $autograde_req,
+                                                    array('class'=>'autogradingform'));
+            $autograde = html_writer::empty_tag('input',
                                                 array('type'  => 'submit',
-                                                      'name'  => 'autograde_req_submit',
-                                                      'value' => get_string('autograde_req',
+                                                      'name'  => 'autograde_all_submit',
+                                                      'value' => get_string('autograde_all',
                                                                             'checkmark')));
-        $autograde_fieldset .= html_writer::tag('div', $autograde_req,
-                                                array('class'=>'autogradingform'));
-        $autograde = html_writer::empty_tag('input',
-                                            array('type'  => 'submit',
-                                                  'name'  => 'autograde_all_submit',
-                                                  'value' => get_string('autograde_all',
-                                                                        'checkmark')));
-        $autograde_fieldset .= html_writer::tag('div', $autograde,
-                                               array('class'=>'autogradingform'));
-
+            $autograde_fieldset .= html_writer::tag('div', $autograde,
+                                                   array('class'=>'autogradingform'));
+        }
         $returnstring .= html_writer::tag('fieldset', $autograde_fieldset,
-                                          array('class' => 'clearfix',
-                                                'id'    => 'autogradingfieldset'));
+                                  array('class' => 'clearfix',
+                                        'id'    => 'autogradingfieldset'));
+
         $returnstring .= html_writer::end_tag('form');
 
         $returnstring .= html_writer::end_tag('div');
