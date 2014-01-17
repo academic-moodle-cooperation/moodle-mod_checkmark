@@ -176,7 +176,9 @@ class mod_checkmark_grading_form extends moodleform {
         }
         $buttonarray[] = &$mform->createElement('cancel');
         $mform->addGroup($buttonarray, 'grading_buttonar', '', array(' '), false);
-        $mform->addGroup($buttonarray2, 'grading_buttonar2', '', array(' '), false);
+        if (!empty($buttonarray2)) {
+            $mform->addGroup($buttonarray2, 'grading_buttonar2', '', array(' '), false);
+        }
         $mform->closeHeaderBefore('grading_buttonar');
         $mform->setType('grading_buttonar', PARAM_RAW);
     }
