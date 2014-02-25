@@ -1,29 +1,18 @@
+/**
+ * README.txt
+ * @version       2014-02-24
+ * @package       mod_checkmark
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+*/
+
 # ---------------------------------------------------------------
-# This software is provided under the GNU General Public License
-# http://www.gnu.org/licenses/gpl.html
-# with Copyright © 2009 onwards
-#
-# Dipl.-Ing. Andreas Hruska
-# andreas.hruska@tuwien.ac.at
-# 
-# Dipl.-Ing. Mag. rer.soc.oec. Katarzyna Potocka
-# katarzyna.potocka@tuwien.ac.at
-# 
-# Vienna University of Technology
-# Teaching Support Center
-# Guﬂhausstraﬂe 28/E015
-# 1040 Wien
-# http://tsc.tuwien.ac.at/
-# ---------------------------------------------------------------
-# FOR Moodle 2.5+
+# Checkmark-Module for Moodle 2.5+
 # ---------------------------------------------------------------
 
-README.txt
-v.2013-08-16
-
-
-Checkmark-Module
-===============
 
 OVERVIEW
 ================================================================================
@@ -58,18 +47,3 @@ INSTALLATION
 	You have to be logged in as admin before.
     The installation process will be displayed on the screen.
     That's all.
-
-CHANGELOG
-================================================================================
-24.09.2013
-- use site-config settings to determine which additional user-fields should be
-  displayed in overview
-- new DB-structure - we got rid of old comma separated lists in db-fields
-  and use a modern normalized db-structure
-- improved pdf-output via shared printing library (common to modules from VUT)
-- various bugfixes and language-improvements
-
-18.05.2012
-- new function "select all/none"
-included a JS-driven link or non-JS-driven button to (de)select all submissions
-in submissions-view and print-preview
