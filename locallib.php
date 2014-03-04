@@ -1993,7 +1993,6 @@ class checkmark {
         if ($tsort) { // Sort table by column!
             if (isset($SESSION->checkmark->columns[$tsort]->sortable)
                 && ($SESSION->checkmark->columns[$tsort]->sortable==false)) {
-                echo $OUTPUT->notification($tsort.' is not sortable', 'notifyproblem');
             } else {
                 if (isset($SESSION->checkmark->orderby)
                     && ($SESSION->checkmark->orderby == $tsort)) {
@@ -2863,7 +2862,7 @@ class checkmark {
      *
      */
     public function get_print_data($cm, $filter, $ids=0, $dataonly=false) {
-        global $DB, $CFG, $OUTPUT;
+        global $DB, $CFG, $OUTPUT, $SESSION;
         if (!empty($CFG->enableoutcomes) and !empty($grading_info->outcomes)) {
             $uses_outcomes = true;
         } else {
@@ -3101,7 +3100,7 @@ class checkmark {
         if (!empty($users)) {
             $useridentityfields = 'u.'.str_replace(',', ',u.', $CFG->showuseridentity);
             $select = 'SELECT '.$ufields.', '.$useridentityfields.',
-                              s.id AS submissionid, s.grade, s.submissioncomment,
+                              s.id AS submissionid, s.grade, s.submissioncomment as comment,
                               s.timemodified, s.timemarked, 100 * COUNT( DISTINCT cchks.id ) / COUNT( DISTINCT gchks.id ) AS summary, COUNT( DISTINCT gchks.id ) AS maxchecks, COUNT( DISTINCT cchks.id ) AS checks ';
             if ($groupmode != NOGROUPS) {
                     $select .= ', groups ';
@@ -3317,9 +3316,9 @@ class checkmark {
                                 }
                             } else {
                                 if (!empty($dataonly)) {
-                                    $comment = shorten_text(strip_tags($auser->submissioncomment), 15);
+                                    $comment = shorten_text(strip_tags($auser->comment), 15);
                                 } else {
-                                    $shortcom = shorten_text(strip_tags($auser->submissioncomment), 15);
+                                    $shortcom = shorten_text(strip_tags($auser->comment), 15);
                                     $comment = html_writer::tag('div', $shortcom,
                                                                 array('id'=>'com'.$auser->id));
                                 }
