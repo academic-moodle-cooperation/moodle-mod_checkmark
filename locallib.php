@@ -2861,7 +2861,7 @@ class checkmark {
      * Either returns html_table_object or raw data for pdf/xls/ods/etc.
      *
      */
-    public function get_print_data($cm, $filter, $ids=0, $dataonly=false) {
+    public function get_print_data($cm, $filter, $ids=array(), $dataonly=false) {
         global $DB, $CFG, $OUTPUT, $SESSION;
         if (!empty($CFG->enableoutcomes) and !empty($grading_info->outcomes)) {
             $uses_outcomes = true;
@@ -2884,7 +2884,9 @@ class checkmark {
 
         // Get all ppl that are allowed to submit checkmarks!
         list($esql, $params) = get_enrolled_sql($context, 'mod/checkmark:submit', $currentgroup);
-
+        if (!empty($ids) && is_array($ids)) {
+            $usrlst = $ids;
+        }
         if (!empty($usrlst)) {
             list($sqluserids, $userparams) = $DB->get_in_or_equal($usrlst, SQL_PARAMS_NAMED, 'user');
             $params = array_merge_recursive($params, $userparams);
@@ -2892,10 +2894,10 @@ class checkmark {
         } else {
             $sqluserids = '';
         }
-        
-        if ($filter == self::FILTER_SELECTED) {
+
+        if (($filter == self::FILTER_SELECTED) || ($filter == self::FILTER_ALL)) {
             $sql = 'SELECT u.id FROM {user} u '.
-                   'LEFT JOIN ('.$esql.') eu ON eu.id=u.id '.
+                   'JOIN ('.$esql.') eu ON eu.id=u.id '.
                    'WHERE 1'.$sqluserids;
         } else {
             $wherefilter = '';
@@ -2912,7 +2914,6 @@ class checkmark {
                    'AND s.checkmarkid = :checkmarkid '.
                    $sqluserids.' '.$wherefilter;
         }
-
         $users = $DB->get_records_sql($sql, $params);
         if (!empty($users)) {
             $users = array_keys($users);
@@ -3112,12 +3113,12 @@ class checkmark {
 
             $sql = 'FROM {user} AS u '.
                    'LEFT JOIN {checkmark_submissions} AS s ON u.id = s.userid
-                    AND s.checkmarkid = :checkmarkid 
+                                                      AND s.checkmarkid = :checkmarkid 
                     LEFT JOIN {checkmark_checks} AS gchks ON gchks.submissionid = s.id
                     LEFT JOIN {checkmark_checks} AS cchks ON cchks.submissionid = s.id AND cchks.state = 1 '.
                    $groupssql.
                    'WHERE '.$where.'u.id '.$sqluserids.'
-                    GROUP BY s.id';
+                    GROUP BY u.id';
 
             if (isset($SESSION->checkmark->orderby)) {
                 $sort = ' ORDER BY '.$SESSION->checkmark->orderby;
@@ -3155,7 +3156,7 @@ class checkmark {
                                      && ($auser->timemarked >= $auser->timemodified);
 
                     if (empty($dataonly)) {
-                        $selected_user = html_writer::checkbox('selecteduser'.$auser->id, 'selected',
+                        $selected_user = html_writer::checkbox('selected[]', $auser->id,
                                                                $state, null,
                                                                array('class'=>'checkboxgroup2'));
                         $row[] = $selected_user;
@@ -3344,6 +3345,27 @@ class checkmark {
                             }
                         }
 
+                        if (!$this->column_is_hidden('summary') && (!empty($summary_abs) || !empty($summary_rel))) {
+                            if (!empty($summary_abs) && !empty($summary_rel)) {
+                                //both values
+                                $summary = $auser->checks.'/'.$auser->maxchecks.' ('.
+                                           round($auser->summary, 2).'%)';
+                            } else if (!empty($summary_abs)) {
+                                //summary abs
+                                $summary = $auser->checks.'/'.$auser->maxchecks;
+                            } else {
+                                //summary rel
+                                $summary = round($auser->summary, 2).'%';
+                            }
+                            if (!empty($dataonly)) {
+                                $row[] = $summary;
+                            } else {
+                                $row[] = html_writer::tag('div', $summary, array('id'=>'sum'.$auser->id));
+                            }
+                        } else if (empty($dataonly)) {
+                            $row[] = '&nbsp;';
+                        }
+                        
                         if (!$this->column_is_hidden('grade')) {
                             if ($final_grade->locked or $final_grade->overridden) {
                                 if (!empty($dataonly)) {
@@ -3462,7 +3484,6 @@ class checkmark {
             if($format == MTablePDF::OUTPUT_FORMAT_PDF) {
                 $printperpage = optional_param('printperpage', 0, PARAM_INT);
                 $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
-                var_dump($printperpage);
                 $printperpage = (($printperpage <= 0) || $printoptimum) ? 0 : $printperpage;
                 set_user_preference('checkmark_pdfprintperpage', $printperpage);
 
@@ -3752,17 +3773,7 @@ class checkmark {
 
         $context = context_module::instance($cm->id);
 
-        $selected = array();
-        // We shall not access $_POST directly @todo don't access $_POST directly!
-        foreach ($_POST as $idx => $var) {
-            if ($var == 'selected') {
-                // This uses params like 'selecteduser[ID]'!
-                $usrid = substr($idx, 12);
-                array_push($selected, $usrid);
-            }
-        }
-
-        $usrlst = $selected;
+        $usrlst = optional_param_array('selected', array(), PARAM_INT);
 
         if (empty($usrlst)) {
             echo $OUTPUT->header();
