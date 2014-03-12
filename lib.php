@@ -1316,6 +1316,8 @@ function checkmark_print_overview($courses, &$htmlarray) {
             $isopen = ($checkmark->timeavailable <= $time);
             if ($checkmark->timedue) {
                 $isover = ($time >= $checkmark->timedue);
+            } else {
+                $isover = 0;
             }
         }
         if (empty($isopen)) { // Closed?
@@ -1389,7 +1391,7 @@ function checkmark_print_overview($courses, &$htmlarray) {
     }
 
     // Get all users who submitted something, indexed by checkmarkid!
-    foreach ($checkmarkids as $curid) {
+    foreach (array_merge($checkmarkids, $overids) as $curid) {
         $userids = $DB->get_fieldset_select('checkmark_submissions',
                                                       'userid',
                                                       'checkmarkid = ?', array($curid));
@@ -1445,16 +1447,14 @@ function checkmark_print_overview($courses, &$htmlarray) {
 
             $totalstudents = 0;
             $studentsubmissions = 0;
-            if ($students = get_enrolled_users($context, 'mod/checkmark:view', 0, 'u.id')) {
+            if ($students = get_enrolled_users($context, 'mod/checkmark:submit', 0, 'u.id')) {
                 foreach ($students as $student) {
-                    if (!has_capability('mod/checkmark:grade', $context, $student->id)) {
-                        $totalstudents++;
-                        if (isset($unmarkedsubmissions[$checkmark->id][$student->id])) {
-                            $submissions->reqgrading++;
-                        }
-                        if (isset($usersubmissions[$checkmark->id][$student->id])) {
-                            $studentsubmissions++;
-                        }
+                    $totalstudents++;
+                    if (isset($unmarkedsubmissions[$checkmark->id][$student->id])) {
+                        $submissions->reqgrading++;
+                    }
+                    if (isset($usersubmissions[$checkmark->id][$student->id])) {
+                        $studentsubmissions++;
                     }
                 }
             }
