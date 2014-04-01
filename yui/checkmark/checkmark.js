@@ -73,8 +73,8 @@ M.mod_checkmark = {
      * @return true if everything's allright (no error handling by now)
      */
     update_summary: function() {
-        var examples_new=0;
-        var grade_new=0;
+        var examples_new = 0;
+        var grade_new = 0;
         //defining local variables improves readability
         var examples = M.mod_checkmark.examples;
 
@@ -162,8 +162,8 @@ M.mod_checkmark = {
     update_settings: function(e) {
         var gradesum = 0;
         var i = 0;
-        
-        //first we strip everything we don't need :)
+
+        // First we strip everything we don't need!
         M.mod_checkmark.stripper(null);
 
         var grade_selector = '#grade';
@@ -172,7 +172,7 @@ M.mod_checkmark = {
         var examplenames_selector = '#examplenames';
         var examplecount_selector = '#examplecount';
         if (M.mod_checkmark.Y.one(grade_selector) == null) {
-            //compatibility to pre 2.2
+            // Compatibility to pre 2.2
             grade_selector = '#id_grade';
             flexiblenaming_selector = '#id_flexiblenaming';
             examplegrades_selector = '#id_examplegrades';
@@ -180,29 +180,30 @@ M.mod_checkmark = {
             examplecount_selector = '#id_examplecount';
         }
 
-        //if non-numeric scales are used or checkmark isn't graded at all, ignore changes
-        if ((M.mod_checkmark.Y.one(grade_selector).get('value')==0) || (M.mod_checkmark.Y.one(grade_selector).get('value') == -1)) {
+        // If non-numeric scales are used or checkmark isn't graded at all, ignore changes!
+        if ((M.mod_checkmark.Y.one(grade_selector).get('value') == 0)
+            || (M.mod_checkmark.Y.one(grade_selector).get('value') == -1)) {
             return true;
         }
         if (M.mod_checkmark.Y.one(flexiblenaming_selector).get('checked')) {
-            //calculate gradesum using individual grades list
-            //replace occurences of more than 1 comma in row through a single one...
+            // Calculate gradesum using individual grades list!
+            // Replace occurences of more than 1 comma in row through a single one...
             Y.one(examplegrades_selector).set('value', Y.one(examplegrades_selector).get('value').replace(/,{2,}/g, ","));
-            //strip trailling and following commata
+            // Strip trailling and following commata!
             if (e.type != 'valuechange') {
                 Y.one(examplegrades_selector).set('value', Y.one(examplegrades_selector).get('value').replace(/^,*|,*$/g, ""));
                 Y.one(examplenames_selector).set('value', Y.one(examplenames_selector).get('value').replace(/^,*|,*$/g, ""));
             }
-            //get string and strip every character except "," (comma) and numerics
+            // Get string and strip every character except "," (comma) and numerics!
             var temp_string = M.mod_checkmark.Y.one(examplegrades_selector).get('value').replace(/[^0-9,]/, "");
             var temp_array = temp_string.split(M.mod_checkmark.dividing_symbol);
-            for (i=0; i<temp_array.length; i++) {
+            for (i = 0; i < temp_array.length; i++) {
                 if(temp_array[i].replace(/[^\d]/g, "") != "") {
                     gradesum += parseInt(temp_array[i].replace(/[^\d]/g, ""));
                 }
             }
         } else {
-            //calculate gradesum using example-amount (each example counts 1 point)
+            // Calculate gradesum using example-amount (each example counts 1 point)!
             gradesum = M.mod_checkmark.Y.one(examplecount_selector).get('value');
         }
 
@@ -213,29 +214,22 @@ M.mod_checkmark = {
          * @todo replace fix index calculation
          *  with lookup of right value
          */
-        //var index = 100-gradesum+2;
         grade_obj = M.mod_checkmark.Y.one(grade_selector);
-        //myNode.get('children');
-        //myNode.next();
-        //myNode.one('> selectorString');
 
         if (!M.mod_checkmark.Y.one(flexiblenaming_selector).get('checked')) {
-            if (M.mod_checkmark.Y.one(grade_selector).get('value')%gradesum == 0) {
-                //grade is integral multiple of gradesum (= examplecount) so everything's fine
+            if (M.mod_checkmark.Y.one(grade_selector).get('value') % gradesum == 0) {
+                // Grade is integral multiple of gradesum (= examplecount) so everything's fine!
                 return true;
             }
         }
         if ((gradesum <= 100) && (gradesum > 0)) {
             if (M.mod_checkmark.Y.one(grade_selector.concat(" > [value=\'".concat(gradesum.toString()).concat("\']"))) == null) {
-                //alert('M.mod_checkmark.Y.one('.concat(grade_selector).concat(" > [value=\'".concat(gradesum.toString()).concat("\']")).concat(') is null'));
                 M.mod_checkmark.Y.one(grade_selector.concat(" > [value=\'-1\']")).set('selected', true);
             }
-            M.mod_checkmark.Y.one(grade_selector.concat(" > [value=\'"+gradesum.toString()+"\']")).set('selected', true);
+            M.mod_checkmark.Y.one(grade_selector.concat(" > [value=\'" + gradesum.toString() + "\']")).set('selected', true);
         } else if (gradesum < 0) {
             M.mod_checkmark.Y.one(grade_selector.concat(" > [value=\'-1\']")).set('selected', true);
         }
-        //index = M.mod_checkmark.Y.one("#id_grade > [value="+gradesum+"]").get('index');
-        //M.mod_checkmark.Y.one("#id_grade").set('selectedIndex', index);
 
         return true;
     },
@@ -247,7 +241,7 @@ M.mod_checkmark = {
         }
         var examplegrades_selector = '#examplegrades';
         if (Y.one(examplegrades_selector) == null) {
-            //compatibility to pre 2.2
+            // Compatibility to pre 2.2
             examplegrades_selector = '#id_examplegrades';
         }
         Y.one(examplegrades_selector).set('value', Y.one(examplegrades_selector).get('value').replace(/[^0-9,]/g, ""));

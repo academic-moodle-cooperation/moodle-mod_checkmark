@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * db/log.php
@@ -28,12 +28,11 @@
 defined('MOODLE_INTERNAL') || die;
 
 $logs = array(
-array('module'=>'checkmark', 'action'=>'view', 'mtable'=>'checkmark', 'field'=>'name'),
-array('module'=>'checkmark', 'action'=>'add', 'mtable'=>'checkmark', 'field'=>'name'),
-array('module'=>'checkmark', 'action'=>'update', 'mtable'=>'checkmark', 'field'=>'name'),
-array('module'=>'checkmark', 'action'=>'view submission', 'mtable'=>'checkmark', 'field'=>'name'),
-array('module'=>'checkmark', 'action'=>'view print-preview', 'mtable'=>'checkmark',
-      'field'=>'name'),
-array('module'=>'checkmark', 'action'=>'export pdf', 'mtable'=>'checkmark', 'field'=>'name'),
-array('module'=>'checkmark', 'action'=>'upload', 'mtable'=>'checkmark', 'field'=>'name'),
+array('module' => 'checkmark', 'action' => 'view',               'mtable' => 'checkmark', 'field' => 'name'),
+array('module' => 'checkmark', 'action' => 'add',                'mtable' => 'checkmark', 'field' => 'name'),
+array('module' => 'checkmark', 'action' => 'update',             'mtable' => 'checkmark', 'field' => 'name'),
+array('module' => 'checkmark', 'action' => 'view submission',    'mtable' => 'checkmark', 'field' => 'name'),
+array('module' => 'checkmark', 'action' => 'view print-preview', 'mtable' => 'checkmark', 'field' => 'name'),
+array('module' => 'checkmark', 'action' => 'export pdf',         'mtable' => 'checkmark', 'field' => 'name'),
+array('module' => 'checkmark', 'action' => 'upload',             'mtable' => 'checkmark', 'field' => 'name'),
 );

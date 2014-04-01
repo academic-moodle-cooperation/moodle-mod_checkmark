@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * backup/moodle2/backup_checkmark_activity_task.class.php
@@ -63,11 +63,11 @@ class backup_checkmark_activity_task extends backup_activity_task {
         $base = preg_quote($CFG->wwwroot, '/');
 
         // Link to the list of checkmarks!
-        $search='/('.$base.'\/mod\/checkmark\/index.php\?id\=)([0-9]+)/';
-        $content= preg_replace($search, '$@CHECKMARKINDEX*$2@$', $content);
+        $search = '/('.$base.'\/mod\/checkmark\/index.php\?id\=)([0-9]+)/';
+        $content = preg_replace($search, '$@CHECKMARKINDEX*$2@$', $content);
         // Link to checkmark view by moduleid!
-        $search='/('.$base.'\/mod\/checkmark\/view.php\?id\=)([0-9]+)/';
-        $content= preg_replace($search, '$@CHECKMARKVIEWBYID*$2@$', $content);
+        $search = '/('.$base.'\/mod\/checkmark\/view.php\?id\=)([0-9]+)/';
+        $content = preg_replace($search, '$@CHECKMARKVIEWBYID*$2@$', $content);
 
         return $content;
     }

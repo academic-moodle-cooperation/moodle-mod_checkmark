@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Converts old Assignmenttype Checkmarks into new checkmarks (but old DB-Style)
@@ -40,23 +40,23 @@ $starttime = microtime(1);
 $instancecount = 0;
 $submissioncount = 0;
 
-$assignment_mod_id = $DB->get_field_sql('SELECT id FROM {modules} WHERE name = \'assignment\'',
+$assignmentmodid = $DB->get_field_sql('SELECT id FROM {modules} WHERE name = \'assignment\'',
                                         null, IGNORE_MISSING);
-$new_mod_id = $DB->get_field_sql('SELECT id FROM {modules} WHERE name = \'checkmark\'', null,
+$newmodid = $DB->get_field_sql('SELECT id FROM {modules} WHERE name = \'checkmark\'', null,
                                  MUST_EXIST);
 
-if (!$assignment_mod_id) {
+if (!$assignmentmodid) {
     // No assignment module installed!
     echo $OUTPUT->notification('No Assignment-Module installed!', 'notifyproblem');
     echo $OUTPUT->notification('Conversion success!', 'notifysuccess');
     exit;
 }
 
-$assignment_instances_old = $DB->get_fieldset_sql('SELECT id
+$assignmentinstancesold = $DB->get_fieldset_sql('SELECT id
                                                    FROM {assignment}
                                                    WHERE assignmenttype = \'checkmark\'');
 
-if (empty($assignment_instances_old)) {
+if (empty($assignmentinstancesold)) {
     // No assignment-checkmark instances found!
     echo $OUTPUT->notification('No old Assignment-Checkmark-Instances found!', 'notifyproblem');
     echo $OUTPUT->notification('Conversion success!', 'notifysuccess');
@@ -67,59 +67,59 @@ echo $OUTPUT->notification('Starting conversion of assignment_checkmarks to mod_
 echo $OUTPUT->box_start('generalbox', 'statusoutput');
 $refreshcourses = array();
 
-foreach ($assignment_instances_old as $instanceid) {
+foreach ($assignmentinstancesold as $instanceid) {
     $instancecount++;
     // Get data from old assignment-entry!
     echo html_writer::start_tag('div').'Get Instance-Data';
 
-    $instance_data = $DB->get_record_sql('SELECT * FROM {assignment} WHERE id = ?',
+    $instancedata = $DB->get_record_sql('SELECT * FROM {assignment} WHERE id = ?',
                                          array($instanceid));
 
-    if ($instance_data) {
+    if ($instancedata) {
         try {
             $transaction = $DB->start_delegated_transaction();
 
 
-            echo ' from '.$instance_data->name.'....OK'.html_writer::end_tag('div');
+            echo ' from '.$instancedata->name.'....OK'.html_writer::end_tag('div');
 
             /*
              * Course needs refresh - otherwise links to updated activities would still refer
              * to mod/assignment!
              */
-            if (!in_array($instance_data->course, $refreshcourses)) {
-                $refreshcourses[] = $instance_data->course;
+            if (!in_array($instancedata->course, $refreshcourses)) {
+                $refreshcourses[] = $instancedata->course;
             }
 
             // Convert to new field names!
-            if (!empty($instance_data->var1)) {
-                $instance_data->examplecount = $instance_data->var1;
-                unset($instance_data->var1);
+            if (!empty($instancedata->var1)) {
+                $instancedata->examplecount = $instancedata->var1;
+                unset($instancedata->var1);
             } else {
-                $instance_data->examplecount = 10;
+                $instancedata->examplecount = 10;
             }
-            if (!empty($instance_data->var2)) {
-                $instance_data->examplestart = $instance_data->var2;
-                unset($instance_data->var2);
+            if (!empty($instancedata->var2)) {
+                $instancedata->examplestart = $instancedata->var2;
+                unset($instancedata->var2);
             } else {
-                $instance_data->examplestart = 1;
+                $instancedata->examplestart = 1;
             }
 
-            unset($instance_data->var3);
-            unset($instance_data->var4);
-            unset($instance_data->var5);
-            unset($instance_data->id);
+            unset($instancedata->var3);
+            unset($instancedata->var4);
+            unset($instancedata->var5);
+            unset($instancedata->id);
 
             // New entry in checkmark with data from old assignment-entry!
             echo html_writer::start_tag('div').'inserted new record in checkmark';
-            $new_instanceid = $DB->insert_record('checkmark', $instance_data, 1);
-            echo '....OK (old='.$instanceid.' / new='.$new_instanceid.')'.html_writer::end_tag('div');
+            $newinstanceid = $DB->insert_record('checkmark', $instancedata, 1);
+            echo '....OK (old='.$instanceid.' / new='.$newinstanceid.')'.html_writer::end_tag('div');
 
             // Event-update!
             $event = new stdClass();
             if ($event = $DB->get_record('event', array('modulename'  => 'assignment',
                                                         'instance'    => $instanceid))) {
                 $event->modulename        = 'checkmark';
-                $event->instance = $new_instanceid;
+                $event->instance = $newinstanceid;
 
                 $calendarevent = calendar_event::load($event->id);
                 $calendarevent->update($event);
@@ -129,7 +129,7 @@ foreach ($assignment_instances_old as $instanceid) {
                                                             'iteminstance'  => $instanceid));
             foreach ($grades as $grade) {
                 $grade->itemmodule = 'checkmark';
-                $grade->iteminstance = $new_instanceid;
+                $grade->iteminstance = $newinstanceid;
                 $DB->update_record('grade_items', $grade);
                 $grade->oldid = $grade->id;
                 unset($grade->id);
@@ -139,7 +139,7 @@ foreach ($assignment_instances_old as $instanceid) {
             }
 
             // Copy submissions!
-            echo html_writer::start_tag('div').'Get submissions for '.$instance_data->name;
+            echo html_writer::start_tag('div').'Get submissions for '.$instancedata->name;
             $submissions = $DB->get_records_sql('SELECT *
                                                  FROM {assignment_submissions}
                                                  WHERE assignment = ?', array($instanceid));
@@ -147,14 +147,14 @@ foreach ($assignment_instances_old as $instanceid) {
 
             if (is_array($submissions)) {
                 echo html_writer::start_tag('div').
-                     'start to insert submissions for '.$instance_data->name;
+                     'start to insert submissions for '.$instancedata->name;
                 $submissioncount += count($submissions);
                 foreach ($submissions as $currentsubmission) {
                     /*
                      * Convert standard-assignment-fields to checkmark fields
                      * and set right references!
                      */
-                    $currentsubmission->checkmarkid = $new_instanceid;
+                    $currentsubmission->checkmarkid = $newinstanceid;
                     unset($currentsubmission->assignment);
                     $currentsubmission->userid = $currentsubmission->userid;
                     unset($currentsubmission->user);
@@ -169,24 +169,24 @@ foreach ($assignment_instances_old as $instanceid) {
             }
             // Set new module and instance-values in course_modules!
             echo html_writer::start_tag('div').
-                 'update course_module entry for '.$instance_data->name;
+                 'update course_module entry for '.$instancedata->name;
             $DB->set_field('course_modules', 'instance', '0',
-                           array('instance'=>$instanceid, 'module'  =>$assignment_mod_id));
-            $DB->set_field('course_modules', 'module', $new_mod_id,
-                           array('instance'=>'0', 'module'=>$assignment_mod_id));
-            $DB->set_field('course_modules', 'instance', $new_instanceid,
-                           array('instance'=>'0', 'module'=>$new_mod_id));
+                           array('instance' => $instanceid, 'module'  => $assignmentmodid));
+            $DB->set_field('course_modules', 'module', $newmodid,
+                           array('instance' => '0', 'module' => $assignmentmodid));
+            $DB->set_field('course_modules', 'instance', $newinstanceid,
+                           array('instance' => '0', 'module' => $newmodid));
             echo '....OK'.html_writer::end_tag('div');
 
             // Delete old submissions!
             echo html_writer::start_tag('div').
-                 'delete old submissions for '.$instance_data->name;
+                 'delete old submissions for '.$instancedata->name;
             $DB->delete_records('assignment_submissions', array('assignment' => $instanceid));
             echo '....OK'.html_writer::end_tag('div');
 
             // Delete old assignment-instance!
             echo html_writer::start_tag('div').
-                 'delete old assignment-instance for '.$instance_data->name;
+                 'delete old assignment-instance for '.$instancedata->name;
             $DB->delete_records('assignment', array('id' => $instanceid));
             echo '....OK'.html_writer::end_tag('div');
 
@@ -229,9 +229,9 @@ if (empty($refreshcourses)) {
     }
 }
 $endtime = microtime(1);
-$conversetime = $midtime-$starttime;
-$updatetime = $endtime-$midtime;
-$totaltime = $endtime-$starttime;
+$conversetime = $midtime - $starttime;
+$updatetime = $endtime - $midtime;
+$totaltime = $endtime - $starttime;
 echo 'Timing-Info:';
 echo ' converted '.$instancecount.' instances with a total of '.$submissioncount.' submissions'.
         ' in about '.$conversetime.' seconds<br />';

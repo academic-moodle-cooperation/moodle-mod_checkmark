@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * index.php
@@ -32,7 +32,7 @@ require_once($CFG->libdir.'/gradelib.php');
 
 $id = required_param('id', PARAM_INT);   // We need a course!
 
-if (!$course = $DB->get_record('course', array('id'=>$id))) {
+if (!$course = $DB->get_record('course', array('id' => $id))) {
     print_error('invalidcourseid');
 }
 
@@ -50,7 +50,7 @@ $strsubmitted = get_string('submitted', 'checkmark');
 $strgrade = get_string('grade');
 
 
-$PAGE->set_url('/mod/checkmark/index.php', array('id'=>$course->id));
+$PAGE->set_url('/mod/checkmark/index.php', array('id' => $course->id));
 $PAGE->navbar->add($strcheckmarks);
 $PAGE->set_title($strcheckmarks);
 $PAGE->set_heading($course->fullname);
@@ -91,8 +91,8 @@ foreach ($modinfo->instances['checkmark'] as $cm) {
     $class = $cm->visible ? '' : 'dimmed';
 
     $link = html_writer::tag('a', format_string($cm->name),
-                             array('href'=>'view.php?id='.$cm->id,
-                                   'class'=>$class));
+                             array('href'  => 'view.php?id='.$cm->id,
+                                   'class' => $class));
 
     $printsection = '';
     if ($usesections) {
@@ -111,9 +111,9 @@ foreach ($modinfo->instances['checkmark'] as $cm) {
 
     $submitted = $checkmarkinstance->submittedlink(true);
 
-    $grading_info = grade_get_grades($course->id, 'mod', 'checkmark', $cm->instance, $USER->id);
-    if (isset($grading_info->items[0]) && !$grading_info->items[0]->grades[$USER->id]->hidden ) {
-        $grade = $grading_info->items[0]->grades[$USER->id]->str_grade;
+    $gradinginfo = grade_get_grades($course->id, 'mod', 'checkmark', $cm->instance, $USER->id);
+    if (isset($gradinginfo->items[0]) && !$gradinginfo->items[0]->grades[$USER->id]->hidden ) {
+        $grade = $gradinginfo->items[0]->grades[$USER->id]->str_grade;
     } else {
         $grade = '-';
     }

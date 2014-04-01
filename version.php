@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * version.php
@@ -30,8 +30,8 @@
  */
 
 $module->version  = 2014033100;
-$module->release   = "2014-03-31"; 	  // User-friendly version number
+$module->release   = "2014-03-31";      // User-friendly version number!
 $module->maturity  = MATURITY_STABLE;
-$module->requires = 2013051400.03;  // Requires this Moodle version!
+$module->requires = 2013051400.03;      // Requires this Moodle version!
 $module->cron     = 60;
 

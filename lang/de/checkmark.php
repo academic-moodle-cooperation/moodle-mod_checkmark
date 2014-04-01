@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Strings for component 'mod_checkmark', language 'de', branch 'MOODLE_21_STABLE'
@@ -32,7 +32,7 @@ $string['checkmark:grade'] = 'Kreuzerlübung benoten';
 $string['checkmark:submit'] = 'Kreuzerlübung abgeben';
 $string['checkmark:view'] = 'Zeige Kreuzerlübung';
 $string['checkmark:view_preview'] = 'Vorschau ansehen';
- 
+
 $string['activateindividuals'] = 'Individualfunktionen aktivieren';
 $string['strassignment'] = 'Aufgabe';
 $string['all'] = 'Alle';

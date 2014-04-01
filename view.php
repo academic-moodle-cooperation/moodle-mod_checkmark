@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * view.php
@@ -39,22 +39,22 @@ if ($id) {
         print_error('invalidcoursemodule');
     }
 
-    if (! $checkmark = $DB->get_record('checkmark', array('id'=>$cm->instance))) {
+    if (!$checkmark = $DB->get_record('checkmark', array('id' => $cm->instance))) {
         print_error('invalidid', 'checkmark');
     }
 
-    if (! $course = $DB->get_record('course', array('id'=>$checkmark->course))) {
+    if (!$course = $DB->get_record('course', array('id' => $checkmark->course))) {
         print_error('coursemisconf', 'checkmark');
     }
     $url->param('id', $id);
 } else {
-    if (!$checkmark = $DB->get_record('checkmark', array('id'=>$a))) {
+    if (!$checkmark = $DB->get_record('checkmark', array('id' => $a))) {
         print_error('invalidid', 'checkmark');
     }
-    if (! $course = $DB->get_record('course', array('id'=>$checkmark->course))) {
+    if (! $course = $DB->get_record('course', array('id' => $checkmark->course))) {
         print_error('coursemisconf', 'checkmark');
     }
-    if (! $cm = get_coursemodule_from_instance('checkmark', $checkmark->id, $course->id)) {
+    if (!$cm = get_coursemodule_from_instance('checkmark', $checkmark->id, $course->id)) {
         print_error('invalidcoursemodule');
     }
     $url->param('a', $a);
@@ -69,7 +69,7 @@ require_once($CFG->dirroot.'/mod/checkmark/lib.php');
 $checkmarkinstance = new checkmark($cm->id, $checkmark, $cm, $course);
 
 // Mark as viewed!
-$completion=new completion_info($course);
+$completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
 $checkmarkinstance->view();   // Actually display the checkmark!

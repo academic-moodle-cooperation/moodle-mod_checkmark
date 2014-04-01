@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * grading_form.php
@@ -38,7 +38,7 @@ class mod_checkmark_grading_form extends moodleform {
         $formattr['id'] = 'submitform';
         $mform->setAttributes($formattr);
         // Here come the hidden params!
-        $mform->addElement('hidden', 'offset', ($this->_customdata->offset+1));
+        $mform->addElement('hidden', 'offset', ($this->_customdata->offset + 1));
         $mform->setType('offset', PARAM_INT);
         $mform->addElement('hidden', 'userid', $this->_customdata->userid);
         $mform->setType('userid', PARAM_INT);
@@ -88,7 +88,7 @@ class mod_checkmark_grading_form extends moodleform {
         $mform =& $this->_form;
         $attributes = array();
         if ($this->_customdata->gradingdisabled) {
-            $attributes['disabled'] ='disabled';
+            $attributes['disabled'] = 'disabled';
         }
 
         $grademenu = make_grades_menu($this->_customdata->checkmark->grade);
@@ -116,9 +116,9 @@ class mod_checkmark_grading_form extends moodleform {
                 }
             }
         }
-        $course_context = context_module::instance($this->_customdata->cm->id);
-        if (has_capability('gradereport/grader:view', $course_context)
-                && has_capability('moodle/grade:viewall', $course_context)) {
+        $coursecontext = context_module::instance($this->_customdata->cm->id);
+        if (has_capability('gradereport/grader:view', $coursecontext)
+            && has_capability('moodle/grade:viewall', $coursecontext)) {
             $gradeitem = $this->_customdata->grading_info->items[0];
             $grade = '<a href="'.$CFG->wwwroot.'/grade/report/grader/index.php?id='.
                      $this->_customdata->course .'" >'.
@@ -167,13 +167,13 @@ class mod_checkmark_grading_form extends moodleform {
         $mform =& $this->_form;
         $buttonarray = array();
         $buttonarray2 = array();
-        if ($this->_customdata->previousid>0) {
+        if ($this->_customdata->previousid > 0) {
             $buttonarray2[] = &$mform->createElement('submit', 'previous', get_string('previous'));
         }
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton',
                                                 get_string('savechanges'));
         // If there are more to be graded.
-        if ($this->_customdata->nextid>0) {
+        if ($this->_customdata->nextid > 0) {
             $buttonarray[] = &$mform->createElement('submit', 'saveandnext',
                                                     get_string('saveandnext'));
             $buttonarray2[] = &$mform->createElement('submit', 'next', get_string('next'));

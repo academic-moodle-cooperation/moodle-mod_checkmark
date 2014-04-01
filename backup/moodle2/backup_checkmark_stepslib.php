@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * backup/moodle2/backup_checkmark_stepslib.php
@@ -51,13 +51,13 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         $submission = new backup_nested_element('submission', array('id'), array(
             'userid', 'timecreated', 'timemodified', 'grade', 'submissioncomment',
             'format', 'teacherid', 'timemarked', 'mailed'));
-            
+
         $examples = new backup_nested_element('examples');
-        
+
         $example = new backup_nested_element('example', array('id'), array('checkmarkid', 'name', 'grade'));
-        
+
         $checks = new backup_nested_element('checks');
-        
+
         $check = new backup_nested_element('check', array('id'), array('checkmarkid', 'submissionid', 'exampleid', 'state'));
 
         // Now build the tree!
@@ -65,13 +65,13 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         $examples->add_child($example);
         $checkmark->add_child($submissions);
         $submissions->add_child($submission);
-        //second level
+        // Second level.
         $submission->add_child($checks);
         $checks->add_child($check);
 
         // Define sources!
         $checkmark->set_source_table('checkmark', array('id' => backup::VAR_ACTIVITYID));
-        
+
         $example->set_source_table('checkmark_examples',
                                     array('checkmarkid' => backup::VAR_PARENTID));
 

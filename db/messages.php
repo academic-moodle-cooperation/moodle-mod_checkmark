@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * db/messages.php
@@ -33,8 +33,7 @@ defined('MOODLE_INTERNAL') || die;
  *
  * @todo should we split implement these in two sepparate message providers?
  */
- 
+
 $messageproviders = array (
-    'checkmark_updates' => array (
-	)
+    'checkmark_updates' => array ()
 );

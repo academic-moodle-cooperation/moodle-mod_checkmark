@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * delete.php
@@ -38,19 +38,19 @@ if ($id) {
         print_error('invalidcoursemodule');
     }
 
-    if (! $checkmark = $DB->get_record('checkmark', array('id'=>$cm->instance))) {
+    if (! $checkmark = $DB->get_record('checkmark', array('id' => $cm->instance))) {
         print_error('invalidid', 'checkmark');
     }
 
-    if (! $course = $DB->get_record('course', array('id'=>$checkmark->course))) {
+    if (! $course = $DB->get_record('course', array('id' => $checkmark->course))) {
         print_error('coursemisconf', 'checkmark');
     }
     $url->param('id', $id);
 } else {
-    if (!$checkmark = $DB->get_record('checkmark', array('id'=>$a))) {
+    if (!$checkmark = $DB->get_record('checkmark', array('id' => $a))) {
         print_error('invalidcoursemodule');
     }
-    if (! $course = $DB->get_record('course', array('id'=>$checkmark->course))) {
+    if (! $course = $DB->get_record('course', array('id' => $checkmark->course))) {
         print_error('coursemisconf', 'checkmark');
     }
     if (! $cm = get_coursemodule_from_instance('checkmark', $checkmark->id, $course->id)) {

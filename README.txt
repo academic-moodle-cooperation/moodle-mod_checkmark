@@ -33,7 +33,7 @@ OVERVIEW
 ================================================================================
     The Checkmark-Module enables the teacher to give the student some work
     (i.e. examples to solve) which the student afterwards checks
-	if he's able to solve them.
+    if he's able to solve them.
     In class the teacher can check if the students really are able to solve the
     examples and assign grades via moodle.
 
@@ -58,7 +58,7 @@ INSTALLATION
    Included languages are: German (de) and English (en)
 
     After it you have to run the admin-page of moodle
-	(http://your-moodle-site/admin) in your browser.
-	You have to be logged in as admin before.
+    (http://your-moodle-site/admin) in your browser.
+    You have to be logged in as admin before.
     The installation process will be displayed on the screen.
     That's all.

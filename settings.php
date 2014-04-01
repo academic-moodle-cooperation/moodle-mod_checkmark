@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * settings.php
@@ -42,8 +42,10 @@ if ($ADMIN->fulltree) {
                                                 get_string('strstdexamplestart', 'checkmark'),
                                                 get_string('strstdexamplestartdesc', 'checkmark'),
                                                 '1'));
-    //tscpr:
-        //instead of having the default values hardcoded, you can "calculate" them with the delimiter set in the checkmark class.. just in case :)
+    /*
+     * TODO tscpr: instead of having the default values hardcoded, you can "calculate" them with
+     * the delimiter set in the checkmark class.. just in case :)
+     */
     $settings->add(new admin_setting_configtext('checkmark_stdnames',
                                                 get_string('strstdnames', 'checkmark'),
                                                 get_string('strstdnamesdesc', 'checkmark'),
