@@ -38,8 +38,6 @@ require_once($CFG->dirroot.'/mod/checkmark/grading_form.php');
 require_once($CFG->libdir.'/eventslib.php');
 // Include formslib.php!
 require_once($CFG->libdir.'/formslib.php');
-// Include textlib.php!
-require_once($CFG->libdir.'/textlib.class.php');
 // Include calendar/lib.php!
 require_once($CFG->dirroot.'/calendar/lib.php');
 
@@ -735,9 +733,9 @@ class checkmark {
             case self::FILTER_ALL:
             default:
                 $sql = '  SELECT u.id FROM {user} u
-                       LEFT JOIN ('.$esql.') eu ON eu.id=u.id'.
+                       LEFT JOIN ('.$esql.') eu ON eu.id=u.id '.
                        // Comment next line to really autograde all (even those without submissions)!
-                      'LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid)'.
+                      'LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid) '.
                           'WHERE u.deleted = 0
                                  AND eu.id=u.id
                                  AND s.checkmarkid = :checkmarkid';
