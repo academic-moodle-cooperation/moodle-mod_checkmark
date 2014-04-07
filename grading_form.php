@@ -60,9 +60,9 @@ class mod_checkmark_grading_form extends moodleform {
         $mform->setType('filter', PARAM_INT);
 
         $mform->addElement('static', 'picture', $OUTPUT->user_picture($this->_customdata->user),
-        fullname($this->_customdata->user, true) . '<br/>' .
-        userdate($this->_customdata->submission->timemodified) .
-        $this->_customdata->lateness );
+                           fullname($this->_customdata->user) . '<br/>' .
+                           userdate($this->_customdata->submission->timemodified) .
+                           $this->_customdata->lateness );
 
         $this->add_submission_content();
         $this->add_grades_section();
@@ -76,7 +76,7 @@ class mod_checkmark_grading_form extends moodleform {
             $mform->addElement('header', 'Last Grade', get_string('lastgrade', 'checkmark'));
             $mform->addElement('static', 'picture',
                                $OUTPUT->user_picture($this->_customdata->teacher),
-                               fullname($this->_customdata->teacher, true).'<br/>'.$datestring);
+                               fullname($this->_customdata->teacher).'<br/>'.$datestring);
         }
         // Buttons we need!
         $this->add_grading_buttons();

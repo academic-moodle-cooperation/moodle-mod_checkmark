@@ -1850,14 +1850,14 @@ class checkmark {
         $submitform->set_data($mformdata);
 
         $PAGE->set_title($this->course->fullname . ': ' .get_string('feedback', 'checkmark').' - '.
-                         fullname($user, true));
+                         fullname($user));
         $PAGE->set_heading($this->course->fullname);
         $PAGE->navbar->add(get_string('submissions', 'checkmark'),
                            new moodle_url('/mod/checkmark/submissions.php', array('id' => $cm->id)));
-        $PAGE->navbar->add(fullname($user, true));
+        $PAGE->navbar->add(fullname($user));
 
         echo $OUTPUT->header();
-        echo $OUTPUT->heading(get_string('feedback', 'checkmark').': '.fullname($user, true));
+        echo $OUTPUT->heading(get_string('feedback', 'checkmark').': '.fullname($user));
 
         // Display mform here!
         $submitform->display();
@@ -2292,7 +2292,7 @@ class checkmark {
         $tablecolumns = array('selection', 'picture', 'fullname');
         $tableheaders = array('', '', get_string('fullnameuser'));
 
-        $useridentity = explode(',', $CFG->showuseridentity);
+        $useridentity = get_extra_user_fields($context);
         foreach ($useridentity as $cur) {
             $tablecolumns[] = $cur;
             $tableheaders[] = ($cur == 'phone1') ? get_string('phone') : get_string($cur);
@@ -2381,6 +2381,7 @@ class checkmark {
                 $sort = '';
             }
         }
+        $ufields = user_picture::fields('u', array('idnumber'));
 
         if ($groupmode != NOGROUPS) {
             if (isset($SESSION->checkmark->orderby) && ($SESSION->checkmark->orderby == 'groups')) {
@@ -2410,10 +2411,9 @@ class checkmark {
             $groupssql = '';
         }
 
-        $ufields = user_picture::fields('u', array('idnumber'));
-        $useridentityfields = 'u.'.str_replace(',', ',u.', $CFG->showuseridentity);
         if (!empty($users)) {
-            $select = 'SELECT '.$ufields.', '.$useridentityfields.',
+            $useridentityfields = get_extra_user_fields_sql($context, 'u');
+            $select = 'SELECT '.$ufields.' '.$useridentityfields.',
                               s.id AS submissionid, s.grade, s.submissioncomment,
                               s.timemodified, s.timemarked ';
             if ($groupmode != NOGROUPS) {
@@ -2470,7 +2470,7 @@ class checkmark {
                                                               array('class' => 'checkboxgroup1'));
                         $picture = $OUTPUT->user_picture($auser);
 
-                        $useridentity = explode(',', $CFG->showuseridentity);
+                        $useridentity = get_extra_user_fields($context);
                         foreach ($useridentity as $cur) {
                             if (!empty($auser->$cur)) {
                                 $$cur = html_writer::tag('div', $auser->$cur,
@@ -2701,13 +2701,12 @@ class checkmark {
                                 $outcomes .= html_writer::end_tag('div');
                             }
                         }
-                        $linktext = fullname($auser, has_capability('moodle/site:viewfullnames',
-                                                                    $this->context));
+                        $linktext = fullname($auser);
                         $linkurl = $CFG->wwwroot.'/user/view.php?id='.$auser->id.'&amp;course='.$course->id;
                         $userlink = html_writer::tag('a', $linktext, array('href' => $linkurl));
                         $row = array($selecteduser, $picture, $userlink);
 
-                        $useridentity = explode(',', $CFG->showuseridentity);
+                        $useridentity = get_extra_user_fields($context);
                         foreach ($useridentity as $cur) {
                             $row[] = $$cur;
                         }
@@ -2925,7 +2924,7 @@ class checkmark {
         $columnformat = array();
         $tableheaders = array();
         $tablecolumns = array();
-        $useridentity = explode(',', $CFG->showuseridentity);
+        $useridentity = get_extra_user_fields($context);
         if (!empty($dataonly)) {
             if (!$this->column_is_hidden('fullnameuser')) {
                 $tableheaders[] = get_string('fullnameuser');
@@ -3094,8 +3093,8 @@ class checkmark {
         }
 
         if (!empty($users)) {
-            $useridentityfields = 'u.'.str_replace(',', ',u.', $CFG->showuseridentity);
-            $select = 'SELECT '.$ufields.', '.$useridentityfields.',
+            $useridentityfields = get_extra_user_fields_sql($context, 'u');
+            $select = 'SELECT '.$ufields.' '.$useridentityfields.',
                               s.id AS submissionid, s.grade, s.submissioncomment as comment,
                               s.timemodified, s.timemarked,
                               100 * COUNT( DISTINCT cchks.id ) / COUNT( DISTINCT gchks.id ) AS summary,
@@ -3160,8 +3159,7 @@ class checkmark {
                     }
 
                     if (!$this->column_is_hidden('fullnameuser')) {
-                        $fullname = fullname($auser, has_capability('moodle/site:viewfullnames',
-                                             $this->context));
+                        $fullname = fullname($auser);
                         if (!empty($dataonly)) {
                             $row[] = $fullname;
                         } else {
@@ -3175,7 +3173,7 @@ class checkmark {
                         $row[] = ' ';
                     }
 
-                    $useridentity = explode(',', $CFG->showuseridentity);
+                    $useridentity = get_extra_user_fields($context);
                     foreach ($useridentity as $cur) {
                         if (!$this->column_is_hidden($cur)) {
                             if (empty($dataonly)) {
@@ -4177,7 +4175,7 @@ EOS;
 
             foreach ($teachers as $teacher) {
                 $info = new stdClass();
-                $info->username = fullname($user, true);
+                $info->username = fullname($user);
                 $info->checkmark = format_string($this->checkmark->name, true);
                 $info->url = $CFG->wwwroot.'/mod/checkmark/submissions.php?id='.$this->cm->id;
                 $info->timeupdated = userdate($submission->timemodified);
