@@ -46,7 +46,7 @@ if (! $course = $DB->get_record('course', array('id' => $checkmark->course))) {
 
 require_login($course, false, $cm);
 
-if (has_capability('mod/checkmark:grade', get_context_instance(CONTEXT_MODULE, $cm->id))) {
+if (has_capability('mod/checkmark:grade', context_module::instance($cm->id))) {
     redirect('submissions.php?id='.$cm->id);
 } else {
     redirect('view.php?id='.$cm->id);

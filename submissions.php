@@ -65,7 +65,7 @@ if ($id) {
 $PAGE->set_url($url);
 require_login($course->id, false, $cm);
 
-require_capability('mod/checkmark:grade', get_context_instance(CONTEXT_MODULE, $cm->id));
+require_capability('mod/checkmark:grade', context_module::instance($cm->id));
 
 $PAGE->requires->js('/mod/checkmark/yui/checkmark/checkmark.js');
 
