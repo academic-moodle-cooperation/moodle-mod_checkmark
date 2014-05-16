@@ -230,6 +230,7 @@ $string['notgradedyet'] = 'Noch nicht bewertet';
 $string['norequiregrading'] = 'Es sind keine Kreuzerlübungen vorhanden, die eine Benotung erfordern';
 $string['nosubmisson'] = 'Es wurden keine Kreuzerlübungen abgegeben';
 $string['notsubmittedyet'] = 'Noch nichts abgegeben';
+$string['notactive'] = 'Nicht aktiv';
 $string['operation'] = 'Operation';
 $string['optionalsettings'] = 'Optionale Einstellungen';
 $string['page-mod-checkmark-x'] = 'Jede Kreuzerlübungsmodulseite';

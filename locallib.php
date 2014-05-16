@@ -3798,6 +3798,7 @@ class checkmark {
         $checkmarkname = $this->checkmark->name;
         $timedue = $this->checkmark->timedue;
         $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
+        $not_active_str = get_string('notactive', 'checkmark');
 
         $viewname = $filters[$filter];
 
@@ -3816,11 +3817,15 @@ class checkmark {
         $pdf = new MTablePDF($orientation, $cellwidth);
 
         $pdf->setHeaderText(get_string('course').':', $coursename,
-                            get_string('availabledate', 'checkmark').':', userdate($timeavailable),
+                            get_string('availabledate', 'checkmark').':', !empty($timeavailable) ?
+                                                                          userdate($timeavailable) :
+                                                                          $not_active_str,
                             get_string('strprintpreview', 'checkmark'), $viewname,
                             // Second header row!
                             get_string('strassignment', 'checkmark').':', $checkmarkname,
-                            get_string('duedate', 'checkmark').':', userdate($timedue),
+                            get_string('duedate', 'checkmark').':', !empty($timedue) ?
+                                                                    userdate($timedue) :
+                                                                    $not_active_str,
                             get_string('groups') . ':', $grpname);
 
         $pdf->ShowHeaderFooter($printheader);

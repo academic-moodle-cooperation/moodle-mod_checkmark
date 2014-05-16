@@ -227,6 +227,7 @@ $string['notgradedyet'] = 'Not graded yet';
 $string['norequiregrading'] = 'There are no checkmarks that require grading';
 $string['nosubmisson'] = 'No checkmarks have been submitted';
 $string['notsubmittedyet'] = 'Not submitted yet';
+$string['notactive'] = 'Not active';
 $string['operation'] = 'Operation';
 $string['optionalsettings'] = 'Optional settings';
 $string['page-mod-checkmark-x'] = 'Every checkmark module page';
