@@ -3492,7 +3492,7 @@ class checkmark {
                 set_user_preference('checkmark_printheader', $pageorientation);
             }
 
-            $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
+            $filter = optional_param('datafilter', self::FILTER_ALL, PARAM_INT);
             set_user_preference('checkmark_filter', $filter);
 
             $sumabs = optional_param('sumabs', 0, PARAM_INT);
@@ -3548,8 +3548,8 @@ class checkmark {
         $mform->addElement('hidden', 'updatepref');
         $mform->setDefault('updatepref', 1);
         $mform->addElement('header', 'data_settings_header', get_string('datasettingstitle', 'checkmark'));
-        $mform->addElement('select', 'filter', get_string('show'),  $filters);
-        $mform->setDefault('filter', $filter);
+        $mform->addElement('select', 'datafilter', get_string('show'),  $filters);
+        $mform->setDefault('datafilter', $filter);
 
         $mform->addElement('html', $this->moodleform_groups_print_activity_menu($cm, true));
         $mform->addElement('html', $this->print_moodleform_initials_bar());
@@ -3731,7 +3731,7 @@ class checkmark {
                 set_user_preference('checkmark_printheader', $pageorientation);
             }
 
-            $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
+            $filter = optional_param('datafilter', self::FILTER_ALL, PARAM_INT);
             set_user_preference('checkmark_filter', $filter);
 
             $sumabs = optional_param('sumabs', 0, PARAM_INT);
@@ -3797,7 +3797,7 @@ class checkmark {
         $timeavailable = $this->checkmark->timeavailable;
         $checkmarkname = $this->checkmark->name;
         $timedue = $this->checkmark->timedue;
-        $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
+        $filter = optional_param('datafilter', self::FILTER_ALL, PARAM_INT);
         $not_active_str = get_string('notactive', 'checkmark');
 
         $viewname = $filters[$filter];
