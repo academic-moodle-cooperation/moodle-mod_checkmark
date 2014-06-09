@@ -64,9 +64,11 @@ $string['autograde_confirm'] = 'Sie sind dabei {$a} automatisch zu bewerten. Die
 $string['autograde_notsupported'] = 'Diese Notenskala wird von der automatischen Bewertung nicht unterstützt.';
 $string['autograde_no_users_selected'] = 'Sie haben keinen Benutzer zur Bewertung ausgewählt. Wählen Sie die gewünschten Benutzer über die Checkboxen der linken Tabellenspalte aus.';
 $string['autograde_non_numeric_grades'] = 'Die automatische Bewertung benötigt numerische Angaben für die Bewertung. Dies kann in den Instanzeinstellungen sichergestellt werden.';
+$string['cantfixevent'] = 'Konnte Kalendereintrag mit der ID {$a->id}, Name {$a->name} nicht reparieren ({$a->matches} treffer).';
 $string['checkmark_overviewsummary'] = 'Sie haben {$a->checked_examples} / {$a->total_examples} Beispiele ({$a->checked_grade} / {$a->total_grade} Punkte) gekreuzt<br />{$a->grade}<br />';
 $string['checkmark_summary'] = 'Sie haben <span id="examples">{$a->checked_examples}</span> von {$a->total_examples} Beispielen gekreuzt.<br />(<span id="grade">{$a->checked_grade}</span> von maximal {$a->total_grade} Punkten)';
 $string['checkmarkstatstitle'] = 'Kursübersicht Kreuzerlübungen';
+$string['couldfixevent'] = 'Konnte Termin mit der ID {$a->id} und dem Namen {$a->name} erfolgreich reparieren.';
 $string['count_individuals_mismatch'] = 'Die Anzahl der Beispielnamen({$a->namecount}) stimmt nicht mit der Anzahl der Beispielgewichtungen({$a->gradecount}) überein!';
 $string['datasettingstitle'] = 'Dateneinstellungen';
 $string['data_settings'] = 'Druckeinstellungen';

@@ -167,7 +167,7 @@ function checkmark_update_instance($checkmark) {
             $event->userid      = 0;
             $event->modulename  = 'checkmark';
             $event->instance    = $checkmark->id;
-            $event->eventtype   = 'course';
+            $event->eventtype   = 'due';
             $event->timestart   = $checkmark->timedue;
             $event->timeduration = 0;
 
@@ -233,7 +233,7 @@ function checkmark_add_instance($checkmark) {
         $event->userid      = 0;
         $event->modulename  = 'checkmark';
         $event->instance    = $returnid;
-        $event->eventtype = 'course';
+        $event->eventtype = 'due';
         $event->timestart   = $checkmark->timedue;
         $event->timeduration = 0;
 

@@ -556,6 +556,182 @@ function xmldb_checkmark_upgrade($oldversion) {
         // Checkmark savepoint reached.
         upgrade_mod_savepoint(true, 2013112500, 'checkmark');
     }
+    
+    if ($oldversion < 2014052104) {
+        //Upgrade old events
+
+        $events = $DB->get_records('event', array('eventtype'  => 'course',
+                                                  'modulename' => 'checkmark'));
+        $eventcount = count($events);
+        $i = 0;
+        $pbar = new progress_bar('CheckmarkFixEvents', 500, true);
+        foreach ($events as $id => $event) {
+            //Find related instance via courseid and duedate
+            $cond = array('course'  => $event->courseid,
+                          'timedue' => $event->timestart);
+            $matches = $DB->count_records('checkmark', $cond);
+            if ($matches == 1) {
+                // Only 1 record found, we can fix it!
+                $event->instance = $DB->get_field('checkmark', 'id', $cond);
+                $event->eventtype = 'due';
+                $calendarevent = calendar_event::load($event->id);
+                $calendarevent->update($event);
+                $i++;
+                echo $OUTPUT->notification(get_string('couldfixevent', 'checkmark', $event),
+                                           'notifysuccess');
+                $pbar->update($i, $eventcount, get_string('couldfixevent', 'checkmark', $event));
+            } else {
+                $cond2 = array('course'  => $event->courseid,
+                               'timedue' => $event->timestart,
+                               'name'    => $event->name);
+                $matches2 = $DB->count_records('checkmark', $cond2);
+                if ($matches2 == 1) {
+                    // Only 1 record found, we can fix it!
+                    $event->instance = $DB->get_field('checkmark', 'id', $cond2);
+                    $event->eventtype = 'due';
+                    $calendarevent = calendar_event::load($event->id);
+                    $calendarevent->update($event);
+                    $i++;
+                    echo $OUTPUT->notification(get_string('couldfixevent', 'checkmark', $event),
+                                               'notifysuccess');
+                    $pbar->update($i, $eventcount, get_string('couldfixevent', 'checkmark', $event));
+                } else {
+                    $event->matches = min($matches, $matches2);
+                    echo $OUTPUT->notification(get_string('cantfixevent', 'checkmark', $event),
+                                               'notifyproblem');
+                    $i++;
+                    $pbar->update($i, $eventcount, get_string('cantfixevent', 'checkmark', $event));
+                }
+            }
+        }
+        $pbar->update($eventcount, $eventcount, "finished first phase");
+
+        upgrade_mod_savepoint(true, 2014052104, 'checkmark');
+    }
+
+    if ($oldversion < 2014052105) {
+        if (!isset($pbar)) {
+            $pbar = new progress_bar('CheckmarkFixEvents', 500, true);
+        }
+        //Get all checkmarks which have no corresponding events but a due date!
+        $checkmarks = $DB->get_records_sql("SELECT checkmark.id, checkmark.name, checkmark.intro, checkmark.timedue, checkmark.course, COUNT( event.id ) AS present
+                                              FROM {checkmark} as checkmark
+                                         LEFT JOIN {event} as event ON event.instance = checkmark.id
+                                                                   AND event.instance <> 0
+                                                                   AND event.modulename LIKE 'checkmark'
+                                            GROUP BY checkmark.id
+                                            HAVING present = 0 AND checkmark.timedue <> 0");
+        $repairedids = array();
+        $i=0;
+        $max = count($checkmarks);
+        //Process each of these checkmarks alone
+        foreach ($checkmarks as $checkmark) {
+            $params = array('name'       => '%'.$checkmark->name.'%',
+                            'intro'      => '%'.$checkmark->intro.'%',
+                            'courseid'   => $checkmark->course,
+                            'timedue'    => $checkmark->timedue,
+                            'modulename' => 'checkmark',
+                            'eventtype'  => 'course');
+            $events = $DB->get_records_sql("SELECT *
+                                              FROM {event} as event
+                                             WHERE event.timestart = :timedue
+                                                   AND event.courseid = :courseid
+                                                   AND ".$DB->sql_like('event.name', ':name')."
+                                                   AND ".$DB->sql_like('event.description', ':intro')."
+                                                   AND ".$DB->sql_like('event.modulename', ':modulename')."
+                                                   AND ".$DB->sql_like('event.eventtype', ':eventtype')."
+                                                   AND event.instance = 0", $params);
+            $matches = count($events);
+            if ($matches > 0) {
+                $event = current($events);
+                while(($matches > 1) && in_array($event->id, $repairedids)) {
+                    // Get next unrepaired matching event!
+                    $matches--;
+                    $event = next($events);
+                }
+                if (in_array($event->id, $repairedids)) { // We allready used this event, copy it for the other instance!
+                    $newevent = clone $event;
+                    unset($newevent->id);
+                    $newevent->instance = $checkmark->id;
+                    $newevent->eventtype = 'due';
+                    if ($eventobj = calendar_event::create($newevent)) {
+                        $repairedids[] = $eventobj->id;
+                        echo $OUTPUT->notification(get_string('couldfixevent', 'checkmark', $event),
+                                                   'notifysuccess');
+                        $i++;
+                        $pbar->update($i, $max, get_string('couldfixevent', 'checkmark', $event));
+                    } else {
+                        $event->id = -1;
+                        echo $OUTPUT->notification(get_string('cantfixevent', 'checkmark', $event),
+                                                   'notifyproblem');
+                        $i++;
+                        $pbar->update($i, $max, get_string('cantfixevent', 'checkmark', $event));
+                    }
+                } else {
+                    $event->instance = $checkmark->id;
+                    $event->eventtype = 'due';
+                    $eventobj = calendar_event::load($event->id);
+                    if ($eventobj->update($event)) {
+                        $repairedids[] = $event->id;
+                        echo $OUTPUT->notification(get_string('couldfixevent', 'checkmark', $event),
+                                                   'notifysuccess');
+                        $i++;
+                        $pbar->update($i, $max, get_string('couldfixevent', 'checkmark', $event));
+                    }
+                }
+            } else {
+                // Create a New Event for this instance...
+                
+                $event = new stdClass();
+                $event->name        = get_string('end_of_submission_for', 'checkmark', $checkmark->name);
+                if (!empty($checkmark->intro)) {
+                    $event->description = $checkmark->intro;
+                }
+                $event->courseid    = $checkmark->course;
+                $event->groupid     = 0;
+                $event->userid      = 0;
+                $event->modulename  = 'checkmark';
+                $event->instance    = $checkmark->id;
+                $event->eventtype   = 'due';
+                $event->timestart   = $checkmark->timedue;
+                $event->timeduration = 0;
+
+                if ($eventobj = calendar_event::create($event)) {
+                    $event->id = $eventobj->id;
+                    $repairedids[] = $event->id;
+                    echo $OUTPUT->notification(get_string('couldfixevent', 'checkmark', $event),
+                                               'notifysuccess');
+                    $i++;
+                    $pbar->update($i, $max, get_string('couldfixevent', 'checkmark', $event));
+                } else {
+                    $event->id = -1;
+                    echo $OUTPUT->notification(get_string('cantfixevent', 'checkmark', $event),
+                                               'notifyproblem');
+                    $i++;
+                    $pbar->update($i, $max, get_string('cantfixevent', 'checkmark', $event));
+                }
+            }
+        }
+
+        //Remove other event-stubs:
+        $events = $DB->get_records('event', array('modulename' => 'checkmark',
+                                                  'instance' => 0,
+                                                  'eventtype' => 'course'));
+        $i = 0;
+        $max = count($events);
+        if (!empty($max)) {
+            foreach($events as $event) {
+                $event = calendar_event::load($event->id);
+                $event->delete(true);
+                $i++;
+                $pbar->update($i, $max, get_string('delete').' '.$i.'/'.$max);
+            }
+        }
+
+        $pbar->update(1, 1, '-');
+
+        upgrade_mod_savepoint(true, 2014052105, 'checkmark');
+    }
 
     return true;
 }

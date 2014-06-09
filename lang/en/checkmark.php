@@ -61,9 +61,11 @@ $string['autograde_confirm'] = 'You are about to update grades and feedback for 
 $string['autograde_notsupported'] = 'This scale is not supported by automatic grading.';
 $string['autograde_no_users_selected'] = 'You have not selected any user to grade. Select the required users via the checkboxes in the left column of the table below.';
 $string['autograde_non_numeric_grades'] = 'Autograding requires a numeric maximum grade to be set. This can be configured in instance-settings.';
+$string['cantfixevent'] = 'Couldn\'t fix event with ID {$a->id}, named {$a->name} ({$a->matches} matches).';
 $string['checkmark_overviewsummary'] = 'You\'ve checked {$a->checked_examples} / {$a->total_examples} examples ({$a->checked_grade} / {$a->total_grade} points)<br />{$a->grade}<br />';
 $string['checkmark_summary'] = 'You\'ve checked <span id="examples">{$a->checked_examples}</span> out of {$a->total_examples} examples.<br />(<span id="grade">{$a->checked_grade}</span> out of a maximum of {$a->total_grade} points)';
 $string['checkmarkstatstitle'] = 'Courseoverview Checkmark';
+$string['couldfixevent'] = 'Could successfully fix event with ID {$a->id}, named {$a->name}.';
 $string['count_individuals_mismatch'] = 'The amount of individual names({$a->namecount}) doesn\'t match the amount of individual grades({$a->gradecount})!';
 $string['datasettingstitle'] = 'Data settings';
 $string['data_settings'] = 'Print settings';
