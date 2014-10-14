@@ -32,6 +32,6 @@
 $module->version  = 2014052105;
 $module->release   = "2014-05-21";      // User-friendly version number!
 $module->maturity  = MATURITY_STABLE;
-$module->requires = 2013051400.03;      // Requires this Moodle version!
+$module->requires = 2013101800;         // Requires this Moodle version!
 $module->cron     = 60;
 
