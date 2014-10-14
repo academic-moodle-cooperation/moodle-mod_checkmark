@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * backup/moodle2/restore_checkmark_activity_task.class.php
@@ -124,10 +124,10 @@ class restore_checkmark_activity_task extends restore_activity_task {
 
         return $rules;
     }
-    
+
     public function after_restore() {
         global $DB, $OUTPUT;
-    
+
         // Here we try to restore corrupt calendar entries due to old checkmark events being course events
         $courseid = $this->get_courseid();
         if ($checkmarkid = $this->get_activityid()) { // always set, but just to be sure to not break any course-restore...
@@ -143,7 +143,7 @@ class restore_checkmark_activity_task extends restore_activity_task {
                      AND courseid = :courseid
                      AND timestart = :timestart
                      AND ".$DB->sql_like('name', ':name');
-            
+
             $events = $DB->get_records_select('event', $where, $params);
             if (count($events) == 1) {
                 $event = current($events);

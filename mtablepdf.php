@@ -12,17 +12,17 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * mtablepdf.php
  * @package       mod_checkmark
- * @version	  24.01.2014
+ * @version       24.01.2014
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
  * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
- * @author        Andreas Windbichler
+ * @author        Philipp Hager
  * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
- * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once("../../config.php");
@@ -36,16 +36,16 @@ class MTablePDF extends pdf{
     const FONTSIZE_SMALL = 8;
     const FONTSIZE_MEDIUM = 10;
     const FONTSIZE_LARGE = 12;
-    
+
     const OUTPUT_FORMAT_PDF = 0;
     const OUTPUT_FORMAT_XLSX = 1;
     const OUTPUT_FORMAT_XLS = 2;
     const OUTPUT_FORMAT_ODS = 3;
     const OUTPUT_FORMAT_CSV_COMMA = 4;
     const OUTPUT_FORMAT_CSV_TAB = 5;
-    
+
     private $outputformat =  MTablePDF::OUTPUT_FORMAT_PDF;
-    
+
 
     private $orientation = MTablePDF::PORTRAIT;
     private $rowsperpage = 0;
@@ -67,9 +67,9 @@ class MTablePDF extends pdf{
         $this->setHeaderMargin(7);
         $this->SetFont('freesans', '');
         $this->columnwidths = $columnwidths;
-        
+
         $this->orientation = $orientation;
-        
+
         $this->columnformat = array();
         for($i=0;$i<count($columnwidths);$i++){
             $this->columnformat[] = array();
@@ -81,9 +81,9 @@ class MTablePDF extends pdf{
     public function setColumnFormat($columnformat){
         if(count($columnformat) != count($this->columnwidths)){
             echo "Error: Columnformat (" . count($columnformat) . ") count doesnt match column count (" . count($this->columnwidths) . ")";
-            exit();            
+            exit();
         }
-        
+
         $this->columnformat = array_merge($this->columnformat,$columnformat);
     }
 
@@ -114,7 +114,7 @@ class MTablePDF extends pdf{
         // Title.
 
         $header = $this->header;
-    
+
         if ($this->showheaderfooter) {
 
             $pagewidth = $this->getPageWidth();
@@ -129,41 +129,41 @@ class MTablePDF extends pdf{
             $this->SetFont('', '');
             $this->Cell(31 * $scale, $height, $header[1], $border, false, 'R', 0, '', 1, false/*, 'M', 'M'*/);
             $this->Cell(/*8*/15 * $scale, $height, "", $border, false, 'C', 0, '', 1, false/*, 'M', 'M'*/);
-    
+
             $this->SetFont('', 'B');
             $this->Cell(21 * $scale, $height, $header[2], $border, false, 'L', 0, '', 1, false/*, '1', '0'*/);
             $this->SetFont('', '');
-    
+
             $this->SetFont('', '');
             $this->Cell(41 * $scale, $height, $header[3], $border, false, 'R', 0, '', 1, false/*, '1', '0'*/);
             $this->Cell(/*8*/15 * $scale, $height, "", $border, false, 'C', 0, '', 1, false/*, '1', '0'*/);
-    
+
             $this->SetFont('', 'B');
             $this->Cell(15 * $scale, $height, $header[4], $border, false, 'L', 0, '', 1, false/*, '1', '0'*/);
             $this->SetFont('', '');
             $this->Cell(31 * $scale, $height, $header[5], $border, false, 'R', 0, '', 1, false/*, '1', '0'*/);
-    
+
             $this->Ln();
-    
+
             // Second row.
             $height = 4;
 
             $this->SetFont('', 'B');
             $this->Cell(/*8*/15 * $scale, $height, $header[6], $border, false, 'L', 0, '', 1, false);
-    
+
             $this->SetFont('', '');
             $this->Cell(31 * $scale, $height, $header[7], $border, false, 'R', 0, '', 1, false/*, '1', '0'*/);
             $this->Cell(/*8*/15 * $scale, $height, "", $border, false, 'C', 0, '', 1, false/*, '1', '0'*/);
-    
+
             $this->SetFont('', 'B');
             $this->Cell(21 * $scale, $height, $header[8], $border, false, 'L', 0, '', 1, false/*, '1', '0'*/);
             $this->SetFont('', '');
-    
+
             $this->SetFont('', '');
             $this->Cell(41 * $scale, $height, $header[9], $border, false, 'R', 0, '', 1, false/*, '1', '0'*/);
-    
+
             $this->Cell(/*8*/15 * $scale, $height, "", $border, false, 'C', 0, '', 1, false/*, '1', '0'*/);
-    
+
             $this->SetFont('', 'B');
             $this->Cell(15 * $scale, $height, $header[10], $border, false, 'L', 0, '', 1, false/*, '1', '0'*/);
             $this->SetFont('', '');
@@ -173,7 +173,7 @@ class MTablePDF extends pdf{
             $this->SetFontSize($oldfontsize);
         }
     }
-    
+
     /**
      * If showheaderfooter is selected
      * Displays the number and total number of pages in the footer
@@ -182,10 +182,10 @@ class MTablePDF extends pdf{
     	if ($this->showheaderfooter) {
     		// Set font.
     		$this->SetFont('', '');
-    		 
+
     		// Position at 15 mm from bottom
     		$this->SetY(-15);
-    
+
     		// Page number
     		$this->Cell(0, 10, $this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
     	}
@@ -200,7 +200,7 @@ class MTablePDF extends pdf{
             echo "Error: Title count doesnt match column count";
             exit();
         }
-        
+
         $this->titles = $titles;
     }
 
@@ -214,15 +214,15 @@ class MTablePDF extends pdf{
             $this->orientation = $orientation;
             return true;
         }
-        
+
         return false;
     }
-    
-    
+
+
     public function setOutputFormat($format){
     	$this->outputformat = $format;
     }
-    
+
     /**
     * Defines how many rows are printed on each page
     * @param int $i > 0
@@ -233,7 +233,7 @@ class MTablePDF extends pdf{
             $this->rowsperpage = $rowsperpage;
             return true;
         }
-        
+
         return false;
     }
 
@@ -244,32 +244,32 @@ class MTablePDF extends pdf{
      */
     public function addRow($row){
         if(count($row) != count($this->columnwidths)){
-            
+
             var_dump($row);
             echo "Error: number of columns from row (" . count($row) . ") doenst match the number defined (" . count($this->columnwidths) . ")";
             return false;
         }
-        
+
         $fastmode = false;
         foreach($row as $r){
             if(!is_null($r) && !is_array($r)){
                 $fastmode = true;
             }
         }
-        
+
         if($fastmode){
             //fast mode
             $tmp = array();
-            
+
             foreach($row as $idx => $value){
                 if(is_array($value)){
                     echo "Error: if you want to add a row using the fast mode, you cannot pass me an array";
                     exit();
                 }
-                
+
                 $tmp[] = array("rowspan"=>0,"data"=>$value);
             }
-            
+
             $row = $tmp;
         }else{
             foreach($row as $idx => $value){
@@ -285,9 +285,9 @@ class MTablePDF extends pdf{
                 }
             }
         }
-        
+
         $this->data[] = $row;
-        
+
         return true;
     }
 
@@ -304,9 +304,9 @@ class MTablePDF extends pdf{
     	}else if($fontsize >= MTablePDF::FONTSIZE_LARGE){
     		$fontsize = MTablePDF::FONTSIZE_LARGE;
     	}
-    	
+
     	$this->fontsize = $fontsize;
-    	
+
         parent::SetFontSize($fontsize, $out);
     }
 
@@ -318,7 +318,7 @@ class MTablePDF extends pdf{
         $this->showheaderfooter = $showheaderfooter;
     }
 
-    
+
     /*
      * Generate the file
      * */
@@ -327,9 +327,9 @@ class MTablePDF extends pdf{
     	if($filename == ''){
     		$filename = userdate(time());
     	}
-    	
+
     	$filename = clean_filename($filename);
-    	
+
     	switch($this->outputformat){
     		case MTablePDF::OUTPUT_FORMAT_XLS:
     			$this->get_xls($filename);
@@ -350,7 +350,7 @@ class MTablePDF extends pdf{
     			$this->get_pdf($filename);
     	}
     }
-    
+
     /**
      * Generate pdf
      */
@@ -364,16 +364,16 @@ class MTablePDF extends pdf{
         // calcuate column widths
         $sum_fix = 0;
         $sum_relativ = 0;
-        
+
         $rowspans = array();
         $allfixed = true;
         $sum = 0;
 
         foreach($this->columnwidths as $idx => $width){
             $rowspans[] = 0;
-            
+
             $sum += $width['value'];
-            
+
             if($width["mode"]=="Fixed"){
                 $sum_fix += $width['value'];
             }else if($width["mode"] == "Relativ"){
@@ -415,7 +415,7 @@ class MTablePDF extends pdf{
                 $prev_rMargin = $this->rMargin;
                 $this->lMargin = $this->pagedim[$this->page]['olm'];
                 $this->rMargin = $this->pagedim[$this->page]['orm'];
-            
+
                 // Colors, line width and bold font.
                 $this->SetFillColor(0xc0, 0xc0, 0xc0);
                 $this->SetTextColor(0);
@@ -453,48 +453,48 @@ class MTablePDF extends pdf{
 
         // Data.
         $fill = 0;
-        
+
         $rowheights = array();
-        
+
         // calculate line heights for not rowspanned fields
         foreach ($this->data as $rownum => $row) {
         	$maxnumlines = 1;
-        	
+
         	foreach ($row as $key => $value){
         		if($value['rowspan'] == 0 && !is_null($value['data'])){
 	        		$this->data[$rownum][$key]['numlines'] = $this->getNumLines($value['data'],$w[$key]);
 	        		$maxnumlines = max($maxnumlines,$this->data[$rownum][$key]['numlines']);
         		}
         	}
-        	
-        	$rowheights[$rownum] = $maxnumlines;        	
+
+        	$rowheights[$rownum] = $maxnumlines;
         }
-        
+
         // add heights to rows for fields wich are rowspanned but still need more space
         foreach($this->data as $rownum => $row){
         	foreach($row as $key => $value){
         		if($value['rowspan'] != 0 && !is_null($value['data'])){
         			$lineheight = $this->getNumLines($value['data'],$w[$key]);
-        			
+
         			$lines = 0;
         			for($i = $rownum; $i <= $rownum+ $value['rowspan'];$i++){
         				$lines += $rowheights[$i];
         			}
-        			
+
         			if($lineheight > $lines){
         				$rowheights[$rownum] += $lineheight - $lines - 1;
         			}
         		}
         	}
         }
-        
+
         $cellsize = $pdf->FontSizePt/2;
         $fullrows = 0;
-        
-        
-        
+
+
+
         // calculate space on pages
-        
+
         $fsize = ceil($this->getFontSize());
         if($fsize == 3){
         	$fsize = MTablePDF::FONTSIZE_SMALL;
@@ -503,7 +503,7 @@ class MTablePDF extends pdf{
         }else if($fsize == 5){
         	$fsize = MTablePDF::FONTSIZE_LARGE;
         }
-        
+
         $spaceonpage = array();
 
         if($this->fontsize == MTablePDF::FONTSIZE_SMALL){
@@ -536,31 +536,31 @@ class MTablePDF extends pdf{
         	echo "Error: an unexpected error occured on line " . __LINE__ . ". Please report this to your administrator.";
         	exit();
         }
-        
+
         $forcebreakonnextpage = false;
-        
+
         // now the generating of the page
-        foreach ($this->data as $rownum => $row) {        	
+        foreach ($this->data as $rownum => $row) {
         	$spanned = 0;
         	$dontbreak = false;
         	foreach($row as $key => $value){
         		if($value['rowspan'] > $spanned){
         			$spanned = $value['rowspan'];
         		}
-        		
+
         		if(is_null($value['data'])){
         			$dontbreak = true;
         		}
         	}
-        	
+
         	$fullrows += $rowheights[$rownum];
-        	
+
         	$spannedheight = 0;
         	for($i=$rownum+1;$i<$rownum+$spanned;$i++){
         		$spannedheight = $rowheights[$i];
         	}
-        	
-       	
+
+
 
 
         	if($this->getPage() == 1){
@@ -568,17 +568,17 @@ class MTablePDF extends pdf{
         	}else{
         		$spaceleft = $spaceonpage[1];
         	}
-        	
-        	
-        	
+
+
+
         	if($forcebreakonnextpage){
         	// break because there had to be allready a break but we couldnt
         		if(!$dontbreak){
         			$pdf->addPage();
         			$fullrows = $rowheights[$rownum];
         			$forcebreakonnextpage = false;
-        			
-        		}      		
+
+        		}
         	// break because of fixed rows per page
         	}else if($this->rowsperpage && $this->rowsperpage > 0 && $rownum != 0 && $rownum % $this->rowsperpage == 0){
         		if(!$dontbreak){
@@ -605,51 +605,51 @@ class MTablePDF extends pdf{
         				$forcebreakonnextpage = true;
         			}
         		}
-        		
+
         	}
-        	
+
             if ($rownum == count($this->data)-1) {
                 $bottomborder = 'B';
             } else {
                 $bottomborder = '';
             }
-            
+
             $debug = false;
-                       
+
             foreach ($row as $key => $value) {
 
                 $cf = $this->columnformat[$key];
                 $cf = $cf[$rownum % count($cf)];
-               
+
                 if(!is_null($value['data'])){
                     $bottomborder = 'TB';
                     if($value['rowspan'] > 0){
                         $rowspans[$key] = $value['rowspan'];
                     }
-                    
+
                     $numlines = 0;
                     for($i = $rownum; $i <= $rownum + $value['rowspan'];$i++){
                     	$numlines += $rowheights[$i];
                     }
-                    
-                                       
+
+
                     if($debug){
                     	$debuginfo = $spanned . '/' . $value['rowspan'] . '/' . $numlines . '/';
-                    	
+
 	                    $value['data'] =  $debuginfo . substr($value['data'],0,strlen($value['data'])-(strlen($debuginfo)));
                     }
-                    
-                    
+
+
                     $pdf->MultiCell($w[$key],$numlines * $cellsize, $value['data'], 'LR'.$bottomborder, $cf['align'], $cf['fill'], 0, '', '', true, '0');
-                    
+
                 }else if($rowspans[$key] > 0){
                    	if($debug){
                    		$value['data'] = $value['rowspan'] . "/_";
                    	}
 
                    	$numlines = $rowheights[$rownum];
- 	
-					$pdf->Cell($w[$key],$numlines * $cellsize, $value['data'],'LR',0,false,0,'','',true,'0');                        
+
+					$pdf->Cell($w[$key],$numlines * $cellsize, $value['data'],'LR',0,false,0,'','',true,'0');
 					$rowspans[$key] = $rowspans[$key]-1;
                 }
             }
@@ -657,26 +657,26 @@ class MTablePDF extends pdf{
             $fill=!$fill;
         }
 
-        
+
         if($filename != ''){
         	if(substr($filename,strlen($filename)-4) != ".pdf"){
         		$filename .= '.pdf';
         	}
-        	
+
         	$filename = clean_filename($filename);
         	$pdf->Output($filename, 'D');
         }else{
         	$pdf->Output();
-        }        
+        }
     }
-    
-    
-    
-    
-    
-    
 
-    
+
+
+
+
+
+
+
     /**
      * fills workbook (either XLS or ODS) with data
      *
@@ -688,7 +688,7 @@ class MTablePDF extends pdf{
     	$time = time();
     	$time = userdate($time);
     	$worksheet = $workbook->add_worksheet($time);
-   
+
     	$headline_prop = array(    'size' => 12,
     			'bold' => 1,
     			'HAlign' => 'center',
@@ -709,7 +709,7 @@ class MTablePDF extends pdf{
     	$hdrright = $workbook->add_format($headline_prop);
     	$hdrright->set_align('left');
     	$hdrright->set_align('vcenter');
-    
+
     	$text_prop = array(   'size' => 10,
     			'align' => 'left');
     	$text = $workbook->add_format($text_prop);
@@ -717,19 +717,19 @@ class MTablePDF extends pdf{
     	$text->set_align('vcenter');
     	$text_first = $workbook->add_format($text_prop);
     	$text_first->set_align('vcenter');
-    
-    	
+
+
     	$line = 0;
-    	
+
     	//write header
-    	for($i=0;$i<count($this->header);$i+=2){    		
+    	for($i=0;$i<count($this->header);$i+=2){
     		$worksheet->write_string($line, 0, $this->header[$i], $hdrleft);
     		$worksheet->write_string($line, 1, $this->header[$i+1], $hdrright);
     		$line++;
     	}
     	$line++;
-    	
-    	
+
+
     	// table header
     	$i = 0;
     	$first = true;
@@ -743,7 +743,7 @@ class MTablePDF extends pdf{
     		}
     		$i++;
     	}
-    	
+
     	// data
     	$prev = $this->data[0];
     	foreach($this->data as $row) {
@@ -754,7 +754,7 @@ class MTablePDF extends pdf{
     			if(is_null($cell['data'])){
     				$cell['data'] = $prev[$idx]['data'];
     			}
-    			
+
     			if($first) {
     				$worksheet->write_string($line, $i, $cell['data'], $text_first);
     				$first = false;
@@ -770,13 +770,13 @@ class MTablePDF extends pdf{
 
     public function get_xls($filename) {
     	global $CFG;
-    
+
     	require_once($CFG->libdir . "/excellib.class.php");
-    	
+
     	$workbook = new MoodleExcelWorkbook("-",'excel5');
-    
+
     	$this->fill_workbook($workbook);
-    
+
     	$workbook->send($filename.'.xls');
     	$workbook->close();
     }
@@ -787,26 +787,26 @@ class MTablePDF extends pdf{
     	require_once($CFG->libdir . "/excellib.class.php");
 
     	$workbook = new MoodleExcelWorkbook("-", 'Excel2007');
-    
+
     	$this->fill_workbook($workbook);
-    
+
     	$workbook->send($filename);
     	$workbook->close();
     }
 
     public function get_ods($filename) {
     	global $CFG;
-    
+
     	require_once($CFG->libdir . "/odslib.class.php");
-    	   	 
+
     	$workbook = new MoodleODSWorkbook("-");
-    
+
     	$this->fill_workbook($workbook);
-    
+
     	$workbook->send($filename.'.ods');
     	$workbook->close();
     }
-    
+
     public function get_csv($filename, $sep = "\t") {
     	$lines = array();
 
@@ -814,12 +814,12 @@ class MTablePDF extends pdf{
     	for($i=0;$i<count($this->header);$i+=2){
     		$lines[] = $this->header[$i] . $sep . $this->header[$i+1];
     	}
-    	 
+
     	// table header
     	$lines[] = join($sep, $this->titles);
-    
+
     	$prev = $this->data[0];
-    	
+
     	// data
     	foreach($this->data as $row){
     		$r = array();
@@ -827,21 +827,21 @@ class MTablePDF extends pdf{
     			if(is_null($cell['data'])){
     				$cell['data'] = $prev[$idx]['data'];
     			}
-    			
+
     			$r[] = $cell['data'];
     			$prev[$idx] = $cell;
     		}
-    		
+
     		$lines[] = join($sep,$r);
     	}
 
     	$filecontent = implode("\n", $lines);
-    	
+
     	if($filename != ''){
     		if(substr($filename,strlen($filename)-4) != ".csv"){
     			$filename .= '.csv';
     		}
-    		 
+
     		$filename = clean_filename($filename);
     	}
 

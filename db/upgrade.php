@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * db/upgrade.php
@@ -556,7 +556,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         // Checkmark savepoint reached.
         upgrade_mod_savepoint(true, 2013112500, 'checkmark');
     }
-    
+
     if ($oldversion < 2014052104) {
         //Upgrade old events
 
@@ -681,7 +681,7 @@ function xmldb_checkmark_upgrade($oldversion) {
                 }
             } else {
                 // Create a New Event for this instance...
-                
+
                 $event = new stdClass();
                 $event->name        = get_string('end_of_submission_for', 'checkmark', $checkmark->name);
                 if (!empty($checkmark->intro)) {

@@ -15,10 +15,9 @@
 // If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * db/tasks.php
+ * classes/task/send_notifications.php
  *
  * @package       mod_checkmark
- * @since         Moodle 2.7
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
  * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
  * @author        Philipp Hager

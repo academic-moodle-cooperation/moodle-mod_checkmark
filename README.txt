@@ -22,7 +22,7 @@
  * @author        Philipp Hager
  * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ */
 
 # ---------------------------------------------------------------
 # Checkmark-Module for Moodle 2.5+
@@ -48,7 +48,7 @@ REQUIREMENTS
 ================================================================================
     Moodle <2.5 or later>
 
-INSTALLATION 
+INSTALLATION
 ================================================================================
    The zip-archive includes the same directory hierarchy as moodle
    So you only have to copy the files to the correspondent place.
