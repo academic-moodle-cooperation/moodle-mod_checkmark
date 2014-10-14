@@ -123,29 +123,21 @@ M.mod_checkmark = {
         this.Y = Y;
         this.dividing_symbol = dividing_symbol;
 
-        var grade_selector = '#grade';
-        var flexiblenaming_selector = "#flexiblenaming";
-        var examplegrades_selector = "#examplegrades";
-        var examplenames_selector = "#examplenames";
-        var examplecount_selector = "#examplecount";
-        if (Y.one(grade_selector) == null) {
-            //compatibility to pre 2.2
-            grade_selector = '#id_grade';
-            flexiblenaming_selector = "#id_flexiblenaming";
-            examplegrades_selector = "#id_examplegrades";
-            examplenames_selector = "#id_examplenames";
-            examplecount_selector = "#id_examplecount";
-        }
+        var type_selector = '#id_modgrade_type';
+        var point_selector = '#id_modgrade_point';
+        var flexiblenaming_selector = "#id_flexiblenaming";
+        var examplegrades_selector = "#id_examplegrades";
+        var examplenames_selector = "#id_examplenames";
+        var examplecount_selector = "#id_examplecount";
         Y.on('change', this.update_settings, flexiblenaming_selector);
+        Y.on('valuechange', this.update_settings, type_selector);
+        Y.on('valuechange', this.valuechange, type_selector);
         Y.on('valuechange', this.update_settings, examplegrades_selector);
         Y.on('valuechange', this.update_settings, examplenames_selector);
         Y.on('valuechange', this.update_settings, examplecount_selector);
         Y.on('blur', this.update_settings, examplegrades_selector);
         Y.on('blur', this.update_settings, examplenames_selector);
         Y.on('blur', this.update_settings, examplecount_selector);
-        //Y.on('change', this.update_settings, grade_selector);
-        //Y.on('keydown', this.stripper, "#id_examplegrades");
-        //Y.on('keypress', this.stripper, "#id_examplegrades");
         Y.on('keyup', this.stripper, examplegrades_selector);
 
         if(M.mod_checkmark.Y.one("input[name=allready_submit]").get('Value') == 'no') {
@@ -166,23 +158,15 @@ M.mod_checkmark = {
         // First we strip everything we don't need!
         M.mod_checkmark.stripper(null);
 
-        var grade_selector = '#grade';
-        var flexiblenaming_selector = '#flexiblenaming';
-        var examplegrades_selector = '#examplegrades';
-        var examplenames_selector = '#examplenames';
-        var examplecount_selector = '#examplecount';
-        if (M.mod_checkmark.Y.one(grade_selector) == null) {
-            // Compatibility to pre 2.2
-            grade_selector = '#id_grade';
-            flexiblenaming_selector = '#id_flexiblenaming';
-            examplegrades_selector = '#id_examplegrades';
-            examplenames_selector = '#id_examplenames';
-            examplecount_selector = '#id_examplecount';
-        }
+        var type_selector = '#id_modgrade_type';
+        var point_selector = '#id_modgrade_point';
+        var flexiblenaming_selector = '#id_flexiblenaming';
+        var examplegrades_selector = '#id_examplegrades';
+        var examplenames_selector = '#id_examplenames';
+        var examplecount_selector = '#id_examplecount';
 
         // If non-numeric scales are used or checkmark isn't graded at all, ignore changes!
-        if ((M.mod_checkmark.Y.one(grade_selector).get('value') == 0)
-            || (M.mod_checkmark.Y.one(grade_selector).get('value') == -1)) {
+        if (M.mod_checkmark.Y.one(type_selector).get('value') != 'point') {
             return true;
         }
         if (M.mod_checkmark.Y.one(flexiblenaming_selector).get('checked')) {
@@ -207,28 +191,17 @@ M.mod_checkmark = {
             gradesum = M.mod_checkmark.Y.one(examplecount_selector).get('value');
         }
 
-        /*
-         * set grade field appropriate to gradesum
-         * first two indices (0,1) are other scales
-         * then it gets counted downward from 100
-         * @todo replace fix index calculation
-         *  with lookup of right value
-         */
-        grade_obj = M.mod_checkmark.Y.one(grade_selector);
-
         if (!M.mod_checkmark.Y.one(flexiblenaming_selector).get('checked')) {
-            if (M.mod_checkmark.Y.one(grade_selector).get('value') % gradesum == 0) {
+            if (M.mod_checkmark.Y.one(point_selector).get('value') % gradesum == 0) {
                 // Grade is integral multiple of gradesum (= examplecount) so everything's fine!
                 return true;
             }
         }
         if ((gradesum <= 100) && (gradesum > 0)) {
-            if (M.mod_checkmark.Y.one(grade_selector.concat(" > [value=\'".concat(gradesum.toString()).concat("\']"))) == null) {
-                M.mod_checkmark.Y.one(grade_selector.concat(" > [value=\'-1\']")).set('selected', true);
-            }
-            M.mod_checkmark.Y.one(grade_selector.concat(" > [value=\'" + gradesum.toString() + "\']")).set('selected', true);
+            M.mod_checkmark.Y.one(type_selector.concat(" > [value=\'point\']")).set('selected', true);
+            M.mod_checkmark.Y.one(point_selector).set('value', gradesum);
         } else if (gradesum < 0) {
-            M.mod_checkmark.Y.one(grade_selector.concat(" > [value=\'-1\']")).set('selected', true);
+            M.mod_checkmark.Y.one(scale_selector.concat(" > [value=\'scale\']")).set('selected', true);
         }
 
         return true;
