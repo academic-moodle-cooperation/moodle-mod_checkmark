@@ -42,25 +42,16 @@ $string['autograde_all'] = 'Alle Abgaben bewerten';
 $string['autograde_custom'] = 'Ausgewählte bewerten';
 $string['autograde_req'] = 'Nichtbewertete bewerten';
 $string['autograde_str'] = 'Automatische Bewertung';
-$string['autograde_str_help'] = 'Die automatische Bewertung berechnet die Noten der Abgaben anhand der Punkte der gekreuzten Beispiele.<br />'.
-                                '<ul><li>Ausgewählte bewerten - hier werden all jene Datensätze bewertet, die links per Häckchen ausgewählt wurden. Falls noch keine Abgabe vorhanden ist,'.
-                                        ' wird eine leere Abgabe hinzugefügt.</li>'.
-                                    '<li>Nichtbewertete Bewerten - hier werden alle Abgaben bewertet, deren Abgabedatum aktueller als die letzte Bewertung ist</li>'.
-                                    '<li>Alle Abgaben bewerten - hier werden alle bereits übermittelten Abgaben bewertet</li></ul><br />'.
-                                    'Die Punkteberechnung erfolgt aufgrund der eingestellten Beispielbewertungen sowie der angekreuzten Beispiele:'.
-                                    '<ul><li>Standard-Bewertungen: hier wird jedes Beispiel gleich gewichtet (ganzzahlige Punkteanzahl pro Beispiel).'.
-                                            ' Die Bewertung ergibt sich aus der Summe der gekreuzten Beispiele multipliziert mit dem Quotienten aus Gesamtbewertung und Beispielanzahl.</li>'.
-                                        '<li>individuelle Beispielgewichtungen: Für die Bewertungsberechnung wird für jedes gekreuzte Beispiel die dem Beispiel zugeordnete Punkteanzahl aufsummiert.</li></ul>';
+$string['autograde_str_help'] = 'Die automatische Bewertung berechnet die Noten der Abgaben anhand der Punkte der gekreuzten Beispiele.<br /><ul><li>Ausgewählte bewerten - hier werden all jene Datensätze bewertet, die links per Häckchen ausgewählt wurden. Falls noch keine Abgabe vorhanden ist, wird eine leere Abgabe hinzugefügt.</li><li>Nichtbewertete Bewerten - hier werden alle Abgaben bewertet, deren Abgabedatum aktueller als die letzte Bewertung ist</li><li>Alle Abgaben bewerten - hier werden alle bereits übermittelten Abgaben bewertet</li></ul><br />Die Punkteberechnung erfolgt aufgrund der eingestellten Beispielbewertungen sowie der angekreuzten Beispiele:<ul><li>Standard-Bewertungen: hier wird jedes Beispiel gleich gewichtet (ganzzahlige Punkteanzahl pro Beispiel). Die Bewertung ergibt sich aus der Summe der gekreuzten Beispiele multipliziert mit dem Quotienten aus Gesamtbewertung und Beispielanzahl.</li><li>individuelle Beispielgewichtungen: Für die Bewertungsberechnung wird für jedes gekreuzte Beispiel die dem Beispiel zugeordnete Punkteanzahl aufsummiert.</li></ul>';
 $string['autograde_strall'] = 'Alle Abgaben';
-$string['autograde_strreq'] = 'Abgaben, die ein Bewertungsupdate benötigen,';
-$string['autograde_stronesubmission'] = '1 Abgabe';
 $string['autograde_strmultiplesubmissions'] = '{$a} Abgaben';
+$string['autograde_stronesubmission'] = '1 Abgabe';
+$string['autograde_strreq'] = 'Abgaben, die ein Bewertungsupdate benötigen,';
 $string['autogradebuttonstitle'] = 'Berechne automatisch Abgaben-Bewertungen f&uuml;r Kreuzerlübung {$a}:';
-$string['autograde_confirm'] = 'Automatische Bewertung erfolgreich!';
+$string['autograde_confirm'] = 'Sie sind dabei {$a} automatisch zu bewerten. Die bisherigen Bewertungen werden überschrieben! Sind Sie SICHER, dass Sie fortfahren wollen?';
 $string['autograde_error'] = 'Ein Fehler ist während der automatischen Bewertung aufgetreten!';
 $string['autograde_failed'] = 'Automatische Bewertung fehlgeschlagen!';
 $string['autograde_success'] = 'Automatische Bewertung erfolgreich! {$a} Abgabenbewertungen wurden aktualisiert.';
-$string['autograde_confirm'] = 'Sie sind dabei {$a} automatisch zu bewerten. Die bisherigen Bewertungen werden überschrieben! Sind Sie SICHER, dass Sie fortfahren wollen?';
 $string['autograde_notsupported'] = 'Diese Notenskala wird von der automatischen Bewertung nicht unterstützt.';
 $string['autograde_no_users_selected'] = 'Sie haben keinen Benutzer zur Bewertung ausgewählt. Wählen Sie die gewünschten Benutzer über die Checkboxen der linken Tabellenspalte aus.';
 $string['autograde_non_numeric_grades'] = 'Die automatische Bewertung benötigt numerische Angaben für die Bewertung. Dies kann in den Instanzeinstellungen sichergestellt werden.';
@@ -141,7 +132,6 @@ $string['str_userid'] = 'Matrikelnummer';
 /*
  * End of Block for checkmark-specific strings
  */
-
 
 /*
  * Block with standard-checkmark-strings (adopted to checkmark)

@@ -42,22 +42,16 @@ $string['autograde_all'] = 'Grade all submissions';
 $string['autograde_custom'] = 'Grade selected users';
 $string['autograde_req'] = 'Grade ungraded';
 $string['autograde_str'] = 'Autograding';
-$string['autograde_str_help'] = 'Autograding calculates users grades according to points per example and checked examples. It adds the points for each checked example and uses this as the users grade.'.
-                                '<ul><li>grade selected users - grades just these users, which are checked in the list. If a user hasn\'t submitted anything, a empty submission get\'s added.</li>'.
-                                    '<li>grade who needs grading - grades every submission which is more up to date than the corresponding grading</li>'.
-                                    '<li>grade all submissions - grades all present submissions (for this instance). Does NOT add empty submissions.</li></ul><br />'.
-                                    'The grade gets calculated based on chosen examplegrades and checked examples:'.
-                                    '<ul><li>standard-grading: here each example is equally weighted (integral grade per example). The grade is calculated by multiplication of the sum of checked examples with the quotient of checkmark-grade and checkmark-count.</li>'.
-                                        '<li>individual example-weights: the grade is the sum of examplegrades for each checked example (according to instance-settings).</li></ul>';
+$string['autograde_str_help'] = 'Autograding calculates users grades according to points per example and checked examples. It adds the points for each checked example and uses this as the users grade. <ul><li>grade selected users - grades just these users, which are checked in the list. If a user hasn\'t submitted anything, a empty submission get\'s added.</li><li>grade who needs grading - grades every submission which is more up to date than the corresponding grading</li><li>grade all submissions - grades all present submissions (for this instance). Does NOT add empty submissions.</li></ul><br />The grade gets calculated based on chosen examplegrades and checked examples:<ul><li>standard-grading: here each example is equally weighted (integral grade per example). The grade is calculated by multiplication of the sum of checked examples with the quotient of checkmark-grade and checkmark-count.</li><li>individual example-weights: the grade is the sum of examplegrades for each checked example (according to instance-settings).</li></ul>';
 $string['autograde_strall'] = 'All submissions';
-$string['autograde_stronesubmission'] = '1 submission';
 $string['autograde_strmultiplesubmissions'] = '{$a} submissions';
+$string['autograde_stronesubmission'] = '1 submission';
 $string['autograde_strreq'] = 'Submissions which require a grade-update';
 $string['autogradebuttonstitle'] = 'Calculate submission-grades for checkmark {$a}';
+$string['autograde_confirm'] = 'You are about to update grades and feedback for {$a}. These will be overwritten!';
+$string['autograde_error'] = 'An error occured during autograding.';
 $string['autograde_failed'] = 'Autograding failed!';
 $string['autograde_success'] = 'Autograde successful! {$a} submissions updated.';
-$string['autograde_error'] = 'An error occured during autograding.';
-$string['autograde_confirm'] = 'You are about to update grades and feedback for {$a}. These will be overwritten!';
 $string['autograde_notsupported'] = 'This scale is not supported by automatic grading.';
 $string['autograde_no_users_selected'] = 'You have not selected any user to grade. Select the required users via the checkboxes in the left column of the table below.';
 $string['autograde_non_numeric_grades'] = 'Autograding requires a numeric maximum grade to be set. This can be configured in instance-settings.';
@@ -99,7 +93,6 @@ $string['numberofexamples'] = 'Number of examples';
 $string['numberofexamples_help'] = 'Examplecount in this checkmark.';
 $string['optimum'] = 'optimum';
 $string['printsettingstitle'] = 'Export settings';
-$string['saveandprevious'] = 'Save and show previous';
 $string['strallononepage'] = 'print all on one page';
 $string['strautograded'] = '[autograded]';
 $string['strexample'] = 'example';
@@ -240,6 +233,7 @@ $string['pagesize_help'] = 'Choose "Optimum" to optimize the distribution of lis
 $string['pdfpagesize'] = 'Submissions shown per page';
 $string['pdfpagesize_help'] = 'Choose "Optimum" to optimize the distribution of list entries according to the chosen textsize and page orientation, if there are plenty of participants registered in your course.';
 $string['popupinnewwindow'] = 'Open in a popup window';
+$string['posintst100required'] = 'Has to be an integral in the intervall [0,100] (0 <= X <= 100)';
 $string['posintrequired'] = 'Needs to be greater than zero (> 0) and integral';
 $string['pluginadministration'] = 'Checkmark administration';
 $string['pluginname'] = 'Checkmark';
