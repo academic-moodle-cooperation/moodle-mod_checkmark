@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * version.php
@@ -29,7 +29,10 @@
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$module->version  = 2014101300;
-$module->release   = "2014-10-13";      // User-friendly version number!
-$module->maturity  = MATURITY_STABLE;
-$module->requires = 2013051400.03;      // Requires this Moodle version!
+defined('MOODLE_INTERNAL') || die();
+
+$plugin->version   = 2014101400;
+$plugin->release   = "2014-10-14";       // User-friendly version number!
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->requires  = 2014041100;         // Requires this Moodle version!
+$plugin->component = 'mod_checkmark';    // To check on upgrade, that module sits in correct place.
