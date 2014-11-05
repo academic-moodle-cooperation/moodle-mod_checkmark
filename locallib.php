@@ -4384,17 +4384,17 @@ EOS;
     public function isopen() {
         $time = time();
 
-        if (!$this->checkmark->timeavailable) {
-            if (!$this->checkmark->cutoffdate) {
-                return ($this->checkmark->timeavailable <= $time);
-            } else {
-                return ($this->checkmark->timeavailable <= $time && $time <= $this->checkmark->cutoffdate);
-            }
-        } else {
-            if (!$this->checkmark->cutoffdate) {
+        if (empty($this->checkmark->timeavailable)) {
+            if (empty($this->checkmark->cutoffdate)) {
                 return true;
             } else {
                 return ($time <= $this->checkmark->cutoffdate);
+            }
+        } else {
+            if (empty($this->checkmark->cutoffdate)) {
+                return ($this->checkmark->timeavailable <= $time);
+            } else {
+                return (($this->checkmark->timeavailable <= $time) && ($time <= $this->checkmark->cutoffdate));
             }
         }
     }
