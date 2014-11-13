@@ -871,8 +871,9 @@ class checkmark {
             $grades = explode(self::DELIMITER, $data['examplegrades']);
             $names = explode(self::DELIMITER, $data['examplenames']);
             if (count($grades) != count($names)) {
+                $a = new stdClass();
                 $a->gradecount = count($grades);
-                $a->namecount = count($names);
+                $a->namecount  = count($names);
                 $errors['examplegrades'] = get_string('count_individuals_mismatch', 'checkmark',
                                                       $a);
                 $errors['examplenames'] = get_string('count_individuals_mismatch', 'checkmark', $a);
@@ -891,6 +892,7 @@ class checkmark {
                 } else {
                     $errors['examplegrades'] .= '<br />';
                 }
+                $a = new stdClass();
                 $a->gradesum = $gradesum;
                 $a->maxgrade = $data['grade'];
                 $errors['grade'] = get_string('gradesum_mismatch', 'checkmark', $a);
