@@ -1128,6 +1128,13 @@ class checkmark {
                     // For fast grade, we need to check if any changes take place!
                     $updatedb = false;
 
+                    if (!array_key_exists($id, $oldgrades)) {
+                        $oldgrades[$id] = null;
+                    }
+                    if (!array_key_exists($id, $oldcomments)) {
+                        $oldcomments[$id] = null;
+                    }
+
                     if ($grading) {
                         $grade = $grades[$id];
                         $updatedb = $updatedb || ($oldgrades[$id] != $grade);
