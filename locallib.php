@@ -2395,16 +2395,16 @@ class checkmark {
                 if (isset($SESSION->checkmark->orderdirection)
                     && $SESSION->checkmark->orderdirection == 'DESC') {
                     $groupselect = 'MAX(grps.name)';
-                    $grouporder = ' ORDER BY grps.name '.$SESSION->checkmark->orderdirection;
+                    $grouporder = ' ORDER BY MAX(grps.name) '.$SESSION->checkmark->orderdirection;
                 } else {
                     $groupselect = 'MIN(grps.name)';
-                    $grouporder = ' ORDER BY grps.name ASC';
+                    $grouporder = ' ORDER BY MIN(grps.name) ASC';
                 }
             } else {
                 $groupselect = 'MIN(grps.name)';
-                $grouporder = ' ORDER BY grps.name ASC';
+                $grouporder = ' ORDER BY MIN(grps.name) ASC';
             }
-            $getgroupsql = 'SELECT grps.courseid, '.$groupselect;
+            $getgroupsql = 'SELECT MAX(grps.courseid), '.$groupselect;
             $params['courseid'] = $this->course->id;
             $getgroupsql .= ' AS groups, grpm.userid AS userid
                          FROM {groups_members} grpm
@@ -2902,7 +2902,7 @@ class checkmark {
         if (($filter == self::FILTER_SELECTED) || ($filter == self::FILTER_ALL)) {
             $sql = 'SELECT u.id FROM {user} u '.
                    'JOIN ('.$esql.') eu ON eu.id=u.id '.
-                   'WHERE 1'.$sqluserids;
+                   'WHERE 1=1'.$sqluserids;
         } else {
             $wherefilter = '';
             if ($filter == self::FILTER_SUBMITTED) {
@@ -3078,16 +3078,16 @@ class checkmark {
                 if (isset($SESSION->checkmark->orderdirection)
                     && $SESSION->checkmark->orderdirection == 'DESC') {
                     $groupselect = 'MAX(grps.name)';
-                    $grouporder = ' ORDER BY grps.name '.$SESSION->checkmark->orderdirection;
+                    $grouporder = ' ORDER BY MAX(grps.name) '.$SESSION->checkmark->orderdirection;
                 } else {
                     $groupselect = 'MIN(grps.name)';
-                    $grouporder = ' ORDER BY grps.name ASC';
+                    $grouporder = ' ORDER BY MIN(grps.name) ASC';
                 }
             } else {
                 $groupselect = 'MIN(grps.name)';
-                $grouporder = ' ORDER BY grps.name ASC';
+                $grouporder = ' ORDER BY MIN(grps.name) ASC';
             }
-            $getgroupsql = 'SELECT grps.courseid, '.$groupselect;
+            $getgroupsql = 'SELECT MAX(grps.courseid), '.$groupselect;
             $params['courseid'] = $this->course->id;
             $getgroupsql .= ' AS groups, grpm.userid AS userid
                          FROM {groups_members} grpm
@@ -3104,19 +3104,21 @@ class checkmark {
 
         if (!empty($users)) {
             $useridentityfields = get_extra_user_fields_sql($context, 'u');
+            $examplecount = count($this->checkmark->examples);
+            $params['examplecount'] = $examplecount;
+
             $select = 'SELECT '.$ufields.' '.$useridentityfields.',
-                              s.id AS submissionid, s.grade, s.submissioncomment as comment,
-                              s.timemodified, s.timemarked,
-                              100 * COUNT( DISTINCT cchks.id ) / COUNT( DISTINCT gchks.id ) AS summary,
-                              COUNT( DISTINCT gchks.id ) AS maxchecks, COUNT( DISTINCT cchks.id ) AS checks';
+                              MAX(s.id) AS submissionid, MAX(s.grade) AS grade, MAX(s.submissioncomment) AS comment,
+                              MAX(s.timemodified) AS timemodified, MAX(s.timemarked) AS timemarked,
+                              100 * COUNT( DISTINCT cchks.id ) / :examplecount AS summary,
+                              COUNT( DISTINCT cchks.id ) AS checks';
             if ($groupmode != NOGROUPS) {
-                    $select .= ', groups ';
+                    $select .= ', MAX(groups) ';
             }
             $params['checkmarkid'] = $this->checkmark->id;
 
             list($sqluserids, $userparams) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'user');
             $params = array_merge_recursive($params, $userparams);
-
             $sql = '     FROM {user} AS u '.
                    'LEFT JOIN {checkmark_submissions} AS s ON u.id = s.userid
                                                       AND s.checkmarkid = :checkmarkid
@@ -3124,10 +3126,10 @@ class checkmark {
                     LEFT JOIN {checkmark_checks} AS cchks ON cchks.submissionid = s.id AND cchks.state = 1 '.
                    $groupssql.
                    '    WHERE '.$where.'u.id '.$sqluserids.'
-                     GROUP BY u.id';
+                     GROUP BY u.id, '.$ufields.' '.$useridentityfields;
 
             if (isset($SESSION->checkmark->orderby)) {
-                $sort = ' ORDER BY '.$SESSION->checkmark->orderby;
+                $sort = ' ORDER BY MAX('.$SESSION->checkmark->orderby.')';
                 if (isset($SESSION->checkmark->orderdirection)
                         && ($SESSION->checkmark->orderdirection == 'DESC')) {
                     $sort .= ' DESC';
@@ -3158,7 +3160,7 @@ class checkmark {
                 foreach ($ausers as $auser) {
                     $row = array();
                     // Calculate user status!
-                    $auser->status = ($auser->timemarked > 0)
+                    $auser->status = !empty($auser->timemarked) && ($auser->timemarked > 0)
                                      && ($auser->timemarked >= $auser->timemodified);
 
                     if (empty($dataonly)) {
@@ -3269,11 +3271,11 @@ class checkmark {
                         if (!$this->column_is_hidden('summary') && (!empty($sumabs) || !empty($sumrel))) {
                             if (!empty($sumabs) && !empty($sumrel)) {
                                 // Both values!
-                                $summary = $auser->checks.'/'.$auser->maxchecks.' ('.
+                                $summary = $auser->checks.'/'.$examplecount.' ('.
                                            round($auser->summary, 2).'%)';
                             } else if (!empty($sumabs)) {
                                 // Summary abs!
-                                $summary = $auser->checks.'/'.$auser->maxchecks;
+                                $summary = $auser->checks.'/'.$examplecount;
                             } else {
                                 // Summary rel!
                                 $summary = round($auser->summary, 2).'%';
@@ -3353,11 +3355,11 @@ class checkmark {
                         if (!$this->column_is_hidden('summary') && (!empty($sumabs) || !empty($sumrel))) {
                             if (!empty($sumabs) && !empty($sumrel)) {
                                 // Both values!
-                                $summary = $auser->checks.'/'.$auser->maxchecks.' ('.
+                                $summary = $auser->checks.'/'.$examplecount.' ('.
                                            round($auser->summary, 2).'%)';
                             } else if (!empty($sumabs)) {
                                 // Summary abs!
-                                $summary = $auser->checks.'/'.$auser->maxchecks;
+                                $summary = $auser->checks.'/'.$examplecount;
                             } else {
                                 // Summary rel!
                                 $summary = round($auser->summary, 2).'%';
