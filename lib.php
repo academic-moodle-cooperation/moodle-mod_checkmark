@@ -106,8 +106,6 @@ function checkmark_delete_instance($id) {
 
 /**
  * Updates a checkmark instance
- *
- * This is done by calling the update_instance() method
  */
 function checkmark_update_instance($checkmark) {
     global $COURSE, $CFG, $OUTPUT, $DB;
@@ -124,6 +122,9 @@ function checkmark_update_instance($checkmark) {
 
     $checkmark->id = $checkmark->instance;
 
+    if ($checkmark->allready_submit != 'yes') {
+        unset($checkmark->grade);
+    }
     $DB->update_record('checkmark', $checkmark);
 
     if ($checkmark->allready_submit != 'yes') {
@@ -172,8 +173,14 @@ function checkmark_update_instance($checkmark) {
                                            'instance'   => $checkmark->id));
     }
 
-    // Get existing grade item!
-    checkmark_grade_item_update($checkmark);
+    if ($checkmark->allready_submit != 'yes') {
+        /*
+         * We won't change the grades after someone submitted already - otherwise he/she would
+         * have submitted with other informations than displayed
+         */
+        // Get existing grade item!
+        checkmark_grade_item_update($checkmark);
+    }
 
     if (! $cm = get_coursemodule_from_instance('checkmark', $checkmark->id)) {
         echo $OUTPUT->notification('invalidinstance('.$checkmark->id.')', 'notifyproblem');
@@ -273,7 +280,11 @@ function checkmark_update_examples($checkmark) {
     if (empty($checkmark->flexiblenaming)) {
         // Standard-naming.
         $i = $checkmark->examplestart;
-        $grade = $checkmark->grade / $checkmark->examplecount;
+        if ($checkmark->grade >= 0) {
+            $grade = $checkmark->grade / $checkmark->examplecount;
+        } else {
+            $grade = 0;
+        }
         // First we go through the old examples.
         while ($example = current($examples)) {
             if ($i < $checkmark->examplestart + $checkmark->examplecount) {

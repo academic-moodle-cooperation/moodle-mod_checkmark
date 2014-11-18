@@ -104,17 +104,6 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $cm = empty($update) ? null : get_coursemodule_from_id('', $update, 0, false, MUST_EXIST);
         $submissioncount = empty($update) ? 0 : checkmark_count_real_submissions($cm);
 
-        if ($submissioncount) {
-            $mform->addElement('hidden', 'allready_submit', 'yes');
-        } else {
-            $mform->addElement('hidden', 'allready_submit', 'no');
-        }
-        $mform->setType('allready_submit', PARAM_ALPHA);
-
-        // Disable manual grading settings if submissions are present!
-        $mform->disabledIf('grade', 'allready_submit', 'eq', 'yes');
-        $mform->disabledIf('gradecat', 'allready_submit', 'eq', 'yes');
-
         $ynoptions = array( 0 => get_string('no'), 1 => get_string('yes'));
 
         $mform->addElement('select', 'resubmit', get_string('allowresubmit', 'checkmark'),
@@ -137,7 +126,6 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->setType('examplecount', PARAM_RAW);
         $mform->addHelpButton('examplecount', 'numberofexamples', 'checkmark');
         $mform->disabledIf('examplecount', 'flexiblenaming', 'checked');
-        $mform->disabledIf('examplecount', 'allready_submit', 'eq', 'yes');
         if (isset($CFG->checkmark_stdexamplecount)) {
             $mform->setDefault('examplecount', $CFG->checkmark_stdexamplecount);
         } else {
@@ -149,7 +137,6 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->setType('examplestart', PARAM_RAW);
         $mform->addHelpButton('examplestart', 'firstexamplenumber', 'checkmark');
         $mform->disabledIf('examplestart', 'flexiblenaming', 'checked');
-        $mform->disabledIf('examplestart', 'allready_submit', 'eq', 'yes');
         if (isset($CFG->checkmark_stdexamplestart)) {
             $mform->setDefault('examplestart', $CFG->checkmark_stdexamplestart);
         } else {
@@ -161,7 +148,6 @@ class mod_checkmark_mod_form extends moodleform_mod {
                            array('id' => 'id_flexiblenaming'));
         $mform->addHelpButton('flexiblenaming', 'flexiblenaming', 'checkmark');
 
-        $mform->disabledIf('flexiblenaming', 'allready_submit', 'eq', 'yes');
         $mform->setAdvanced('flexiblenaming');
 
         $mform->addElement('text', 'examplenames',
@@ -176,7 +162,6 @@ class mod_checkmark_mod_form extends moodleform_mod {
         }
 
         $mform->disabledIf('examplenames', 'flexiblenaming', 'notchecked');
-        $mform->disabledIf('examplenames', 'allready_submit', 'eq', 'yes');
         $mform->setAdvanced('examplenames');
 
         $mform->addElement('text', 'examplegrades',
@@ -191,7 +176,6 @@ class mod_checkmark_mod_form extends moodleform_mod {
             $mform->setDefault('examplegrades', '10,10,10,10,10,10,10,10,10,10');
         }
         $mform->disabledIf('examplegrades', 'flexiblenaming', 'notchecked');
-        $mform->disabledIf('examplegrades', 'allready_submit', 'eq', 'yes');
         $mform->setAdvanced('examplegrades');
 
         $coursecontext = context_course::instance($COURSE->id);
@@ -200,6 +184,19 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $this->standard_grading_coursemodule_elements();
 
         $this->standard_coursemodule_elements();
+
+        if ($submissioncount) {
+            $mform->freeze('grade');
+            $mform->freeze('examplecount');
+            $mform->freeze('examplestart');
+            $mform->freeze('flexiblenaming');
+            $mform->freeze('examplenames');
+            $mform->freeze('examplegrades');
+            $mform->addElement('hidden', 'allready_submit', 'yes');
+        } else {
+            $mform->addElement('hidden', 'allready_submit', 'no');
+        }
+        $mform->setType('allready_submit', PARAM_ALPHA);
 
         $this->add_action_buttons();
     }

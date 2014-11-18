@@ -1365,7 +1365,7 @@ class checkmark {
         // Cache scales for each checkmark - they might have different scales!
         static $scalegrades = array();
 
-        if ($this->checkmark->grade >= 0) {    // Normal number?
+        if ($this->checkmark->grade > 0) {    // Normal number?
             if ($grade == -1) {
                 return '-';
             } else {
