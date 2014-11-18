@@ -939,6 +939,7 @@ class checkmark {
      * @param string $mode Specifies the kind of teacher interaction taking place
      */
     public function submissions($mode) {
+        global $SESSION;
         /*
          * The main switch is changed to facilitate
          *     1) Batch fast grading
@@ -953,15 +954,20 @@ class checkmark {
 
         if (optional_param('next', null, PARAM_BOOL)) {
             $mode = 'next';
-        }
-        if (optional_param('previous', null, PARAM_BOOL)) {
+        } else if (optional_param('previous', null, PARAM_BOOL)) {
             $mode = 'previous';
-        }
-        if (optional_param('saveandnext', null, PARAM_BOOL)) {
+        } else if (optional_param('saveandnext', null, PARAM_BOOL)) {
             $mode = 'saveandnext';
-        }
-        if (optional_param('saveandprevious', null, PARAM_BOOL)) {
+        } else if (optional_param('saveandprevious', null, PARAM_BOOL)) {
             $mode = 'saveandprevious';
+        } else if (optional_param('autograde_all_submit', null, PARAM_BOOL)) {
+            $mode = self::FILTER_ALL;
+        } else if (optional_param('autograde_req_submit', null, PARAM_BOOL)) {
+            $mode = self::FILTER_REQUIRE_GRADING;
+        } else if (optional_param('autograde_custom_submit', null, PARAM_BOOL)) {
+            $mode = self::FILTER_SELECTED;
+        } else {
+            $mode = optional_param('mode', 'all', PARAM_ALPHANUM);
         }
 
         // This is no security check, this just tells us if there is posted data!
@@ -986,6 +992,92 @@ class checkmark {
                 }
                 break;
 
+            case self::FILTER_SELECTED:
+            case self::FILTER_REQUIRE_GRADING:
+            case self::FILTER_ALL:
+                $autograde = $mode;
+                if (($autograde != null) && !optional_param('confirm', 0, PARAM_BOOL)) {
+                    $PAGE->set_title(format_string($this->checkmark->name, true));
+                    $PAGE->set_heading($this->course->fullname);
+                    if ($autograde == self::FILTER_SELECTED) {
+                        $selected = optional_param_array('selected', array(), PARAM_INT);
+                        if (!isset($SESSION->checkmark)) {
+                            $SESSION->checkmark = new stdClass();
+                        }
+                        if (!isset($SESSION->checkmark->autograde)) {
+                            $SESSION->checkmark->autograde = new stdClass();
+                        }
+                        $SESSION->checkmark->autograde->selected = $selected;
+                    }
+                    switch ($autograde) {
+                        case self::FILTER_SELECTED:
+                            if (count($selected) == 1) {
+                                $amount = get_string('autograde_stronesubmission', 'checkmark');
+                            } else {
+                                $amount = get_string('autograde_strmultiplesubmissions', 'checkmark',
+                                                     count($selected));
+                            }
+                            break;
+                        case self::FILTER_REQUIRE_GRADING:
+                            $amount = get_string('autograde_strreq', 'checkmark');
+                            break;
+                        default:
+                        case self::FILTER_ALL:
+                            $amount = get_string('autograde_strall', 'checkmark');
+                            break;
+                    }
+                    if (isset($selected) && (count($selected) == 0)) {
+                        if (!isset($message)) {
+                            $message = '';
+                        } else {
+                            $message .= html_writer::empty_tag('br');
+                        }
+
+                        $message .= $OUTPUT->notification(get_string('autograde_no_users_selected',
+                                                                     'checkmark'),
+                                                         'notifyproblem');
+                    } else if (($this->checkmark->grade <= 0)) {
+                        // No autograde possible if no numeric grades are selected!
+                        $message .= $OUTPUT->notification(get_string('autograde_non_numeric_grades',
+                                                                     'checkmark'),
+                                                         'notifyproblem');
+                    } else {
+                        echo $OUTPUT->header();
+                        $confirmboxcontent = $OUTPUT->confirm(get_string('autograde_confirm', 'checkmark',
+                                                                         $amount),
+                                                              'submissions.php?id='.$this->cm->id.'&mode='.
+                                                              $autograde.'&confirm=1', 'submissions.php?id='.$this->cm->id);
+                        echo $OUTPUT->box($confirmboxcontent, 'generalbox');
+                        echo $OUTPUT->footer();
+                        exit;
+                    }
+                } else if ( $autograde != null) {
+                    if (($this->checkmark->grade <= 0)) {
+                        // No autograde possible if no numeric grades are selected!
+                        $message .= $OUTPUT->notification(get_string('autograde_non_numeric_grades',
+                                                                     'checkmark'),
+                                                         'notifyproblem');
+                    } else if (has_capability('mod/checkmark:grade', context_module::instance($this->cm->id))) {
+                        $result = $this->autograde_submissions($autograde);
+                        if (!isset($message)) {
+                            $message = '';
+                        } else {
+                            $message .= html_writer::empty_tag('br');
+                        }
+                        if ($result['status'] == GRADE_UPDATE_OK) {
+                            $message .= $OUTPUT->notification(get_string('autograde_success', 'checkmark',
+                                                                         $result['updated']),
+                                                              'notifysuccess');
+                        } else {
+                            $message .= $OUTPUT->notification(get_string('autograde_failed', 'checkmark'),
+                                                              'notifyproblem');
+                        }
+                    } else {
+                        print_error('autogradegrade_error', 'checkmark');
+                    }
+                }
+                $this->display_submissions($message);
+                break;
             case 'all':                          // Main window, display everything!
                 $this->display_submissions();
                 break;
@@ -995,13 +1087,21 @@ class checkmark {
                 $grading    = false;
                 $commenting = false;
                 $col        = false;
-                if (isset($_POST['submissioncomment'])) {
+
+                $grades = optional_param_array('menu', array(), PARAM_INT);
+                $comments = optional_param_array('submissioncomment', array(), PARAM_TEXT);
+                $oldgrades = optional_param_array('oldgrade', array(), PARAM_INT);
+                $oldcomments = optional_param_array('oldcomment', array(), PARAM_TEXT);
+
+                if (!empty($comments)) {
                     $col = 'submissioncomment';
                     $commenting = true;
+                    $ids = array_keys($comments);
                 }
-                if (isset($_POST['menu'])) {
+                if (!empty($grades)) {
                     $col = 'menu';
                     $grading = true;
+                    $ids = array_keys($grades);
                 }
 
                 if (!(data_submitted() && confirm_sesskey())) {
@@ -1013,10 +1113,7 @@ class checkmark {
                     $this->display_submissions();
                     break;
                 }
-
-                foreach ($_POST[$col] as $id => $unusedvalue) {
-
-                    $id = (int)$id; // Clean parameter name!
+                foreach ($ids as $id) {
 
                     $this->process_outcomes($id);
 
@@ -1032,8 +1129,8 @@ class checkmark {
                     $updatedb = false;
 
                     if ($grading) {
-                        $grade = $_POST['menu'][$id];
-                        $updatedb = $updatedb || ($_POST['oldgrade'.$id] != $grade);
+                        $grade = $grades[$id];
+                        $updatedb = $updatedb || ($oldgrades[$id] != $grade);
                         $submission->grade = $grade;
                     } else {
                         if (!$newsubmission) {
@@ -1041,8 +1138,8 @@ class checkmark {
                         }
                     }
                     if ($commenting) {
-                        $commentvalue = trim($_POST['submissioncomment'][$id]);
-                        $updatedb = $updatedb || (trim($_POST['oldcomment'.$id]) != $commentvalue);
+                        $commentvalue = trim($comments[$id]);
+                        $updatedb = $updatedb || (trim($oldcomments[$id]) != $commentvalue);
                         $submission->submissioncomment = $commentvalue;
                     } else {
                         unset($submission->submissioncomment);  // Don't need to update this.
@@ -2027,104 +2124,6 @@ class checkmark {
 
         $tabs[] = $row;
 
-        $autograde = optional_param('autograde', null, PARAM_INT);
-
-        if (($autograde != null) && !isset($_POST['confirm'])) {
-            $PAGE->set_title(format_string($this->checkmark->name, true));
-            $PAGE->set_heading($this->course->fullname);
-
-            if ($autograde == self::FILTER_SELECTED) {
-                $selected = array();
-                // We shall not access $_POST directly @todo YOU shall not access $_POST directly!
-                // @todo solution with required_param_array()?!?
-                foreach ($_POST as $idx => $var) {
-                    if ($var == 'selected') {
-                        // This uses params like 'selecteduser[ID]'!
-                        $usrid = substr($idx, 13);
-                        array_push($selected, $usrid);
-                    }
-                }
-                if (!isset($SESSION->checkmark)) {
-                    $SESSION->checkmark = new stdClass();
-                }
-                if (!isset($SESSION->checkmark->autograde)) {
-                    $SESSION->checkmark->autograde = new stdClass();
-                }
-                $SESSION->checkmark->autograde->selected = $selected;
-            }
-
-            switch ($autograde) {
-                case self::FILTER_SELECTED:
-                    if (count($selected) == 1) {
-                        $amount = get_string('autograde_stronesubmission', 'checkmark');
-                    } else {
-                        $amount = get_string('autograde_strmultiplesubmissions', 'checkmark',
-                                             count($selected));
-                    }
-                    break;
-                case self::FILTER_REQUIRE_GRADING:
-                    $amount = get_string('autograde_strreq', 'checkmark');
-                    break;
-                default:
-                case self::FILTER_ALL:
-                    $amount = get_string('autograde_strall', 'checkmark');
-                    break;
-            }
-
-            if (isset($selected) && (count($selected) == 0)) {
-                if (!isset($message)) {
-                    $message = '';
-                } else {
-                    $message .= html_writer::empty_tag('br');
-                }
-                // We've got to overwrite the checkboxstate otherwise it would toggle now!
-                unset($_POST['checkbox_controller1']);
-
-                $message .= $OUTPUT->notification(get_string('autograde_no_users_selected',
-                                                             'checkmark'),
-                                                 'notifyproblem');
-            } else if (($this->checkmark->grade <= 0)) {
-                // No autograde possible if no numeric grades are selected!
-                $message .= $OUTPUT->notification(get_string('autograde_non_numeric_grades',
-                                                             'checkmark'),
-                                                 'notifyproblem');
-            } else {
-                echo $OUTPUT->header();
-                $confirmboxcontent = $OUTPUT->confirm(get_string('autograde_confirm', 'checkmark',
-                                                                 $amount),
-                                                      'submissions.php?id='.$id.'&autograde='.
-                                                      $autograde.'&confirm=1', 'submissions.php?id='.$id);
-                echo $OUTPUT->box($confirmboxcontent, 'generalbox');
-                echo $OUTPUT->footer();
-                exit;
-            }
-
-        } else if ( $autograde != null) {
-            if (($this->checkmark->grade <= 0)) {
-                // No autograde possible if no numeric grades are selected!
-                $message .= $OUTPUT->notification(get_string('autograde_non_numeric_grades',
-                                                             'checkmark'),
-                                                 'notifyproblem');
-            } else if (has_capability('mod/checkmark:grade', context_module::instance($this->cm->id))) {
-                $result = $this->autograde_submissions($autograde);
-                if (!isset($message)) {
-                    $message = '';
-                } else {
-                    $message .= html_writer::empty_tag('br');
-                }
-                if ($result['status'] == GRADE_UPDATE_OK) {
-                    $message .= $OUTPUT->notification(get_string('autograde_success', 'checkmark',
-                                                                 $result['updated']),
-                                                      'notifysuccess');
-                } else {
-                    $message .= $OUTPUT->notification(get_string('autograde_failed', 'checkmark'),
-                                                      'notifyproblem');
-                }
-            } else {
-                print_error('autogradegrade_error', 'checkmark');
-            }
-        }
-
         $outputtabs = print_tabs($tabs, $currenttab, $inactive, $activetwo, true);
 
         switch ($currenttab) {
@@ -2161,7 +2160,7 @@ class checkmark {
 
         $updatepref = optional_param('updatepref', 0, PARAM_INT);
 
-        if (isset($_POST['updatepref'])) {
+        if (!empty($updatepref)) {
             $perpage = optional_param('perpage', 10, PARAM_INT);
             $perpage = ($perpage <= 0) ? 10 : $perpage;
             $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
@@ -2472,8 +2471,8 @@ class checkmark {
                         // Calculate user status!
                         $auser->status = ($auser->timemarked > 0)
                                          && ($auser->timemarked >= $auser->timemodified);
-                        $selecteduser = html_writer::checkbox('selectedeuser'.$auser->id,
-                                                              'selected', $selectstate, null,
+                        $selecteduser = html_writer::checkbox('selected[]',
+                                                              $auser->id, $selectstate, null,
                                                               array('class' => 'checkboxgroup1'));
                         $picture = $OUTPUT->user_picture($auser);
 
@@ -2556,7 +2555,7 @@ class checkmark {
                                                             array(-1 => get_string('nograde')),
                                                             $attributes);
                                 $oldgradeattr = array('type'  => 'hidden',
-                                                      'name'  => 'oldgrade'.$auser->id,
+                                                      'name'  => 'oldgrade['.$auser->id.']',
                                                       'value' => $auser->grade);
                                 $oldgrade = html_writer::empty_tag('input', $oldgradeattr);
                                 $grade = html_writer::tag('div', $menu.$oldgrade,
@@ -2573,7 +2572,7 @@ class checkmark {
                                                             array('id' => 'com'.$auser->id));
                             } else if ($quickgrade) {
                                 $inputarr = array('type'  => 'hidden',
-                                                  'name'  => 'oldcomment'.$auser->id,
+                                                  'name'  => 'oldcomment['.$auser->id.']',
                                                   'value' => trim($auser->submissioncomment));
                                 $oldcomment = html_writer::empty_tag('input', $inputarr);
                                 $content = html_writer::tag('textarea', $auser->submissioncomment,
@@ -3944,11 +3943,19 @@ class checkmark {
         }
 
         $selectvalue = optional_param('checkbox_controller'.$groupid, null, PARAM_INT);
-
-        if ($selectvalue == 0 || is_null($selectvalue)) {
-            $newselectvalue = 1;
+        // We need this only if JS is deactivated...
+        if (optional_param('nosubmit_checkbox_controller'.$groupid, null, PARAM_BOOL)) {
+            if (empty($selectvalue)) {
+                $newselectvalue = 1;
+            } else {
+                $newselectvalue = 0;
+            }
         } else {
-            $newselectvalue = 0;
+            if ($selectvalue == null) {
+                $newselectvalue = $origval;
+            } else {
+                $newselectvalue = $selectvalue;
+            }
         }
 
         $hiddenstate = html_writer::empty_tag('input',

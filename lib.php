@@ -1162,6 +1162,8 @@ function checkmark_print_overview($courses, &$htmlarray) {
         return;
     }
 
+    require_once($CFG->libdir.'/gradelib.php');
+
     $checkmarkids = array();
     $closedids = array();
     $overids = array();

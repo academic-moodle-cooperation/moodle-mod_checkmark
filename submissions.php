@@ -32,7 +32,7 @@ require_once($CFG->libdir.'/plagiarismlib.php');
 
 $id   = optional_param('id', 0, PARAM_INT);          // Course module ID
 $a    = optional_param('a', 0, PARAM_INT);           // checkmark ID
-$mode = optional_param('mode', 'all', PARAM_ALPHA);  // What mode are we in?
+$mode = optional_param('mode', 'all', PARAM_ALPHANUM);  // What mode are we in?
 $download = optional_param('download' , 'none', PARAM_ALPHA); // ZIP download asked for?
 
 $url = new moodle_url('/mod/checkmark/submissions.php');
@@ -74,17 +74,6 @@ $checkmarkinstance = new checkmark($cm->id, $checkmark, $cm, $course);
 
 if ($mode !== 'all') {
     $url->param('mode', $mode);
-}
-
-if (isset($_POST['autograde_all_submit'])) {
-    $mode = 'all';
-    $_POST['autograde'] = checkmark::FILTER_ALL;
-} else if (isset($_POST['autograde_req_submit'])) {
-    $mode = 'all';
-    $_POST['autograde'] = checkmark::FILTER_REQUIRE_GRADING;
-} else if (isset($_POST['autograde_custom_submit'])) {
-    $mode = 'all';
-    $_POST['autograde'] = checkmark::FILTER_SELECTED;
 }
 
 if ($download == 'zip') {
