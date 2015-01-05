@@ -11,12 +11,6 @@
  */
 
 /** General Styles **/
-.path-mod-checkmark .userpicture,.path-mod-checkmark .picture.user,.path-mod-checkmark .picture.teacher
-    {
-    width: 35px;
-    height: 35px;
-    vertical-align: top;
-}
 
 .path-mod-checkmark .feedback .files,.path-mod-checkmark .feedback .grade,.path-mod-checkmark .feedback .outcome,.path-mod-checkmark .feedback .finalgrade
     {
