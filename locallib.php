@@ -262,6 +262,20 @@ class checkmark {
         $context = context_module::instance($this->cm->id);
         require_capability('mod/checkmark:view', $context);
 
+        /* TRIGGER THE VIEW EVENT */
+        $event = \mod_checkmark\event\course_module_viewed::create(array(
+            'objectid' => $this->cm->instance,
+            'context'  => context_module::instance($this->cm->id),
+            'other'    => array(
+                'name' => $this->checkmark->name,
+            ),
+        ));
+        $event->add_record_snapshot('course', $this->course);
+        // In the next line you can use $PAGE->activityrecord if you have set it, or skip this line if you don't have a record.
+        $event->add_record_snapshot($PAGE->cm->modname, $this->checkmark);
+        $event->trigger();
+        /* END OF VIEW EVENT */
+
         $submission = $this->get_submission($USER->id, false);
 
         // Guest can not submit nor edit an checkmark (bug: 4604)!
@@ -295,7 +309,6 @@ class checkmark {
         }
 
         if ($editmode) {
-
             // Prepare form and process submitted data!
             $mform = new checkmark_submission_form(null, $data);
 
@@ -321,17 +334,13 @@ class checkmark {
 
                 $this->email_teachers($submission);
 
-                add_to_log($this->course->id, 'checkmark', 'update submission',
-                           'view.php?a='.$this->checkmark->id, $this->checkmark->id,
-                           $this->cm->id);
+                // Trigger the event!
+                \mod_checkmark\event\submission_updated::create_from_object($this->cm, $submission)->trigger();
 
                 // Redirect to get updated submission date!
                 redirect(new moodle_url($PAGE->url, array('id' => $this->cm->id, 'saved' => 1)));
             }
         }
-
-        add_to_log($this->course->id, 'checkmark', 'view', 'view.php?id='.$this->cm->id,
-                   $this->checkmark->id, $this->cm->id);
 
         // Print header, etc. and display form if needed!
         if ($editmode) {
@@ -783,8 +792,9 @@ class checkmark {
                 $DB->update_record('checkmark_submissions', $submission);
                 $result['updated']++;
                 $url = 'submissions.php?id='.$this->cm->id.'&autograde=1&autograde_filter='.$filter;
-                add_to_log($this->course->id, 'checkmark', 'update grades', $url,
-                           'autograding '.$currentuser->id, $this->cm->id);
+                // Trigger the event!
+                \mod_checkmark\event\grade_updated::automatic($this->cm, array('userid'       => $currentuser->id,
+                                                                               'submissionid' => $submission->id))->trigger();
             }
 
             if (!empty($grades)) {
@@ -1063,11 +1073,9 @@ class checkmark {
                         // Trigger grade event!
                         $this->update_grade($submission);
 
-                        // Add to log only if updating!
-                        add_to_log($this->course->id, 'checkmark', 'update grades',
-                                   'submissions.php?id='.$this->cm->id.'&user='.
-                                   $submission->userid,
-                                   $submission->userid, $this->cm->id);
+                        // Trigger the event!
+                        \mod_checkmark\event\grade_updated::manual($this->cm, array('userid'       => $submission->userid,
+                                                                                    'submissionid' => $submission->id))->trigger();
                     }
 
                 }
@@ -1943,6 +1951,9 @@ class checkmark {
 
         $tab = optional_param('tab', null, PARAM_ALPHAEXT);
         if ($tab) {
+            if (empty($SESSION->checkmark)) {
+                $SESSION->checkmark = new stdClass();
+            }
             $SESSION->checkmark->currenttab = $tab;
         }
 
@@ -2184,8 +2195,8 @@ class checkmark {
         $cm         = $this->cm;
 
         $tabindex = 1; // Tabindex for quick grading tabbing; Not working for dropdowns yet!
-        add_to_log($course->id, 'checkmark', 'view submission', 'submissions.php?id='.$this->cm->id,
-                   $this->checkmark->id, $this->cm->id);
+        // Trigger the event!
+        \mod_checkmark\event\submissions_viewed::submissions($this->cm)->trigger();
 
         $PAGE->set_title(format_string($this->checkmark->name, true));
         $PAGE->set_heading($this->course->fullname);
@@ -3527,8 +3538,8 @@ class checkmark {
         $hassubmission = false;
 
         $tabindex = 1; // Tabindex for quick grading tabbing; Not working for dropdowns yet!
-        add_to_log($this->checkmark->course, 'checkmark', 'view print-preview',
-                   'submissions.php?id='.$this->cm->id, $this->checkmark->id, $this->cm->id);
+        // Trigger the event!
+        \mod_checkmark\event\printpreview_viewed::printpreview($this->cm)->trigger();
 
         $PAGE->set_title(format_string($this->checkmark->name, true));
         $PAGE->set_heading($this->course->fullname);
@@ -3705,8 +3716,14 @@ class checkmark {
         $returnstring = '';
 
         $filters = array(self::FILTER_ALL             => get_string('all'),
-        self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
-        self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
+                         self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
+                         self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
+        $formats = array(MTablePDF::OUTPUT_FORMAT_PDF        => 'PDF',
+                         MTablePDF::OUTPUT_FORMAT_XLSX       => 'XLSX',
+                         MTablePDF::OUTPUT_FORMAT_XLS        => 'XLS',
+                         MTablePDF::OUTPUT_FORMAT_ODS        => 'ODS',
+                         MTablePDF::OUTPUT_FORMAT_CSV_COMMA  => 'CSV (;)',
+                         MTablePDF::OUTPUT_FORMAT_CSV_TAB    => 'CSV (tab)');
 
         $updatepref = optional_param('updatepref', 0, PARAM_INT);
 
@@ -3740,16 +3757,40 @@ class checkmark {
         /* next we get perpage (allow quick grade) params
          * from database
          */
-        $printperpage    = get_user_preferences('checkmark_pdfprintperpage', null);
-        $filter = get_user_preferences('checkmark_filter', 0);
-        $sumabs = get_user_preferences('checkmark_sumabs', 1);
-        $sumrel = get_user_preferences('checkmark_sumrel', 1);
+        $printperpage = optional_param('printperpage', false, PARAM_INT);
+        if ($printperpage === false) { // Use preference if not overwritten!
+            $printperpage    = get_user_preferences('checkmark_pdfprintperpage', null);
+        }
+        $filter = optional_param('filter', false, PARAM_INT);
+        if ($filter === false) { // Use preference if not overwritten!
+            $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
+        }
+        $sumabs = optional_param('sumabs', false, PARAM_INT);
+        if ($sumabs === false) { // Use preference if not overwritten!
+            $sumabs = get_user_preferences('checkmark_sumabs', 1);
+        }
+        $sumrel = optional_param('sumrel', false, PARAM_INT);
+        if ($sumrel === false) { // Use preference if not overwritten!
+            $sumrel = get_user_preferences('checkmark_sumrel', 1);
+        }
 
         $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark',
-                                         $this->checkmark->id);
+                                        $this->checkmark->id);
 
-        $groupmode = groups_get_activity_groupmode($this->cm);
-        $currentgroup = groups_get_activity_group($this->cm, true);
+        $groupmode = optional_param('groupmode', false, PARAM_INT);
+        if ($groupmode === false) {
+            $groupmode = groups_get_activity_groupmode($this->cm);
+            $currentgroup = groups_get_activity_group($this->cm, true);
+        } else {
+            $currentgroup = optional_param('groupid', 0, PARAM_INT);
+        }
+
+        $usrlst = optional_param_array('selected', array(), PARAM_INT);
+        // Get orientation (P/L)!
+        $orientation = optional_param('pageorientation', 0, PARAM_INT) ? MTablePDF::PORTRAIT : MTablePDF::LANDSCAPE;
+        $printheader = optional_param('printheader', false, PARAM_BOOL);
+        $textsize = optional_param('textsize', 1, PARAM_INT);
+        $format = optional_param('format', MTablePDF::OUTPUT_FORMAT_PDF, PARAM_INT);
 
         if (!empty($CFG->enableoutcomes) && !empty($gradinginfo->outcomes)) {
             $usesoutcomes = true;
@@ -3765,12 +3806,8 @@ class checkmark {
         $hassubmission = false;
 
         $tabindex = 1; // Tabindex for quick grading tabbing; Not working for dropdowns yet!
-        add_to_log($course->id, 'checkmark', 'export pdf', 'submissions.php?id='.$this->cm->id,
-                   $this->checkmark->id, $this->cm->id);
 
         $context = context_module::instance($cm->id);
-
-        $usrlst = optional_param_array('selected', array(), PARAM_INT);
 
         if (empty($usrlst)) {
             echo $OUTPUT->header();
@@ -3783,9 +3820,6 @@ class checkmark {
             exit();
         }
 
-        // Get orientation (P/L)!
-        $orientation = optional_param('pageorientation', 0, PARAM_INT) ? MTablePDF::PORTRAIT : MTablePDF::LANDSCAPE;
-
         // Get data!
         $printdata = $this->get_print_data($cm, $filter, $usrlst, true);
         list($columns, $tableheaders, $data, $columnformat, $cellwidth) = $printdata;
@@ -3794,12 +3828,8 @@ class checkmark {
         $timeavailable = $this->checkmark->timeavailable;
         $checkmarkname = $this->checkmark->name;
         $timedue = $this->checkmark->timedue;
-        $filter = optional_param('datafilter', self::FILTER_ALL, PARAM_INT);
         $not_active_str = get_string('notactive', 'checkmark');
-
         $viewname = $filters[$filter];
-
-        $printheader = optional_param('printheader', false, PARAM_BOOL);
 
         if ($groupmode != NOGROUPS) {
             if ($currentgroup == "") {
@@ -3827,7 +3857,6 @@ class checkmark {
 
         $pdf->ShowHeaderFooter($printheader);
 
-        $textsize = optional_param('textsize', 1, PARAM_INT);
         switch ($textsize) {
             case '0':
                 $pdf->SetFontSize(MTablePDF::FONTSIZE_SMALL);
@@ -3861,11 +3890,29 @@ class checkmark {
             }
         }
 
-        $pdf->setOutputFormat(optional_param('format',
-                                             MTablePDF::OUTPUT_FORMAT_PDF,
-                                             PARAM_INT));
+        $pdf->setOutputFormat($format);
 
-        $pdf->generate($this->course->shortname . '-' . $this->checkmark->name);
+        $data = array(
+            'groupmode'       => $groupmode,
+            'groupid'         => $currentgroup,
+            'selected'        => $usrlst,
+            'filter'          => $filter,
+            'filter_readable' => $filters[$filter],
+            'format'          => $format,
+            'format_readable' => $formats[$format],
+            'sumabs'          => $sumabs,
+            'sumrel'          => $sumrel,
+        );
+
+        if ($data['format'] == MTablePDF::OUTPUT_FORMAT_PDF) {
+            $data['orientation']  = $orientation;
+            $data['printheader']  = $printheader;
+            $data['textsize']     = $textsize;
+            $data['printperpage'] = $printperpage;
+        }
+        \mod_checkmark\event\submissions_exported::exported($this->cm, $data)->trigger();
+
+       $pdf->generate($this->course->shortname . '-' . $this->checkmark->name);
         exit();
     }
 
@@ -4005,9 +4052,9 @@ EOS;
             // Trigger grade event!
             $this->update_grade($submission);
 
-            add_to_log($this->course->id, 'checkmark', 'update grades',
-                       'submissions.php?id='.$this->cm->id.'&user='.$feedback->userid,
-                       $feedback->userid, $this->cm->id);
+            // Trigger the event!
+            \mod_checkmark\event\grade_updated::manual($this->cm, array('userid'       => $submission->userid,
+                                                                        'submissionid' => $submission->id))->trigger();
         }
 
         return $submission;

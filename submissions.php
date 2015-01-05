@@ -87,10 +87,9 @@ if (isset($_POST['autograde_all_submit'])) {
     $_POST['autograde'] = checkmark::FILTER_SELECTED;
 }
 
-
 if ($download == 'zip') {
     $checkmarkinstance->download_submissions();
-} else if (isset($_POST['submittoprint'])) {
+} else if (optional_param('submittoprint', false, PARAM_BOOL) !== false) {
     $PAGE->set_pagelayout('popup'); // Remove navbars, etc!
     $checkmarkinstance->submissions_print();
 } else {

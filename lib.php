@@ -101,10 +101,6 @@ function checkmark_delete_instance($id) {
 
     checkmark_grade_item_delete($checkmark);
 
-    add_to_log($COURSE->id, 'checkmark', 'delete',
-               $CFG->wwwroot.'/course/view.php?id='.$COURSE->id, $id . ' - ' . $checkmark->name,
-               $id);
-
     return $result;
 }
 
@@ -189,7 +185,7 @@ function checkmark_update_instance($checkmark) {
         $id = $cm->id;
         $name = $id . ' - ' . $checkmark->name;
     }
-    add_to_log($COURSE->id, 'checkmark', 'update', $link, $name, $id);
+
     return true;
 }
 
@@ -242,8 +238,6 @@ function checkmark_add_instance($checkmark) {
 
     $link = $CFG->wwwroot.'/mod/checkmark/view.php?c='.$returnid;
     $name = $checkmark->name;
-
-    add_to_log($COURSE->id, 'checkmark', 'add', $link, $name);
 
     return $returnid;
 }

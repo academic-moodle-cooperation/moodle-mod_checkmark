@@ -15,24 +15,35 @@
 // If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * version.php
- * Defines the version of checkmark
- *
- * This code fragment is called by moodle_needs_upgrading() and
- * /admin/index.php
+ * The submissions_viewed event.
  *
  * @package       mod_checkmark
+ * @since         Moodle 2.7
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
  * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
  * @author        Philipp Hager
  * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace mod_checkmark\event;
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2014101402;
-$plugin->release   = "2014-10-14";       // User-friendly version number!
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->requires  = 2014041100;         // Requires this Moodle version!
-$plugin->component = 'mod_checkmark';    // To check on upgrade, that module sits in correct place.
+class submissions_viewed extends submissions_viewed_base {
+    public static function submissions(\stdClass $cm) {
+        $event = \mod_checkmark\event\submissions_viewed::create(array(
+            'objectid' => $cm->instance,
+            'context'  => \context_module::instance($cm->id),
+            'other'    => 'submissions',
+        ));
+        return $event;
+    }
+
+    /**
+     * Return localised event name.
+     *
+     * @return string
+     */
+    public static function get_name() {
+        return get_string('eventviewsubmissions', 'checkmark');
+    }
+}

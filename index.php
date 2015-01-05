@@ -39,7 +39,12 @@ if (!$course = $DB->get_record('course', array('id' => $id))) {
 require_course_login($course);
 $PAGE->set_pagelayout('incourse');
 
-add_to_log($course->id, 'checkmark', 'view all', 'index.php?id=$course->id', '');
+/* TRIGGER THE VIEW ALL EVENT */
+$event = \mod_checkmark\event\course_module_instance_list_viewed::create(array(
+    'context' => context_course::instance($course->id)
+));
+$event->trigger();
+/* END OF VIEW ALL EVENT */
 
 $strcheckmarks = get_string('modulenameplural', 'checkmark');
 $strcheckmark = get_string('modulename', 'checkmark');
