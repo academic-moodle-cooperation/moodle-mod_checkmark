@@ -2528,7 +2528,7 @@ class checkmark {
                                 $studentmodified = html_writer::tag('div', $content,
                                                                     array('id' => 'ts'.$auser->id));
                                 $time = $this->checkmark->timedue - $auser->timemodified;
-                                if ($time < 0) {
+                                if (!empty($this->checkmark->timedue) && $time < 0) {
                                     $late = 1;
                                 }
                             } else {
@@ -2962,6 +2962,12 @@ class checkmark {
                 $tablecolumns[] = 'groups';
                 $columnformat[] = array(array('align' => 'L'));
             }
+            if (!$this->column_is_hidden('lastmodified')) {
+                $cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
+                $tablecolumns[] = 'timesubmitted';
+                $tableheaders[] = get_string('lastmodified').' ('.get_string('submission', 'checkmark').')';
+                $columnformat[] = array(array('align' => 'L'));
+            }
             // Dynamically add examples!
             foreach ($this->checkmark->examples as $key => $example) {
                 if (!$this->column_is_hidden('example'.$key)) {
@@ -3011,6 +3017,9 @@ class checkmark {
                 $tableheaders[] = $this->get_submissions_column_header('groups', get_string('group'));
                 $tablecolumns[] = 'groups';
             }
+            $tablecolumns[] = 'timesubmitted';
+            $tableheaders[] = $this->get_submissions_column_header('timesubmitted',
+                                                                   get_string('lastmodified').' ('.get_string('submission', 'checkmark').')');
             // Dynamically add examples!
             foreach ($this->checkmark->examples as $key => $example) {
                 $tablecolumns[] = 'example'.$key;
@@ -3115,7 +3124,7 @@ class checkmark {
 
             $select = 'SELECT '.$ufields.' '.$useridentityfields.',
                               MAX(s.id) AS submissionid, MAX(s.grade) AS grade, MAX(s.submissioncomment) AS comment,
-                              MAX(s.timemodified) AS timemodified, MAX(s.timemarked) AS timemarked,
+                              MAX(s.timemodified) AS timesubmitted, MAX(s.timemarked) AS timemarked,
                               100 * COUNT( DISTINCT cchks.id ) / :examplecount AS summary,
                               COUNT( DISTINCT cchks.id ) AS checks';
             if ($groupmode != NOGROUPS) {
@@ -3135,7 +3144,11 @@ class checkmark {
                      GROUP BY u.id, '.$ufields.' '.$useridentityfields;
 
             if (isset($SESSION->checkmark->orderby)) {
-                $sort = ' ORDER BY MAX('.$SESSION->checkmark->orderby.')';
+                if ($SESSION->checkmark->orderby == 'timesubmitted') {
+                    $sort = ' ORDER BY timesubmitted';
+                } else {
+                    $sort = ' ORDER BY MAX('.$SESSION->checkmark->orderby.')';
+                }
                 if (isset($SESSION->checkmark->orderdirection)
                         && ($SESSION->checkmark->orderdirection == 'DESC')) {
                     $sort .= ' DESC';
@@ -3167,7 +3180,7 @@ class checkmark {
                     $row = array();
                     // Calculate user status!
                     $auser->status = !empty($auser->timemarked) && ($auser->timemarked > 0)
-                                     && ($auser->timemarked >= $auser->timemodified);
+                                     && ($auser->timemarked >= $auser->timesubmitted);
 
                     if (empty($dataonly)) {
                         $selecteduser = html_writer::checkbox('selected[]', $auser->id,
@@ -3247,6 +3260,39 @@ class checkmark {
                     }
                     if (empty($auser->submissionid)) {
                         $auser->grade = -1;
+                    }
+
+                    if ($this->column_is_hidden('timesubmitted')) {
+                        if (!empty($dataonly)) {
+                            $row[] = null;
+                        } else {
+                            $row[] = '&nbsp;';
+                        }
+                    } else {
+                        if (!empty($auser->submissionid) && ($auser->timesubmitted > 0)) {
+                            $content = userdate($auser->timesubmitted);
+                            if ($auser->timesubmitted >= $this->checkmark->timedue) {
+                                $content .= ' '.$this->display_lateness($auser->timesubmitted);
+                            }
+                            if (!empty($dataonly)) {
+                                $studentmodified = strip_tags($content);
+                            } else {
+                                $studentmodified = html_writer::tag('div', $content,
+                                                                    array('id' => 'ts'.$auser->id));
+                            }
+                            $time = $this->checkmark->timedue - $auser->timesubmitted;
+                            if (!empty($this->checkmark->timedue) && $time < 0) {
+                                $late = 1;
+                            }
+                        } else {
+                            if (!empty($dataonly)) {
+                                $studentmodified = '-';
+                            } else {
+                                $studentmodified = html_writer::tag('div', '-',
+                                                                    array('id' => 'ts'.$auser->id));
+                            }
+                        }
+                        $row[] = $studentmodified;
                     }
 
                     if (!empty($auser->submissionid)) {
