@@ -122,7 +122,7 @@ function checkmark_update_instance($checkmark) {
 
     $checkmark->id = $checkmark->instance;
 
-    if ($checkmark->allready_submit != 'yes') {
+    if ($checkmark->allready_submit == 'yes') {
         unset($checkmark->grade);
     }
     $DB->update_record('checkmark', $checkmark);
