@@ -3647,11 +3647,10 @@ class checkmark {
         $pppgroup = array();
         $pppgroup[] = &$mform->createElement('text', 'printperpage',
                                              get_string('pdfpagesize', 'checkmark'), array('size' => 3));
-        $pppgroup[] = &$mform->createElement('advcheckbox', 'printoptimum',
-                                             get_string('optimum', 'checkmark'),
+        $pppgroup[] = &$mform->createElement('advcheckbox', 'printoptimum', '',
                                              get_string('optimum', 'checkmark'), array('group' => 1));
         $mform->addGroup($pppgroup, 'printperpagegrp', get_string('pdfpagesize', 'checkmark'),
-                         array(' '), false);
+                         ' ', false);
         $mform->addHelpButton('printperpagegrp', 'pdfpagesize', 'checkmark');
         $mform->setDefault('printperpage', $printperpage);
         $mform->setDefault('printoptimum', $printoptimum);

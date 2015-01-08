@@ -39,10 +39,6 @@
 }
 
 /** Styles for submissions.php **/
-#page-mod-checkmark-submissions fieldset.felement {
-    margin-left: 16%;
-}
-
 #page-mod-checkmark-submissions form#options div {
     text-align: right;
     margin-left: auto;
@@ -307,11 +303,6 @@
 
 .checkmark.overview.statistics > .details .total {
     font-weight: bold;
-}
-
-.path-mod-checkmark input[type="checkbox"] + label {
-    margin-left: 1em;
-    vertical-align: middle;
 }
 
 .path-mod-checkmark input[type="checkbox"] {
