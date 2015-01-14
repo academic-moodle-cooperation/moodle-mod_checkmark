@@ -117,8 +117,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->setDefault('emailteachers', 0);
 
         if (!empty($update) && $submissioncount) {
-            $mform->addElement('html', '<div class="elements_disabled_warning">'.
-                                       get_string('elements_disabled', 'checkmark').'</div>');
+            $mform->addElement('html', $OUTPUT->notification(get_string('elements_disabled', 'checkmark'), 'notifymessage'));
         }
         $mform->addElement('text', 'examplecount', get_string('numberofexamples', 'checkmark'),
                            array('id' => 'id_examplecount'));

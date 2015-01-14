@@ -313,10 +313,6 @@
     clear: both;
 }
 
-.path-mod-checkmark .elements_disabled_warning {
-    font-weight: bold;
-}
-
 #page-mod-checkmark-view .reportlink a {
     background-color: #fcffd8;
     background-image: none;
