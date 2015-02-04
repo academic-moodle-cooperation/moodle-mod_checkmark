@@ -26,9 +26,7 @@
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined('MOODLE_INTERNAL') || die;
-
 
 /**
  * Deletes a checkmark instance
@@ -403,131 +401,6 @@ function checkmark_get_coursemodule_info($coursemodule) {
         }
     }
     return $result;
-}
-
-/**
- * Function to be run periodically according to the moodle cron
- *
- * Finds all checkmark notifications that have yet to be mailed out, and mails them
- */
-function checkmark_cron () {
-    global $CFG, $USER, $DB;
-
-    /*
-     * Notices older than 2 days will not be mailed.  This is to avoid the problem where
-     * cron has not been running for a long time, and then suddenly people are flooded
-     * with mail from the past few weeks or months
-     */
-
-    $timenow   = time();
-    $endtime   = $timenow - $CFG->maxeditingtime;
-    if (isset($CFG->checkmark_validmsgtime)) {
-        $starttime = $endtime - $CFG->checkmark_validmsgtime * 24 * 3600;   // Two days earlier?
-    } else {
-            $starttime = $endtime - 2 * 24 * 3600;   // Two days earlier?
-    }
-    if ($submissions = checkmark_get_unmailed_submissions($starttime, $endtime)) {
-
-        foreach ($submissions as $key => $submission) {
-            $DB->set_field('checkmark_submissions', 'mailed', '1', array('id' => $submission->id));
-        }
-
-        $timenow = time();
-
-        foreach ($submissions as $submission) {
-
-            echo 'Processing checkmark submission '.$submission->id."\n";
-
-            if (!$user = $DB->get_record('user', array('id' => $submission->userid))) {
-                echo 'Could not find user '.$user->id."\n";
-                continue;
-            }
-
-            if (!$course = $DB->get_record('course', array('id' => $submission->course))) {
-                echo 'Could not find course '.$submission->course."\n";
-                continue;
-            }
-
-            /*
-             * Override the language and timezone of the 'current' user, so that
-             * mail is customised for the receiver.
-             */
-            cron_setup_user($user, $course);
-
-            if (!is_enrolled(context_course::instance($submission->course), $user->id)) {
-                echo fullname($user).' isn\'t an active participant in ' .
-                     format_string($course->shortname) . "\n";
-                continue;
-            }
-
-            if (!$teacher = $DB->get_record('user', array('id' => $submission->teacherid))) {
-                echo 'Could not find teacher '.$submission->teacherid."\n";
-                continue;
-            }
-
-            if (!$mod = get_coursemodule_from_instance('checkmark', $submission->checkmarkid,
-                                                       $course->id)) {
-                echo 'Could not find course module for checkmark id '.$submission->checkmarkid."\n";
-                continue;
-            }
-
-            if (!$mod->visible) {    // Hold mail notification for hidden checkmarks until later!
-                continue;
-            }
-
-            $strcheckmarks = get_string('modulenameplural', 'checkmark');
-            $strcheckmark  = get_string('modulename', 'checkmark');
-
-            $checkmarkinfo = new stdClass();
-            $checkmarkinfo->teacher = fullname($teacher);
-            $checkmarkinfo->checkmark = format_string($submission->name, true);
-            $checkmarkinfo->url = $CFG->wwwroot.'/mod/checkmark/view.php?id='.$mod->id;
-
-            $postsubject = $course->shortname.': '.$strcheckmarks.': '.
-                           format_string($submission->name, true);
-            $posttext  = $course->shortname.' -> '.$strcheckmarks.' -> '.
-                         format_string($submission->name, true)."\n".
-                         "---------------------------------------------------------------------\n".
-                         get_string('checkmarkmail', 'checkmark', $checkmarkinfo)."\n".
-                         "---------------------------------------------------------------------\n";
-
-            if ($user->mailformat == 1) {  // HTML!
-                $posthtml = '<p><font face="sans-serif">'.
-                '<a href="'.$CFG->wwwroot.'/course/view.php?id='.$course->id.'">'.$course->shortname.'</a> '.
-                '-><a href="'.$CFG->wwwroot.'/mod/checkmark/index.php?id='.$course->id.'">'.$strcheckmarks.'</a> '.
-                '-><a href="'.$CFG->wwwroot.'/mod/checkmark/view.php?id='.$mod->id.'">'.
-                format_string($submission->name, true).'</a></font></p>'.
-                '<hr /><font face="sans-serif">'.
-                '<p>'.get_string('checkmarkmailhtml', 'checkmark', $checkmarkinfo).'</p>'.
-                '</font><hr />';
-            } else {
-                // We don't need HTML-Text if mailformat is plain text. (Plain text is in stdClass::fullmessage)!
-                $posthtml = '';
-            }
-
-            $eventdata = new stdClass();
-            $eventdata->modulename       = 'checkmark';
-            $eventdata->userfrom         = $teacher;
-            $eventdata->userto           = $user;
-            $eventdata->subject          = $postsubject;
-            $eventdata->fullmessage      = $posttext;
-            $eventdata->fullmessageformat = FORMAT_PLAIN;
-            $eventdata->fullmessagehtml  = $posthtml;
-            $eventdata->smallmessage     = get_string('checkmarkmailsmall', 'checkmark',
-                                                      $checkmarkinfo);
-            $eventdata->name            = 'checkmark_updates';
-            $eventdata->component       = 'mod_checkmark';
-            $eventdata->notification    = 1;
-            $eventdata->contexturl      = $checkmarkinfo->url;
-            $eventdata->contexturlname  = $checkmarkinfo->checkmark;
-
-            message_send($eventdata);
-        }
-
-        cron_setup_user();
-    }
-
-    return true;
 }
 
 /**
@@ -1098,12 +971,11 @@ function checkmark_get_unmailed_submissions($starttime, $endtime) {
     global $CFG, $DB;
 
     return $DB->get_records_sql('SELECT s.*, a.course, a.name
-                                 FROM {checkmark_submissions} s,
-                                      {checkmark} a
+                                 FROM {checkmark_submissions} s
+                            LEFT JOIN {checkmark} a ON s.checkmarkid = a.id
                                  WHERE s.mailed = 0
                                      AND s.timemarked <= ?
-                                     AND s.timemarked >= ?
-                                     AND s.checkmarkid = a.id', array($endtime, $starttime));
+                                     AND s.timemarked >= ?', array($endtime, $starttime));
 }
 
 /**

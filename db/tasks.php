@@ -12,24 +12,27 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * version.php
- * Defines the version of checkmark
- *
- * This code fragment is called by moodle_needs_upgrading() and
- * /admin/index.php
+ * db/tasks.php
  *
  * @package       mod_checkmark
+ * @since         Moodle 2.7
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
  * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
  * @author        Philipp Hager
  * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-$module->version  = 2014101300;
-$module->release   = "2014-10-13";      // User-friendly version number!
-$module->maturity  = MATURITY_STABLE;
-$module->requires = 2013051400.03;      // Requires this Moodle version!
+$tasks = array(
+    array(
+        'classname' => 'mod_checkmark\task\send_notifications',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    )
+);

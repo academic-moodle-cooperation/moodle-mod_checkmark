@@ -93,6 +93,7 @@ $string['numberofexamples'] = 'Beispielanzahl';
 $string['numberofexamples_help'] = 'Anzahl der Beispiele';
 $string['optimum'] = 'optimal';
 $string['printsettingstitle'] = 'Exporteinstellungen';
+$string['sendnotifications'] = 'Sende Benachrichtigungen';
 $string['strallononepage'] = 'alles auf eine Seite';
 $string['strautograded'] = '[automatisch bewertet]';
 $string['strexample'] = 'Beispiel';

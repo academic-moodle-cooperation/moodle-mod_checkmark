@@ -749,6 +749,7 @@ class checkmark {
             $result['status'] = GRADE_UPDATE_OK;
             return $result;
         } else {
+            $mailinfo = get_user_preferences('checkmark_mailinfo', 0);
             // Do this for each user enrolled in course!
             foreach ($users as $currentuser) {
                 $submission = $this->get_submission($currentuser->id, true); // Get or make one!
@@ -773,7 +774,6 @@ class checkmark {
                 $grades[$currentuser->id]->dategraded = $timemarked;
                 $grades[$currentuser->id]->feedback = $submission->submissioncomment;
                 $grades[$currentuser->id]->feedbackformat = $submission->format;
-                $mailinfo = get_user_preferences('checkmark_mailinfo', 0);
                 if (!$mailinfo) {
                     $submission->mailed = 1;       // Treat as already mailed!
                 } else {
@@ -952,14 +952,8 @@ class checkmark {
             $mode = 'saveandprevious';
         }
 
-        if (is_null($mailinfo)) {
-            // This is no security check, this just tells us if there is posted data!
-            if (data_submitted() && confirm_sesskey()) {
-                set_user_preference('checkmark_mailinfo', $mailinfo);
-            } else {
-                $mailinfo = get_user_preferences('checkmark_mailinfo', 0);
-            }
-        } else {
+        // This is no security check, this just tells us if there is posted data!
+        if (data_submitted() && confirm_sesskey() && $mailinfo !== null) {
             set_user_preference('checkmark_mailinfo', $mailinfo);
         }
 
@@ -2756,7 +2750,10 @@ class checkmark {
             if (get_user_preferences('checkmark_mailinfo', 1)) {
                 $mailinfopref = true;
             }
-            $emailnotification = html_writer::checkbox('mailinfo', 1, $mailinfopref,
+            $emailnotification = html_writer::empty_tag('input', array('type'  => 'hidden',
+                                                                       'name'  => 'mailinfo',
+                                                                       'value' => 0)).
+                                 html_writer::checkbox('mailinfo', 1, $mailinfopref,
                                                        get_string('enablenotification',
                                                                   'checkmark'));
 
@@ -3976,6 +3973,11 @@ EOS;
             return false;
         }
 
+        // This is no security check, this just tells us if there is posted data!
+        if ($feedback->mailinfo !== null) {
+            set_user_preference('checkmark_mailinfo', $feedback->mailinfo);
+        }
+
         $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark',
                                          $this->checkmark->id, $feedback->userid);
 
@@ -3990,11 +3992,11 @@ EOS;
             $submission->grade      = $feedback->xgrade;
             $submission->submissioncomment    = $feedback->submissioncomment_editor['text'];
             $submission->teacherid    = $USER->id;
-            $mailinfo = get_user_preferences('checkmark_mailinfo', 0);
-            if (!$mailinfo) {
-                $submission->mailed = 1;       // Treat as already mailed!
-            } else {
+            $mailinfo = $feedback->mailinfo;
+            if (!empty($mailinfo)) {
                 $submission->mailed = 0;       // Make sure mail goes out (again, even)!
+            } else {
+                $submission->mailed = 1;       // Treat as already mailed!
             }
             $submission->timemarked = time();
 
