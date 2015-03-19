@@ -82,6 +82,10 @@
     margin: 10px auto;
 }
 
+#page-mod-checkmark-view #checkmarkform .mform .fcheckbox input {
+    margin-top:0;
+}
+
 #page-mod-checkmark-view .feedback {
     margin: 10px auto;
 }
