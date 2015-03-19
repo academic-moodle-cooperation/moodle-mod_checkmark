@@ -2090,11 +2090,17 @@ class checkmark {
 
         $thide = optional_param('thide', null, PARAM_ALPHANUMEXT);
         if ($thide) { // Hide table-column!
+            if (!isset($SESSION->checkmark->columns[$thide])) {
+                $SESSION->checkmark->columns[$thide] = new stdClass();
+            }
             $SESSION->checkmark->columns[$thide]->visibility = 0;
         }
 
         $tshow = optional_param('tshow', null, PARAM_ALPHANUMEXT);
         if ($tshow) { // Show table-column!
+            if (!isset($SESSION->checkmark->columns[$thide])) {
+                $SESSION->checkmark->columns[$thide] = new stdClass();
+            }
             $SESSION->checkmark->columns[$tshow]->visibility = 1;
         }
 
@@ -2567,10 +2573,26 @@ class checkmark {
                                 $oldgrade = html_writer::empty_tag('input', $oldgradeattr);
                                 $grade = html_writer::tag('div', $menu.$oldgrade,
                                                           array('id' => 'g'.$auser->id));
+                                if ($auser->timemarked > 0) {
+                                    $date = userdate($auser->timemarked);
+                                    $teachermodified = html_writer::tag('div', $date,
+                                                                        array('id' => 'tt'.$auser->id));
+                                } else {
+                                    $teachermodified = html_writer::tag('div', '-',
+                                                                        array('id' => 'tt'.$auser->id));
+                                }
                             } else {
                                 $grade = html_writer::tag('div',
                                                           $this->display_grade($auser->grade),
                                                           array('id' => 'g'.$auser->id));
+                                if ($auser->timemarked > 0) {
+                                    $date = userdate($auser->timemarked);
+                                    $teachermodified = html_writer::tag('div', $date,
+                                                                        array('id' => 'tt'.$auser->id));
+                                } else {
+                                    $teachermodified = html_writer::tag('div', '-',
+                                                                        array('id' => 'tt'.$auser->id));
+                                }
                             }
                             // Print Comment!
                             if ($finalgrade->locked || $finalgrade->overridden) {
@@ -2962,7 +2984,7 @@ class checkmark {
                 $tablecolumns[] = 'groups';
                 $columnformat[] = array(array('align' => 'L'));
             }
-            if (!$this->column_is_hidden('lastmodified')) {
+            if (!$this->column_is_hidden('timesubmitted')) {
                 $cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
                 $tablecolumns[] = 'timesubmitted';
                 $tableheaders[] = get_string('lastmodified').' ('.get_string('submission', 'checkmark').')';
@@ -2977,7 +2999,7 @@ class checkmark {
                     $columnformat[] = array(array('align' => 'C'));
                 }
             }
-            if (!$this->column_is_hidden('summary') && !empty($sumabs) || !empty($sumrel)) {
+            if (!$this->column_is_hidden('summary') && (!empty($sumabs) || !empty($sumrel))) {
                 $cellwidth[] = array('mode' => 'Fixed', 'value' => '10');
                 $tableheaders[] = get_string('checkmarks', 'checkmark');
                 $tablecolumns[] = 'summary';
@@ -3263,9 +3285,7 @@ class checkmark {
                     }
 
                     if ($this->column_is_hidden('timesubmitted')) {
-                        if (!empty($dataonly)) {
-                            $row[] = null;
-                        } else {
+                        if (empty($dataonly)) {
                             $row[] = '&nbsp;';
                         }
                     } else {
