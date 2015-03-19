@@ -2967,14 +2967,14 @@ class checkmark {
             if (!$this->column_is_hidden('fullnameuser')) {
                 $tableheaders[] = get_string('fullnameuser');
                 $tablecolumns[] = 'fullnameuser';
-                $cellwidth = array(array('mode' => 'Fixed', 'value' => '50'));
+                $cellwidth = array(array('mode' => 'Fixed', 'value' => '25'));
                 $columnformat[] = array(array('align' => 'L'));
             }
             foreach ($useridentity as $cur) {
                 if (!$this->column_is_hidden($cur)) {
                     $tableheaders[] = ($cur == 'phone1') ? get_string('phone') : get_string($cur);
                     $tablecolumns[] = $cur;
-                    $cellwidth[] = array('mode' => 'Fixed', 'value' => '25');
+                    $cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
                     $columnformat[] = array(array('align' => 'L'));
                 }
             }
