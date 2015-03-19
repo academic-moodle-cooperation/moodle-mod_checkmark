@@ -27,6 +27,8 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+require_once $CFG->dirroot.'/calendar/lib.php';
+
 /*
  * This file keeps track of upgrades to
  * the checkmark module
@@ -559,7 +561,6 @@ function xmldb_checkmark_upgrade($oldversion) {
 
     if ($oldversion < 2014052104) {
         //Upgrade old events
-
         $events = $DB->get_records('event', array('eventtype'  => 'course',
                                                   'modulename' => 'checkmark'));
         $eventcount = count($events);
