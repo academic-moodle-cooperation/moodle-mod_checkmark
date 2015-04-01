@@ -62,6 +62,23 @@ if ($id) {
 $PAGE->set_url($url);
 require_login($course->id, false, $cm);
 
+$modinfo = get_fast_modinfo($course);
+$cminfo = $modinfo->get_cm($cm->id);
+if (empty($cminfo->uservisible)) {
+    if ($cminfo->availableinfo) {
+        // User cannot access the activity, but on the course page they will
+        // see a link to it, greyed-out, with information (HTML format) from
+        // $cm->availableinfo about why they can't access it.
+        $text = "<br />".format_text($cminfo->availableinfo, FORMAT_HTML);
+    } else {
+        // User cannot access the activity and they will not see it at all.
+        $text = '';
+    }
+    $notification = $OUTPUT->notification(get_string('conditions_prevent_access', 'checkmark').$text, 'notifyproblem');
+    echo $OUTPUT->box($notification, 'generalbox centered');
+    die;
+}
+
 // Load up the required checkmark code!
 require($CFG->dirroot.'/mod/checkmark/lib.php');
 checkmark_delete_instance($checkmark->id);

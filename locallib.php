@@ -1806,12 +1806,11 @@ class checkmark {
         $users = get_enrolled_users($context, 'mod/checkmark:submit', $currentgroup, 'u.id');
         if ($users) {
             $users = array_keys($users);
-            // If groupmembersonly used, remove users who are not in any group!
-            if (!empty($CFG->enablegroupmembersonly) and $cm->groupmembersonly) {
-                if ($groupingusers = groups_get_grouping_members($cm->groupingid, 'u.id', 'u.id')) {
-                    $users = array_intersect($users, array_keys($groupingusers));
-                }
-            }
+
+            $modinfo = get_fast_modinfo($course);
+            $cminfo = $modinfo->get_cm($cm->id);
+            $info = new \core_availability\info_module($cminfo);
+            $users = $info->filter_user_list($users);
         }
 
         $nextid = 0;
@@ -2301,12 +2300,10 @@ class checkmark {
             $users = array_keys($users);
         }
 
-        // If groupmembersonly used, remove users who are not in any group!
-        if ($users && !empty($CFG->enablegroupmembersonly) && $cm->groupmembersonly) {
-            if ($groupingusers = groups_get_grouping_members($cm->groupingid, 'u.id', 'u.id')) {
-                $users = array_intersect($users, array_keys($groupingusers));
-            }
-        }
+        $modinfo = get_fast_modinfo($course);
+        $cminfo = $modinfo->get_cm($cm->id);
+        $info = new \core_availability\info_module($cminfo);
+        $users = $info->filter_user_list($users);
 
         $tablecolumns = array('selection', 'picture', 'fullname');
         $tableheaders = array('', '', get_string('fullnameuser'));
@@ -2951,12 +2948,10 @@ class checkmark {
             $users = array_keys($users);
         }
 
-        // If groupmembersonly used, remove users who are not in any group!
-        if ($users && !empty($CFG->enablegroupmembersonly) && $cm->groupmembersonly) {
-            if ($groupingusers = groups_get_grouping_members($cm->groupingid, 'u.id', 'u.id')) {
-                $users = array_intersect($users, array_keys($groupingusers));
-            }
-        }
+        $modinfo = get_fast_modinfo($course);
+        $cminfo = $modinfo->get_cm($cm->id);
+        $info = new \core_availability\info_module($cminfo);
+        $users = $info->filter_user_list($users);
 
         $cellwidth = array();
         $columnformat = array();
@@ -4104,7 +4099,7 @@ EOS;
         }
 
         // This is no security check, this just tells us if there is posted data!
-        if ($feedback->mailinfo !== null) {
+        if (isset($feedback->mailinfo) && $feedback->mailinfo !== null) {
             set_user_preference('checkmark_mailinfo', $feedback->mailinfo);
         }
 
@@ -4122,8 +4117,7 @@ EOS;
             $submission->grade      = $feedback->xgrade;
             $submission->submissioncomment    = $feedback->submissioncomment_editor['text'];
             $submission->teacherid    = $USER->id;
-            $mailinfo = $feedback->mailinfo;
-            if (!empty($mailinfo)) {
+            if (!empty($feedback->mailinfo)) {
                 $submission->mailed = 0;       // Make sure mail goes out (again, even)!
             } else {
                 $submission->mailed = 1;       // Treat as already mailed!

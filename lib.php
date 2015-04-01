@@ -999,12 +999,10 @@ function checkmark_count_real_submissions($cm, $groupid=0) {
         $users = array_keys($users);
     }
 
-    // If groupmembersonly used, remove users who are not in any group!
-    if ($users and !empty($CFG->enablegroupmembersonly) and $cm->groupmembersonly) {
-        if ($groupingusers = groups_get_grouping_members($cm->groupingid, 'u.id', 'u.id')) {
-            $users = array_intersect($users, array_keys($groupingusers));
-        }
-    }
+    $modinfo = get_fast_modinfo($cm->course);
+    $cminfo = $modinfo->get_cm($cm->id);
+    $info = new \core_availability\info_module($cminfo);
+    $users = $info->filter_user_list($users);
 
     if (empty($users)) {
         return 0;
