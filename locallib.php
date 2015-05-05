@@ -2375,6 +2375,7 @@ class checkmark {
 
         $table->no_sorting('finalgrade');
         $table->no_sorting('outcome');
+        $table->no_sorting('status');
 
         // Start working -- this is necessary as soon as the niceties are over!
         $table->setup();
@@ -3166,10 +3167,19 @@ class checkmark {
                      GROUP BY u.id, '.$ufields.' '.$useridentityfields;
 
             if (isset($SESSION->checkmark->orderby)) {
-                if ($SESSION->checkmark->orderby == 'timesubmitted') {
-                    $sort = ' ORDER BY timesubmitted';
-                } else {
-                    $sort = ' ORDER BY MAX('.$SESSION->checkmark->orderby.')';
+                switch ($SESSION->checkmark->orderby) {
+                    case 'timesubmitted':
+                        $sort = ' ORDER BY timesubmitted';
+                        break;
+                    case 'summary':
+                        $sort = ' ORDER BY summary';
+                        break;
+                    case 'comment':
+                        $sort = ' ORDER BY comment';
+                        break;
+                    default:
+                        //$sort = ' ORDER BY MAX('.$SESSION->checkmark->orderby.')';
+                        $sort = ' ORDER BY '.$SESSION->checkmark->orderby;
                 }
                 if (isset($SESSION->checkmark->orderdirection)
                         && ($SESSION->checkmark->orderdirection == 'DESC')) {
