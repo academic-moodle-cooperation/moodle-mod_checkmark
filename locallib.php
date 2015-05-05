@@ -914,7 +914,7 @@ class checkmark {
                 if (!isset($errors['examplecount'])) {
                     $errors['examplecount'] = get_string('grade_mismatch', 'checkmark');
                 } else {
-                    $errors['examplecount'] .= get_string('grade_mismatch', 'checkmark');
+                    $errors['examplecount'] .= '<br />'.get_string('grade_mismatch', 'checkmark');
                 }
                 $errors['grade'] = get_string('grade_mismatch', 'checkmark');
             }
