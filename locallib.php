@@ -2769,15 +2769,15 @@ class checkmark {
                                   array('class' => 'checkboxcontroller'));
         } else {
             if ($filter == self::FILTER_SUBMITTED) {
-                $returnstring .= html_writer::tag('div', get_string('nosubmisson', 'checkmark'),
-                                                  array('class' => 'nosubmission'));
+                $returnstring .= $OUTPUT->notification(html_writer::tag('div', get_string('nosubmisson', 'checkmark'),
+                                                                        array('class' => 'nosubmission')), 'notifymessage');
             } else if ($filter == self::FILTER_REQUIRE_GRADING) {
-                $returnstring .= html_writer::tag('div',
-                                                  get_string('norequiregrading', 'checkmark'),
-                                                  array('class' => 'norequiregrading'));
+                $returnstring .= $OUTPUT->notification(html_writer::tag('div',
+                                                                        get_string('norequiregrading', 'checkmark'),
+                                                                        array('class' => 'norequiregrading')), 'notifymessage');
             } else {
-                $returnstring .= html_writer::tag('div', get_string('nostudents', 'checkmark'),
-                                                  array('class' => 'nostudents'));
+                $returnstring .= $OUTPUT->notification(html_writer::tag('div', get_string('nostudents', 'checkmark'),
+                                                                        array('class' => 'nostudents')), 'notifymessage');
             }
         }
 
@@ -3525,14 +3525,14 @@ class checkmark {
         } else {
             if (empty($dataonly)) {
                 if ($filter == self::FILTER_SUBMITTED) {
-                    $tablehtml = html_writer::tag('div', get_string('nosubmisson', 'checkmark'),
-                                                  array('class' => 'nosubmisson'));
+                    $tablehtml = $OUTPUT->notification(html_writer::tag('div', get_string('nosubmisson', 'checkmark'),
+                                                                        array('class' => 'nosubmisson')), 'notifymessage');
                 } else if ($filter == self::FILTER_REQUIRE_GRADING) {
-                    $tablehtml = html_writer::tag('div', get_string('norequiregrading', 'checkmark'),
-                                                  array('class' => 'norequiregrading'));
+                    $tablehtml = $OUTPUT->notification(html_writer::tag('div', get_string('norequiregrading', 'checkmark'),
+                                                                        array('class' => 'norequiregrading')), 'notifymessage');
                 } else {
-                    $tablehtml = html_writer::tag('div', get_string('nostudents', 'checkmark'),
-                                                  array('class' => 'norequiregrading'));
+                    $tablehtml = $OUTPUT->notification(html_writer::tag('div', get_string('nostudents', 'checkmark'),
+                                                                        array('class' => 'norequiregrading')), 'notifymessage');
                 }
             } else {
                 return array(array(), array(), array(), array(), array());
