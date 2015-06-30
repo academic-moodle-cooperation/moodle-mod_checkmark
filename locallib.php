@@ -1743,8 +1743,6 @@ class checkmark {
                    html_writer::end_tag('div');
 
         $nothing = empty($select->nothing) ? false : key($select->nothing);
-        $PAGE->requires->js_init_call('M.util.init_select_autosubmit', array($select->formid,
-                                      $select->attributes['id'], $nothing));
 
         // Then div wrapper for xhtml strictness!
         $output = html_writer::tag('div', $output, array('class' => 'fitem'));
