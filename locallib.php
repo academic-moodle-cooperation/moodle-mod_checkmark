@@ -3247,33 +3247,36 @@ class checkmark {
                     }
 
                     if (!$this->column_is_hidden('groups') && ($groupmode != NOGROUPS)) {
-                        if (isset($auser->groups)) {
-                            $groups = groups_get_all_groups($this->course->id, $auser->id, 0, 'g.name');
-                            $auser->groups = '';
-                            foreach ($groups as $group) {
-                                if ($auser->groups != '') {
-                                    $auser->groups .= ', ';
-                                }
-                                $auser->groups .= $group->name;
+                        $groups = groups_get_all_groups($this->course->id, $auser->id, 0, 'g.name');
+                        $auser->groups = '';
+                        foreach ($groups as $group) {
+                            if ($auser->groups != '') {
+                                $auser->groups .= ', ';
                             }
-                            if (!empty($dataonly)) {
-                                $group = shorten_text($auser->groups, 20);
-                                $row[] = $group;
-                            } else if (empty($dataonly)) {
+                            $auser->groups .= $group->name;
+                        }
+                        if (!empty($dataonly)) {
+                            $group = shorten_text($auser->groups, 20);
+                            $row[] = $group;
+                        } else if (empty($dataonly)) {
+                            if (isset($auser->groups)) {
                                 $group = html_writer::tag('div', $auser->groups,
                                                           array('id' => 'gr'.$auser->id));
-                                $row[] = $group;
-                            }
-                        } else {
-                            if (!empty($dataonly)) {
-                                $group = '-';
-                                $row[] = $group;
-                            } else if (empty($dataonly)) {
+                            } else {
                                 $group = html_writer::tag('div', '-', array('id' => 'gr'.$auser->id));
-                                $row[] = $group;
                             }
+                            $row[] = $group;
                         }
-                    } else if (($groupmode != NOGROUPS) && empty($dataonly)) {
+
+                    } else if (($groupmode != NOGROUPS)) {
+                        if (!empty($dataonly)) {
+                            $group = '-';
+                            $row[] = $group;
+                        } else if (empty($dataonly)) {
+                            $group = html_writer::tag('div', '-', array('id' => 'gr'.$auser->id));
+                            $row[] = $group;
+                        }
+                    } else {
                         $row[] = ' ';
                     }
 
