@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * mtablepdf.php
@@ -251,7 +251,7 @@ class MTablePDF extends pdf{
         }
 
         $fastmode = false;
-        foreach($row as $r){
+        foreach ($row as $r){
             if(!is_null($r) && !is_array($r)){
                 $fastmode = true;
             }
@@ -261,7 +261,7 @@ class MTablePDF extends pdf{
             //fast mode
             $tmp = array();
 
-            foreach($row as $idx => $value){
+            foreach ($row as $idx => $value){
                 if(is_array($value)){
                     echo "Error: if you want to add a row using the fast mode, you cannot pass me an array";
                     exit();
@@ -272,7 +272,7 @@ class MTablePDF extends pdf{
 
             $row = $tmp;
         }else{
-            foreach($row as $idx => $value){
+            foreach ($row as $idx => $value){
                 if(!is_array($value)){
                     $row[$idx] = array("rowspan"=>0,"data"=>$value);
                 }else if(!isset($value["data"])){
@@ -369,7 +369,7 @@ class MTablePDF extends pdf{
         $allfixed = true;
         $sum = 0;
 
-        foreach($this->columnwidths as $idx => $width){
+        foreach ($this->columnwidths as $idx => $width){
             $rowspans[] = 0;
 
             $sum += $width['value'];
@@ -387,7 +387,7 @@ class MTablePDF extends pdf{
         }
 
         $w = array();
-        foreach($this->columnwidths as $idx => $width){
+        foreach ($this->columnwidths as $idx => $width){
             if($allfixed){
                 $w[$idx] = round(
                         ($pdf->getPageWidth()-20)/$sum*$width['value']);
@@ -471,8 +471,8 @@ class MTablePDF extends pdf{
         }
 
         // add heights to rows for fields wich are rowspanned but still need more space
-        foreach($this->data as $rownum => $row){
-        	foreach($row as $key => $value){
+        foreach ($this->data as $rownum => $row){
+        	foreach ($row as $key => $value){
         		if($value['rowspan'] != 0 && !is_null($value['data'])){
         			$lineheight = $this->getNumLines($value['data'],$w[$key]);
 
@@ -543,7 +543,7 @@ class MTablePDF extends pdf{
         foreach ($this->data as $rownum => $row) {
         	$spanned = 0;
         	$dontbreak = false;
-        	foreach($row as $key => $value){
+        	foreach ($row as $key => $value){
         		if($value['rowspan'] > $spanned){
         			$spanned = $value['rowspan'];
         		}
@@ -746,7 +746,7 @@ class MTablePDF extends pdf{
 
     	// data
     	$prev = $this->data[0];
-    	foreach($this->data as $row) {
+    	foreach ($this->data as $row) {
     		$first = true;
     		$line++;
     		$i = 0;
@@ -821,9 +821,9 @@ class MTablePDF extends pdf{
     	$prev = $this->data[0];
 
     	// data
-    	foreach($this->data as $row){
+    	foreach ($this->data as $row){
     		$r = array();
-    		foreach($row as $idx => $cell){
+    		foreach ($row as $idx => $cell){
     			if(is_null($cell['data'])){
     				$cell['data'] = $prev[$idx]['data'];
     			}

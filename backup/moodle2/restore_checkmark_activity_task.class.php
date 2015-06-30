@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * backup/moodle2/restore_checkmark_activity_task.class.php
@@ -128,10 +128,10 @@ class restore_checkmark_activity_task extends restore_activity_task {
     public function after_restore() {
         global $DB, $OUTPUT;
 
-        // Here we try to restore corrupt calendar entries due to old checkmark events being course events
+        // Here we try to restore corrupt calendar entries due to old checkmark events being course events!
         $courseid = $this->get_courseid();
-        if ($checkmarkid = $this->get_activityid()) { // always set, but just to be sure to not break any course-restore...
-            $checkmark = $DB->get_record('checkmark', array('id'=>$checkmarkid));
+        if ($checkmarkid = $this->get_activityid()) { // ...always set, but just to be sure to not break any course-restore!
+            $checkmark = $DB->get_record('checkmark', array('id' => $checkmarkid));
 
             $params = array('eventtype'  => 'course',
                             'modulename' => 'checkmark',
@@ -147,7 +147,7 @@ class restore_checkmark_activity_task extends restore_activity_task {
             $events = $DB->get_records_select('event', $where, $params);
             if (count($events) == 1) {
                 $event = current($events);
-                //We can fix this event!
+                // We can fix this event!
                 $event->instance = $checkmarkid;
                 $event->eventtype = 'due';
                 $calendarevent = calendar_event::load($event->id);
@@ -157,7 +157,7 @@ class restore_checkmark_activity_task extends restore_activity_task {
                 echo $OUTPUT->notification(get_string('couldfixevent', 'checkmark', $event),
                                            'notifysuccess');
             } else {
-                foreach($events as $event) {
+                foreach ($events as $event) {
                     echo $OUTPUT->notification(get_string('cantfixevent', 'checkmark', $event),
                                    'notifyproblem');
                     $this->get_logger()->process(get_string('cantfixevent', 'checkmark', $event),

@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * db/upgrade.php
@@ -27,7 +27,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-require_once $CFG->dirroot.'/calendar/lib.php';
+require_once($CFG->dirroot.'/calendar/lib.php');
 
 /*
  * This file keeps track of upgrades to
@@ -560,14 +560,14 @@ function xmldb_checkmark_upgrade($oldversion) {
     }
 
     if ($oldversion < 2014052104) {
-        //Upgrade old events
+        // Upgrade old events!
         $events = $DB->get_records('event', array('eventtype'  => 'course',
                                                   'modulename' => 'checkmark'));
         $eventcount = count($events);
         $i = 0;
         $pbar = new progress_bar('CheckmarkFixEvents', 500, true);
         foreach ($events as $id => $event) {
-            //Find related instance via courseid and duedate
+            // Find related instance via courseid and duedate!
             $cond = array('course'  => $event->courseid,
                           'timedue' => $event->timestart);
             $matches = $DB->count_records('checkmark', $cond);
@@ -614,18 +614,19 @@ function xmldb_checkmark_upgrade($oldversion) {
         if (!isset($pbar)) {
             $pbar = new progress_bar('CheckmarkFixEvents', 500, true);
         }
-        //Get all checkmarks which have no corresponding events but a due date!
-        $checkmarks = $DB->get_records_sql("SELECT checkmark.id, checkmark.name, checkmark.intro, checkmark.timedue, checkmark.course, COUNT( event.id ) AS present
-                                              FROM {checkmark} as checkmark
-                                         LEFT JOIN {event} as event ON event.instance = checkmark.id
-                                                                   AND event.instance <> 0
-                                                                   AND event.modulename LIKE 'checkmark'
+        // Get all checkmarks which have no corresponding events but a due date!
+        $checkmarks = $DB->get_records_sql("SELECT checkmark.id, checkmark.name, checkmark.intro, checkmark.timedue,
+                                                   checkmark.course, COUNT( event.id ) AS present
+                                              FROM {checkmark} checkmark
+                                         LEFT JOIN {event} event ON event.instance = checkmark.id
+                                                                 AND event.instance <> 0
+                                                                 AND event.modulename LIKE 'checkmark'
                                             GROUP BY checkmark.id
                                             HAVING present = 0 AND checkmark.timedue <> 0");
         $repairedids = array();
-        $i=0;
+        $i = 0;
         $max = count($checkmarks);
-        //Process each of these checkmarks alone
+        // Process each of these checkmarks alone!
         foreach ($checkmarks as $checkmark) {
             $params = array('name'       => '%'.$checkmark->name.'%',
                             'intro'      => '%'.$checkmark->intro.'%',
@@ -634,7 +635,7 @@ function xmldb_checkmark_upgrade($oldversion) {
                             'modulename' => 'checkmark',
                             'eventtype'  => 'course');
             $events = $DB->get_records_sql("SELECT *
-                                              FROM {event} as event
+                                              FROM {event} event
                                              WHERE event.timestart = :timedue
                                                    AND event.courseid = :courseid
                                                    AND ".$DB->sql_like('event.name', ':name')."
@@ -645,7 +646,7 @@ function xmldb_checkmark_upgrade($oldversion) {
             $matches = count($events);
             if ($matches > 0) {
                 $event = current($events);
-                while(($matches > 1) && in_array($event->id, $repairedids)) {
+                while (($matches > 1) && in_array($event->id, $repairedids)) {
                     // Get next unrepaired matching event!
                     $matches--;
                     $event = next($events);
@@ -714,14 +715,14 @@ function xmldb_checkmark_upgrade($oldversion) {
             }
         }
 
-        //Remove other event-stubs:
+        // Remove other event-stubs...
         $events = $DB->get_records('event', array('modulename' => 'checkmark',
                                                   'instance' => 0,
                                                   'eventtype' => 'course'));
         $i = 0;
         $max = count($events);
         if (!empty($max)) {
-            foreach($events as $event) {
+            foreach ($events as $event) {
                 $event = calendar_event::load($event->id);
                 $event->delete(true);
                 $i++;

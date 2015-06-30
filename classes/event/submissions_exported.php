@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_checkmark_submissions_exported event.
@@ -28,7 +28,7 @@
 namespace mod_checkmark\event;
 defined('MOODLE_INTERNAL') || die();
 
-require_once $CFG->dirroot.'/mod/checkmark/mtablepdf.php';
+require_once($CFG->dirroot.'/mod/checkmark/mtablepdf.php');
 
 class submissions_exported extends \core\event\base {
     /**
@@ -66,7 +66,7 @@ class submissions_exported extends \core\event\base {
      * @return \mod_checkmark\event\submissions_exported
      */
     public static function exported(\stdClass $cm, $data) {
-        $event = \mod_checkmark\event\submissions_exported::create(array(
+        $event = self::create(array(
             'objectid' => $cm->instance,
             'context'  => \context_module::instance($cm->id),
             'other'    => $data,
@@ -106,21 +106,6 @@ class submissions_exported extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-    /*
-     * -- groupmode = groups_get_activity_groupmode($this->cm);
-     * -- groupid = currentgroup = groups_get_activity_group($this->cm, true);
-     * -- selected = optional_param_array('selected', array(), PARAM_INT);
-     * -- filter
-     * -- filter_readable
-     * -- format (following indented only if format == MTablePDF::OUTPUT_FORMAT_PDF)
-     *     -- orientation = optional_param('pageorientation', 0, PARAM_INT) ? MTablePDF::PORTRAIT : MTablePDF::LANDSCAPE;
-     *     -- printheader
-     *     -- textsize
-     *     -- printperpage    = get_user_preferences('checkmark_pdfprintperpage', null);
-     * -- format_readable
-     * -- sumabs = get_user_preferences('checkmark_sumabs', 1);
-     * -- sumrel = get_user_preferences('checkmark_sumrel', 1);
-     */
         $params = array('id' => $this->contextinstanceid,
                         'tab' => 'printpreview',
                         'format' => $this->data['other']['format'],
@@ -129,7 +114,7 @@ class submissions_exported extends \core\event\base {
                         'datafilter' => $this->data['other']['filter'],
                         'sumabs' => $this->data['other']['sumabs'],
                         'sumrel' => $this->data['other']['sumrel'],
-                        'submittoprint' => true,);
+                        'submittoprint' => true);
         foreach ($this->data['other']['selected'] as $cur) {
             $params['selected['.$cur.']'] = $cur;
         }
@@ -149,8 +134,8 @@ class submissions_exported extends \core\event\base {
      */
     protected function get_legacy_logdata() {
         return array($this->courseid, $this->objecttable, 'export '.$this->data['other']['format_readable'],
-                     "submissions.php?id=".$this->contextinstanceid."&groupid=".$this->data['other']['groupid']."&format=".$this->data['other']['format'],
-                     '', $this->contextinstanceid);
+                     "submissions.php?id=".$this->contextinstanceid."&groupid=".$this->data['other']['groupid'].
+                     "&format=".$this->data['other']['format'], '', $this->contextinstanceid);
     }
 
     /**
@@ -221,9 +206,5 @@ class submissions_exported extends \core\event\base {
         if (!key_exists('sumrel', $this->data['other'])) {
             throw new \coding_exception('Summary (relative) key is missing!');
         }
-
-        /*if (!key_exists('format_readable', $this->data['other']) || empty($this->data['other']['format_readable'])) {
-            debugging('Missing or empty readable-export-format.', DEBUG_DEVELOPER);
-        }*/
     }
 }

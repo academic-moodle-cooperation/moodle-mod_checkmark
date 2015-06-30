@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * classes/task/send_notifications.php
@@ -29,14 +29,14 @@ defined('MOODLE_INTERNAL') || die();
 
 class send_notifications extends \core\task\scheduled_task {
     public function get_name() {
-        // Shown in admin screens
+        // Shown in admin screens!
         return get_string('modulename', 'checkmark').' | '.get_string('sendnotifications', 'mod_checkmark');
     }
 
     public function execute() {
         global $CFG, $DB;
 
-        include $CFG->dirroot.'/mod/checkmark/lib.php';
+        require_once($CFG->dirroot.'/mod/checkmark/lib.php');
 
         /*
          * Notices older than 2 days will not be mailed.  This is to avoid the problem where

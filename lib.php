@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * lib.php
@@ -174,11 +174,11 @@ function checkmark_update_instance($checkmark) {
     }
 
     if ($checkmark->allready_submit != 'yes') {
-        /*
-         * We won't change the grades after someone submitted already - otherwise he/she would
+        /* We won't change the grades after someone submitted already - otherwise he/she would
          * have submitted with other informations than displayed
+         *
+         * Get existing grade item!
          */
-        // Get existing grade item!
         checkmark_grade_item_update($checkmark);
     }
 
@@ -427,9 +427,9 @@ function checkmark_get_user_grades($checkmark, $userid=0) {
     }
     $params['aid'] = $checkmark->id;
 
-    $sql = 'SELECT u.id, u.id AS userid, s.grade AS rawgrade, s.submissioncomment AS feedback,
-                   s.format AS feedbackformat, s.teacherid AS usermodified,
-                   s.timemarked AS dategraded, s.timemodified AS datesubmitted
+    $sql = 'SELECT u.id, u.id userid, s.grade rawgrade, s.submissioncomment feedback,
+                   s.format feedbackformat, s.teacherid usermodified,
+                   s.timemarked dategraded, s.timemodified datesubmitted
               FROM {user} u, {checkmark_submissions} s
              WHERE u.id = s.userid AND s.checkmarkid = :aid'.
             $user;
@@ -468,7 +468,7 @@ function checkmark_upgrade_grades() {
              WHERE m.name=\'checkmark\' AND m.id=cm.module AND cm.instance=a.id';
     $count = $DB->count_records_sql($sql);
 
-    $sql = 'SELECT a.*, cm.idnumber AS cmidnumber, a.course AS course
+    $sql = 'SELECT a.*, cm.idnumber cmidnumber, a.course course
               FROM {checkmark} a, {course_modules} cm, {modules} m
              WHERE m.name=\'checkmark\' AND m.id=cm.module AND cm.instance=a.id';
     $rs = $DB->get_recordset_sql($sql);
@@ -675,7 +675,7 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
     // Do not use log table if possible, it may be huge!
 
     if (!$submissions = $DB->get_records_sql('
-            SELECT asb.id, asb.timemodified, cm.id AS cmid, asb.userid,
+            SELECT asb.id, asb.timemodified, cm.id cmid, asb.userid,
                  u.firstname, u.lastname, u.email, u.picture
             FROM {checkmark_submissions} asb
                 JOIN {checkmark} a      ON a.id = asb.checkmarkid
@@ -1256,9 +1256,9 @@ function checkmark_print_overview($courses, &$htmlarray) {
                                               AND checkmarkid '.$sqlcheckmarkids,
                                           array_merge(array($USER->id), $checkmarkidparams));
     foreach ($mysubmissions as $key => $mysubmission) {
-        $sql = 'SELECT exampleid as id, name, grade, state
-                  FROM {checkmark_checks} as chks
-            RIGHT JOIN {checkmark_examples} as ex
+        $sql = 'SELECT exampleid id, name, grade, state
+                  FROM {checkmark_checks} chks
+            RIGHT JOIN {checkmark_examples} ex
                     ON chks.exampleid = ex.id
                  WHERE submissionid = :subid';
         $mysubmissions[$key]->examples = $DB->get_records_sql($sql,
@@ -1520,7 +1520,7 @@ function checkmark_reset_gradebook($courseid) {
 
     $params = array('courseid' => $courseid);
 
-    $sql = 'SELECT a.*, cm.idnumber as cmidnumber, a.course as courseid
+    $sql = 'SELECT a.*, cm.idnumber cmidnumber, a.course courseid
               FROM {checkmark} a, {course_modules} cm, {modules} m
              WHERE m.name=\'checkmark\' AND m.id=cm.module
                                         AND cm.instance=a.id
@@ -1582,20 +1582,33 @@ function checkmark_get_extra_capabilities() {
  */
 function checkmark_supports($feature) {
     switch ($feature) {
-        case FEATURE_GROUPS:                  return true;
-        case FEATURE_GROUPINGS:               return true;
-        case FEATURE_GROUPMEMBERSONLY:        return true;
-        case FEATURE_MOD_INTRO:               return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
-        case FEATURE_GRADE_HAS_GRADE:         return true;
-        case FEATURE_GRADE_OUTCOMES:          return true;
-        case FEATURE_GRADE_HAS_GRADE:         return true;
-        case FEATURE_BACKUP_MOODLE2:          return true;
-        case FEATURE_IDNUMBER:                return true;
-        case FEATURE_SHOW_DESCRIPTION:        return true;
-        case FEATURE_MOD_ARCHETYPE:           return MOD_ARCHETYPE_OTHER;
+        case FEATURE_GROUPS:
+            return true;
+        case FEATURE_GROUPINGS:
+            return true;
+        case FEATURE_GROUPMEMBERSONLY:
+            return true;
+        case FEATURE_MOD_INTRO:
+            return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+            return true;
+        case FEATURE_GRADE_HAS_GRADE:
+            return true;
+        case FEATURE_GRADE_OUTCOMES:
+            return true;
+        case FEATURE_GRADE_HAS_GRADE:
+            return true;
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
+        case FEATURE_IDNUMBER:
+            return true;
+        case FEATURE_SHOW_DESCRIPTION:
+            return true;
+        case FEATURE_MOD_ARCHETYPE:
+            return MOD_ARCHETYPE_OTHER;
 
-        default: return false;
+        default:
+            return false;
     }
 }
 

@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * locallib.php
@@ -1843,7 +1843,7 @@ class checkmark {
                 }
                 $getgroupsql = 'SELECT grps.courseid, '.$groupselect;
                 $params['courseid'] = $this->course->id;
-                $getgroupsql .= ' AS groups, grpm.userid AS userid
+                $getgroupsql .= ' AS groups, grpm.userid userid
                              FROM {groups_members} grpm
                              LEFT JOIN {groups} grps
                              ON grps.id = grpm.groupid
@@ -1856,7 +1856,7 @@ class checkmark {
             }
 
             $select = 'SELECT '.$userfields.',
-                              s.id AS submissionid, s.grade, s.submissioncomment,
+                              s.id submissionid, s.grade, s.submissioncomment,
                               s.timemodified, s.timemarked ';
             if ($groupmode != NOGROUPS) {
                 $select .= ', groups ';
@@ -2414,7 +2414,7 @@ class checkmark {
             }
             $getgroupsql = 'SELECT MAX(grps.courseid), '.$groupselect;
             $params['courseid'] = $this->course->id;
-            $getgroupsql .= ' AS groups, grpm.userid AS userid
+            $getgroupsql .= ' AS groups, grpm.userid userid
                          FROM {groups_members} grpm
                          LEFT JOIN {groups} grps
                          ON grps.id = grpm.groupid
@@ -2429,7 +2429,7 @@ class checkmark {
         if (!empty($users)) {
             $useridentityfields = get_extra_user_fields_sql($context, 'u');
             $select = 'SELECT '.$ufields.' '.$useridentityfields.',
-                              s.id AS submissionid, s.grade, s.submissioncomment,
+                              s.id submissionid, s.grade, s.submissioncomment,
                               s.timemodified, s.timemarked ';
             if ($groupmode != NOGROUPS) {
                 $select .= ', groups ';
@@ -3035,7 +3035,8 @@ class checkmark {
             }
             $tablecolumns[] = 'timesubmitted';
             $tableheaders[] = $this->get_submissions_column_header('timesubmitted',
-                                                                   get_string('lastmodified').' ('.get_string('submission', 'checkmark').')');
+                                                                   get_string('lastmodified').
+                                                                   ' ('.get_string('submission', 'checkmark').')');
             // Dynamically add examples!
             foreach ($this->checkmark->examples as $key => $example) {
                 $tablecolumns[] = 'example'.$key;
@@ -3120,7 +3121,7 @@ class checkmark {
             }
             $getgroupsql = 'SELECT MAX(grps.courseid), '.$groupselect;
             $params['courseid'] = $this->course->id;
-            $getgroupsql .= ' AS groups, grpm.userid AS userid
+            $getgroupsql .= ' AS groups, grpm.userid userid
                          FROM {groups_members} grpm
                          LEFT JOIN {groups} grps
                          ON grps.id = grpm.groupid
@@ -3139,10 +3140,10 @@ class checkmark {
             $params['examplecount'] = $examplecount;
 
             $select = 'SELECT '.$ufields.' '.$useridentityfields.',
-                              MAX(s.id) AS submissionid, MAX(s.grade) AS grade, MAX(s.submissioncomment) AS comment,
-                              MAX(s.timemodified) AS timesubmitted, MAX(s.timemarked) AS timemarked,
-                              100 * COUNT( DISTINCT cchks.id ) / :examplecount AS summary,
-                              COUNT( DISTINCT cchks.id ) AS checks';
+                              MAX(s.id) submissionid, MAX(s.grade) grade, MAX(s.submissioncomment) comment,
+                              MAX(s.timemodified) timesubmitted, MAX(s.timemarked) timemarked,
+                              100 * COUNT( DISTINCT cchks.id ) / :examplecount summary,
+                              COUNT( DISTINCT cchks.id ) checks';
             if ($groupmode != NOGROUPS) {
                     $select .= ', MAX(groups) ';
             }
@@ -3150,11 +3151,11 @@ class checkmark {
 
             list($sqluserids, $userparams) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'user');
             $params = array_merge_recursive($params, $userparams);
-            $sql = '     FROM {user} AS u '.
-                   'LEFT JOIN {checkmark_submissions} AS s ON u.id = s.userid
-                                                      AND s.checkmarkid = :checkmarkid
-                    LEFT JOIN {checkmark_checks} AS gchks ON gchks.submissionid = s.id
-                    LEFT JOIN {checkmark_checks} AS cchks ON cchks.submissionid = s.id AND cchks.state = 1 '.
+            $sql = '     FROM {user} u '.
+                   'LEFT JOIN {checkmark_submissions} s ON u.id = s.userid
+                                                        AND s.checkmarkid = :checkmarkid
+                    LEFT JOIN {checkmark_checks} gchks ON gchks.submissionid = s.id
+                    LEFT JOIN {checkmark_checks} cchks ON cchks.submissionid = s.id AND cchks.state = 1 '.
                    $groupssql.
                    '    WHERE '.$where.'u.id '.$sqluserids.'
                      GROUP BY u.id, '.$ufields.' '.$useridentityfields;
@@ -3171,7 +3172,6 @@ class checkmark {
                         $sort = ' ORDER BY comment';
                         break;
                     default:
-                        //$sort = ' ORDER BY MAX('.$SESSION->checkmark->orderby.')';
                         $sort = ' ORDER BY '.$SESSION->checkmark->orderby;
                 }
                 if (isset($SESSION->checkmark->orderdirection)
@@ -3909,7 +3909,7 @@ class checkmark {
         $timeavailable = $this->checkmark->timeavailable;
         $checkmarkname = $this->checkmark->name;
         $timedue = $this->checkmark->timedue;
-        $not_active_str = get_string('notactive', 'checkmark');
+        $notactivestr = get_string('notactive', 'checkmark');
         $viewname = $filters[$filter];
 
         if ($groupmode != NOGROUPS) {
@@ -3927,13 +3927,13 @@ class checkmark {
         $pdf->setHeaderText(get_string('course').':', $coursename,
                             get_string('availabledate', 'checkmark').':', !empty($timeavailable) ?
                                                                           userdate($timeavailable) :
-                                                                          $not_active_str,
+                                                                          $notactivestr,
                             get_string('strprintpreview', 'checkmark'), $viewname,
                             // Second header row!
                             get_string('strassignment', 'checkmark').':', $checkmarkname,
                             get_string('duedate', 'checkmark').':', !empty($timedue) ?
                                                                     userdate($timedue) :
-                                                                    $not_active_str,
+                                                                    $notactivestr,
                             get_string('groups') . ':', $grpname);
 
         $pdf->ShowHeaderFooter($printheader);
@@ -3993,7 +3993,7 @@ class checkmark {
         }
         \mod_checkmark\event\submissions_exported::exported($this->cm, $data)->trigger();
 
-       $pdf->generate($this->course->shortname . '-' . $this->checkmark->name);
+        $pdf->generate($this->course->shortname . '-' . $this->checkmark->name);
         exit();
     }
 
@@ -4206,7 +4206,7 @@ EOS;
         if ($submission || !$createnew) {
             if ($submission) {
                 if (!$submission->examples = $DB->get_records_sql('
-                    SELECT exampleid as id, name, grade, state
+                    SELECT exampleid id, name, grade, state
                       FROM {checkmark_checks}
                 RIGHT JOIN {checkmark_examples}
                         ON {checkmark_checks}.exampleid = {checkmark_examples}.id
@@ -4235,9 +4235,9 @@ EOS;
         $submission = $DB->get_record('checkmark_submissions',
                                       array('checkmarkid' => $this->checkmark->id,
                                             'userid'      => $userid));
-        $submission->examples = $DB->get_records_sql('SELECT exampleid as id, name, grade, state
-                                                        FROM {checkmark_checks} as chks
-                                                  RIGHT JOIN {checkmark_examples} as ex
+        $submission->examples = $DB->get_records_sql('SELECT exampleid id, name, grade, state
+                                                        FROM {checkmark_checks} chks
+                                                  RIGHT JOIN {checkmark_examples} ex
                                                           ON chks.exampleid = ex.id
                                                        WHERE submissionid = :subid',
                                                      array('subid' => $sid));

@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_checkmark_grade_updated event.
@@ -45,7 +45,7 @@ class grade_updated extends \core\event\base {
     public static function manual(\stdClass $cm, array $data) {
         $data['type'] = 'manual';
         // Trigger overview event.
-        $event = \mod_checkmark\event\grade_updated::create(array(
+        $event = self::create(array(
             'objectid'    => $data['submissionid'],
             'context'     => \context_module::instance($cm->id),
             'relateduserid' => $data['userid'],
@@ -57,7 +57,7 @@ class grade_updated extends \core\event\base {
     public static function automatic(\stdClass $cm, array $data) {
         // Trigger overview event.
         $data['type'] = 'automatic';
-        $event = \mod_checkmark\event\grade_updated::create(array(
+        $event = self::create(array(
             'objectid'    => $cm->instance,
             'context'     => \context_module::instance($cm->id),
             'relateduserid' => $data['userid'],
@@ -100,7 +100,7 @@ class grade_updated extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url("/mod/checkmark/submissions.php", array('id'  => $this->contextinstanceid,
-                                                                       'tab' => 'submissions',));
+                                                                       'tab' => 'submissions'));
     }
 
     /**

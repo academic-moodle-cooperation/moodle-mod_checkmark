@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The submissions_viewed event.
@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 
 class submissions_viewed extends submissions_viewed_base {
     public static function submissions(\stdClass $cm) {
-        $event = \mod_checkmark\event\submissions_viewed::create(array(
+        $event = self::create(array(
             'objectid' => $cm->instance,
             'context'  => \context_module::instance($cm->id),
             'other'    => 'submissions',

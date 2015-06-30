@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The submissions_viewed_base event.
@@ -56,7 +56,8 @@ abstract class submissions_viewed_base extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/submissions.php", array('id' => $this->contextinstanceid, 'tab' => $this->data['other']));
+        return new \moodle_url("/mod/$this->objecttable/submissions.php", array('id'  => $this->contextinstanceid,
+                                                                                'tab' => $this->data['other']));
     }
 
     /**
@@ -65,7 +66,8 @@ abstract class submissions_viewed_base extends \core\event\base {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, $this->objecttable, 'view', 'submissions.php?id=' . $this->contextinstanceid.'&tab='.$this->data['other'],
+        return array($this->courseid, $this->objecttable, 'view',
+                     'submissions.php?id=' . $this->contextinstanceid.'&tab='.$this->data['other'],
                      'view '.$this->data['other'], $this->contextinstanceid);
     }
 
