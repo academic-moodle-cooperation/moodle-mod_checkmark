@@ -676,7 +676,7 @@ class checkmark {
      *               optional, std: FILTER_ALL
      * @return 0 if everything's ok, otherwise error code
      */
-    public function autograde_submissions($filter = self::FILTER_ALL) {
+    public function autograde_submissions($filter = self::FILTER_ALL, $countonly = false) {
         global $CFG, $COURSE, $PAGE, $DB, $OUTPUT, $USER, $SESSION;
         require_once($CFG->libdir.'/gradelib.php');
         require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
@@ -694,7 +694,11 @@ class checkmark {
             $params['grademin']  = 0;
         } else {
             $result['status'] = AUTOGRADE_SCALE_NOT_SUPPORTED;
-            return $result;
+            if ($countonly) {
+                return 0;
+            } else {
+                return $result;
+            }
         }
 
         // Get all ppl that are allowed to submit checkmarks!
@@ -756,45 +760,53 @@ class checkmark {
         $users = $DB->get_records_sql($sql, $params);
         if ($users == null) {
             $result['status'] = GRADE_UPDATE_OK;
-            return $result;
+            if ($countonly) {
+                return 0;
+            } else {
+                return $result;
+            }
         } else {
-            $mailinfo = get_user_preferences('checkmark_mailinfo', 0);
-            // Do this for each user enrolled in course!
-            foreach ($users as $currentuser) {
-                $submission = $this->get_submission($currentuser->id, true); // Get or make one!
+            if ($countonly) {
+                return count($users);
+            } else {
+                $mailinfo = get_user_preferences('checkmark_mailinfo', 0);
+                // Do this for each user enrolled in course!
+                foreach ($users as $currentuser) {
+                    $submission = $this->get_submission($currentuser->id, true); // Get or make one!
 
-                $timemarked = time();
-                $calculatedgrade = $this->calculate_grade($currentuser->id);
-                $submission->grade = $calculatedgrade;
-                if ($submission->submissioncomment == null) {
-                    $submission->submissioncomment = get_string('strautograded', 'checkmark');
-                } else if (!strstr($submission->submissioncomment, get_string('strautograded',
-                                                                              'checkmark'))) {
+                    $timemarked = time();
+                    $calculatedgrade = $this->calculate_grade($currentuser->id);
+                    $submission->grade = $calculatedgrade;
+                    if ($submission->submissioncomment == null) {
+                        $submission->submissioncomment = get_string('strautograded', 'checkmark');
+                    } else if (!strstr($submission->submissioncomment, get_string('strautograded',
+                                                                                  'checkmark'))) {
 
-                    $submission->submissioncomment .= get_string('strautograded', 'checkmark');
-                }
-                $submission->teacherid = $USER->id;
-                $submission->timemarked = $timemarked;
-                if (!isset($grades[$currentuser->id])) { // Prevent strict standard warning!
-                    $grades[$currentuser->id] = new stdClass();
-                }
-                $grades[$currentuser->id]->userid = $currentuser->id;
-                $grades[$currentuser->id]->rawgrade = $calculatedgrade;
-                $grades[$currentuser->id]->dategraded = $timemarked;
-                $grades[$currentuser->id]->feedback = $submission->submissioncomment;
-                $grades[$currentuser->id]->feedbackformat = $submission->format;
-                if (!$mailinfo) {
-                    $submission->mailed = 1;       // Treat as already mailed!
-                } else {
-                    $submission->mailed = 0;       // Make sure mail goes out (again, even)!
-                }
+                        $submission->submissioncomment .= get_string('strautograded', 'checkmark');
+                    }
+                    $submission->teacherid = $USER->id;
+                    $submission->timemarked = $timemarked;
+                    if (!isset($grades[$currentuser->id])) { // Prevent strict standard warning!
+                        $grades[$currentuser->id] = new stdClass();
+                    }
+                    $grades[$currentuser->id]->userid = $currentuser->id;
+                    $grades[$currentuser->id]->rawgrade = $calculatedgrade;
+                    $grades[$currentuser->id]->dategraded = $timemarked;
+                    $grades[$currentuser->id]->feedback = $submission->submissioncomment;
+                    $grades[$currentuser->id]->feedbackformat = $submission->format;
+                    if (!$mailinfo) {
+                        $submission->mailed = 1;       // Treat as already mailed!
+                    } else {
+                        $submission->mailed = 0;       // Make sure mail goes out (again, even)!
+                    }
 
-                $DB->update_record('checkmark_submissions', $submission);
-                $result['updated']++;
-                $url = 'submissions.php?id='.$this->cm->id.'&autograde=1&autograde_filter='.$filter;
-                // Trigger the event!
-                \mod_checkmark\event\grade_updated::automatic($this->cm, array('userid'       => $currentuser->id,
-                                                                               'submissionid' => $submission->id))->trigger();
+                    $DB->update_record('checkmark_submissions', $submission);
+                    $result['updated']++;
+                    $url = 'submissions.php?id='.$this->cm->id.'&autograde=1&autograde_filter='.$filter;
+                    // Trigger the event!
+                    \mod_checkmark\event\grade_updated::automatic($this->cm, array('userid'       => $currentuser->id,
+                                                                                   'submissionid' => $submission->id))->trigger();
+                }
             }
 
             if (!empty($grades)) {
@@ -1017,13 +1029,20 @@ class checkmark {
                                 $amount = get_string('autograde_strmultiplesubmissions', 'checkmark',
                                                      count($selected));
                             }
+                            $amountinfo = '';
                             break;
                         case self::FILTER_REQUIRE_GRADING:
+                            // Count only!
+                            $result = $this->autograde_submissions($autograde, true);
                             $amount = get_string('autograde_strreq', 'checkmark');
+                            $amountinfo = get_string('autograde_strchanged', 'checkmark', $result);
                             break;
                         default:
                         case self::FILTER_ALL:
+                            // Count only!
+                            $result = $this->autograde_submissions($autograde, true);
                             $amount = get_string('autograde_strall', 'checkmark');
+                            $amountinfo = get_string('autograde_strchanged', 'checkmark', $result);
                             break;
                     }
                     if (isset($selected) && (count($selected) == 0)) {
@@ -1043,8 +1062,9 @@ class checkmark {
                                                          'notifyproblem');
                     } else {
                         echo $OUTPUT->header();
-                        $confirmboxcontent = $OUTPUT->confirm(get_string('autograde_confirm', 'checkmark',
-                                                                         $amount),
+                        $confirmboxcontent = $OUTPUT->notification(get_string('autograde_confirm', 'checkmark', $amount).
+                                                                   html_writer::empty_tag('br').$amountinfo, 'notifymessage').
+                                             $OUTPUT->confirm(get_string('autograde_confirm_continue', 'checkmark'),
                                                               'submissions.php?id='.$this->cm->id.'&mode='.
                                                               $autograde.'&confirm=1', 'submissions.php?id='.$this->cm->id);
                         echo $OUTPUT->box($confirmboxcontent, 'generalbox');
