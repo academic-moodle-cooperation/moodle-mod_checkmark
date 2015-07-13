@@ -3038,6 +3038,12 @@ class checkmark {
                 $tableheaders[] = get_string('outcome', 'grades');
                 $tablecolumns[] = 'outcome';
             }
+            if (!$this->column_is_hidden('signature')) {
+                $cellwidth[] = array('mode' => 'Fixed', 'value' => '30');
+                $columnformat[] = array(array('align' => 'L'));
+                $tableheaders[] = get_string('signature', 'checkmark');
+                $tablecolumns[] = 'signature';
+            }
 
         } else {
             $tablecolumns = array('selection', 'fullnameuser');
@@ -3082,6 +3088,9 @@ class checkmark {
                 $tableheaders[] = $this->get_submissions_column_header('outcome', get_string('outcome',
                                                                        'grades'));
             }
+            $tablecolumns[] = 'signature'; // No sorting based on signature column!
+            $tableheaders[] = $this->get_submissions_column_header('signature', get_string('signature', 'checkmark'));
+
             $table = new html_table();
             if (!isset($table->attributes)) {
                 $table->attributes = array('class' => 'coloredrows');
@@ -3504,6 +3513,13 @@ class checkmark {
                             }
                             $row[] = $comment;
                         }
+                    }
+
+                    if (!$this->column_is_hidden('signature')) {
+                        // Print empty signature-cell!
+                        $row[] = '';
+                    } else if (empty($dataonly)) {
+                        $row[] = ' ';
                     }
 
                     if (empty($auser->status)) { // Confirm we have exclusively 0 or 1!

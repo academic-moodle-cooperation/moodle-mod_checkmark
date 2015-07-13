@@ -101,6 +101,7 @@ $string['numberofexamples_help'] = 'Example count in this checkmark.';
 $string['optimum'] = 'optimum';
 $string['printsettingstitle'] = 'Export settings';
 $string['sendnotifications'] = 'Send notifications';
+$string['signature'] = 'Signature';
 $string['strallononepage'] = 'print all on one page';
 $string['strautograded'] = '[auto-graded]';
 $string['strexample'] = 'example';
