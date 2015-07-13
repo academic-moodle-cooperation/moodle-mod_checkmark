@@ -2981,25 +2981,25 @@ class checkmark {
             if (!$this->column_is_hidden('fullnameuser')) {
                 $tableheaders[] = get_string('fullnameuser');
                 $tablecolumns[] = 'fullnameuser';
-                $cellwidth = array(array('mode' => 'Fixed', 'value' => '25'));
+                $cellwidth = array(array('mode' => 'Relativ', 'value' => '25'));
                 $columnformat[] = array(array('align' => 'L'));
             }
             foreach ($useridentity as $cur) {
                 if (!$this->column_is_hidden($cur)) {
                     $tableheaders[] = ($cur == 'phone1') ? get_string('phone') : get_string($cur);
                     $tablecolumns[] = $cur;
-                    $cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
+                    $cellwidth[] = array('mode' => 'Relativ', 'value' => '20');
                     $columnformat[] = array(array('align' => 'L'));
                 }
             }
             if (($groupmode != NOGROUPS) && !$this->column_is_hidden('groups')) {
-                $cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
+                $cellwidth[] = array('mode' => 'Relativ', 'value' => '20');
                 $tableheaders[] = get_string('group');
                 $tablecolumns[] = 'groups';
                 $columnformat[] = array(array('align' => 'L'));
             }
             if (!$this->column_is_hidden('timesubmitted')) {
-                $cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
+                $cellwidth[] = array('mode' => 'Fixed', 'value' => '30');
                 $tablecolumns[] = 'timesubmitted';
                 $tableheaders[] = get_string('lastmodified').' ('.get_string('submission', 'checkmark').')';
                 $columnformat[] = array(array('align' => 'L'));
@@ -3007,32 +3007,33 @@ class checkmark {
             // Dynamically add examples!
             foreach ($this->checkmark->examples as $key => $example) {
                 if (!$this->column_is_hidden('example'.$key)) {
-                    $cellwidth[] = array('mode' => 'Relativ', 'value' => '10');
+                    $width = strlen($example->name) + strlen($example->grade) + 4;
+                    $cellwidth[] = array('mode' => 'Fixed', 'value' => $width);
                     $tableheaders[] = $example->name." (".$example->grade.'P)';
                     $tablecolumns[] = 'example'.$key;
                     $columnformat[] = array(array('align' => 'C'));
                 }
             }
             if (!$this->column_is_hidden('summary') && (!empty($sumabs) || !empty($sumrel))) {
-                $cellwidth[] = array('mode' => 'Fixed', 'value' => '10');
+                $cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
                 $tableheaders[] = get_string('checkmarks', 'checkmark');
                 $tablecolumns[] = 'summary';
                 $columnformat[] = array(array('align' => 'L'));
             }
             if (!$this->column_is_hidden('grade')) {
-                $cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
+                $cellwidth[] = array('mode' => 'Fixed', 'value' => '15');
                 $tableheaders[] = get_string('grade');
                 $tablecolumns[] = 'grade';
                 $columnformat[] = array(array('align' => 'R'));
             }
             if (!$this->column_is_hidden('comment')) {
-                $cellwidth[] = array('mode' => 'Fixed', 'value' => '30');
+                $cellwidth[] = array('mode' => 'Relativ', 'value' => '50');
                 $tableheaders[] = get_string('comment', 'checkmark');
                 $tablecolumns[] = 'comment';
                 $columnformat[] = array(array('align' => 'L'));
             }
             if ($usesoutcomes && !$this->column_is_hidden('outcome')) {
-                $cellwidth[] = array('mode' => 'Fixed', 'value' => '50');
+                $cellwidth[] = array('mode' => 'Relativ', 'value' => '50');
                 $columnformat[] = array(array('align' => 'L'));
                 $tableheaders[] = get_string('outcome', 'grades');
                 $tablecolumns[] = 'outcome';
@@ -3286,16 +3287,11 @@ class checkmark {
                             $row[] = $group;
                         }
 
-                    } else if (($groupmode != NOGROUPS)) {
-                        if (!empty($dataonly)) {
-                            $group = '-';
-                            $row[] = $group;
-                        } else if (empty($dataonly)) {
+                    } else if (($groupmode != NOGROUPS) && empty($dataonly)) {
+                        if (empty($dataonly)) {
                             $group = html_writer::tag('div', '-', array('id' => 'gr'.$auser->id));
                             $row[] = $group;
                         }
-                    } else {
-                        $row[] = ' ';
                     }
 
                     $finalgrade = $gradinginfo->items[0]->grades[$auser->id];
@@ -3316,7 +3312,7 @@ class checkmark {
                         }
                     } else {
                         if (!empty($auser->submissionid) && ($auser->timesubmitted > 0)) {
-                            $content = userdate($auser->timesubmitted);
+                            $content = userdate($auser->timesubmitted, get_string('strftimedatetime'));
                             if ($auser->timesubmitted >= $this->checkmark->timedue) {
                                 $content .= ' '.$this->display_lateness($auser->timesubmitted);
                             }
