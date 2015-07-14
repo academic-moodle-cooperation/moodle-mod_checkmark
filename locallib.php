@@ -2972,6 +2972,11 @@ class checkmark {
         $info = new \core_availability\info_module($cminfo);
         $users = $info->filter_user_list($users);
 
+        if (!isset($SESSION->checkmark->orderby)) {
+            $SESSION->checkmark->orderby = 'lastname';
+            $SESSION->checkmark->orderdirection = 'ASC';
+        }
+
         $cellwidth = array();
         $columnformat = array();
         $tableheaders = array();
@@ -3212,8 +3217,13 @@ class checkmark {
                 }
                 if (($groupmode == NOGROUPS) && ($SESSION->checkmark->orderby == 'groups')) {
                     unset($SESSION->checkmark->orderby);
-                    $sort = '';
+                    $sort = ' lastname ASC';
                 }
+            } else {
+                echo "SORT NOT SET SO SORT BY LASTNAME AND SET IT!";
+                $sort = ' ORDER BY lastname ASC ';
+                $SESSION->checkmark->orderby = 'lastname';
+                $SESSION->checkmark->orderdirection = 'ASC';
             }
 
             $ausers = $DB->get_records_sql($select.$sql.$sort, $params);
