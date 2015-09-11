@@ -735,5 +735,51 @@ function xmldb_checkmark_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2014052105, 'checkmark');
     }
 
+    if ($oldversion < 2015071501) {
+        if (isset($CFG->checkmark_requiremodintro)) {
+            set_config('requiremodintro', $CFG->checkmark_requiremodintro, 'checkmark');
+            unset($CFG->checkmark_requiremodintro);
+            $DB->delete_records('config', array('name' => 'checkmark_requiremodintro'));
+        } else {
+            set_config('requiremodintro', 1, 'mod_checkmark');
+        }
+
+        if (isset($CFG->checkmark_stdexamplecount)) {
+            set_config('stdexamplecount', $CFG->checkmark_stdexamplecount, 'checkmark');
+            $DB->delete_records('config', array('name' => 'checkmark_stdexamplecount'));
+        } else {
+            set_config('stdexamplecount', 10, 'mod_checkmark');
+        }
+
+        if (isset($CFG->checkmark_stdexamplestart)) {
+            set_config('stdexamplestart', $CFG->checkmark_stdexamplestart, 'checkmark');
+            $DB->delete_records('config', array('name' => 'checkmark_stdexamplestart'));
+        } else {
+            set_config('stdexamplestart', 1, 'checkmark');
+        }
+
+        if (isset($CFG->checkmark_stdnames)) {
+            set_config('stdnames', $CFG->checkmark_stdnames, 'checkmark');
+            $DB->delete_records('config', array('name' => 'checkmark_stdnames'));
+        } else {
+            set_config('stdnames', 'a,b,c,d,e,f', 'checkmark');
+        }
+
+        if (isset($CFG->checkmark_stdgrades)) {
+            set_config('stdgrades', $CFG->checkmark_stdgrades, 'checkmark');
+            $DB->delete_records('config', array('name' => 'checkmark_stdgrades'));
+        } else {
+            set_config('stdgrades', '10,10,20,20,20,20', 'checkmark');
+        }
+        if (isset($CFG->checkmark_validmsgtime)) {
+            set_config('validmsgtime', $CFG->checkmark_validmsgtime, 'checkmark');
+            $DB->delete_records('config', array('name' => 'checkmark_validmsgtime'));
+        } else {
+            set_config('validmsgtime', 2, 'checkmark');
+        }
+
+        upgrade_mod_savepoint(true, 2015071501, 'checkmark');
+    }
+
     return true;
 }

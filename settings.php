@@ -30,15 +30,15 @@ defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
 
-    $settings->add(new admin_setting_configcheckbox('checkmark_requiremodintro',
+    $settings->add(new admin_setting_configcheckbox('checkmark/requiremodintro',
                                                     get_string('requiremodintro', 'admin'),
                                                     get_string('configrequiremodintro', 'admin'), 1));
 
-    $settings->add(new admin_setting_configtext('checkmark_stdexamplecount',
+    $settings->add(new admin_setting_configtext('checkmark/stdexamplecount',
                                                 get_string('strstdexamplecount', 'checkmark'),
                                                 get_string('strstdexamplecountdesc', 'checkmark'),
                                                 '10'));
-    $settings->add(new admin_setting_configtext('checkmark_stdexamplestart',
+    $settings->add(new admin_setting_configtext('checkmark/stdexamplestart',
                                                 get_string('strstdexamplestart', 'checkmark'),
                                                 get_string('strstdexamplestartdesc', 'checkmark'),
                                                 '1'));
@@ -46,16 +46,20 @@ if ($ADMIN->fulltree) {
      * TODO tscpr: instead of having the default values hardcoded, you can "calculate" them with
      * the delimiter set in the checkmark class.. just in case :)
      */
-    $settings->add(new admin_setting_configtext('checkmark_stdnames',
+    $settings->add(new admin_setting_configtext('checkmark/stdnames',
                                                 get_string('strstdnames', 'checkmark'),
                                                 get_string('strstdnamesdesc', 'checkmark'),
                                                 'a,b,c,d,e,f'));
-    $settings->add(new admin_setting_configtext('checkmark_stdgrades',
+    $settings->add(new admin_setting_configtext('checkmark/stdgrades',
                                                 get_string('strstdgrades', 'checkmark'),
                                                 get_string('strstdgradesdesc', 'checkmark'),
                                                 '10,10,20,20,20,20'));
-    $settings->add(new admin_setting_configtext('checkmark_validmsgtime',
+    $settings->add(new admin_setting_configtext('checkmark/validmsgtime',
                                                 get_string('strvalidmsgtime', 'checkmark'),
                                                 get_string('strvalidmsgtimedesc', 'checkmark'),
                                                 '2'));
+
+    $settings->add(new admin_setting_configcheckbox('checkmark/showrecentsubmissions',
+                                                    get_string('showrecentsubmissions', 'checkmark'),
+                                                    get_string('configshowrecentsubmissions', 'checkmark'), 0));
 }

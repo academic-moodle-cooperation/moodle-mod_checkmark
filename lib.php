@@ -693,6 +693,8 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
     $show    = array();
     $grader  = array();
 
+    $showrecentsubmissions = get_config('checkmark', 'showrecentsubmissions');
+
     foreach ($submissions as $submission) {
         if (!array_key_exists($submission->cmid, $modinfo->cms)) {
             continue;
@@ -710,7 +712,7 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
          * The act of sumbitting of checkmark may be considered private
          * only graders will see it if specified!
          */
-        if (empty($CFG->checkmark_showrecentsubmissions)) {
+        if (empty($showrecentsubmissions)) {
             if (!array_key_exists($cm->id, $grader)) {
                 $grader[$cm->id] = has_capability('moodle/grade:viewall',
                                                   context_module::instance($cm->id));
@@ -833,6 +835,8 @@ function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $c
 
     $show = array();
 
+    $showrecentsubmissions = get_config('checkmark', 'showrecentsubmissions');
+
     foreach ($submissions as $submission) {
         if ($submission->userid == $USER->id) {
             $show[] = $submission;
@@ -842,7 +846,7 @@ function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $c
          * The act of submitting of checkmark may be considered private
          * only graders will see it if specified!
          */
-        if (empty($CFG->checkmark_showrecentsubmissions)) {
+        if (empty($showrecentsubmissions)) {
             if (!$grader) {
                 continue;
             }

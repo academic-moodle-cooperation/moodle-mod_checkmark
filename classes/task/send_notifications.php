@@ -46,8 +46,9 @@ class send_notifications extends \core\task\scheduled_task {
 
         $timenow   = time();
         $endtime   = $timenow - $CFG->maxeditingtime;
-        if (isset($CFG->checkmark_validmsgtime)) {
-            $starttime = $endtime - $CFG->checkmark_validmsgtime * 24 * 3600;   // Two days earlier?
+        $validmsgtime = get_config('checkmark', 'validmsgtime');
+        if (false !== $validmsgtime) {
+            $starttime = $endtime - $validmsgtime * 24 * 3600;   // Two days earlier?
         } else {
                 $starttime = $endtime - 2 * 24 * 3600;   // Two days earlier?
         }

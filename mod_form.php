@@ -56,7 +56,8 @@ class mod_checkmark_mod_form extends moodleform_mod {
         }
         $mform->addRule('name', null, 'required', null, 'client');
 
-        $this->add_intro_editor($CFG->checkmark_requiremodintro, get_string('description', 'checkmark'));
+        $requiremodintro = get_config('checkmark', 'requiremodintro');
+        $this->add_intro_editor($requiremodintro, get_string('description', 'checkmark'));
 
         $mform->addElement('header', 'availability', get_string('availability', 'assign'));
         $mform->setExpanded('availability', true);
@@ -125,22 +126,16 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->setType('examplecount', PARAM_RAW);
         $mform->addHelpButton('examplecount', 'numberofexamples', 'checkmark');
         $mform->disabledIf('examplecount', 'flexiblenaming', 'checked');
-        if (isset($CFG->checkmark_stdexamplecount)) {
-            $mform->setDefault('examplecount', $CFG->checkmark_stdexamplecount);
-        } else {
-            $mform->setDefault('examplecount', '10');
-        }
+        $stdexamplecount = get_config('checkmark', 'stdexamplecount');
+        $mform->setDefault('examplecount', $stdexamplecount);
 
         $mform->addElement('text', 'examplestart', get_string('firstexamplenumber', 'checkmark'));
         // We're going to clean them by ourselves...
         $mform->setType('examplestart', PARAM_RAW);
         $mform->addHelpButton('examplestart', 'firstexamplenumber', 'checkmark');
         $mform->disabledIf('examplestart', 'flexiblenaming', 'checked');
-        if (isset($CFG->checkmark_stdexamplestart)) {
-            $mform->setDefault('examplestart', $CFG->checkmark_stdexamplestart);
-        } else {
-            $mform->setDefault('examplestart', '1');
-        }
+        $stdexamplestart = get_config('checkmark', 'stdexamplestart');
+        $mform->setDefault('examplestart', $stdexamplestart);
 
         $mform->addElement('checkbox', 'flexiblenaming', get_string('flexiblenaming', 'checkmark'),
                            get_string('activateindividuals', 'checkmark'),
@@ -154,11 +149,8 @@ class mod_checkmark_mod_form extends moodleform_mod {
         // We clean these by ourselves!
         $mform->setType('examplenames', PARAM_RAW);
         $mform->addHelpButton('examplenames', 'examplenames', 'checkmark');
-        if (isset($CFG->checkmark_stdnames)) {
-            $mform->setDefault('examplenames', $CFG->checkmark_stdnames);
-        } else {
-            $mform->setDefault('examplenames', '1,2,3,4,5,6,7,8,9,10');
-        }
+        $stdnames = get_config('checkmark', 'stdnames');
+        $mform->setDefault('examplenames', $stdnames);
 
         $mform->disabledIf('examplenames', 'flexiblenaming', 'notchecked');
         $mform->setAdvanced('examplenames');
@@ -169,11 +161,8 @@ class mod_checkmark_mod_form extends moodleform_mod {
         // We clean these by ourselves!
         $mform->setType('examplegrades', PARAM_RAW);
         $mform->addHelpButton('examplegrades', 'examplegrades', 'checkmark');
-        if (isset($CFG->checkmark_stdgrades)) {
-            $mform->setDefault('examplegrades', $CFG->checkmark_stdgrades);
-        } else {
-            $mform->setDefault('examplegrades', '10,10,10,10,10,10,10,10,10,10');
-        }
+        $stdgrades = get_config('checkmark', 'stdgrades');
+        $mform->setDefault('examplegrades', $stdgrades);
         $mform->disabledIf('examplegrades', 'flexiblenaming', 'notchecked');
         $mform->setAdvanced('examplegrades');
 
@@ -205,9 +194,9 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform =& $this->_form;
         parent::standard_grading_coursemodule_elements();
         $mform->addHelpButton('grade', 'grade', 'checkmark');
-        if (isset($CFG->checkmark_stdexamplecount)
-            && (100 % $CFG->checkmark_stdexamplecount)) {
-            $mform->setDefault('grade', $CFG->checkmark_stdexamplecount);
+        $stdexamplecount = get_config('checkmark', 'stdexamplecount');
+        if (100 % $stdexamplecount) {
+            $mform->setDefault('grade', $stdexamplecount);
         }
         $mform->setExpanded('modstandardgrade');
     }
