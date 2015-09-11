@@ -28,8 +28,6 @@
 namespace mod_checkmark\event;
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/mod/checkmark/mtablepdf.php');
-
 class submissions_exported extends \core\event\base {
     /**
      * Init method.
@@ -53,8 +51,10 @@ class submissions_exported extends \core\event\base {
      * -- selected = optional_param_array('selected', array(), PARAM_INT);
      * -- filter
      * -- filter_readable
-     * -- format (following indented only if format == MTablePDF::OUTPUT_FORMAT_PDF)
-     *     -- orientation = optional_param('pageorientation', 0, PARAM_INT) ? MTablePDF::PORTRAIT : MTablePDF::LANDSCAPE;
+     * -- format (following indented only if format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF)
+     *     -- orientation = optional_param('pageorientation', 0, PARAM_INT) ?
+                            \mod_checkmark\MTablePDF::PORTRAIT :
+                            \mod_checkmark\MTablePDF::LANDSCAPE;
      *     -- printheader
      *     -- textsize
      *     -- printperpage    = get_user_preferences('checkmark_pdfprintperpage', null);
@@ -118,7 +118,7 @@ class submissions_exported extends \core\event\base {
         foreach ($this->data['other']['selected'] as $cur) {
             $params['selected['.$cur.']'] = $cur;
         }
-        if ($this->data['other']['format'] == \MTablePDF::OUTPUT_FORMAT_PDF) {
+        if ($this->data['other']['format'] == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
             $params['pageorientation'] = $this->data['other']['orientation'];
             $params['printheader'] = $this->data['other']['printheader'];
             $params['printperpage'] = $this->data['other']['printperpage'];
@@ -157,7 +157,7 @@ class submissions_exported extends \core\event\base {
 
         if (!key_exists('format', $this->data['other'])) {
             throw new \coding_exception('Format has to be specified!');
-        } else if ($this->data['other']['format'] == \MTablePDF::OUTPUT_FORMAT_PDF) {
+        } else if ($this->data['other']['format'] == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
             if (!key_exists('printperpage', $this->data['other'])) {
                 throw new \coding_exception('Entries per page have to be specified!');
             }

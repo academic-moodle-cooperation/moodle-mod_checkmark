@@ -3590,7 +3590,6 @@ class checkmark {
     public function print_preview_tab($message='', $outputtabs='') {
         global $SESSION, $CFG, $DB, $USER, $OUTPUT, $PAGE;
         require_once($CFG->libdir.'/gradelib.php');
-        require_once($CFG->dirroot.'/mod/checkmark/mtablepdf.php');
 
         /*
          * First we check to see if the form has just been submitted
@@ -3605,9 +3604,9 @@ class checkmark {
         $updatepref = optional_param('updatepref', 0, PARAM_INT);
 
         if ($updatepref && confirm_sesskey()) {
-            $format = optional_param('format', MTablePDF::OUTPUT_FORMAT_PDF, PARAM_INT);
+            $format = optional_param('format', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF, PARAM_INT);
             set_user_preference('checkmark_format', $format);
-            if ($format == MTablePDF::OUTPUT_FORMAT_PDF) {
+            if ($format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
                 $printperpage = optional_param('printperpage', 0, PARAM_INT);
                 $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
                 $printperpage = (($printperpage <= 0) || $printoptimum) ? 0 : $printperpage;
@@ -3643,7 +3642,7 @@ class checkmark {
             $printoptimum = 0;
         }
         $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
-        $format = get_user_preferences('checkmark_format', MTablePDF::OUTPUT_FORMAT_PDF);
+        $format = get_user_preferences('checkmark_format', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
         $textsize = get_user_preferences('checkmark_textsize', 0);
         $pageorientation = get_user_preferences('checkmark_pageorientation', 0);
         $printheader = get_user_preferences('checkmark_printheader', 1);
@@ -3699,12 +3698,12 @@ class checkmark {
         $mform->setExpanded('print_settings_header');
 
         // Format?
-        $formats = array(MTablePDF::OUTPUT_FORMAT_PDF        => 'PDF',
-                         MTablePDF::OUTPUT_FORMAT_XLSX       => 'XLSX',
-                         MTablePDF::OUTPUT_FORMAT_XLS        => 'XLS',
-                         MTablePDF::OUTPUT_FORMAT_ODS        => 'ODS',
-                         MTablePDF::OUTPUT_FORMAT_CSV_COMMA  => 'CSV (;)',
-                         MTablePDF::OUTPUT_FORMAT_CSV_TAB    => 'CSV (tab)');
+        $formats = array(\mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF        => 'PDF',
+                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLSX       => 'XLSX',
+                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLS        => 'XLS',
+                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_ODS        => 'ODS',
+                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_COMMA  => 'CSV (;)',
+                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_TAB    => 'CSV (tab)');
         $mform->addElement('select', 'format', get_string('format', 'checkmark'), $formats);
         $mform->setDefault('format', $format);
 
@@ -3722,24 +3721,24 @@ class checkmark {
         $mform->setDefault('printperpage', $printperpage);
         $mform->setDefault('printoptimum', $printoptimum);
         $mform->disabledIf('printperpage', 'printoptimum', 'checked');
-        $mform->disabledIf('printperpage', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
-        $mform->disabledIf('printoptimum', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->disabledIf('printperpage', 'format', 'neq', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->disabledIf('printoptimum', 'format', 'neq', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
 
         $textsizes = array(0 => get_string('strsmall', 'checkmark'),
                            1 => get_string('strmedium', 'checkmark'),
                            2 => get_string('strlarge', 'checkmark'));
         $mform->addElement('select', 'textsize', get_string('pdftextsize', 'checkmark'),  $textsizes);
-        $mform->disabledIf('textsize', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->disabledIf('textsize', 'format', 'neq', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
 
         $pageorientations = array(0 => get_string('strlandscape', 'checkmark'),
                                   1 => get_string('strportrait', 'checkmark'));
         $mform->addElement('select', 'pageorientation', get_string('pdfpageorientation', 'checkmark'),  $pageorientations);
-        $mform->disabledIf('pageorientation', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->disabledIf('pageorientation', 'format', 'neq', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
 
         $mform->addElement('advcheckbox', 'printheader', get_string('pdfprintheader', 'checkmark'));
         $mform->addHelpButton('printheader', 'pdfprintheader', 'checkmark');
         $mform->setDefault('printheader', 1);
-        $mform->disabledIf('printheader', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->disabledIf('printheader', 'format', 'neq', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
 
         $mform->addElement('submit', 'submittoprint', get_string('strprint', 'checkmark'));
 
@@ -3830,7 +3829,6 @@ class checkmark {
     public function submissions_print() {
         global $SESSION, $CFG, $DB, $USER, $DB, $OUTPUT, $PAGE;
         require_once($CFG->libdir.'/gradelib.php');
-        require_once($CFG->dirroot.'/mod/checkmark/mtablepdf.php');
 
         /* first we check to see if the form has just been submitted
          * to request user_preference updates
@@ -3840,18 +3838,18 @@ class checkmark {
         $filters = array(self::FILTER_ALL             => get_string('all'),
                          self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
                          self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
-        $formats = array(MTablePDF::OUTPUT_FORMAT_PDF        => 'PDF',
-                         MTablePDF::OUTPUT_FORMAT_XLSX       => 'XLSX',
-                         MTablePDF::OUTPUT_FORMAT_XLS        => 'XLS',
-                         MTablePDF::OUTPUT_FORMAT_ODS        => 'ODS',
-                         MTablePDF::OUTPUT_FORMAT_CSV_COMMA  => 'CSV (;)',
-                         MTablePDF::OUTPUT_FORMAT_CSV_TAB    => 'CSV (tab)');
+        $formats = array(\mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF        => 'PDF',
+                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLSX       => 'XLSX',
+                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLS        => 'XLS',
+                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_ODS        => 'ODS',
+                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_COMMA  => 'CSV (;)',
+                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_TAB    => 'CSV (tab)');
 
         $updatepref = optional_param('updatepref', 0, PARAM_INT);
 
         if ($updatepref && confirm_sesskey()) {
-            $format = optional_param('format', MTablePDF::OUTPUT_FORMAT_PDF, PARAM_INT);
-            if ($format == MTablePDF::OUTPUT_FORMAT_PDF) {
+            $format = optional_param('format', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF, PARAM_INT);
+            if ($format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
                 $printperpage = optional_param('printperpage', 0, PARAM_INT);
                 $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
                 $printperpage = (($printperpage <= 0) || $printoptimum) ? 0 : $printperpage;
@@ -3909,10 +3907,12 @@ class checkmark {
 
         $usrlst = optional_param_array('selected', array(), PARAM_INT);
         // Get orientation (P/L)!
-        $orientation = optional_param('pageorientation', 0, PARAM_INT) ? MTablePDF::PORTRAIT : MTablePDF::LANDSCAPE;
+        $orientation = optional_param('pageorientation', 0, PARAM_INT) ?
+                       \mod_checkmark\MTablePDF::PORTRAIT :
+                       \mod_checkmark\MTablePDF::LANDSCAPE;
         $printheader = optional_param('printheader', false, PARAM_BOOL);
         $textsize = optional_param('textsize', 1, PARAM_INT);
-        $format = optional_param('format', MTablePDF::OUTPUT_FORMAT_PDF, PARAM_INT);
+        $format = optional_param('format', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF, PARAM_INT);
 
         if (!empty($CFG->enableoutcomes) && !empty($gradinginfo->outcomes)) {
             $usesoutcomes = true;
@@ -3963,7 +3963,7 @@ class checkmark {
             $grpname = '-';
         }
 
-        $pdf = new MTablePDF($orientation, $cellwidth);
+        $pdf = new \mod_checkmark\MTablePDF($orientation, $cellwidth);
 
         $pdf->setHeaderText(get_string('course').':', $coursename,
                             get_string('availabledate', 'checkmark').':', !empty($timeavailable) ?
@@ -3981,13 +3981,13 @@ class checkmark {
 
         switch ($textsize) {
             case '0':
-                $pdf->SetFontSize(MTablePDF::FONTSIZE_SMALL);
+                $pdf->SetFontSize(\mod_checkmark\MTablePDF::FONTSIZE_SMALL);
                 break;
             case '1':
-                $pdf->SetFontSize(MTablePDF::FONTSIZE_MEDIUM);
+                $pdf->SetFontSize(\mod_checkmark\MTablePDF::FONTSIZE_MEDIUM);
                 break;
             case '2':
-                $pdf->SetFontSize(MTablePDF::FONTSIZE_LARGE);
+                $pdf->SetFontSize(\mod_checkmark\MTablePDF::FONTSIZE_LARGE);
                 break;
         }
 
@@ -4026,7 +4026,7 @@ class checkmark {
             'sumrel'          => $sumrel,
         );
 
-        if ($data['format'] == MTablePDF::OUTPUT_FORMAT_PDF) {
+        if ($data['format'] == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
             $data['orientation']  = $orientation;
             $data['printheader']  = $printheader;
             $data['textsize']     = $textsize;

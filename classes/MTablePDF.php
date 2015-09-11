@@ -17,13 +17,14 @@
 /**
  * mtablepdf.php
  *
- * @package       mtablepdf
+ * @package       \mod_checkmark\mtablepdf
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
  * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
  * @author        Andreas Windbichler
  * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace mod_checkmark;
 
 require_once('../../config.php');
 
@@ -34,7 +35,7 @@ require_once($CFG->libdir . '/pdflib.php');
  * @version 25.06.2015
  *
  */
-class MTablePDF extends pdf{
+class MTablePDF extends \pdf {
     const PORTRAIT = 'P';
     const LANDSCAPE = 'L';
 
@@ -759,7 +760,7 @@ class MTablePDF extends pdf{
 
         require_once($CFG->libdir . "/excellib.class.php");
 
-        $workbook = new MoodleExcelWorkbook("-", 'excel5');
+        $workbook = new \MoodleExcelWorkbook("-", 'excel5');
 
         $this->fill_workbook($workbook);
 
@@ -772,7 +773,7 @@ class MTablePDF extends pdf{
 
         require_once($CFG->libdir . "/excellib.class.php");
 
-        $workbook = new MoodleExcelWorkbook("-", 'Excel2007');
+        $workbook = new \MoodleExcelWorkbook("-", 'Excel2007');
 
         $this->fill_workbook($workbook);
 
@@ -785,7 +786,7 @@ class MTablePDF extends pdf{
 
         require_once($CFG->libdir . "/odslib.class.php");
 
-        $workbook = new MoodleODSWorkbook("-");
+        $workbook = new \MoodleODSWorkbook("-");
 
         $this->fill_workbook($workbook);
 
