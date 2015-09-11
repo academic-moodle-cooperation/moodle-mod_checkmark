@@ -621,8 +621,8 @@ function xmldb_checkmark_upgrade($oldversion) {
                                          LEFT JOIN {event} event ON event.instance = checkmark.id
                                                                  AND event.instance <> 0
                                                                  AND event.modulename LIKE 'checkmark'
-                                            GROUP BY checkmark.id
-                                            HAVING present = 0 AND checkmark.timedue <> 0");
+                                          GROUP BY checkmark.id
+                                            HAVING COUNT( event.id ) = 0 AND checkmark.timedue <> 0");
         $repairedids = array();
         $i = 0;
         $max = count($checkmarks);
