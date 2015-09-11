@@ -673,23 +673,23 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
     global $CFG, $USER, $DB, $OUTPUT;
 
     // Do not use log table if possible, it may be huge!
-
+    $userfields = get_all_user_name_fields(true, 'u');
     if (!$submissions = $DB->get_records_sql('
             SELECT asb.id, asb.timemodified, cm.id AS cmid, asb.userid,
-                 u.firstname, u.lastname, u.email, u.picture
-            FROM {checkmark_submissions} asb
-                JOIN {checkmark} a       ON a.id = asb.checkmarkid
-                JOIN {course_modules} cm ON cm.instance = a.id
-                JOIN {modules} md        ON md.id = cm.module
-                JOIN {user} u            ON u.id = asb.userid
-            WHERE asb.timemodified > ? AND
-                  a.course = ? AND
-                  md.name = \'checkmark\'
-            ORDER BY asb.timemodified ASC', array($timestart, $course->id))) {
+                   '.$userfields.', u.email, u.picture
+              FROM {checkmark_submissions} asb
+              JOIN {checkmark} a       ON a.id = asb.checkmarkid
+              JOIN {course_modules} cm ON cm.instance = a.id
+              JOIN {modules} md        ON md.id = cm.module
+              JOIN {user} u            ON u.id = asb.userid
+             WHERE asb.timemodified > ? AND
+                   a.course = ? AND
+                   md.name = \'checkmark\'
+          ORDER BY asb.timemodified ASC', array($timestart, $course->id))) {
         return false;
     }
 
-    $modinfo =& get_fast_modinfo($course); // Reference needed because we might load the groups!
+    $modinfo = get_fast_modinfo($course);
     $show    = array();
     $grader  = array();
 
