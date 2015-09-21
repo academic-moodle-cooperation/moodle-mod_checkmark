@@ -427,9 +427,9 @@ function checkmark_get_user_grades($checkmark, $userid=0) {
     }
     $params['aid'] = $checkmark->id;
 
-    $sql = 'SELECT u.id, u.id userid, s.grade rawgrade, s.submissioncomment feedback,
-                   s.format feedbackformat, s.teacherid usermodified,
-                   s.timemarked dategraded, s.timemodified datesubmitted
+    $sql = 'SELECT u.id, u.id userid, s.grade AS rawgrade, s.submissioncomment AS feedback,
+                   s.format AS feedbackformat, s.teacherid AS usermodified,
+                   s.timemarked AS dategraded, s.timemodified AS datesubmitted
               FROM {user} u, {checkmark_submissions} s
              WHERE u.id = s.userid AND s.checkmarkid = :aid'.
             $user;
@@ -468,7 +468,7 @@ function checkmark_upgrade_grades() {
              WHERE m.name=\'checkmark\' AND m.id=cm.module AND cm.instance=a.id';
     $count = $DB->count_records_sql($sql);
 
-    $sql = 'SELECT a.*, cm.idnumber cmidnumber, a.course course
+    $sql = 'SELECT a.*, cm.idnumber AS cmidnumber, a.course AS course
               FROM {checkmark} a, {course_modules} cm, {modules} m
              WHERE m.name=\'checkmark\' AND m.id=cm.module AND cm.instance=a.id';
     $rs = $DB->get_recordset_sql($sql);
@@ -675,10 +675,10 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
     // Do not use log table if possible, it may be huge!
 
     if (!$submissions = $DB->get_records_sql('
-            SELECT asb.id, asb.timemodified, cm.id cmid, asb.userid,
+            SELECT asb.id, asb.timemodified, cm.id AS cmid, asb.userid,
                  u.firstname, u.lastname, u.email, u.picture
             FROM {checkmark_submissions} asb
-                JOIN {checkmark} a      ON a.id = asb.checkmarkid
+                JOIN {checkmark} a       ON a.id = asb.checkmarkid
                 JOIN {course_modules} cm ON cm.instance = a.id
                 JOIN {modules} md        ON md.id = cm.module
                 JOIN {user} u            ON u.id = asb.userid
@@ -1242,7 +1242,7 @@ function checkmark_print_overview($courses, &$htmlarray) {
     }
     $rs->close();
 
-    $rs = $DB->get_recordset_sql('SELECT checkmarkid, count(DISTINCT userid) as amount
+    $rs = $DB->get_recordset_sql('SELECT checkmarkid, count(DISTINCT userid) AS amount
                                     FROM {checkmark_submissions}
                                    WHERE checkmarkid '.$sqlcheckmarkids.' '.
                                'GROUP BY checkmarkid',
@@ -1260,7 +1260,7 @@ function checkmark_print_overview($courses, &$htmlarray) {
                                               AND checkmarkid '.$sqlcheckmarkids,
                                           array_merge(array($USER->id), $checkmarkidparams));
     foreach ($mysubmissions as $key => $mysubmission) {
-        $sql = 'SELECT exampleid id, name, grade, state
+        $sql = 'SELECT exampleid AS id, name, grade, state
                   FROM {checkmark_checks} chks
             RIGHT JOIN {checkmark_examples} ex
                     ON chks.exampleid = ex.id
@@ -1524,7 +1524,7 @@ function checkmark_reset_gradebook($courseid) {
 
     $params = array('courseid' => $courseid);
 
-    $sql = 'SELECT a.*, cm.idnumber cmidnumber, a.course courseid
+    $sql = 'SELECT a.*, cm.idnumber AS cmidnumber, a.course AS courseid
               FROM {checkmark} a, {course_modules} cm, {modules} m
              WHERE m.name=\'checkmark\' AND m.id=cm.module
                                         AND cm.instance=a.id

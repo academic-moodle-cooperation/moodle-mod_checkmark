@@ -1863,20 +1863,20 @@ class checkmark {
                 }
                 $getgroupsql = 'SELECT grps.courseid, '.$groupselect;
                 $params['courseid'] = $this->course->id;
-                $getgroupsql .= ' AS groups, grpm.userid userid
+                $getgroupsql .= ' AS groups, grpm.userid AS userid
                              FROM {groups_members} grpm
                              LEFT JOIN {groups} grps
                              ON grps.id = grpm.groupid
                              WHERE grps.courseid = :courseid
                              GROUP BY grpm.userid'.
                              $grouporder;
-                $groupssql = ' LEFT JOIN ('.$getgroupsql.') AS grpq ON u.id = grpq.userid ';
+                $groupssql = ' LEFT JOIN ('.$getgroupsql.') grpq ON u.id = grpq.userid ';
             } else {
                 $groupssql = '';
             }
 
             $select = 'SELECT '.$userfields.',
-                              s.id submissionid, s.grade, s.submissioncomment,
+                              s.id AS submissionid, s.grade, s.submissioncomment,
                               s.timemodified, s.timemarked ';
             if ($groupmode != NOGROUPS) {
                 $select .= ', groups ';
@@ -2434,7 +2434,7 @@ class checkmark {
             }
             $getgroupsql = 'SELECT MAX(grps.courseid), '.$groupselect;
             $params['courseid'] = $this->course->id;
-            $getgroupsql .= ' AS groups, grpm.userid userid
+            $getgroupsql .= ' AS groups, grpm.userid AS userid
                          FROM {groups_members} grpm
                          LEFT JOIN {groups} grps
                          ON grps.id = grpm.groupid
@@ -2449,7 +2449,7 @@ class checkmark {
         if (!empty($users)) {
             $useridentityfields = get_extra_user_fields_sql($context, 'u');
             $select = 'SELECT '.$ufields.' '.$useridentityfields.',
-                              s.id submissionid, s.grade, s.submissioncomment,
+                              s.id AS submissionid, s.grade, s.submissioncomment,
                               s.timemodified, s.timemarked ';
             if ($groupmode != NOGROUPS) {
                 $select .= ', groups ';
@@ -3156,7 +3156,7 @@ class checkmark {
             }
             $getgroupsql = 'SELECT MAX(grps.courseid), '.$groupselect;
             $params['courseid'] = $this->course->id;
-            $getgroupsql .= ' AS groups, grpm.userid userid
+            $getgroupsql .= ' AS groups, grpm.userid AS userid
                          FROM {groups_members} grpm
                          LEFT JOIN {groups} grps
                          ON grps.id = grpm.groupid
@@ -3175,12 +3175,12 @@ class checkmark {
             $params['examplecount'] = $examplecount;
 
             $select = 'SELECT '.$ufields.' '.$useridentityfields.',
-                              MAX(s.id) submissionid, MAX(s.grade) grade, MAX(s.submissioncomment) comment,
-                              MAX(s.timemodified) timesubmitted, MAX(s.timemarked) timemarked,
-                              100 * COUNT( DISTINCT cchks.id ) / :examplecount summary,
-                              COUNT( DISTINCT cchks.id ) checks';
+                              MAX(s.id) AS submissionid, MAX(s.grade) AS grade, MAX(s.submissioncomment) AS comment,
+                              MAX(s.timemodified) AS timesubmitted, MAX(s.timemarked) AS timemarked,
+                              100 * COUNT( DISTINCT cchks.id ) / :examplecount AS summary,
+                              COUNT( DISTINCT cchks.id ) AS checks';
             if ($groupmode != NOGROUPS) {
-                    $select .= ', MAX(groups) ';
+                    $select .= ', MAX(groups) AS groups';
             }
             $params['checkmarkid'] = $this->checkmark->id;
 
@@ -3220,7 +3220,6 @@ class checkmark {
                     $sort = ' lastname ASC';
                 }
             } else {
-                echo "SORT NOT SET SO SORT BY LASTNAME AND SET IT!";
                 $sort = ' ORDER BY lastname ASC ';
                 $SESSION->checkmark->orderby = 'lastname';
                 $SESSION->checkmark->orderdirection = 'ASC';
@@ -4248,7 +4247,7 @@ EOS;
         if ($submission || !$createnew) {
             if ($submission) {
                 if (!$submission->examples = $DB->get_records_sql('
-                    SELECT exampleid id, name, grade, state
+                    SELECT exampleid AS id, name, grade, state
                       FROM {checkmark_checks}
                 RIGHT JOIN {checkmark_examples}
                         ON {checkmark_checks}.exampleid = {checkmark_examples}.id
@@ -4277,7 +4276,7 @@ EOS;
         $submission = $DB->get_record('checkmark_submissions',
                                       array('checkmarkid' => $this->checkmark->id,
                                             'userid'      => $userid));
-        $submission->examples = $DB->get_records_sql('SELECT exampleid id, name, grade, state
+        $submission->examples = $DB->get_records_sql('SELECT exampleid AS id, name, grade, state
                                                         FROM {checkmark_checks} chks
                                                   RIGHT JOIN {checkmark_examples} ex
                                                           ON chks.exampleid = ex.id
