@@ -1003,11 +1003,6 @@ function checkmark_count_real_submissions($cm, $groupid=0) {
         $users = array_keys($users);
     }
 
-    $modinfo = get_fast_modinfo($cm->course);
-    $cminfo = $modinfo->get_cm($cm->id);
-    $info = new \core_availability\info_module($cminfo);
-    $users = $info->filter_user_list($users);
-
     if (empty($users)) {
         return 0;
     }

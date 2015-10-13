@@ -1822,14 +1822,6 @@ class checkmark {
         $groupmode = groups_get_activity_groupmode($cm);
         $currentgroup = groups_get_activity_group($cm);
         $users = get_enrolled_users($context, 'mod/checkmark:submit', $currentgroup, 'u.id');
-        if ($users) {
-            $users = array_keys($users);
-
-            $modinfo = get_fast_modinfo($course);
-            $cminfo = $modinfo->get_cm($cm->id);
-            $info = new \core_availability\info_module($cminfo);
-            $users = $info->filter_user_list($users);
-        }
 
         $nextid = 0;
         $where = '';
@@ -2317,11 +2309,6 @@ class checkmark {
         if (!empty($users)) {
             $users = array_keys($users);
         }
-
-        $modinfo = get_fast_modinfo($course);
-        $cminfo = $modinfo->get_cm($cm->id);
-        $info = new \core_availability\info_module($cminfo);
-        $users = $info->filter_user_list($users);
 
         $tablecolumns = array('selection', 'picture', 'fullname');
         $tableheaders = array('', '', get_string('fullnameuser'));
@@ -2966,11 +2953,6 @@ class checkmark {
         if (!empty($users)) {
             $users = array_keys($users);
         }
-
-        $modinfo = get_fast_modinfo($course);
-        $cminfo = $modinfo->get_cm($cm->id);
-        $info = new \core_availability\info_module($cminfo);
-        $users = $info->filter_user_list($users);
 
         if (!isset($SESSION->checkmark->orderby)) {
             $SESSION->checkmark->orderby = 'lastname';
