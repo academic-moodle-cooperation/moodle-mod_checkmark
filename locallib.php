@@ -1834,7 +1834,7 @@ class checkmark {
         if ($users) {
             $userfields = user_picture::fields('u', array('lastaccess', 'idnumber'));
 
-            list($sqluserids, $userparams) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'user');
+            list($sqluserids, $userparams) = $DB->get_in_or_equal(array_keys($users), SQL_PARAMS_NAMED, 'user');
             $params = array_merge_recursive($params, $userparams);
 
             $params['checkmarkid'] = $this->checkmark->id;
