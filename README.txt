@@ -25,7 +25,7 @@
  */
 
 # ---------------------------------------------------------------
-# FOR Moodle 2.7+
+# FOR Moodle 2.8+
 # ---------------------------------------------------------------
 
 Checkmark-Module
@@ -48,7 +48,7 @@ OVERVIEW
 
 REQUIREMENTS
 ================================================================================
-    Moodle <2.7 or later>
+    Moodle <2.8 or later>
 
 INSTALLATION
 ================================================================================
@@ -67,6 +67,39 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2015071504
+-------------------------
+*) fixed small bug preventing manual grading (not quick grading)
+
+v 2015071503
+-------------------------
+*) fix no submissions shown/counted because of filtered users lists
+
+v 2015071502
+-------------------------
+*) fix query in updgrade script breaking in postgres
+*) remove obsolete/unused files/code
+*) improve support for PostgreSQL
+*) fix missing additional user fields in recent_activities_block output
+*) refactor code to use autoloading
+
+v 2015071501
+-------------------------
+*) move plugin settings from config to config plugins
+
+v 2015071500
+-------------------------
+*) fix PDF export sometimes has bad layout in portrait mode
+*) column shown in table header even if column is hidden
+*) some small CSS improvements
+*) fixed some form validation error messages
+*) fixed sorting of print preview and submissions table (sort by lastname by default)
+*) fix groups not shown in print preview
+*) remove blocking JS calls
+*) output (styled) notification message if there's no data to shown
+*) enhance autograding confirm message with numbers of autograded entries
+*) add posibility to export "signature" column
+
 v 2015011400
 -------------------------
 *) Replace cron with scheduled task
