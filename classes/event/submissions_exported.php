@@ -53,8 +53,8 @@ class submissions_exported extends \core\event\base {
      * -- filter_readable
      * -- format (following indented only if format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF)
      *     -- orientation = optional_param('pageorientation', 0, PARAM_INT) ?
-                            \mod_checkmark\MTablePDF::PORTRAIT :
-                            \mod_checkmark\MTablePDF::LANDSCAPE;
+     *                      \mod_checkmark\MTablePDF::PORTRAIT :
+     *                      \mod_checkmark\MTablePDF::LANDSCAPE;
      *     -- printheader
      *     -- textsize
      *     -- printperpage    = get_user_preferences('checkmark_pdfprintperpage', null);
