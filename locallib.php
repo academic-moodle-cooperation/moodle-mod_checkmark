@@ -4347,23 +4347,21 @@ EOS;
                 $posttext = $this->email_teachers_text($info);
                 $posthtml = ($teacher->mailformat == 1) ? $this->email_teachers_html($info) : '';
 
-                $eventdata = new stdClass();
-                $eventdata->modulename       = 'checkmark';
-                $eventdata->userfrom         = $user;
-                $eventdata->userto           = $teacher;
-                $eventdata->subject          = $postsubject;
-                $eventdata->fullmessage      = $posttext;
-                $eventdata->fullmessageformat = FORMAT_PLAIN;
-                $eventdata->fullmessagehtml  = $posthtml;
-                $eventdata->smallmessage     = $postsubject;
+                $message = new \core\message\message();
+                $message->component         = 'mod_checkmark';
+                $message->name              = 'checkmark_updates';
+                $message->userfrom          = $user;
+                $message->userto            = $teacher;
+                $message->subject           = $postsubject;
+                $message->fullmessage       = $posttext;
+                $message->fullmessageformat = FORMAT_HTML;
+                $message->fullmessagehtml   = $posthtml;
+                $message->smallmessage      = $postsubject;
+                $message->notification      = 1;
+                $message->contexturl        = $info->url;
+                $message->contexturlname    = $info->checkmark;
 
-                $eventdata->name            = 'checkmark_updates';
-                $eventdata->component       = 'mod_checkmark';
-                $eventdata->notification    = 1;
-                $eventdata->contexturl      = $info->url;
-                $eventdata->contexturlname  = $info->checkmark;
-
-                message_send($eventdata);
+                message_send($message);
             }
         }
     }

@@ -127,23 +127,22 @@ class send_notifications extends \core\task\scheduled_task {
                     $posthtml = '';
                 }
 
-                $eventdata = new \stdClass();
-                $eventdata->modulename       = 'checkmark';
-                $eventdata->userfrom         = $teacher;
-                $eventdata->userto           = $user;
-                $eventdata->subject          = $postsubject;
-                $eventdata->fullmessage      = $posttext;
-                $eventdata->fullmessageformat = FORMAT_PLAIN;
-                $eventdata->fullmessagehtml  = $posthtml;
-                $eventdata->smallmessage     = \get_string('checkmarkmailsmall', 'checkmark',
-                                                           $checkmarkinfo);
-                $eventdata->name            = 'checkmark_updates';
-                $eventdata->component       = 'mod_checkmark';
-                $eventdata->notification    = 1;
-                $eventdata->contexturl      = $checkmarkinfo->url;
-                $eventdata->contexturlname  = $checkmarkinfo->checkmark;
+                $message = new \core\message\message();
+                $message->component         = 'mod_checkmark';
+                $message->name              = 'checkmark_updates';
+                $message->userfrom          = $teacher;
+                $message->userto            = $user;
+                $message->subject           = $postsubject;
+                $message->fullmessage       = $posttext;
+                $message->fullmessageformat = FORMAT_HTML;
+                $message->fullmessagehtml   = $posthtml;
+                $message->smallmessage      = \get_string('checkmarkmailsmall', 'checkmark',
+                                                          $checkmarkinfo);
+                $message->notification      = 1;
+                $message->contexturl        = $checkmarkinfo->url;
+                $message->contexturlname    = $checkmarkinfo->checkmark;
 
-                \message_send($eventdata);
+                \message_send($message);
                 $DB->set_field('checkmark_submissions', 'mailed', '1', array('id' => $submission->id));
             }
 
