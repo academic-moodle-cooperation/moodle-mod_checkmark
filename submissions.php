@@ -67,7 +67,6 @@ require_login($course->id, false, $cm);
 
 require_capability('mod/checkmark:grade', context_module::instance($cm->id));
 
-$PAGE->requires->js('/mod/checkmark/yui/checkmark/checkmark.js');
 
 // Load up the required checkmark code!
 $checkmarkinstance = new checkmark($cm->id, $checkmark, $cm, $course);

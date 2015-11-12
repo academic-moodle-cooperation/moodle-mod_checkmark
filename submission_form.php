@@ -75,16 +75,9 @@ class checkmark_submission_form extends moodleform {
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');
 
-        $jsdata = array($this->_customdata->examples);
-
-        $jsmodule = array('name'     => 'mod_checkmark',
-                          'fullpath' => '/mod/checkmark/yui/checkmark/checkmark.js',
-                          'requires' => array('base', 'io', 'node', 'json'),
-                          'strings'  => array(array('yes', 'moodle'),
-                                              array('no', 'moodle')));
-
-        $PAGE->requires->js_init_call('M.mod_checkmark.init_submission', $jsdata, false,
-                                      $jsmodule);
+        $params = new stdClass();
+        $params->examples = $this->_customdata->examples;
+        $PAGE->requires->js_call_amd('mod_checkmark/submission', 'initializer', array($params));
 
         // Set data from last submission and hidden fields!
         $this->set_data($this->_customdata);

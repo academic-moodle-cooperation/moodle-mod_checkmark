@@ -92,14 +92,10 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         $mform->addElement('hidden', 'course', optional_param('course', 0, PARAM_INT));
 
-        $jsdata = array(checkmark::DELIMITER);
-        $jsmodule = array('name'     => 'mod_checkmark',
-                          'fullpath' => '/mod/checkmark/yui/checkmark/checkmark.js',
-                          'requires' => array('base', 'io', 'node', 'json', 'event-valuechange'),
-                          'strings'  => array(array('yes', 'moodle'),
-                                              array('no', 'moodle')));
+        $params = new stdClass();
+        $params->dividing_symbol = checkmark::DELIMITER;
+        $PAGE->requires->js_call_amd('mod_checkmark/settings', 'initializer', array($params));
 
-        $PAGE->requires->js_init_call('M.mod_checkmark.init_settings', $jsdata, true, $jsmodule);
         $update = optional_param('update', 0, PARAM_INT);
         $cm = empty($update) ? null : get_coursemodule_from_id('', $update, 0, false, MUST_EXIST);
         $submissioncount = empty($update) ? 0 : checkmark_count_real_submissions($cm);
