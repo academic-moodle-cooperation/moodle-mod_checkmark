@@ -1879,7 +1879,7 @@ class checkmark {
                    $groupssql.
                    'WHERE '.$where.'u.id '.$sqluserids;
             // Construct sort!
-            if (!is_array($SESSION->flextable['mod-checkmark-submissions']->sortby)) {
+            if (empty($SESSION->flextable['mod-checkmark-submission']) || !is_array($SESSION->flextable['mod-checkmark-submissions']->sortby)) {
                 $sort = '';
             } else {
 
