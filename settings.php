@@ -30,10 +30,6 @@ defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
 
-    $settings->add(new admin_setting_configcheckbox('checkmark/requiremodintro',
-                                                    get_string('requiremodintro', 'admin'),
-                                                    get_string('configrequiremodintro', 'admin'), 1));
-
     $settings->add(new admin_setting_configtext('checkmark/stdexamplecount',
                                                 get_string('strstdexamplecount', 'checkmark'),
                                                 get_string('strstdexamplecountdesc', 'checkmark'),

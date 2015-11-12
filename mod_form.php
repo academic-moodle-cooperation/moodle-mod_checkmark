@@ -56,8 +56,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         }
         $mform->addRule('name', null, 'required', null, 'client');
 
-        $requiremodintro = get_config('checkmark', 'requiremodintro');
-        $this->add_intro_editor($requiremodintro, get_string('description', 'checkmark'));
+        $this->standard_intro_elements(get_string('description', 'checkmark'));
 
         $mform->addElement('header', 'availability', get_string('availability', 'assign'));
         $mform->setExpanded('availability', true);
