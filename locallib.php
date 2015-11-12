@@ -3682,7 +3682,6 @@ class checkmark {
         // Format?
         $formats = array(\mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF        => 'PDF',
                          \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLSX       => 'XLSX',
-                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLS        => 'XLS',
                          \mod_checkmark\MTablePDF::OUTPUT_FORMAT_ODS        => 'ODS',
                          \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_COMMA  => 'CSV (;)',
                          \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_TAB    => 'CSV (tab)');
@@ -3822,7 +3821,6 @@ class checkmark {
                          self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
         $formats = array(\mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF        => 'PDF',
                          \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLSX       => 'XLSX',
-                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLS        => 'XLS',
                          \mod_checkmark\MTablePDF::OUTPUT_FORMAT_ODS        => 'ODS',
                          \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_COMMA  => 'CSV (;)',
                          \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_TAB    => 'CSV (tab)');
