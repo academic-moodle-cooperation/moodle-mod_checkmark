@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * view.php
- * view checkmark (called by moodle-core)
+ * view.php Prints the main view of a particular instance of checkmark
  *
  * @package       mod_checkmark
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)

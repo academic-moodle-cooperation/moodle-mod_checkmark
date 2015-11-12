@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * index.php
- * Lists all checkmarks in course.
+ * index.php Lists all checkmarks in course.
  *
  * @package       mod_checkmark
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)

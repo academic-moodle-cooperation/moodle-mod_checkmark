@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * submissions.php
- * Lists all checkmark-submissions in course-module.
+ * submissions.php lists all checkmark-submissions in this course-module
  *
  * @package       mod_checkmark
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)

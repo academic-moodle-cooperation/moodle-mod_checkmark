@@ -15,23 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * db/upgrade.php
- *
- * @package       mod_checkmark
- * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
- * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
- * @author        Philipp Hager
- * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
- * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
-defined('MOODLE_INTERNAL') || die;
-
-require_once($CFG->dirroot.'/calendar/lib.php');
-
-/*
- * This file keeps track of upgrades to
- * the checkmark module
+ * This file keeps track of upgrades to the checkmark module
  *
  * Sometimes, changes between versions involve
  * alterations to database structures and other
@@ -49,8 +33,25 @@ require_once($CFG->dirroot.'/calendar/lib.php');
  *
  * Please do not forget to use upgrade_set_timeout()
  * before any action that may take longer time to finish.
+ *
+ * @package       mod_checkmark
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die;
+
+require_once($CFG->dirroot.'/calendar/lib.php');
+
+/**
+ * Handles changes in the DB and similar during upgrades.
+ *
+ * @param int $oldversion Currently installed version of the plugin.
+ * @return bool true if everythings OK!
+ */
 function xmldb_checkmark_upgrade($oldversion) {
     global $CFG, $DB, $OUTPUT;
 
@@ -256,7 +257,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         $field = new xmldb_field('checkedexamples', XMLDB_TYPE_TEXT, 'small', null, null, null,
                                  null, 'timemodified');
         $newname = 'checked';
-        if ($dbman->field_exists($table, $field)) {  // Inconsistent upgrades! @todo clean before publication!
+        if ($dbman->field_exists($table, $field)) {
             $dbman->rename_field($table, $field, $newname);
         }
         upgrade_mod_savepoint(true, 2012022300, 'checkmark');

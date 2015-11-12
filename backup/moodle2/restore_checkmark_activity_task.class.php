@@ -31,8 +31,14 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/checkmark/backup/moodle2/restore_checkmark_stepslib.php');
 
 /**
- * checkmark restore task that provides all the settings and steps to perform one
- * complete restore of the activity
+ * checkmark restore task that provides all the settings and steps to perform one complete restore of the activity
+ *
+ * @package       mod_checkmark
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_checkmark_activity_task extends restore_activity_task {
 
@@ -125,6 +131,9 @@ class restore_checkmark_activity_task extends restore_activity_task {
         return $rules;
     }
 
+    /**
+     * After restoration we try to correct corrupt calendar entries due to old checkmark events being course events!
+     */
     public function after_restore() {
         global $DB, $OUTPUT;
 

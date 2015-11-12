@@ -28,7 +28,23 @@
 namespace mod_checkmark\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Submissions have been viewed in this event.
+ *
+ * @package       mod_checkmark
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class submissions_viewed extends submissions_viewed_base {
+    /**
+     * Convenience method to create and return the event object.
+     *
+     * @param \stdClass $cm course module object
+     * @return \mod_checkmark\event\submissions_viewed event object
+     */
     public static function submissions(\stdClass $cm) {
         $event = self::create(array(
             'objectid' => $cm->instance,

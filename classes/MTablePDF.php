@@ -17,7 +17,7 @@
 /**
  * mtablepdf.php
  *
- * @package       \mod_checkmark\mtablepdf
+ * @package       mod_checkmark
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
  * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
  * @author        Andreas Windbichler
@@ -31,39 +31,73 @@ require_once('../../config.php');
 require_once($CFG->libdir . '/pdflib.php');
 
 /**
- * @author Andreas Windbichler
- * @version 25.06.2015
+ * MTablePDF class handles exports to PDF, XLSX, ODS, CSV...
  *
+ * @package       mod_checkmark
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Andreas Windbichler
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class MTablePDF extends \pdf {
+    /** Portrait orientation in PDF */
     const PORTRAIT = 'P';
+    /** Landscape orientation in PDF */
     const LANDSCAPE = 'L';
 
+    /** Small sized font in PDF */
     const FONTSIZE_SMALL = 8;
+    /** Medium sized font in PDF */
     const FONTSIZE_MEDIUM = 10;
+    /** Large sized font in PDF */
     const FONTSIZE_LARGE = 12;
 
+    /** Output as PDF */
     const OUTPUT_FORMAT_PDF = 0;
+    /** Output as XLSX */
     const OUTPUT_FORMAT_XLSX = 1;
+    /** Output as XLS
+      * @deprecated since 2.8
+      */
     const OUTPUT_FORMAT_XLS = 2;
+    /** Output as ODS */
     const OUTPUT_FORMAT_ODS = 3;
+    /** Output as comma separated CSV (separator is a semicolon, but nevermind) */
     const OUTPUT_FORMAT_CSV_COMMA = 4;
+    /** Output as tab separated CSV */
     const OUTPUT_FORMAT_CSV_TAB = 5;
 
+    /** @var $outputformat which format to export into */
     private $outputformat = self::OUTPUT_FORMAT_PDF;
 
+    /** @var $orientation page orientation to use for PDF output */
     private $orientation = self::PORTRAIT;
+    /** @var $rowsperpage how many rows a PDF page contains at max (0 = auto pagination) */
     private $rowsperpage = 0;
+    /** @var $fontsize which fontsize to use (8 pt, 10 pt or 12 pt) in PDF */
     private $fontsize = self::FONTSIZE_MEDIUM;
+    /** @var $showheaderfooter if we should show header and footer in PDF */
     private $showheaderfooter = true;
 
+    /** @var $columnwidths columns widths */
     private $columnwidths = array();
+    /** @var $titles columns titles */
     private $titles = null;
+    /** @var $columnformat columns formats */
     private $columnformat;
+    /** @var $headerformat */
     private $headerformat = array('title' => array(), 'desc' => array());
 
+    /** @var $data tables data */
     private $data = array();
 
+    /**
+     * Constructor
+     *
+     * @param char $orientation Orientation to use for PDF export
+     * @param object[] $columnwidths Width management for columns
+     */
     public function __construct($orientation, $columnwidths) {
         parent::__construct($orientation);
 
@@ -83,6 +117,11 @@ class MTablePDF extends \pdf {
         }
     }
 
+    /**
+     * Sets format for columns
+     *
+     * @param object[] $columnformat The columns formats
+     */
     public function setcolumnformat($columnformat) {
         if (count($columnformat) != count($this->columnwidths)) {
             print_error("Columnformat (" . count($columnformat) . ") count doesnt match " .
@@ -94,18 +133,19 @@ class MTablePDF extends \pdf {
 
     /**
      * Set the texts for the header of the pdf
-     * @param unknown $title1
-     * @param unknown $desc1
-     * @param unknown $title2
-     * @param unknown $desc2
-     * @param unknown $title3
-     * @param unknown $desc3
-     * @param unknown $title4
-     * @param unknown $desc4
-     * @param unknown $title5
-     * @param unknown $desc5
-     * @param unknown $title6
-     * @param unknown $desc6
+     *
+     * @param string $title1
+     * @param string $desc1
+     * @param string $title2
+     * @param string $desc2
+     * @param string $title3
+     * @param string $desc3
+     * @param string $title4
+     * @param string $desc4
+     * @param string $title5
+     * @param string $desc5
+     * @param string $title6
+     * @param string $desc6
      */
     public function setheadertext($title1, $desc1, $title2, $desc2, $title3, $desc3,
             $title4, $desc4, $title5, $desc5, $title6, $desc6) {
@@ -113,6 +153,9 @@ class MTablePDF extends \pdf {
                 $title4, $desc4, $title5, $desc5, $title6, $desc6);
     }
 
+    /**
+     * Print the header in the PDF
+     */
     public function header() {
         // Set font.
         $this->SetFont('', '');
@@ -180,8 +223,7 @@ class MTablePDF extends \pdf {
     }
 
     /**
-     * If showheaderfooter is selected
-     * Displays the number and total number of pages in the footer
+     * Displays the number and total number of pages in the footer, if showheaderfooter is true
      */
     public function footer() {
         if ($this->showheaderfooter) {
@@ -198,6 +240,7 @@ class MTablePDF extends \pdf {
 
     /**
      * Sets the titles for the columns in the pdf
+     *
      * @param String $titles
      */
     public function settitles($titles) {
@@ -210,8 +253,9 @@ class MTablePDF extends \pdf {
     }
 
     /**
-     * $orientation 'P' = Portrait, 'L' = Landscape
-     * @param Char $orientation
+     * Sets the PDFs page orientation ('P' = Portrait, 'L' = Landscape)
+     *
+     * @param char $orientation
      * @return true if ok
      */
     public function setorientation($orientation) {
@@ -223,13 +267,19 @@ class MTablePDF extends \pdf {
         return false;
     }
 
+    /**
+     * Set outputformat
+     *
+     * @param int $format Exports outputformat
+     */
     public function setoutputformat($format) {
         $this->outputformat = $format;
     }
 
     /**
      * Defines how many rows are printed on each page
-     * @param int $i > 0
+     *
+     * @param int $rowsperpage positive integer defining maximum rows per page or 0 for auto pagination
      * @return true if ok
      */
     public function setrowsperpage($rowsperpage) {
@@ -243,6 +293,7 @@ class MTablePDF extends \pdf {
 
     /**
      * Adds a row to the pdf
+     *
      * @param array $row
      * @return boolean
      */
@@ -295,8 +346,9 @@ class MTablePDF extends \pdf {
 
     /**
      * Sets the font size
-     * @param unknown $fontsize
-     * @param string $out
+     *
+     * @param int $fontsize
+     * @param string $out (optional)
      */
     public function setfontsize($fontsize, $out=true) {
         if ($fontsize <= self::FONTSIZE_SMALL) {
@@ -314,15 +366,18 @@ class MTablePDF extends \pdf {
 
     /**
      * Define if the header and footer should be printed
-     * @param unknown $showheaderfooter
+     *
+     * @param bool $showheaderfooter
      */
     public function showheaderfooter($showheaderfooter) {
         $this->showheaderfooter = $showheaderfooter;
     }
 
-    /*
+    /**
      * Generate the file.
-     * */
+     *
+     * @param string $filename Name of the exported file
+     */
     public function generate($filename = '') {
 
         if ($filename == '') {
@@ -354,6 +409,8 @@ class MTablePDF extends \pdf {
 
     /**
      * Generate pdf
+     *
+     * @param string $filename Name of the exported file
      */
     private function get_pdf($filename) {
         $pdf = $this;
@@ -657,7 +714,7 @@ class MTablePDF extends \pdf {
     }
 
     /**
-     * fills workbook (either XLS or ODS) with data
+     * Fills workbook (either XLS or ODS) with data
      *
      * @param MoodleExcelWorkbook $workbook workbook to put data into
      */
@@ -750,11 +807,23 @@ class MTablePDF extends \pdf {
         }
     }
 
+    /**
+     * Set headerformat
+     *
+     * @param array $headertitleformat Headertitleformats for workbooks
+     * @param array $headerdescformat Headerdescriptionformats for workbooks
+     */
     public function set_headerformat($headertitleformat, $headerdescformat) {
              $this->headerformat['title'] = $headertitleformat;
              $this->headerformat['desc'] = $headerdescformat;
     }
 
+    /**
+     * Generate XLS
+     *
+     * @deprecated since 2.8
+     * @param string $filename Name of the exported file
+     */
     public function get_xls($filename) {
         global $CFG;
 
@@ -768,6 +837,11 @@ class MTablePDF extends \pdf {
         $workbook->close();
     }
 
+    /**
+     * Generate XLSX
+     *
+     * @param string $filename Name of the exported file
+     */
     public function get_xlsx($filename) {
         global $CFG;
 
@@ -781,6 +855,11 @@ class MTablePDF extends \pdf {
         $workbook->close();
     }
 
+    /**
+     * Generate ODS
+     *
+     * @param string $filename Name of the exported file
+     */
     public function get_ods($filename) {
         global $CFG;
 
@@ -794,6 +873,12 @@ class MTablePDF extends \pdf {
         $workbook->close();
     }
 
+    /**
+     * Generate CSV
+     *
+     * @param string $filename Name of the exported file
+     * @param char $sep Character used to separate the data (usually tab or semicolon)
+     */
     public function get_csv($filename, $sep = "\t") {
         $lines = array();
 

@@ -28,6 +28,16 @@
 namespace mod_checkmark\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Event for when the submission has been updated by the student.
+ *
+ * @package       mod_checkmark
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class submission_updated extends \core\event\base {
     /**
      * Init method.
@@ -42,6 +52,13 @@ class submission_updated extends \core\event\base {
         $this->data['objecttable'] = 'checkmark_submissions';
     }
 
+    /**
+     * Convenience method to create event from object.
+     *
+     * @param \stdClass $cm course module object
+     * @param \stdClass $submission submission object
+     * @return object event object
+     */
     public static function create_from_object(\stdClass $cm, \stdClass $submission) {
         // Trigger overview event.
         $event = self::create(array(

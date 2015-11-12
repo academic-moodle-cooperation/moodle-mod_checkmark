@@ -16,7 +16,6 @@
 
 /**
  * Converts old Assignmenttype Checkmarks into new checkmarks (but old DB-Style)
- * db/upgradeoldcheckmarks.php
  *
  * @package       mod_checkmark
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)

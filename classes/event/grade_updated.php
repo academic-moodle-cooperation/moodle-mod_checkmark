@@ -28,6 +28,16 @@
 namespace mod_checkmark\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Grades have been updated in this event.
+ *
+ * @package       mod_checkmark
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class grade_updated extends \core\event\base {
     /**
      * Init method.
@@ -42,6 +52,13 @@ class grade_updated extends \core\event\base {
         $this->data['objecttable'] = 'checkmark_submissions';
     }
 
+    /**
+     * Convenience method to create event object and return it if grade has been manually updated.
+     *
+     * @param \stdClass $cm course module object
+     * @param array $data event data
+     * @return \mod_checkmark\event\grade_updated
+     */
     public static function manual(\stdClass $cm, array $data) {
         $data['type'] = 'manual';
         // Trigger overview event.
@@ -54,6 +71,13 @@ class grade_updated extends \core\event\base {
         return $event;
     }
 
+    /**
+     * Convenience method to create event object and return it if grade has been automatically updated.
+     *
+     * @param \stdClass $cm course module object
+     * @param array $data event data
+     * @return \mod_checkmark\event\grade_updated
+     */
     public static function automatic(\stdClass $cm, array $data) {
         // Trigger overview event.
         $data['type'] = 'automatic';

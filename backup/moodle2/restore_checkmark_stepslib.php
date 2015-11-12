@@ -17,6 +17,8 @@
 /**
  * backup/moodle2/restore_checkmark_stepslib.php
  *
+ * Define all the restore steps that will be used by the restore_checkmark_activity_task
+ *
  * @package       mod_checkmark
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
  * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
@@ -28,14 +30,22 @@
 defined('MOODLE_INTERNAL') || die;
 
 /**
- * Define all the restore steps that will be used by the restore_checkmark_activity_task
- */
-
-/**
  * Structure step to restore one checkmark activity
+ *
+ * @package       mod_checkmark
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_checkmark_activity_structure_step extends restore_activity_structure_step {
 
+    /**
+     * Define structure for restoration
+     *
+     * @return object Standard activity restore structure
+     */
     protected function define_structure() {
 
         $paths = array();
@@ -60,6 +70,11 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
         return $this->prepare_activity_structure($paths);
     }
 
+    /**
+     * Handles restoration of 1 checkmark instance.
+     *
+     * @param object $data Checkmark data to restore
+     */
     protected function process_checkmark($data) {
         global $DB;
 
@@ -131,6 +146,11 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
         }
     }
 
+    /**
+     * Handles restoration of 1 checkmark submission
+     *
+     * @param object $data Submission data to restore
+     */
     protected function process_checkmark_submission($data) {
         global $DB;
 
@@ -188,6 +208,11 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
         }
     }
 
+    /**
+     * Handles restoration of 1 example
+     *
+     * @param object $data Example data to restore
+     */
     protected function process_checkmark_example($data) {
         global $DB;
 
@@ -200,6 +225,11 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
         $this->set_mapping('checkmark_examples', $oldid, $newitemid, true);
     }
 
+    /**
+     * Handles restoration of 1 check
+     *
+     * @param object $data Check data to restore
+     */
     protected function process_checkmark_check($data) {
         global $DB;
 
@@ -213,6 +243,9 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
         $this->set_mapping('checkmark_checks', $oldid, $newitemid, true);
     }
 
+    /**
+     * Executed after restoration to restore files
+     */
     protected function after_execute() {
         // Add checkmark related files, no need to match by itemname (jst intern handled context)!
         $this->add_related_files('mod_checkmark', 'intro', null);

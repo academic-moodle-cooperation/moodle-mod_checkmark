@@ -17,7 +17,7 @@
 /**
  * Unit tests for (some of) mod_checkmark's methods.
  *
- * @todo update to new test-framework!
+ * TODO update to new test-framework!
  *
  * @package       mod_checkmark
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
@@ -34,8 +34,20 @@ if (!defined('MOODLE_INTERNAL')) {
 // Make sure the code being tested is accessible.
 require_once($CFG->dirroot . '/mod/checkmark/lib.php'); // Include the code to test!
 
-/** This class contains the test cases for the formular validation. */
+/**
+ * This class contains the test cases for the formular validation.
+ *
+ * @package       mod_checkmark
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class checkmark_formvalidation_test extends UnitTestCase {
+    /**
+     * Tests if there is an proper error for different amounts of examples and example-gradesum
+     */
     public function test_countmismatch() {
         // Setup fixture!
         $checkmark = new checkmark();
@@ -60,6 +72,9 @@ class checkmark_formvalidation_test extends UnitTestCase {
         $checkmark = null;
     }
 
+    /**
+     * Tests if there is an proper error for when example-gradesum differs from gradesum in instance
+     */
     public function test_summismatch() {
         // Setup fixture!
         $checkmark = new checkmark();
@@ -83,6 +98,9 @@ class checkmark_formvalidation_test extends UnitTestCase {
         $checkmark = null;
     }
 
+    /**
+     * Tests if both errors together will be displayed correctly
+     */
     public function test_both_errors() {
         // Setup fixture!
         $checkmark = new checkmark();
@@ -113,6 +131,9 @@ class checkmark_formvalidation_test extends UnitTestCase {
         $checkmark = null;
     }
 
+    /**
+     * Tests if there are no errors if flexible naming is deactivated and amount and sum mismatch
+     */
     public function test_noflexiblenaming() {
         // Setup fixture!
         $checkmark = new checkmark();
@@ -134,6 +155,9 @@ class checkmark_formvalidation_test extends UnitTestCase {
         $checkmark = null;
     }
 
+    /**
+     * Tests if no error will be wrongly displayed if everythings correct
+     */
     public function test_noerror() {
         // Setup fixture!
         $checkmark = new checkmark();

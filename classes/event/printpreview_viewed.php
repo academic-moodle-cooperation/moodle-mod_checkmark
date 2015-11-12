@@ -28,7 +28,23 @@
 namespace mod_checkmark\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Printpreview has been viewed in this event.
+ *
+ * @package       mod_checkmark
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class printpreview_viewed extends submissions_viewed_base {
+    /**
+     * Create event object and return it.
+     *
+     * @param \stdClass $cm course module object
+     * @return \mod_checkmark\event\printpreview_viewed event object
+     */
     public static function printpreview(\stdClass $cm) {
         // Trigger overview event.
         $event = self::create(array(

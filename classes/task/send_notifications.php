@@ -27,12 +27,32 @@
 namespace mod_checkmark\task;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class send_notifications handles sending of messages to students if their submissions have been graded.
+ *
+ * @package       mod_checkmark
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class send_notifications extends \core\task\scheduled_task {
+    /**
+     * Get the tasks name.
+     *
+     * @return string Tasks name
+     */
     public function get_name() {
         // Shown in admin screens!
         return get_string('modulename', 'checkmark').' | '.get_string('sendnotifications', 'mod_checkmark');
     }
 
+    /**
+     * Executes the task.
+     *
+     * @return bool true if everythings OK.
+     */
     public function execute() {
         global $CFG, $DB;
 

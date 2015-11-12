@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * submission_form.php
- * Extend the moodleform class for checkmark submission form, branch 'MOODLE_21_STABLE'
+ * submission_form.php Extends the moodleform class for checkmark submission form
  *
  * @package       mod_checkmark
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
@@ -29,13 +28,24 @@
 defined('MOODLE_INTERNAL') || die;
 require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
 
-/*
- * class checkmark_submission_form extends moodleform
- * definition of the submission form containing checkboxes
- * for each example in the checkmark
+/**
+ * checkmark_submission_form extends moodleform and defines checkmarks' submission form
+ *
+ * contains a checkbox for each example and some standard form buttons
+ * additionally it invokes some JS to display the amount of currently checked examples and points
+ *
+ * @package       mod_checkmark
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class checkmark_submission_form extends moodleform {
 
+    /**
+     * Defines the submission form
+     */
     public function definition() {
         global $CFG, $USER, $DB, $PAGE;
 

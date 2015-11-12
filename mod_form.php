@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * mod_form.php
- * Moodleform for checkmark-settings
+ * mod_form.php moodleform for checkmark-settings
  *
  * @package       mod_checkmark
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
@@ -36,9 +35,21 @@ if (!defined('MOODLE_INTERNAL')) {
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 
+/**
+ * This class contains the instance's settings formular.
+ *
+ * @package       mod_checkmark
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class mod_checkmark_mod_form extends moodleform_mod {
+    /** @var object */
     protected $_checkmarkinstance = null;
 
+    /** Defines checkmark instance settings form */
     public function definition() {
         global $CFG, $DB, $COURSE, $PAGE, $OUTPUT;
         $mform =& $this->_form;
@@ -184,6 +195,12 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $this->add_action_buttons();
     }
 
+    /**
+     * Overwritten from moodleform_mod, calls parent
+     *
+     * We enhance the standard_grading_coursemodule_elements() to set them expanded
+     * or alter the default values under certain circumstances.
+     */
     public function standard_grading_coursemodule_elements() {
         global $CFG;
         $mform =& $this->_form;
@@ -196,16 +213,21 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->setExpanded('modstandardgrade');
     }
 
-    // Needed by plugin checkmark if it includes a filemanager element in the settings form!
+    /** Needed by plugin checkmark if it includes a filemanager element in the settings form! */
     public function has_instance() {
         return ($this->_instance != null);
     }
 
-    // Needed by plugin checkmarks if it includes a filemanager element in the settings form!
+    /** Needed by plugin checkmarks if it includes a filemanager element in the settings form! */
     public function get_context() {
         return $this->context;
     }
 
+    /**
+     * Returns the module instance (PHP object)
+     *
+     * @return object checkmark instance
+     */
     protected function get_checkmark_instance() {
         global $CFG, $DB;
 
@@ -217,10 +239,15 @@ class mod_checkmark_mod_form extends moodleform_mod {
         return $this->checkmarkinstance;
     }
 
+    /**
+     * Preprocess form data!
+     *
+     * Calculate form elements status (examplegrades, examplenames, examplestart,
+     * examplecount, flexiblenaming, etc. from given examples for this instance.
+     *
+     * @param array $defaultvalues (called by reference) values to preprocess and alter if necessary
+     */
     public function data_preprocessing(&$defaultvalues) {
-        /* Allow plugin checkmarks to preprocess form data
-         * (needed if it include any filemanager elements)!
-         */
         $this->get_checkmark_instance()->form_data_preprocessing($defaultvalues, $this);
 
         if ($defaultvalues['instance']) {
@@ -262,6 +289,13 @@ class mod_checkmark_mod_form extends moodleform_mod {
         }
     }
 
+    /**
+     * Validates current checkmark settings
+     *
+     * @param array $data data from the module form
+     * @param array $files data about files transmitted by the module form
+     * return string[] array of error messages, to be displayed at the form fields
+     */
     public function validation($data, $files) {
         // Allow plugin checkmarks to do any extra validation after the form has been submitted!
         $errors = parent::validation($data, $files);

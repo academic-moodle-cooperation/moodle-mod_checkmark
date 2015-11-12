@@ -15,9 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * grade.php
- * This file redirects to submissions-list if someone has grading capabilities.
- * Otherwise it redirects to standard view.
+ * grade.php redirects to submissions-list if someone has grading capabilities. Otherwise it redirects to standard view.
  *
  * @package       mod_checkmark
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)

@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * grading_form.php
- * This class contains the grading form for checkmark-submissions
+ * grading_form.php This file contains the grading form for checkmark-submissions
  *
  * @package       mod_checkmark
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
@@ -28,8 +27,21 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+/**
+ * This class contains the grading form for checkmark-submissions
+ *
+ * @package       mod_checkmark
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class mod_checkmark_grading_form extends moodleform {
 
+    /**
+     * Definition of the grading form.
+     */
     public function definition() {
         global $OUTPUT;
         $mform =& $this->_form;
@@ -83,6 +95,9 @@ class mod_checkmark_grading_form extends moodleform {
 
     }
 
+    /**
+     * Add the grades section to the form.
+     */
     public function add_grades_section() {
         global $CFG;
         $mform =& $this->_form;
@@ -133,8 +148,7 @@ class mod_checkmark_grading_form extends moodleform {
     }
 
     /**
-     *
-     * @global core_renderer $OUTPUT
+     * Add the feedback section to the form.
      */
     public function add_feedback_section() {
         global $OUTPUT;
@@ -163,6 +177,9 @@ class mod_checkmark_grading_form extends moodleform {
         }
     }
 
+    /**
+     * Adds standard grading-butons to the form.
+     */
     public function add_grading_buttons() {
         $mform =& $this->_form;
         $buttonarray = array();
@@ -187,12 +204,20 @@ class mod_checkmark_grading_form extends moodleform {
         $mform->setType('grading_buttonar', PARAM_RAW);
     }
 
+    /**
+     * Add submission content to the form.
+     */
     public function add_submission_content() {
         $mform =& $this->_form;
         $mform->addElement('header', 'Submission', get_string('submission', 'checkmark'));
         $mform->addElement('html', $this->_customdata->submission_content);
     }
 
+    /**
+     * Helper method to get the editor options easily.
+     *
+     * @return mixed[] Editor-options
+     */
     protected function get_editor_options() {
         $editoroptions = array();
         $editoroptions['context'] = context_module::instance($this->_customdata->cm->id);
@@ -203,6 +228,13 @@ class mod_checkmark_grading_form extends moodleform {
         return $editoroptions;
     }
 
+    /**
+     * Overwrites parents set_data() method to perform some actions in addition.
+     * TODO: do we need this still here?
+     *
+     * @param object $data Data to set the form elements
+     * @return array form data
+     */
     public function set_data($data) {
         $editoroptions = $this->get_editor_options();
         if (!isset($data->text)) {
@@ -226,6 +258,12 @@ class mod_checkmark_grading_form extends moodleform {
         return parent::set_data($data);
     }
 
+    /**
+     * Overwrites parents get_data() method to perform some actions in addition.
+     * TODO: do we need this still here?
+     *
+     * @return array form data
+     */
     public function get_data() {
         $data = parent::get_data();
 

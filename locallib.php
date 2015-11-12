@@ -15,9 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * locallib.php
  * This file contains checkmark-class with all logic-methods used by checkmark
- * and moodleform definitions for grading form
  *
  * @package       mod_checkmark
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
@@ -52,17 +50,21 @@ require_once($CFG->dirroot.'/calendar/lib.php');
  */
 class checkmark {
 
+    /** FILTER_ALL */
     const FILTER_ALL             = 1;
+    /** FILTER_SUBMITTED */
     const FILTER_SUBMITTED       = 2;
+    /** FILTER_REQUIRE_GRADING */
     const FILTER_REQUIRE_GRADING = 3;
+    /** FILTER_SELECTED */
     const FILTER_SELECTED = 4;
 
-    // Used to connect example-names, example-grades, submission-examplenumbers!
+    /** DELIMITER Used to connect example-names, example-grades, submission-examplenumbers! */
     const DELIMITER = ',';
 
-    // UTF-8 empty box = &#x2610; = '☐'!
+    /** EMPTYBOX UTF-8 empty box = &#x2610; = '☐'! */
     const EMPTYBOX = '&#x2610;';
-    // UTF-8 box with x-mark = &#x2612; = '☒'!
+    /** CHECKEDBOX UTF-8 box with x-mark = &#x2612; = '☒'! */
     const CHECKEDBOX = '&#x2612;';
 
     /** @var object */
@@ -73,13 +75,9 @@ class checkmark {
     public $checkmark;
     /** @var bool */
     public $usehtmleditor;
-    /**
-     * @todo document this var
-     */
+    /** @var int */
     public $defaultformat;
-    /**
-     * @todo document this var
-     */
+    /** @var object */
     public $context;
 
     /**
@@ -90,8 +88,6 @@ class checkmark {
      * If the checkmark is hidden and the user is not a teacher then
      * this prints a page header and notice.
      *
-     * @global object
-     * @global object
      * @param int $cmid the current course module id - not set for new checkmarks
      * @param object $checkmark usually null, but if we have it we pass it to save db access
      * @param object $cm usually null, but if we have it we pass it to save db access
@@ -143,6 +139,12 @@ class checkmark {
         $this->checkmark->examples = $this->get_examples($this->checkmark);
     }
 
+    /**
+     * Get the examples for this checkmark from the DB
+     *
+     * @param object|int $checkmark the checkmark object containing ID or the ID itself
+     * @return object[] checkmark's examples from the DB (raw records)
+     */
     public static function get_examples($checkmark) {
         global $DB;
         if (!is_object($checkmark)) {
@@ -153,7 +155,7 @@ class checkmark {
         return $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmark->id));
     }
 
-    /*
+    /**
      * print_example_preview() returns a preview of the set examples
      *
      * @return string example-preview
@@ -197,7 +199,7 @@ class checkmark {
 
     }
 
-    /*
+    /**
      * print_summary() returns a short statistic over the actual checked examples in this checkmark
      * You've checked out X from a maximum of Y examples. (A out of B points)
      *
@@ -221,8 +223,8 @@ class checkmark {
      * print_student_answer($userid, $return) returns a short HTML-coded string
      * with the checked examples in black an unchecked ones lined through and in a light grey.
      *
-     * @param $userid
-     * @param $return
+     * @param int $userid The user-ID to print the student anwer for.
+     * @param bool $return Should we return or echo?
      * @return string checked examples
      */
     public function print_student_answer($userid, $return=false) {
@@ -424,7 +426,6 @@ class checkmark {
      * it can be used on other pages in which case the string to denote the
      * page in the navigation trail should be passed as an argument
      *
-     * @global object
      * @param string $subpage Description of subpage to be used in navigation trail
      */
     public function view_header($subpage='') {
@@ -512,9 +513,6 @@ class checkmark {
      * This default method prints the teacher picture and name, date when marked,
      * grade and teacher submissioncomment.
      *
-     * @global object
-     * @global object
-     * @global object
      * @param object $submission The submission object or null in which case it will be loaded
      */
     public function view_feedback($submission=null) {
@@ -600,10 +598,7 @@ class checkmark {
      * For teachers it gives the number of submitted checkmarks with a link
      * For students it gives the time of their submission.
      *
-     * @global object
-     * @global object
-     * @param bool $allgroup print all groups info if user can access all groups, suitable for
-     *                       index.php
+     * @param bool $allgroups print all groups info if user can access all groups, suitable for index.php
      * @return string
      */
     public function submittedlink($allgroups=false) {
@@ -646,6 +641,12 @@ class checkmark {
         return $submitted;
     }
 
+    /**
+     * Calculate the grade corresponding to the users checks
+     *
+     * @param int $userid the user's ID
+     * @return int the user's grade according to his checks
+     */
     public function calculate_grade($userid) {
         global $CFG, $USER, $OUTPUT;
         $grade = 0;
@@ -672,9 +673,9 @@ class checkmark {
     /**
      * grades submissions from this checkmark-instance (either all or those which require grading)
      *
-     * @param filter which entrys to filter (self::FILTER_ALL, self::FILTER_REQUIRE_GRADING)
-     *               optional, std: FILTER_ALL
-     * @return 0 if everything's ok, otherwise error code
+     * @param int $filter (optional) which entrys to filter (self::FILTER_ALL, self::FILTER_REQUIRE_GRADING)
+     * @param bool $countonly (optional) defaults to false, should we only count the submissions or grade them?
+     * @return int 0 if everything's ok, otherwise error code
      */
     public function autograde_submissions($filter = self::FILTER_ALL, $countonly = false) {
         global $CFG, $COURSE, $PAGE, $DB, $OUTPUT, $USER, $SESSION;
@@ -841,6 +842,12 @@ class checkmark {
         }
     }
 
+    /**
+     * Return if flexiblenaming is used/can be used with this examples
+     *
+     * @param int $instanceid ID of the current instance
+     * @return bool flexible naming is used or not
+     */
     public function get_flexiblenaming($instanceid) {
         global $DB;
         if ($instanceid == 0) {
@@ -868,6 +875,10 @@ class checkmark {
      * Any extra validation checks needed for the settings
      *
      * See lib/formslib.php, 'validation' function for details
+     *
+     * @param array $data Form data as submitted
+     * @param array $files File data - not used here, because we don't have files!
+     * @return array Array of strings with error messages
      */
     public function form_validation($data, $files) {
         global $CFG, $DB;
@@ -921,7 +932,7 @@ class checkmark {
             if ($data['examplestart'] < 0 || !is_numeric($data['examplestart'])) {
                 $errors['examplestart'] = get_string('nonnegativeintrequired', 'checkmark');
             }
-            // Grade has to be examplecount multiplied with an integer!
+            // Grade has to be examplecount multiplied with an int!
             if (($data['examplecount'] != 0) && ($data['grade'] % $data['examplecount'])) {
                 if (!isset($errors['examplecount'])) {
                     $errors['examplecount'] = get_string('grade_mismatch', 'checkmark');
@@ -937,6 +948,8 @@ class checkmark {
 
     /**
      * Update grade item for this submission.
+     *
+     * @param object $submission Submission object
      */
     public function update_grade($submission) {
         checkmark_update_grades($this->checkmark, $submission->userid);
@@ -947,7 +960,6 @@ class checkmark {
      *
      * This is for handling the teacher interaction with the grading interface
      *
-     * @global object
      * @param string $mode Specifies the kind of teacher interaction taking place
      */
     public function submissions($mode) {
@@ -1271,9 +1283,8 @@ class checkmark {
     /**
      * Helper method updating the listing on the main script from popup using javascript
      *
-     * @global object
-     * @global object
-     * @param $submission object The submission whose data is to be updated on the main page
+     * @param object $submission The submission whose data is to be updated on the main page
+     * @return string HTML-snippet
      */
     public function update_main_listing($submission) {
         global $SESSION, $CFG, $OUTPUT;
@@ -1382,7 +1393,6 @@ class checkmark {
     /**
      *  Return a grade in user-friendly form, whether it's a scale or not
      *
-     * @global object
      * @param mixed $grade
      * @return string User-friendly representation of grade
      */
@@ -1417,8 +1427,9 @@ class checkmark {
     /**
      * returns html-string for column headers
      *
-     * @param $columnname
-     * @param $columnstring
+     * @param string $columnname Name of the column in code
+     * @param string $columnstring String to display as column name
+     * @return string HTML-snippet
      */
     public function get_submissions_column_header($columnname=null, $columnstring=null) {
         global $CFG, $OUTPUT, $SESSION;
@@ -1545,15 +1556,17 @@ class checkmark {
 
     /**
      * checks if a column in submissions or print-previews table is set to hidden
-     * @param $columnname
+     *
+     * @param string $columnname Name of the column
+     * @return bool
      */
     public function column_is_hidden($columnname) {
         global $SESSION;
         if (isset($SESSION->checkmark->columns[$columnname])
                 && ($SESSION->checkmark->columns[$columnname]->visibility == 0)) {
-            return 1;
+            return true;
         } else {
-            return 0;
+            return false;
         }
     }
 
@@ -1623,17 +1636,15 @@ class checkmark {
     /**
      * Print group menu selector for activity.
      *
-     * @param stdClass $cm course module object
-     * @param string|moodle_url $urlroot return address that users get to if they choose an option;
-     *   should include any parameters needed, e.g. $CFG->wwwroot.'/mod/forum/view.php?id=34'
-     * @param boolean $return return as string instead of printing
-     * @param boolean $hideallparticipants If true, this prevents the 'All participants'
+     * @param object $cm course module object
+     * @param bool $return return as string instead of printing
+     * @param bool $hideallparticipants If true, this prevents the 'All participants'
      *   option from appearing in cases where it normally would. This is intended for
      *   use only by activities that cannot display all groups together. (Note that
      *   selecting this option does not prevent groups_get_activity_group from
      *   returning 0; it will still do that if the user has chosen 'all participants'
      *   in another activity, or not chosen anything.)
-     * @return mixed void or string depending on $return param
+     * @return mixed|void|string depending on $return param
      */
     public function moodleform_groups_print_activity_menu($cm, $return=false,
                                                           $hideallparticipants=false) {
@@ -1710,6 +1721,7 @@ class checkmark {
 
     /**
      * Internal implementation of single_select rendering
+     *
      * @param single_select $select
      * @return string HTML fragment
      */
@@ -1780,10 +1792,11 @@ class checkmark {
      * provide a 'Next submission' button.
      * to process submissions before they are graded
      * This method gets its arguments from the page parameters userid and offset
+     * TODO look through this method - it's pretty old and I don't know if we should update it someday
      *
-     * @global object
-     * @global object
-     * @param string $extra_javascript
+     * @param int $offset (optional)
+     * @param int $userid (optional)
+     * @param bool $display (optional) defaults to true. Wether to echo the content or return it
      */
     public function display_submission($offset=-1, $userid =-1, $display=true) {
         global $CFG, $DB, $PAGE, $OUTPUT, $SESSION;
@@ -1879,7 +1892,8 @@ class checkmark {
                    $groupssql.
                    'WHERE '.$where.'u.id '.$sqluserids;
             // Construct sort!
-            if (empty($SESSION->flextable['mod-checkmark-submission']) || !is_array($SESSION->flextable['mod-checkmark-submissions']->sortby)) {
+            if (empty($SESSION->flextable['mod-checkmark-submission'])
+                || !is_array($SESSION->flextable['mod-checkmark-submissions']->sortby)) {
                 $sort = '';
             } else {
 
@@ -1924,8 +1938,6 @@ class checkmark {
             global $USER;
             $teacher = $USER;
         }
-
-        $this->preprocess_submission($submission);
 
         $mformdata = new stdClass();
         $mformdata->context = $this->context;
@@ -1979,32 +1991,14 @@ class checkmark {
         // Display mform here!
         $submitform->display();
 
-        $customfeedback = $this->custom_feedbackform($submission, true);
-        if (!empty($customfeedback)) {
-            echo $customfeedback;
-        }
-
         echo $OUTPUT->footer();
     }
 
     /**
-     *  Preprocess submission before grading
+     * update_submission($submission) - updates the submission for the actual user
      *
-     * Called by display_submission()
-     *
-     * @param object $submission The submission object
-     */
-    public function preprocess_submission(&$submission) {
-    }
-
-    /**
-     * update_submission($data) - updates the submission for the actual user
-     *
-     * @param $data
-     * @global $USER
-     * @global $CFG
-     * @global $DB
-     * @return $submission
+     * @param object $submission Submission object to update
+     * @return object $submission
      */
     public function update_submission($submission) {
         global $CFG, $USER, $DB;
@@ -2038,10 +2032,6 @@ class checkmark {
     /**
      *  Display all the submissions ready for grading (including automated grading buttons)
      *
-     * @global object
-     * @global object
-     * @global object
-     * @global object
      * @param string $message
      * @return bool|void
      */
@@ -2161,9 +2151,10 @@ class checkmark {
     }
 
     /**
+     * Content of the tab for normal submissions-view
      *
-     * content of the tab for normal submissions-view
-     * @param $message
+     * @param string $message (optional) a message (plain text or HTML snippet) to display on the page
+     * @param string $outputtabs (optional) HTML snippet of tabs to output on the page
      */
     public function submissions_tab($message='', $outputtabs='') {
         global $SESSION, $CFG, $DB, $USER, $DB, $OUTPUT, $PAGE;
@@ -2892,9 +2883,14 @@ class checkmark {
         return $returnstring;
     }
 
-    /*
+    /**
      * Either returns html_table_object or raw data for pdf/xls/ods/etc.
      *
+     * @param object $cm Course module object
+     * @param int $filter Filter to apply (checkmark::FILTER_ALL, checkmark::FILTER_REQUIRE_GRADING, ...)
+     * @param int[] $ids (optional) User-IDs to filter for
+     * @param bool $dataonly (optional) return raw data-object or HTML table
+     * @return string|object either HTML snippet or data object
      */
     public function get_print_data($cm, $filter, $ids=array(), $dataonly=false) {
         global $DB, $CFG, $OUTPUT, $SESSION;
@@ -3569,6 +3565,13 @@ class checkmark {
         }
     }
 
+    /**
+     * Echo the print preview tab including a optional message and tabs!
+     *
+     * @param string $message The message to display in the tab!
+     * @param string $outputtabs The tabs to output before the other content!
+     * @return string HTML snippet containing the whole print preview tab!
+     */
     public function print_preview_tab($message='', $outputtabs='') {
         global $SESSION, $CFG, $DB, $USER, $OUTPUT, $PAGE;
         require_once($CFG->libdir.'/gradelib.php');
@@ -3807,6 +3810,9 @@ class checkmark {
         return $output;
     }
 
+    /**
+     * Finaly print the submissions!
+     */
     public function submissions_print() {
         global $SESSION, $CFG, $DB, $USER, $DB, $OUTPUT, $PAGE;
         require_once($CFG->libdir.'/gradelib.php');
@@ -4021,12 +4027,11 @@ class checkmark {
     /**
      * Renders a link to select/deselect all checkboxes of a group
      *
-     * Based upon @see moodleform::add_checkbox_controller() but also useable without moodleform
+     * Based upon moodleform::add_checkbox_controller() but also useable without moodleform
      * use
      *     $state = optional_param('checkbox_controller'.$group, $CHKBOXDEFAULT, PARAM_INT);
      * to determin the current state for the checkboxes
      *
-     * @global object
      * @param int    $groupid The id of the group of advcheckboxes this element controls
      * @param string $text The text of the link. Defaults to selectallornone ('select all/none')
      * @param array  $attributes associative array of HTML attributes
@@ -4104,9 +4109,7 @@ EOS;
      * This is called by submissions() when a grading even has taken place.
      * It gets its data from the submitted form.
      *
-     * @global object
-     * @global object
-     * @global object
+     * @param mixed $formdata unused, we get the submitted data elsewhere.
      * @return object|bool The updated submission object or false
      */
     public function process_feedback($formdata=null) {
@@ -4170,6 +4173,11 @@ EOS;
 
     }
 
+    /**
+     * Process outcomes for this user.
+     *
+     * @param int $userid the user's ID
+     */
     public function process_outcomes($userid) {
         global $CFG, $USER;
 
@@ -4206,11 +4214,8 @@ EOS;
     /**
      * Load the submission object for a particular user
      *
-     * @global object
-     * @global object
-     * @param $userid int The id of the user whose submission we want or 0 in which case USER->id
-     *                     is used
-     * @param $createnew boolean optional Defaults to false. If set to true a new submission object
+     * @param int $userid The id of the user whose submission we want or 0 in which case USER->id is used
+     * @param bool $createnew (optional) defaults to false. If set to true a new submission object
      *                           will be created in the database
      * @param bool $teachermodified student submission set if false
      * @return object The submission
@@ -4318,9 +4323,7 @@ EOS;
      * Sends an email to ALL teachers in the course (or in the group if using separate groups).
      * Uses the methods email_teachers_text() and email_teachers_html() to construct the content.
      *
-     * @global object
-     * @global object
-     * @param $submission object The submission that has changed
+     * @param object $submission The submission that has changed
      * @return void
      */
     public function email_teachers($submission) {
@@ -4367,9 +4370,11 @@ EOS;
     }
 
     /**
-     * @param string $filearea
-     * @param array $args
-     * @return bool
+     * Not implemented here, we don't send any files!
+     *
+     * @param string $filearea The filearea to look for.
+     * @param array $args Other args - we don't need that anyway, there are no files here!
+     * @return bool false - always!
      */
     public function send_file($filearea, $args) {
         debugging('plugin does not implement file sending', DEBUG_DEVELOPER);
@@ -4380,7 +4385,7 @@ EOS;
      * Returns a list of teachers that should be grading given submission
      *
      * @param object $user
-     * @return array
+     * @return array Array of users able to grade
      */
     public function get_graders($user) {
         // Get potential graders!
@@ -4427,8 +4432,8 @@ EOS;
     /**
      * Creates the text content for emails to teachers
      *
-     * @param $info object The info used by the 'emailteachermail' language string
-     * @return string
+     * @param object $info The info used by the 'emailteachermail' language string
+     * @return string Plain-Text snippet to use in messages
      */
     public function email_teachers_text($info) {
         $posttext  = format_string($this->course->shortname).' -> '.
@@ -4443,8 +4448,8 @@ EOS;
     /**
      * Creates the html content for emails to teachers
      *
-     * @param $info object The info used by the 'emailteachermailhtml' language string
-     * @return string
+     * @param object $info The info used by the 'emailteachermailhtml' language string
+     * @return string HTML snippet to use in messages
      */
     public function email_teachers_html($info) {
         global $CFG;
@@ -4464,9 +4469,9 @@ EOS;
     /**
      * Produces a list of links to the files uploaded by a user
      *
-     * @param $userid int optional id of the user. If 0 then $USER->id is used.
-     * @param $return boolean optional defaults to false. If true the html
-     * @return string optional
+     * @param int $userid (optional) id of the user. If 0 then $USER->id is used.
+     * @param bool $return (optional) defaults to false. If true the html snippet is returned
+     * @return string|void HTML snippet if $return is true
      */
     public function print_user_submission($userid=0, $return=false) {
         global $CFG, $USER, $OUTPUT;
@@ -4520,8 +4525,8 @@ EOS;
     /**
      * Count the files uploaded by a given user
      *
-     * @param $itemid int The submission's id as the file's itemid.
-     * @return int
+     * @param int $itemid The submission's id as the file's itemid.
+     * @return int Amount of user files
      */
     public function count_user_files($itemid) {
         $fs = get_file_storage();
@@ -4535,7 +4540,7 @@ EOS;
      *
      * Checks that the checkmark has started and, cut-off-date or duedate hasn't
      * passed already.
-     * @return boolean
+     * @return bool
      */
     public function isopen() {
         $time = time();
@@ -4560,10 +4565,10 @@ EOS;
      *
      * This is needed by calendar so that hidden descriptions do not
      * come up in upcoming events.
-     *
      * Check that description is hidden till available date
-     * By default return false
-     * @return boolen
+     * TODO: check if we can delete this by now?!?
+     *
+     * @return bool false (always!)
      */
     public function description_is_hidden() {
         return false;
@@ -4572,8 +4577,9 @@ EOS;
     /**
      * Return an outline of the user's interaction with the checkmark
      *
-     * The default method prints the grade and timemodified
-     * @param $grade object
+     * The default method returns the grade and timemodified
+     *
+     * @param object $grade Grade object
      * @return object with properties ->info and ->time
      */
     public function user_outline($grade) {
@@ -4587,7 +4593,8 @@ EOS;
     /**
      * Print complete information about the user's interaction with the checkmark
      *
-     * @param $user object
+     * @param object $user User object
+     * @param object $grade (optional) Grade object
      */
     public function user_complete($user, $grade=null) {
         global $OUTPUT;
@@ -4631,15 +4638,15 @@ EOS;
     /**
      * Return a string indicating how late a submission is
      *
-     * @param $timesubmitted int
-     * @return string
+     * @param int $timesubmitted Submissions timestamp to compare
+     * @return string HTML snippet containing info about submission time
      */
     public function display_lateness($timesubmitted) {
         return checkmark_display_lateness($timesubmitted, $this->checkmark->timedue);
     }
 
     /**
-     * Empty method stub for all delete actions.
+     * Empty method stub for all delete actions. Just redirects!
      */
     public function delete() {
         // Nothing by default!
@@ -4647,22 +4654,13 @@ EOS;
     }
 
     /**
-     * Empty custom feedback grading form.
-     */
-    public function custom_feedbackform($submission, $return=false) {
-        // Nothing by default!
-        return '';
-    }
-
-    /**
      * Given a course_module object, this function returns any 'extra' information that may be
      * needed when printing this activity in a course listing.  See get_array_of_activities()
      * in course/lib.php.
      *
-     * @param $coursemodule object The coursemodule object (record).
+     * @param object $coursemodule The coursemodule object (record).
      * @return object An object on information that the courses will know about
      *                (most noticeably, an icon).
-     *
      */
     public function get_coursemodule_info($coursemodule) {
         return false;
@@ -4670,6 +4668,9 @@ EOS;
 
     /**
      * Reset all submissions
+     *
+     * @param object $data info for which instance to reset the userdata
+     * @return array status array
      */
     public function reset_userdata($data) {
         global $CFG, $DB;

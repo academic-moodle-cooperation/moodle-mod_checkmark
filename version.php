@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * version.php
- * Defines the version of checkmark
+ * version.php Defines the version of checkmark
  *
  * This code fragment is called by moodle_needs_upgrading() and
  * /admin/index.php

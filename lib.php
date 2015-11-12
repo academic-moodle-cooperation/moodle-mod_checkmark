@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * lib.php
- * This file contains the basic checkmark functions
+ * lib.php - This file contains the basic checkmark functions
  *
  * @package       mod_checkmark
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
@@ -32,6 +31,9 @@ defined('MOODLE_INTERNAL') || die;
  * Deletes a checkmark instance
  *
  * This is done by calling the delete_instance() method
+ *
+ * @param int $id ID of checkmark-instance to delete
+ * @return bool true if OK, else false
  */
 function checkmark_delete_instance($id) {
     global $CFG, $DB, $OUTPUT, $COURSE;
@@ -106,6 +108,9 @@ function checkmark_delete_instance($id) {
 
 /**
  * Updates a checkmark instance
+ *
+ * @param object $checkmark Checkmark-data from form
+ * @return bool true if OK, else false
  */
 function checkmark_update_instance($checkmark) {
     global $COURSE, $CFG, $OUTPUT, $DB;
@@ -200,6 +205,9 @@ function checkmark_update_instance($checkmark) {
  * Adds a checkmark instance
  *
  * This is done by calling the add_instance() method
+ *
+ * @param object $checkmark Checkmark-data from form
+ * @return int new checkmark id
  */
 function checkmark_add_instance($checkmark) {
     global $COURSE, $CFG, $OUTPUT, $DB;
@@ -253,8 +261,7 @@ function checkmark_add_instance($checkmark) {
  * Updates the examples in the DB for this checkmark
  *
  * @since MOODLE 2.4
- * @param $checkmark object containing data from checkmarks mod_form
- * @global $DB
+ * @param object $checkmark containing data from checkmarks mod_form
  */
 function checkmark_update_examples($checkmark) {
     global $DB;
@@ -341,6 +348,12 @@ function checkmark_update_examples($checkmark) {
  * Returns an outline of a user interaction with an checkmark
  *
  * This is done by calling the user_outline() method
+ *
+ * @param object $course Course object
+ * @param object $user User object
+ * @param object $mod Course module object
+ * @param object $checkmark Checkmark object
+ * @return object
  */
 function checkmark_user_outline($course, $user, $mod, $checkmark) {
     global $CFG;
@@ -359,6 +372,12 @@ function checkmark_user_outline($course, $user, $mod, $checkmark) {
  * Prints the complete info about a user's interaction with an checkmark
  *
  * This is done by calling the user_complete() method
+ *
+ * @param object $course Course object
+ * @param object $user User object
+ * @param object $mod course module object
+ * @param object $checkmark checkmark object
+ * @return void
  */
 function checkmark_user_complete($course, $user, $mod, $checkmark) {
     global $CFG;
@@ -410,11 +429,11 @@ function checkmark_get_coursemodule_info($coursemodule) {
 
 /**
  * Return grade for given user or all users.
+ * @todo 2.5 use primarily grades from gradebook!
  *
- * @param int $checkmarkid id of checkmark
+ * @param object $checkmark checkmark object
  * @param int $userid optional user id, 0 means all users
  * @return array array of grades, false if none
- * @todo 2.5 use primarily grades from gradebook!
  */
 function checkmark_get_user_grades($checkmark, $userid=0) {
     global $CFG, $DB;
@@ -441,6 +460,7 @@ function checkmark_get_user_grades($checkmark, $userid=0) {
  *
  * @param object $checkmark
  * @param int $userid specific user only, 0 means all
+ * @param bool $nullifnone (optional) not used here!
  */
 function checkmark_update_grades($checkmark, $userid=0, $nullifnone=true) {
     global $CFG, $DB;
@@ -491,7 +511,7 @@ function checkmark_upgrade_grades() {
  * Create grade item for given checkmark
  *
  * @param object $checkmark object with extra cmidnumber
- * @param mixed optional array/object of grade(s); 'reset' means reset grades in gradebook
+ * @param object[]|object|string $grades (optional) array/object of grade(s); 'reset' means reset grades in gradebook
  * @return int 0 if ok, error code otherwise
  */
 function checkmark_grade_item_update($checkmark, $grades=null) {
@@ -572,9 +592,10 @@ function checkmark_pluginfile($course, $cm, $context, $filearea, $args, $forcedo
  * Checks if a scale is being used by an checkmark
  *
  * This is used by the backup code to decide whether to back up a scale
- * @param $checkmarkid int
- * @param $scaleid int
- * @return boolean True if the scale is used by the checkmark
+ *
+ * @param int $checkmarkid
+ * @param int $scaleid
+ * @return bool True if the scale is used by the checkmark
  */
 function checkmark_scale_used($checkmarkid, $scaleid) {
     global $DB;
@@ -594,8 +615,9 @@ function checkmark_scale_used($checkmarkid, $scaleid) {
  * Checks if scale is being used by any instance of checkmark
  *
  * This is used to find out if scale used anywhere
- * @param $scaleid int
- * @return boolean True if the scale is used by any checkmark
+ *
+ * @param int $scaleid
+ * @return bool True if the scale is used by any checkmark
  */
 function checkmark_scale_used_anywhere($scaleid) {
     global $DB;
@@ -616,8 +638,8 @@ function checkmark_scale_used_anywhere($scaleid) {
  * only checkmark events belonging to the course specified are checked.
  * This function is used, in its new format, by restore_refresh_events()
  *
- * @param $course int optional If zero then all checkmarks for all courses are covered
- * @return boolean Always returns true
+ * @param int $course (optional) If zero then all checkmarks for all courses are covered
+ * @return bool Always returns true
  */
 function checkmark_refresh_events($course = 0) {
     global $DB;
@@ -668,6 +690,11 @@ function checkmark_refresh_events($course = 0) {
  * Print recent activity from all checkmarks in a given course
  *
  * This is used by the recent activity block
+ *
+ * @param object $course Course object
+ * @param bool $viewfullnames Wether to print fullnames or not
+ * @param int $timestart Earliest timestamp to print activities for
+ * @return bool true if something has been printed!
  */
 function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
     global $CFG, $USER, $DB, $OUTPUT;
@@ -772,6 +799,14 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
 
 /**
  * Returns all checkmarks since a given time in specified forum.
+ *
+ * @param object[] $activities Where to put the data in general
+ * @param object[] $index Where to place the data in $activities
+ * @param int $timestart Timestamp for the earliest activities to get
+ * @param int $courseid the course id
+ * @param int $cmid the course module id
+ * @param int $userid (optional) to filter for a user
+ * @param int $groupid (optional) to filter for a group
  */
 function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid,
                                            $userid=0, $groupid=0) {
@@ -921,6 +956,11 @@ function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $c
  * Print recent activity from all checkmarks in a given course
  *
  * This is used by course/recent.php
+ *
+ * @param object $activity various data to use.
+ * @param int $courseid Courses id
+ * @param bool $detail Wether to display details or just a summary
+ * @param string $modnames not used here!
  */
 function checkmark_print_recent_mod_activity($activity, $courseid, $detail, $modnames) {
     global $CFG, $OUTPUT;
@@ -959,7 +999,7 @@ function checkmark_print_recent_mod_activity($activity, $courseid, $detail, $mod
 /**
  * Fetch info from logs
  *
- * @param $log object with properties ->info (the checkmark id) and ->userid
+ * @param object $log with properties ->info (the checkmark id) and ->userid
  * @return array with checkmark name and user firstname and lastname
  */
 function checkmark_log_info($log) {
@@ -974,6 +1014,8 @@ function checkmark_log_info($log) {
 /**
  * Return list of marked submissions that have not been mailed out for currently enrolled students
  *
+ * @param int $starttime earliest timetamp
+ * @param int $endtime latest timestamp
  * @return array
  */
 function checkmark_get_unmailed_submissions($starttime, $endtime) {
@@ -990,7 +1032,8 @@ function checkmark_get_unmailed_submissions($starttime, $endtime) {
 /**
  * Counts all real checkmark submissions by ENROLLED students (not empty ones)
  *
- * @param $groupid int optional If nonzero then count is restricted to this group
+ * @param object $cm The course module object
+ * @param int $groupid optional If nonzero then count is restricted to this group
  * @return int The number of submissions
  */
 function checkmark_count_real_submissions($cm, $groupid=0) {
@@ -1021,8 +1064,9 @@ function checkmark_count_real_submissions($cm, $groupid=0) {
 /**
  * Return all checkmark submissions by ENROLLED students (even empty)
  *
- * @param $sort string optional field names for the ORDER BY in the sql query
- * @param $dir string optional specifying the sort direction, defaults to DESC
+ * @param object $checkmark Checkmark to get submissions for
+ * @param string $sort optional field names for the ORDER BY in the sql query
+ * @param string $dir optional specifying the sort direction, defaults to DESC
  * @return array The submission objects indexed by id
  */
 function checkmark_get_all_submissions($checkmark, $sort='', $dir='DESC') {
@@ -1054,11 +1098,13 @@ function checkmark_get_all_submissions($checkmark, $sort='', $dir='DESC') {
  ******************** OTHER GENERAL FUNCTIONS FOR checkmarks  ***********************
  */
 
-/*
+/**
  * checkmark_get_summarystring() returns a short statistic over the actual checked examples
  * in this checkmark
  * You've checked out X from a maximum of Y examples. (A out of B points)
  *
+ * @param object $submission Submisson-object
+ * @param object $checkmark Checkmark-instance-object
  * @return string short summary
  */
 function checkmark_getsummarystring($submission, $checkmark) {
@@ -1080,11 +1126,13 @@ function checkmark_getsummarystring($submission, $checkmark) {
     return $output;
 }
 
-/*
+/**
  * checkmark_getsubmissionstats() returns a short statistic over the actual
  * checked examples in this checkmarksubmission
  * checked out X of Y examples (A of B points) graded/not graded
  *
+ * @param object $submission Submission object
+ * @param object $checkmark Checkmark-Instance object
  * @return object submissions statistics data
  */
 function checkmark_getsubmissionstats($submission, $checkmark) {
@@ -1156,8 +1204,9 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
 
 /**
  * prepares text for mymoodle-Page to be displayed
- * @param $courses
- * @param $htmlarray
+ *
+ * @param int[] $courses Courses to print overview for
+ * @param string[] $htmlarray array of html snippets to be printed
  */
 function checkmark_print_overview($courses, &$htmlarray) {
     global $USER, $CFG, $DB, $OUTPUT;
@@ -1481,6 +1530,13 @@ function checkmark_print_overview($courses, &$htmlarray) {
     }
 }
 
+/**
+ * Return a string indicating how late a submission is
+ *
+ * @param int $timesubmitted Submissions timestamp to compare
+ * @param int $timedue Instances due date
+ * @return string HTML snippet containing info about submission time
+ */
 function checkmark_display_lateness($timesubmitted, $timedue) {
     if (!$timedue) {
         return '';
@@ -1502,10 +1558,20 @@ function checkmark_display_lateness($timesubmitted, $timedue) {
     }
 }
 
+/**
+ * Returns all actions which display data (or something at least)
+ *
+ * @return string[];
+ */
 function checkmark_get_view_actions() {
     return array('view', 'view submission', 'view submission', 'view print-preview');
 }
 
+/**
+ * Returns all actions which post data.
+ *
+ * @return string[]
+ */
 function checkmark_get_post_actions() {
     return array('upload');
 }
@@ -1536,7 +1602,8 @@ function checkmark_reset_gradebook($courseid) {
  * This function is used by the reset_course_userdata function in moodlelib.
  * This function will remove all posts from the specified checkmark
  * and clean up any related data.
- * @param $data the data submitted from the reset course.
+ *
+ * @param object $data the data submitted from the reset course.
  * @return array status array
  */
 function checkmark_reset_userdata($data) {
@@ -1553,7 +1620,7 @@ function checkmark_reset_userdata($data) {
 /**
  * Implementation of the function for printing the form elements that control
  * whether the course reset functionality affects the checkmark.
- * @param $mform form passed by reference
+ * @param object $mform form passed by reference
  */
 function checkmark_reset_course_form_definition(&$mform) {
     $mform->addElement('header', 'checkmarkheader', get_string('modulenameplural', 'checkmark'));
@@ -1563,6 +1630,9 @@ function checkmark_reset_course_form_definition(&$mform) {
 
 /**
  * Course reset form defaults.
+ *
+ * @param mixed $course The course, not used here anyway!
+ * @return array Associative array defining defaults for the form
  */
 function checkmark_reset_course_form_defaults($course) {
     return array('reset_checkmark_submissions' => 1);
@@ -1576,8 +1646,10 @@ function checkmark_get_extra_capabilities() {
 }
 
 /**
+ * Defines what is supported by checkmark plugin.
+ *
  * @param string $feature FEATURE_xx constant for requested feature
- * @return mixed True if module supports feature, null if doesn't know
+ * @return bool|null True if module supports feature, null if doesn't know
  */
 function checkmark_supports($feature) {
     switch ($feature) {
