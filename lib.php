@@ -38,6 +38,10 @@ defined('MOODLE_INTERNAL') || die;
 function checkmark_delete_instance($id) {
     global $CFG, $DB, $OUTPUT, $COURSE;
 
+    // Bad practice, but we had some issues deleting corrupt checkmark instances with >200k examples
+    core_php_time_limit::raise(600);
+    raise_memory_limit(MEMORY_UNLIMITED);
+
     if (!$checkmark = $DB->get_record('checkmark', array('id' => $id))) {
         return false;
     }
