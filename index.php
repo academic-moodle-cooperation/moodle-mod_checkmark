@@ -88,9 +88,6 @@ foreach ($modinfo->instances['checkmark'] as $cm) {
         continue;
     }
 
-    $cm->timedue        = $cms[$cm->id]->timedue;
-    $cm->idnumber       = $cms[$cm->id]->idnumber;
-
     // Show dimmed if the mod is hidden!
     $class = $cm->visible ? '' : 'dimmed';
 
@@ -123,7 +120,7 @@ foreach ($modinfo->instances['checkmark'] as $cm) {
     }
 
 
-    $due = $cm->timedue ? userdate($cm->timedue) : '-';
+    $due = !empty($cms[$cm->id]) && !empty($cms[$cm->id]->timedue) ? userdate($cms[$cm->id]->timedue) : '-';
 
     if ($usesections) {
         $table->data[] = array ($printsection, $link, $due, $submitted, $grade);
