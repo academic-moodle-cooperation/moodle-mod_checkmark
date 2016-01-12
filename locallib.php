@@ -192,12 +192,12 @@ class checkmark {
 
         $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmarkid));
 
-        if ($flexiblenaming && $exampleprefix != '') {
+        if ($flexiblenaming) {
             foreach ($examples as $key => $cur) {
                 $examples[$key]->shortname = $cur->name;
                 $examples[$key]->name = $exampleprefix.$cur->name;
             }
-        } else if (!$flexiblenaming) {
+        } else {
             $exampleprefix = get_string('strexample', 'checkmark').' ';
             foreach ($examples as $key => $cur) {
                 $examples[$key]->shortname = $cur->name;
