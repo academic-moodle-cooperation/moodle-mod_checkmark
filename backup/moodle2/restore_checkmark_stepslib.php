@@ -88,6 +88,10 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
         $data->timeavailable = $this->apply_date_offset($data->timeavailable);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
 
+        if (!isset($data->exampleprefix)) {
+            $data->exampleprefix = get_string('strexample', 'checkmark').' ';
+        }
+
         if (!isset($data->cutoffdate)) {
             $data->cutoffdate = 0;
         }

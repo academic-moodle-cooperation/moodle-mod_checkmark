@@ -62,13 +62,10 @@ class checkmark_submission_form extends moodleform {
                 break;
             }
 
-            $mform->addElement('advcheckbox', 'example'.$key, null,
-                               get_string('strexample', 'checkmark').' '.$example->name.' ('.
-                               $example->grade.' '.$pointsstring.')',
+            $mform->addElement('advcheckbox', 'example'.$key, null, $example->name.' ('.$example->grade.' '.$pointsstring.')',
                                array('id' => 'example'.$key, 'group' => '1'), array(0, 1));
         }
-        $checkmark = $DB->get_record('checkmark',
-                                     array('id' => $this->_customdata->checkmarkid), '*', MUST_EXIST);
+        $checkmark = $DB->get_record('checkmark', array('id' => $this->_customdata->checkmarkid), '*', MUST_EXIST);
 
         // Here come the hidden params!
         $mform->addElement('hidden', 'id');

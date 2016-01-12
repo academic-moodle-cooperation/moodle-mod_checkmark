@@ -794,5 +794,21 @@ function xmldb_checkmark_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2015111201, 'checkmark');
     }
 
+    if ($oldversion < 2015122100) {
+        // Define field exampleprefix to be added to checkmark.
+        $table = new xmldb_table('checkmark');
+        $field = new xmldb_field('exampleprefix', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'grade');
+
+        // Conditionally launch add field exampleprefix.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $DB->set_field('checkmark', 'exampleprefix', get_string('strexample', 'checkmark').' ', array());
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2015122100, 'checkmark');
+    }
+
     return true;
 }

@@ -79,6 +79,8 @@ class checkmark {
     public $defaultformat;
     /** @var object */
     public $context;
+    /** @var object[] cached examples for this instance */
+    public $examples;
 
     /**
      * Constructor for the checkmark class
@@ -136,23 +138,74 @@ class checkmark {
         // Set up things for a HTML editor if it's needed!
         $this->defaultformat = editors_get_preferred_format();
 
-        $this->checkmark->examples = $this->get_examples($this->checkmark);
+        // We cache examples now...
+        $this->get_examples();
     }
 
     /**
      * Get the examples for this checkmark from the DB
      *
+     * Adds the prefix if set and flexible naming is used
+     *
      * @param object|int $checkmark the checkmark object containing ID or the ID itself
      * @return object[] checkmark's examples from the DB (raw records)
      */
-    public static function get_examples($checkmark) {
+    public function get_examples() {
         global $DB;
-        if (!is_object($checkmark)) {
-            $id = $checkmark;
-            $checkmark = new stdClass();
-            $checkmark->id = $id;
+
+        if (!isset($this->checkmark->examples)) {
+            $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $this->checkmark->id));
+            $flexiblenaming = $this->get_flexiblenaming($this->checkmark->id);
+
+            if ($flexiblenaming) {
+                foreach ($examples as $key => $cur) {
+                    $examples[$key]->shortname = $cur->name;
+                    $examples[$key]->name = $this->checkmark->exampleprefix.$cur->name;
+                }
+            } else {
+                $exampleprefix = get_string('strexample', 'checkmark');
+                foreach ($examples as $key => $cur) {
+                    $examples[$key]->shortname = $cur->name;
+                    $examples[$key]->name = $exampleprefix.' '.$cur->name;
+                }
+            }
+
+            $this->checkmark->examples = $examples;
         }
-        return $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmark->id));
+
+        return $this->checkmark->examples;
+    }
+
+    /**
+     * Get the examples for this checkmark from the DB
+     *
+     * Adds the prefix if set and flexible naming is used
+     *
+     * @param object|int $checkmark the checkmark object containing ID or the ID itself
+     * @return object[] checkmark's examples from the DB (raw records)
+     */
+    public static function get_examples_static($checkmarkid) {
+        global $DB;
+
+        $exampleprefix = $DB->get_field('checkmark', 'exampleprefix', array('id' => $checkmarkid));
+        $flexiblenaming = checkmark::get_flexiblenaming_static($checkmarkid);
+
+        $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmarkid));
+
+        if ($flexiblenaming && $exampleprefix != '') {
+            foreach ($examples as $key => $cur) {
+                $examples[$key]->shortname = $cur->name;
+                $examples[$key]->name = $exampleprefix.$cur->name;
+            }
+        } else if (!$flexiblenaming) {
+            $exampleprefix = get_string('strexample', 'checkmark').' ';
+            foreach ($examples as $key => $cur) {
+                $examples[$key]->shortname = $cur->name;
+                $examples[$key]->name = $exampleprefix.$cur->name;
+            }
+        }
+
+        return $examples;
     }
 
     /**
@@ -168,11 +221,8 @@ class checkmark {
         echo html_writer::start_tag('div', array('class' => 'clearfix')).
              get_string('example_preview_title', 'checkmark');
         echo $OUTPUT->help_icon('example_preview_title', 'checkmark');
-        if (!empty($this->checkmark->examples)) {
-            $examples = $this->checkmark->examples;
-        } else {
-            $examples = $this->get_examples($this->checkmark);
-        }
+
+        $examples = $this->get_examples();
 
         foreach ($examples as $key => $example) {
             $name = 'example'.$key;
@@ -186,7 +236,7 @@ class checkmark {
                 break;
             }
             $symbol = self::EMPTYBOX;
-            $label = get_string('strexample', 'checkmark').' '.$example->name;
+            $label = $example->name;
             $grade = '('.$example->grade.' '.$pointsstring.')';
             $content = html_writer::tag('div', '&nbsp;', array('class' => 'fitemtitle')).
                        html_writer::tag('div', $symbol.'&nbsp;'.$label.'&nbsp;'.$grade,
@@ -234,17 +284,19 @@ class checkmark {
         if (!$submission = $this->get_submission($userid)) {
             return get_string('nosubmission', 'checkmark');
         }
-        $output .= get_string('strexamples', 'checkmark').': ';
+
         foreach ($submission->examples as $example) {
             if ($output != '') {
                 $output .= ', ';
+            } else {
+                $output .= get_string('strexamples', 'checkmark').': ';
             }
             if ($example->state) { // Is it checked?
                 $class = 'checked';
             } else {
                 $class = 'unchecked';
             }
-            $output .= html_writer::tag('span', $example->name,
+            $output .= html_writer::tag('span', $example->shortname,
                                         array('class' => $class));
         }
 
@@ -296,7 +348,7 @@ class checkmark {
         $data->id         = $this->cm->id;
         $data->checkmarkid = $this->checkmark->id;
         $data->edit       = $editmode;
-        $data->examples   = $this->get_examples($this->checkmark);;
+        $data->examples   = $this->get_examples();
         if ($submission) {
             $data->sid        = $submission->id;
         } else {
@@ -848,11 +900,33 @@ class checkmark {
      * @param int $instanceid ID of the current instance
      * @return bool flexible naming is used or not
      */
-    public function get_flexiblenaming($instanceid) {
+    public function get_flexiblenaming() {
+        global $DB;
+
+        // We try to cache the value while we're in object context...
+        $instanceid = $this->checkmark->id;
+        if (isset($this->checkmark->flexiblenaming)) {
+            return $this->checkmark->flexiblenaming;
+        }
+
+        // Cache for later!
+        $this->checkmark->flexiblenaming = self::get_flexiblenaming_static($this->checkmark->id);
+
+        return $this->checkmark->flexiblenaming;
+    }
+
+    /**
+     * Return if flexiblenaming is used/can be used with this examples
+     *
+     * @param int $instanceid ID of the current instance
+     * @return bool flexible naming is used or not
+     */
+    public static function get_flexiblenaming_static($instanceid) {
         global $DB;
         if ($instanceid == 0) {
             return false;
         }
+
         $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $instanceid));
 
         $oldname = null;
@@ -868,6 +942,7 @@ class checkmark {
             $oldname = $example->name;
             $oldgrade = $example->grade;
         }
+
         return $flexiblenaming;
     }
 
@@ -1155,7 +1230,6 @@ class checkmark {
                     } else {
                         $newsubmission = false;
                     }
-                    unset($submission->checked);  // Don't need to update this.
 
                     // For fast grade, we need to check if any changes take place!
                     $updatedb = false;
@@ -1274,6 +1348,7 @@ class checkmark {
             case 'print':
                 $this->display_submission();
                 break;
+
             default:
                 echo 'something seriously is wrong!!';
                 break;
@@ -2013,11 +2088,9 @@ class checkmark {
             if (!$id = $DB->get_field('checkmark_checks', 'id',
                                       array('submissionid' => $submission->id,
                                             'exampleid'    => $key), IGNORE_MISSING)) {
-                $DB->set_debug(true);
                 $DB->insert_record('checkmark_checks', array('submissionid' => $submission->id,
                                                              'exampleid'    => $key,
                                                              'state'        => $example->state));
-                $DB->set_debug(false);
             } else {
                 $stateupdate->id = $id;
                 $stateupdate->state = $example->state;
@@ -2990,9 +3063,9 @@ class checkmark {
             // Dynamically add examples!
             foreach ($this->checkmark->examples as $key => $example) {
                 if (!$this->column_is_hidden('example'.$key)) {
-                    $width = strlen($example->name) + strlen($example->grade) + 4;
+                    $width = strlen($example->shortname) + strlen($example->grade) + 4;
                     $cellwidth[] = array('mode' => 'Fixed', 'value' => $width);
-                    $tableheaders[] = $example->name." (".$example->grade.'P)';
+                    $tableheaders[] = $example->shortname." (".$example->grade.'P)';
                     $tablecolumns[] = 'example'.$key;
                     $columnformat[] = array(array('align' => 'C'));
                 }
@@ -3051,7 +3124,7 @@ class checkmark {
             foreach ($this->checkmark->examples as $key => $example) {
                 $tablecolumns[] = 'example'.$key;
                 $tableheaders[] = $this->get_submissions_column_header('example'.$key,
-                                                                       $example->name.
+                                                                       $example->shortname.
                                                                        html_writer::empty_tag('br').
                                                                        '('.$example->grade.' P)');
             }
@@ -4229,29 +4302,40 @@ EOS;
         $submission = $DB->get_record('checkmark_submissions',
                                       array('checkmarkid' => $this->checkmark->id,
                                             'userid'      => $userid));
+        $examples = $this->get_examples();
         if ($submission || !$createnew) {
             if ($submission) {
                 if (!$submission->examples = $DB->get_records_sql('
-                    SELECT exampleid AS id, name, grade, state
+                    SELECT exampleid AS id, state
                       FROM {checkmark_checks}
-                RIGHT JOIN {checkmark_examples}
-                        ON {checkmark_checks}.exampleid = {checkmark_examples}.id
                      WHERE submissionid = :subid', array('subid' => $submission->id))) {
-                    $examples = $DB->get_records('checkmark_examples',
-                                                 array('checkmarkid' => $this->checkmark->id));
+                    // Empty submission!
                     foreach ($examples as $key => $example) {
+                        $submission->examples[$key] = new stdClass();
+                        $submission->examples[$key]->id = $key;
+                        $submission->examples[$key]->name = $examples[$key]->name;
+                        $submission->examples[$key]->shortname = $examples[$key]->shortname;
+                        $submission->examples[$key]->grade = $examples[$key]->grade;
+                        $submission->examples[$key]->state = null;
                         $DB->insert_record('checkmark_checks', array('exampleid'    => $key,
                                                                      'submissionid' => $submission->id,
                                                                      'state'        => null));
+                    }
+                } else {
+                    foreach ($submission->examples as $key => $ex) {
+                        $submission->examples[$key]->name = $examples[$ex->id]->name;
+                        $submission->examples[$key]->shortname = $examples[$ex->id]->shortname;
+                        $submission->examples[$key]->grade = $examples[$ex->id]->grade;
                     }
                 }
             }
             return $submission;
         }
+
+        // New empty submission!
         $newsubmission = $this->prepare_new_submission($userid, $teachermodified);
         $sid = $DB->insert_record('checkmark_submissions', $newsubmission);
-        $examples = $DB->get_records('checkmark_examples',
-                                     array('checkmarkid' => $this->checkmark->id));
+
         foreach ($examples as $key => $example) {
             $DB->insert_record('checkmark_checks', array('exampleid'    => $key,
                                                          'submissionid' => $sid,
@@ -4261,12 +4345,16 @@ EOS;
         $submission = $DB->get_record('checkmark_submissions',
                                       array('checkmarkid' => $this->checkmark->id,
                                             'userid'      => $userid));
-        $submission->examples = $DB->get_records_sql('SELECT exampleid AS id, name, grade, state
+        $submission->examples = $DB->get_records_sql('SELECT exampleid AS id, state
                                                         FROM {checkmark_checks} chks
-                                                  RIGHT JOIN {checkmark_examples} ex
-                                                          ON chks.exampleid = ex.id
                                                        WHERE submissionid = :subid',
                                                      array('subid' => $sid));
+        foreach ($submission->examples as $key => $ex) {
+            $submission->examples[$key]->name = $examples[$ex->id]->name;
+            $submission->examples[$key]->shortname = $examples[$ex->id]->shortname;
+            $submission->examples[$key]->grade = $examples[$ex->id]->grade;
+        }
+
         return $submission;
     }
 
@@ -4508,7 +4596,7 @@ EOS;
                 $symbol = self::EMPTYBOX;
                 $class = 'uncheckedexample';
             }
-            $label = get_string('strexample', 'checkmark').' '.$example->name;
+            $label = $example->name;
             $grade = '('.$example->grade.' '.$pointsstring.')';
             $content = html_writer::tag('div', '&nbsp;', array('class' => 'fitemtitle')).
                        html_writer::tag('div', $symbol.'&nbsp;'.$label.'&nbsp;'.$grade,

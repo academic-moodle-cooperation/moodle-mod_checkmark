@@ -150,6 +150,14 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         $mform->setAdvanced('flexiblenaming');
 
+        $mform->addElement('text', 'exampleprefix',
+                           get_string('exampleprefix', 'checkmark'));
+        $mform->setType('exampleprefix', PARAM_TEXT);
+        $mform->addHelpButton('exampleprefix', 'exampleprefix', 'checkmark');
+        $mform->setDefault('exampleprefix', get_string('strexample', 'checkmark'));
+        $mform->disabledIf('exampleprefix', 'flexiblenaming', 'notchecked');
+        $mform->setAdvanced('exampleprefix');
+
         $mform->addElement('text', 'examplenames',
                            get_string('examplenames', 'checkmark').' ('.checkmark::DELIMITER.')');
         // We clean these by ourselves!
@@ -251,7 +259,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $this->get_checkmark_instance()->form_data_preprocessing($defaultvalues, $this);
 
         if ($defaultvalues['instance']) {
-            $examples = checkmark::get_examples($defaultvalues['instance']);
+            $examples = checkmark::get_examples_static($defaultvalues['instance']);
             $flexiblenaming = false;
             $oldname = null;
             $oldgrade = null;
@@ -261,21 +269,21 @@ class mod_checkmark_mod_form extends moodleform_mod {
             $examplecount = count($examples);
             foreach ($examples as $key => $example) {
                 if (($oldname == null) && ($oldgrade == null)) {
-                    $oldname = $example->name;
+                    $oldname = $example->shortname;
                     $oldgrade = $example->grade;
-                    $names = $example->name;
+                    $names = $example->shortname;
                     $grades = $example->grade;
                     $examplestart = $example->name;
                 } else {
-                    if ((intval($oldname) + 1 != intval($example->name))
+                    if ((intval($oldname) + 1 != intval($example->shortname))
                         || (intval($oldgrade) != intval($example->grade))) {
                             $flexiblenaming = true;
                     }
-                    $names .= checkmark::DELIMITER.$example->name;
+                    $names .= checkmark::DELIMITER.$example->shortname;
                     $grades .= checkmark::DELIMITER.$example->grade;
                 }
                 $oldgrade = $example->grade;
-                $oldname = $example->name;
+                $oldname = $example->shortname;
             }
             if ($flexiblenaming) {
                 $defaultvalues['examplegrades'] = $grades;

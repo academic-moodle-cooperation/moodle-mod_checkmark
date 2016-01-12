@@ -50,8 +50,8 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         // Define each element separated!
         $checkmark = new backup_nested_element('checkmark', array('id'), array(
             'name', 'intro', 'introformat', 'alwaysshowdescription', 'resubmit',
-            'cutoffdate', 'emailteachers', 'timedue', 'timeavailable', 'grade',
-            'timemodified'));
+            'cutoffdate', 'emailteachers', 'timedue', 'timeavailable', 'exampleprefix',
+            'grade', 'timemodified'));
 
         $submissions = new backup_nested_element('submissions');
 
