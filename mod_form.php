@@ -273,7 +273,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
                     $oldgrade = $example->grade;
                     $names = $example->shortname;
                     $grades = $example->grade;
-                    $examplestart = $example->name;
+                    $examplestart = $example->shortname;
                 } else {
                     if ((intval($oldname) + 1 != intval($example->shortname))
                         || (intval($oldgrade) != intval($example->grade))) {
