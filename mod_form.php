@@ -143,9 +143,9 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $stdexamplestart = get_config('checkmark', 'stdexamplestart');
         $mform->setDefault('examplestart', $stdexamplestart);
 
-        $mform->addElement('checkbox', 'flexiblenaming', get_string('flexiblenaming', 'checkmark'),
+        $mform->addElement('advcheckbox', 'flexiblenaming', get_string('flexiblenaming', 'checkmark'),
                            get_string('activateindividuals', 'checkmark'),
-                           array('id' => 'id_flexiblenaming'));
+                           array('id' => 'id_flexiblenaming', 'group' => 1), array('0', '1'));
         $mform->addHelpButton('flexiblenaming', 'flexiblenaming', 'checkmark');
 
         $mform->setAdvanced('flexiblenaming');

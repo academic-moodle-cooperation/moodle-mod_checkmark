@@ -155,19 +155,17 @@ class checkmark {
 
         if (!isset($this->checkmark->examples)) {
             $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $this->checkmark->id));
-            $flexiblenaming = $this->get_flexiblenaming($this->checkmark->id);
+            $flexiblenaming = $this->get_flexiblenaming();
 
             if ($flexiblenaming) {
-                foreach ($examples as $key => $cur) {
-                    $examples[$key]->shortname = $cur->name;
-                    $examples[$key]->name = $this->checkmark->exampleprefix.$cur->name;
-                }
+                $exampleprefix = $this->checkmark->exampleprefix;
             } else {
-                $exampleprefix = get_string('strexample', 'checkmark');
-                foreach ($examples as $key => $cur) {
-                    $examples[$key]->shortname = $cur->name;
-                    $examples[$key]->name = $exampleprefix.' '.$cur->name;
-                }
+                $exampleprefix = get_string('strexample', 'checkmark').' ';
+            }
+
+            foreach ($examples as $key => $cur) {
+                $examples[$key]->shortname = $cur->name;
+                $examples[$key]->name = $exampleprefix.$cur->name;
             }
 
             $this->checkmark->examples = $examples;
@@ -187,22 +185,19 @@ class checkmark {
     public static function get_examples_static($checkmarkid) {
         global $DB;
 
-        $exampleprefix = $DB->get_field('checkmark', 'exampleprefix', array('id' => $checkmarkid));
         $flexiblenaming = checkmark::get_flexiblenaming_static($checkmarkid);
 
         $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmarkid));
 
         if ($flexiblenaming) {
-            foreach ($examples as $key => $cur) {
-                $examples[$key]->shortname = $cur->name;
-                $examples[$key]->name = $exampleprefix.$cur->name;
-            }
+            $exampleprefix = $DB->get_field('checkmark', 'exampleprefix', array('id' => $checkmarkid));
         } else {
             $exampleprefix = get_string('strexample', 'checkmark').' ';
-            foreach ($examples as $key => $cur) {
-                $examples[$key]->shortname = $cur->name;
-                $examples[$key]->name = $exampleprefix.$cur->name;
-            }
+        }
+
+        foreach ($examples as $key => $cur) {
+            $examples[$key]->shortname = $cur->name;
+            $examples[$key]->name = $exampleprefix.$cur->name;
         }
 
         return $examples;
@@ -959,7 +954,7 @@ class checkmark {
         global $CFG, $DB;
         $errors = array();
         if ($data['allready_submit'] == 'yes') {
-            $data['flexiblenaming'] = $this->get_flexiblenaming($data['instance']);
+            $data['flexiblenaming'] = checkmark::get_flexiblenaming_static($data['instance']);
         } else if (!isset($data['flexiblenaming'])) {
             $data['flexiblenaming'] = 0;
         }
