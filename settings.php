@@ -57,4 +57,14 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configcheckbox('checkmark/showrecentsubmissions',
                                                     get_string('showrecentsubmissions', 'checkmark'),
                                                     get_string('configshowrecentsubmissions', 'checkmark'), 0));
+
+    // Determines the amount of examples in a checkmark instance over which a export warning will be displayed!
+    /* Trial'n'error determined maximum amount of standard examples without other columns: 48,
+     * so we should have some place left for everything else!*/
+    $options = array(0 => get_string('cfg_nowarning', 'checkmark')) + array_combine(range(10, 50, 1), range(10, 50, 1));
+    $settings->add(new admin_setting_configselect('checkmark/pdfexampleswarning',
+                                                  get_string('cfg_pdfexampleswarning', 'checkmark'),
+                                                  get_string('cfg_pdfexampleswarning_desc', 'checkmark'),
+                                                  25,
+                                                  $options));
 }

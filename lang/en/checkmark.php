@@ -58,6 +58,9 @@ $string['autograde_notsupported'] = 'This scale is not supported by automatic gr
 $string['autograde_no_users_selected'] = 'You have not selected any user to grade. Select the required users via the checkboxes in the left column of the table below.';
 $string['autograde_non_numeric_grades'] = 'Auto-grading requires a numeric maximum grade to be set. This can be configured in instance-settings.';
 $string['cantfixevent'] = 'Couldn\'t fix event with ID {$a->id}, named {$a->name} ({$a->matches} matches).';
+$string['cfg_nowarning'] = 'No warning';
+$string['cfg_pdfexampleswarning'] = 'Amount of examples to display a warning for PDF export';
+$string['cfg_pdfexampleswarning_desc'] = 'Minimum amount of examples above which a warning is displayed, that no reasonable PDF export can be guaranteed. Usually you don\'t have to change this, except you don\'t want to have it shown at all or if you want to tweak it for your installation.';
 $string['checkmark_overviewsummary'] = 'You\'ve checked {$a->checked_examples} / {$a->total_examples} examples ({$a->checked_grade} / {$a->total_grade} points)<br />{$a->grade}<br />';
 $string['checkmark_summary'] = 'You\'ve checked <span id="examples">{$a->checked_examples}</span> out of {$a->total_examples} examples.<br />(<span id="grade">{$a->checked_grade}</span> out of a maximum of {$a->total_grade} points)';
 $string['checkmarkstatstitle'] = 'Course overview checkmark';
@@ -218,6 +221,7 @@ $string['invaliduserid'] = 'Invalid user ID';
 $string['itemstocount'] = 'Count';
 $string['lastgrade'] = 'Last grade';
 $string['late'] = '{$a} late';
+$string['manycolumnsinpdfwarning'] = 'Attention: due to a high example-count and limited space a reasonable export to PDF cannot be ensured. Try to hide unnecessary columns or use XLSX or ODS export instead and adapt the layout in your spreadsheet application.';
 $string['maximumgrade'] = 'Maximum grade';
 $string['messageprovider:checkmark_updates'] = 'Checkmark notifications';
 $string['modulename'] = 'Checkmark';

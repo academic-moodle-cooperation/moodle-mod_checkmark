@@ -3750,6 +3750,14 @@ class checkmark {
         $mform->addElement('header', 'print_settings_header', get_string('printsettingstitle', 'checkmark'));
         $mform->setExpanded('print_settings_header');
 
+        $warninglvl = get_config('checkmark', 'pdfexampleswarning');
+        if (!empty($warninglvl) && (count($this->get_examples()) >= $warninglvl)) {
+            /* TODO maybe we could replace this fixed value someday with some sort of calculation
+               how much space would be needed and the info to hide some columns */
+            $mform->addElement('html', $OUTPUT->notification(get_string('manycolumnsinpdfwarning', 'checkmark'),
+                                                             'notifymessage'));
+        }
+
         // Format?
         $formats = array(\mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF        => 'PDF',
                          \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLSX       => 'XLSX',

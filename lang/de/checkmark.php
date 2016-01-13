@@ -58,6 +58,9 @@ $string['autograde_notsupported'] = 'Diese Notenskala wird von der automatischen
 $string['autograde_no_users_selected'] = 'Sie haben keine Teilnehmer/in zur Bewertung ausgewählt. Wählen Sie die gewünschten Teilnehmer/innen über die Checkboxen der linken Tabellenspalte aus.';
 $string['autograde_non_numeric_grades'] = 'Die automatische Bewertung benötigt numerische Angaben für die Bewertung. Dies kann in den Instanzeinstellungen sichergestellt werden.';
 $string['cantfixevent'] = 'Konnte Kalendereintrag mit der ID {$a->id}, Name {$a->name} nicht reparieren ({$a->matches} treffer).';
+$string['cfg_nowarning'] = 'keine Warnung';
+$string['cfg_pdfexampleswarning'] = 'Beispielanzahl-Limit für Warnung PDF Export';
+$string['cfg_pdfexampleswarning_desc'] = 'Ab wie vielen Beispielen in einer Instanz eine Warnung gezeigt wird, dass kein ordentlicher PDF-Export mehr garantiert werden kann. Üblicherweise muss dieser Wert nicht verändert werden, es sei denn, man möchte diese Warnung gar nicht anzeigen, oder sie für die konkrete Installation etwas verfeinern.';
 $string['checkmark_overviewsummary'] = 'Sie haben {$a->checked_examples} / {$a->total_examples} Beispiele ({$a->checked_grade} / {$a->total_grade} Punkte) gekreuzt<br />{$a->grade}<br />';
 $string['checkmark_summary'] = 'Sie haben <span id="examples">{$a->checked_examples}</span> von {$a->total_examples} Beispielen gekreuzt.<br />(<span id="grade">{$a->checked_grade}</span> von maximal {$a->total_grade} Punkten)';
 $string['checkmarkstatstitle'] = 'Kursübersicht Kreuzerlübungen';
@@ -218,6 +221,7 @@ $string['invaliduserid'] = 'Ungültige Teilnehmer/innen-ID';
 $string['itemstocount'] = 'Zählen';
 $string['lastgrade'] = 'Letzte Bewertung';
 $string['late'] = '{$a} zu spät';
+$string['manycolumnsinpdfwarning'] = 'Achtung: bei hoher Beispielanzahl kann aus Platzgründen kein vernünftiger Export als PDF mehr garantiert werden. Versuchen Sie unwichtige Spalten auszublenden oder verwenden sie stattdessen XLSX oder ODS Export und passen sie das Layout in Ihrem Tabellenkalkulationsprogramm an.';
 $string['maximumgrade'] = 'Höchstbewertung';
 $string['messageprovider:checkmark_updates'] = 'Kreuzerlübungsbenachrichtigungen';
 $string['modulename'] = 'Kreuzerlübung';

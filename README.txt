@@ -15,7 +15,7 @@
 
 /**
  * README.txt
- * @version       2015-01-14
+ * @version       2016-01-12
  * @package       mod_checkmark
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
  * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
@@ -25,7 +25,7 @@
  */
 
 # ---------------------------------------------------------------
-# FOR Moodle 2.8+
+# FOR Moodle 2.9+
 # ---------------------------------------------------------------
 
 Checkmark-Module
@@ -48,7 +48,7 @@ OVERVIEW
 
 REQUIREMENTS
 ================================================================================
-    Moodle <2.8 or later>
+    Moodle <2.9 or later>
 
 INSTALLATION
 ================================================================================
@@ -67,6 +67,12 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2016011200
+-------------------------
+*) New setting: checkmark/pdfexampleswarning = amount of examples in instance
+   to trigger warning about possibly unreasonable layouted PDF documents
+   if too many examples are displayed!
+
 v 2015071504
 -------------------------
 *) fixed small bug preventing manual grading (not quick grading)
