@@ -187,13 +187,13 @@ $string['editmysubmission'] = 'Edit my submission';
 $string['addsubmission'] = 'Add submission';
 $string['emailstudents'] = 'Email alerts to students';
 $string['emailteachermail'] = '{$a->username} has updated the checkmark submission
-for \'{$a->checkmark}\' at {$a->timeupdated}.
+for \'{$a->checkmark}\' on {$a->dayupdated} at {$a->timeupdated}.
 
 It is available here:
 
     {$a->url}';
 $string['emailteachermailhtml'] = '{$a->username} has updated the checkmark submission
-for <i>\'{$a->checkmark}\'  at {$a->timeupdated}</i><br /><br />
+for <i>\'{$a->checkmark}\' on {$a->dayupdated} at {$a->timeupdated}</i><br /><br />
 It is <a href="{$a->url}">available on the web site</a>.';
 $string['emailteachers'] = 'Email alerts to teachers';
 $string['emailteachers_help'] = 'If enabled, teachers receive email notification whenever students add or update a checkmark submission.

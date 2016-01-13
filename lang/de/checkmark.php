@@ -67,7 +67,7 @@ $string['datasettingstitle'] = 'Dateneinstellungen';
 $string['data_settings'] = 'Druckeinstellungen';
 $string['data_preview_help'] = 'Klicken Sie in der Vorschau auf [+] und [-] um die zu druckenden Spalten ein bzw. auszuschalten!';
 $string['data_preview'] = 'Datenvorschau';
-$string['duedatevalidation'] = 'Der Abgabetermin muss nach dem Verfügbarkeitsbeginn liegen.';
+$string['duedatevalidation'] = 'Das Abgabeende muss nach dem Verfügbarkeitsbeginn liegen.';
 $string['element_disabled'] = 'Folgendes Element ist gesperrt, da bereits Abgaben getätigt wurden.';
 $string['elements_disabled'] = 'Folgende Elemente sind gesperrt, da bereits Abgaben getätigt wurden.';
 $string['end_of_submission_for'] = 'Ende des Abgabezeitraums von {$a}';
@@ -187,13 +187,13 @@ $string['editmysubmission'] = 'Abgabe bearbeiten';
 $string['addsubmission'] = 'Abgabe hinzufügen';
 $string['emailstudents'] = 'E-Mail Benachrichtigung an Teilnehmer/innen';
 $string['emailteachermail'] = '{$a->username} hat eine Kreuzerlübungsabgabe für
- \'{$a->checkmark}\' um {$a->timeupdated} aktualisiert.
+ \'{$a->checkmark}\' am {$a->dayupdated} um {$a->timeupdated} aktualisiert.
 
 Sie ist hier verfügbar:
 
     {$a->url}';
 $string['emailteachermailhtml'] = '{$a->username} hat eine Kreuzerlübungsabgabe
-für <i>\'{$a->checkmark}\'  um {$a->timeupdated}</i>  aktualisiert<br /><br />
+für <i>\'{$a->checkmark}\'  am {$a->dayupdated} um {$a->timeupdated}</i>  aktualisiert<br /><br />
 Sie ist <a href="{$a->url}">auf dieser Website verfügbar</a>.';
 $string['emailteachers'] = 'E-Mail Benachrichtigung an Trainer/innen';
 $string['emailteachers_help'] = 'Wenn aktiviert, bekommen Trainer/innen eine E-Mail-Benachrichtigung, sobald Teilnehmer/innen eine Kreuzerlübung abgeben bzw. ihre Kreuzerlübungsabgaben aktualisieren.
