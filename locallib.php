@@ -3443,7 +3443,7 @@ class checkmark {
                             } else {
                                 $row[] = html_writer::tag('div', $summary, array('id' => 'sum'.$auser->id));
                             }
-                        } else if (empty($dataonly)) {
+                        } else if (empty($dataonly) && (!empty($sumabs) || !empty($sumrel))) {
                             $row[] = '&nbsp;';
                         }
 
@@ -3527,7 +3527,7 @@ class checkmark {
                             } else {
                                 $row[] = html_writer::tag('div', $summary, array('id' => 'sum'.$auser->id));
                             }
-                        } else if (empty($dataonly)) {
+                        } else if (empty($dataonly) && (!empty($sumabs) || !empty($sumrel))) {
                             $row[] = '&nbsp;';
                         }
 
