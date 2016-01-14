@@ -783,7 +783,7 @@ function xmldb_checkmark_upgrade($oldversion) {
     }
 
     if ($oldversion < 2015111201) {
-        // Remove not used settings (requiremodintro and duplicates of stdexamplecount and requiremodintro)
+        // Remove not used settings (requiremodintro and duplicates of stdexamplecount and requiremodintro)!
         $DB->delete_records('config_plugins', array('plugin' => 'checkmark',
                                                     'name'   => 'requiremodintro'));
         $DB->delete_records('config_plugins', array('plugin' => 'mod_checkmark',

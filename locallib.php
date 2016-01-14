@@ -147,7 +147,6 @@ class checkmark {
      *
      * Adds the prefix if set and flexible naming is used
      *
-     * @param object|int $checkmark the checkmark object containing ID or the ID itself
      * @return object[] checkmark's examples from the DB (raw records)
      */
     public function get_examples() {
@@ -179,13 +178,13 @@ class checkmark {
      *
      * Adds the prefix if set and flexible naming is used
      *
-     * @param object|int $checkmark the checkmark object containing ID or the ID itself
+     * @param object|int $checkmarkid the checkmark object containing ID or the ID itself
      * @return object[] checkmark's examples from the DB (raw records)
      */
     public static function get_examples_static($checkmarkid) {
         global $DB;
 
-        $flexiblenaming = checkmark::get_flexiblenaming_static($checkmarkid);
+        $flexiblenaming = self::get_flexiblenaming_static($checkmarkid);
 
         $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmarkid));
 
@@ -892,7 +891,6 @@ class checkmark {
     /**
      * Return if flexiblenaming is used/can be used with this examples
      *
-     * @param int $instanceid ID of the current instance
      * @return bool flexible naming is used or not
      */
     public function get_flexiblenaming() {
@@ -954,7 +952,7 @@ class checkmark {
         global $CFG, $DB;
         $errors = array();
         if ($data['allready_submit'] == 'yes') {
-            $data['flexiblenaming'] = checkmark::get_flexiblenaming_static($data['instance']);
+            $data['flexiblenaming'] = self::get_flexiblenaming_static($data['instance']);
         } else if (!isset($data['flexiblenaming'])) {
             $data['flexiblenaming'] = 0;
         }
