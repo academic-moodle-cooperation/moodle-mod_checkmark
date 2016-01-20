@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 require_once($CFG->libdir . '/completionlib.php');
 require_once($CFG->libdir . '/plagiarismlib.php');
 $id = optional_param('id', 0, PARAM_INT);  // Course Module ID?
-$a  = optional_param('a', 0, PARAM_INT);   // Checkmark ID?
+$c  = optional_param('c', 0, PARAM_INT);   // Checkmark ID?
 
 $url = new moodle_url('/mod/checkmark/view.php');
 if ($id) {
@@ -47,7 +47,7 @@ if ($id) {
     }
     $url->param('id', $id);
 } else {
-    if (!$checkmark = $DB->get_record('checkmark', array('id' => $a))) {
+    if (!$checkmark = $DB->get_record('checkmark', array('id' => $c))) {
         print_error('invalidid', 'checkmark');
     }
     if (! $course = $DB->get_record('course', array('id' => $checkmark->course))) {
@@ -56,14 +56,13 @@ if ($id) {
     if (!$cm = get_coursemodule_from_instance('checkmark', $checkmark->id, $course->id)) {
         print_error('invalidcoursemodule');
     }
-    $url->param('a', $a);
+    $id = $cm->id;
+    $url->param('id', $id);
 }
 
 $PAGE->set_url($url);
 require_login($course, true, $cm);
 
-
-require_once($CFG->dirroot.'/mod/checkmark/lib.php');
 $checkmarkinstance = new checkmark($cm->id, $checkmark, $cm, $course);
 
 // Mark as viewed!
