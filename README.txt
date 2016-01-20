@@ -15,7 +15,7 @@
 
 /**
  * README.txt
- * @version       2016-01-12
+ * @version       2016-01-20
  * @package       mod_checkmark
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
  * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
@@ -67,10 +67,12 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
-v 2016011400
+v 2016012000
 -------------------------
 *) Separated DB table for submissions and feedbacks, students without submission
    wont get an empty submission when the feedback is given anymore
+*) Add first behat tests
+*) Change alternative identifier parameter in view.php from 'a' to 'c'
 
 v 2016011200
 -------------------------
