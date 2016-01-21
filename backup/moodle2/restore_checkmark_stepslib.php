@@ -121,7 +121,7 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
             unset($data->flexiblenaming);
         }
         if (isset($data->flexiblenaming) && !$data->flexiblenaming
-            && isset($data->examplestart) && isset($data->examplecount)) {
+            && isset($data->examplestart) && !empty($data->examplecount) && ($data->examplecount > 0)) {
             // Prepare processing of old standard-naming backup!
             $addexamples = true;
             $examplenames = array();
