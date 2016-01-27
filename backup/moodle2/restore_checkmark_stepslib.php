@@ -64,6 +64,9 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
             $check = new restore_path_element('checkmark_check',
                                               '/activity/checkmark/submissions/submission/checks/check');
             $paths[] = $check;
+            $feedback = new restore_path_element('checkmark_feedback',
+                                                   '/activity/checkmark/feedbacks/feedback');
+            $paths[] = $feedback;
         }
 
         // Return the paths wrapped into standard activity structure!
@@ -175,13 +178,33 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
             unset($data->teacher_id);
         }
 
+        // Split feedback off, if it's an pre v2.9 backup!
+        if (isset($data->teacherid)) {
+            $feedback = new stdClass();
+            $feedback->checkmarkid = $this->get_new_parentid('checkmark');
+            $feedback->userid = $data->userid;
+            $feedback->grade = $data->grade;
+            unset($data->grade);
+            $feedback->feedback = $data->submissioncomment;
+            unset($data->submissioncomment);
+            $feedback->format = $data->format;
+            unset($data->format);
+            $feedback->graderid = $data->teacherid;
+            unset($data->teacherid);
+            $feedback->mailed = $data->mailed;
+            unset($data->mailed);
+            $feedback->timecreated = $data->timemarked;
+            $feedback->timemodified = $data->timemarked;
+            unset($data->timemarked);
+            // Process feedback restore here!
+            $this->process_checkmark_feedback($feedback);
+        }
+
         $data->checkmarkid = $this->get_new_parentid('checkmark');
         $data->timecreated = $this->apply_date_offset($data->timecreated);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
-        $data->timemarked = $this->apply_date_offset($data->timemarked);
 
         $data->userid = $this->get_mappingid('user', $data->userid);
-        $data->teacherid = $this->get_mappingid('user', $data->teacherid);
 
         // Prepare conversion of old db structure to new one if needed!
         if (isset($data->checked)) {
@@ -210,6 +233,27 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
                 $DB->insert_record('checkmark_checks', $data);
             }
         }
+    }
+
+    /**
+     * Handles restoration of 1 checkmark feedback
+     *
+     * @param object $data Feedback data to restore
+     */
+    protected function process_checkmark_feedback($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $data->checkmarkid = $this->get_new_parentid('checkmark');
+        $data->userid = $this->get_mappingid('user', $data->userid);
+        $data->graderid = $this->get_mappingid('user', $data->graderid);
+        $data->timecreated = $this->apply_date_offset($data->timecreated);
+        $data->timemodified = $this->apply_date_offset($data->timemodified);
+
+        $newitemid = $DB->insert_record('checkmark_feedbacks', $data);
+        $this->set_mapping('checkmark_feedback', $oldid, $newitemid, true);
     }
 
     /**

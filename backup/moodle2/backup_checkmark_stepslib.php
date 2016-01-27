@@ -56,8 +56,13 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         $submissions = new backup_nested_element('submissions');
 
         $submission = new backup_nested_element('submission', array('id'), array(
-            'userid', 'timecreated', 'timemodified', 'grade', 'submissioncomment',
-            'format', 'teacherid', 'timemarked', 'mailed'));
+            'userid', 'timecreated', 'timemodified'));
+
+        $feedbacks = new backup_nested_element('feedbacks');
+
+        $feedback = new backup_nested_element('feedback', array('id'), array(
+            'userid', 'grade', 'feedback', 'format', 'graderid', 'mailed',
+            'timecreated', 'timemodified'));
 
         $examples = new backup_nested_element('examples');
 
@@ -72,6 +77,8 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         $examples->add_child($example);
         $checkmark->add_child($submissions);
         $submissions->add_child($submission);
+        $checkmark->add_child($feedbacks);
+        $feedbacks->add_child($feedback);
         // Second level.
         $submission->add_child($checks);
         $checks->add_child($check);
@@ -86,6 +93,8 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         if ($userinfo) {
             $submission->set_source_table('checkmark_submissions',
                                           array('checkmarkid' => backup::VAR_PARENTID));
+            $feedback->set_source_table('checkmark_feedbacks',
+                                          array('checkmarkid' => backup::VAR_PARENTID));
             $check->set_source_table('checkmark_checks',
                                       array('submissionid' => backup::VAR_PARENTID));
         }
@@ -93,7 +102,8 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         // Define id annotations!
         $checkmark->annotate_ids('scale', 'grade');
         $submission->annotate_ids('user', 'userid');
-        $submission->annotate_ids('user', 'teacherid');
+        $feedback->annotate_ids('user', 'userid');
+        $feedback->annotate_ids('user', 'graderid');
         $check->annotate_ids('checkmark_example', 'exampleid');
 
         // Define file annotations!

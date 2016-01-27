@@ -67,6 +67,11 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2016011400
+-------------------------
+*) Separated DB table for submissions and feedbacks, students without submission
+   wont get an empty submission when the feedback is given anymore
+
 v 2016011200
 -------------------------
 *) New setting: checkmark/pdfexampleswarning = amount of examples in instance

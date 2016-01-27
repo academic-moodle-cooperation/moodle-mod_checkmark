@@ -49,7 +49,7 @@ class grade_updated extends \core\event\base {
     protected function init() {
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_TEACHING;
-        $this->data['objecttable'] = 'checkmark_submissions';
+        $this->data['objecttable'] = 'checkmark_feedbacks';
     }
 
     /**
@@ -61,9 +61,9 @@ class grade_updated extends \core\event\base {
      */
     public static function manual(\stdClass $cm, array $data) {
         $data['type'] = 'manual';
-        // Trigger overview event.
+        $data['instance'] = $cm->instance;
         $event = self::create(array(
-            'objectid'    => $data['submissionid'],
+            'objectid'    => $data['feedbackid'],
             'context'     => \context_module::instance($cm->id),
             'relateduserid' => $data['userid'],
             'other'       => $data,
@@ -79,10 +79,10 @@ class grade_updated extends \core\event\base {
      * @return \mod_checkmark\event\grade_updated
      */
     public static function automatic(\stdClass $cm, array $data) {
-        // Trigger overview event.
         $data['type'] = 'automatic';
+        $data['instance'] = $cm->instance;
         $event = self::create(array(
-            'objectid'    => $cm->instance,
+            'objectid'    => $data['feedbackid'],
             'context'     => \context_module::instance($cm->id),
             'relateduserid' => $data['userid'],
             'other'       => $data,
@@ -99,11 +99,11 @@ class grade_updated extends \core\event\base {
         switch($this->data['other']['type']) {
             case 'manual':
                 return "The user with id '".$this->userid."' updated the grade for user with id '".$this->data['relateduserid'].
-                       "' using ".$this->objecttable." with course module id '$this->contextinstanceid'.";
+                       "' in checkmark module with course module id '$this->contextinstanceid'.";
             break;
             case 'automatic':
                 return "The user with id '".$this->userid."' updated the grade for user with id '".$this->data['relateduserid']."'".
-                       " using autograding in ".$this->objecttable." with course module id '$this->contextinstanceid'.";
+                       " using autograding in checkmark module with course module id '$this->contextinstanceid'.";
             break;
         }
     }
@@ -165,10 +165,6 @@ class grade_updated extends \core\event\base {
 
         if (empty($this->data['relateduserid'])) {
             throw new \coding_exception('Related user has to be set!');
-        }
-
-        if (empty($this->data['other']['submissionid'])) {
-            throw new \coding_exception('Submission-ID has to be set!');
         }
     }
 }

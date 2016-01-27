@@ -810,5 +810,95 @@ function xmldb_checkmark_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2015122100, 'checkmark');
     }
 
+    if ($oldversion < 2016011500) {
+        // Split submissions-table to submissions- and feedbacks-table!
+
+        // First step: we create a new table for the feedbacks!
+        $table = new xmldb_table('checkmark_feedbacks');
+        // Adding fields to table checkmark_feedbacks.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('checkmarkid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('grade', XMLDB_TYPE_NUMBER, '10, 5', null, null, null, null);
+        $table->add_field('feedback', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('format', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('graderid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('mailed', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        // Adding keys to table checkmark_feedbacks.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('checkmarkid', XMLDB_KEY_FOREIGN, array('checkmarkid'), 'checkmark', array('id'));
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+        $table->add_key('graderid', XMLDB_KEY_FOREIGN, array('graderid'), 'user', array('id'));
+        // Adding indexes to table checkmark_feedbacks.
+        $table->add_index('mailed', XMLDB_INDEX_NOTUNIQUE, array('mailed'));
+        $table->add_index('timemodified', XMLDB_INDEX_NOTUNIQUE, array('timemodified'));
+        // Conditionally launch create table for checkmark_feedbacks.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Step No. 2: transfer the feedback data from submission table to new feedback table!
+        $rs = $DB->get_recordset_sql("
+        SELECT checkmarkid, userid, grade, submissioncomment, format, teacherid, mailed, timemarked
+          FROM {checkmark_submissions}
+         WHERE timemarked > 0", array());
+
+         // And enough memory too!
+        raise_memory_limit(MEMORY_UNLIMITED);
+        foreach ($rs as $record) {
+            // Let us take enough time for this!
+            core_php_time_limit::raise(600);
+
+            $feedback = new stdClass();
+            $feedback->checkmarkid = $record->checkmarkid;
+            $feedback->userid = $record->userid;
+            $feedback->grade = $record->grade;
+            $feedback->feedback = $record->submissioncomment;
+            $feedback->format = $record->format;
+            $feedback->graderid = $record->teacherid;
+            $feedback->mailed = $record->mailed;
+            $feedback->timecreated = $record->timemarked;
+            $feedback->timemodified = $record->timemarked;
+            $DB->insert_record('checkmark_feedbacks', $feedback);
+        }
+        $rs->close(); // Don't forget to close the recordset!
+
+        // Step No. 3: delete old unused fields!
+        $table = new xmldb_table('checkmark_submissions');
+        $indices = array(new xmldb_index('timemarked', XMLDB_INDEX_NOTUNIQUE, array('timemarked')),
+                         new xmldb_index('mailed', XMLDB_INDEX_NOTUNIQUE, array('mailed')));
+        // Conditionally launch drop indices timemarked and mailed.
+        foreach ($indices as $index) {
+            if ($dbman->index_exists($table, $index)) {
+                $dbman->drop_index($table, $index);
+            }
+        }
+
+        // Define key teacherid (foreign) to be dropped form checkmark_submissions.
+        $key = new xmldb_key('teacherid', XMLDB_KEY_FOREIGN, array('teacherid'), 'user', array('id'));
+        // Launch drop key teacherid.
+        $dbman->drop_key($table, $key);
+
+        // Define field checked to be dropped from checkmark_submissions.
+        $fields = array(new xmldb_field('checked'),
+                        new xmldb_field('grade'),
+                        new xmldb_field('submissioncomment'),
+                        new xmldb_field('format'),
+                        new xmldb_field('teacherid'),
+                        new xmldb_field('timemarked'),
+                        new xmldb_field('mailed'));
+        // Conditionally launch drop fields: checked, grade, submissioncomment, format, teacherid, timemarked and mailed.
+        foreach ($fields as $field) {
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->drop_field($table, $field);
+            }
+        }
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2016011500, 'checkmark');
+    }
+
     return true;
 }

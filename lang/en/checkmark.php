@@ -154,16 +154,16 @@ $string['allowresubmit'] = 'Allow resubmitting';
 $string['allowresubmit_help'] = 'If enabled, students will be allowed to resubmit checkmarks after they have been graded (to be regraded).';
 $string['alreadygraded'] = 'Your submission has already been graded and resubmission is not allowed.';
 $string['checkmarkdetails'] = 'Checkmark details';
-$string['checkmarkmail'] = '{$a->teacher} posted feedback on your
+$string['checkmarkmail'] = '{$a->grader} posted feedback on your
 checkmark submission for \'{$a->checkmark}\'
 
 You can see it appended to your checkmark submission:
 
     {$a->url}';
-$string['checkmarkmailhtml'] = '{$a->teacher} posted feedback on your
+$string['checkmarkmailhtml'] = '{$a->grader} posted feedback on your
 checkmark submission for \'<i>{$a->checkmark}</i>\'<br /><br />
 You can see it appended to your <a href="{$a->url}">checkmark submission</a>.';
-$string['checkmarkmailsmall'] = '{$a->teacher} posted feedback on your
+$string['checkmarkmailsmall'] = '{$a->grader} posted feedback on your
 checkmark submission for \'{$a->checkmark}\' You can see it appended to your submission';
 $string['checkmarkname'] = 'Checkmark name';
 $string['checkmarks'] = 'Checkmarks';

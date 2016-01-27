@@ -154,16 +154,16 @@ $string['allowresubmit'] = 'Erneute Abgabe erlauben';
 $string['allowresubmit_help'] = 'Wenn aktiviert, ist es Teilnehmer/innen erlaubt, nach der Benotung erneut (für eine erneute Benotung) abzugeben.';
 $string['alreadygraded'] = 'Ihre Abgabe wurde bereits benotet und erneutes Abgeben ist daher nicht erlaubt.';
 $string['checkmarkdetails'] = 'Kreuzerlübungsdetails';
-$string['checkmarkmail'] = '{$a->teacher} hat eine Rückmeldung bezüglich ihrer
+$string['checkmarkmail'] = '{$a->grader} hat eine Rückmeldung bezüglich ihrer
 Kreuzerlübungsabgabe für \'{$a->checkmark}\' gepostet.
 
 Sie können sie als Anhang an Ihre Abgabe einsehen:
 
     {$a->url}';
-$string['checkmarkmailhtml'] = '{$a->teacher} hat eine Rückmeldung zu ihrer
+$string['checkmarkmailhtml'] = '{$a->grader} hat eine Rückmeldung zu ihrer
 Kreuzerlübungsabgabe für \'<i>{$a->checkmark}</i>\' gegeben.<br /><br />
 Sie können sie als Anhang an ihre <a href="{$a->url}">Abgabe</a> einsehen.';
-$string['checkmarkmailsmall'] = '{$a->teacher} hat eine Rückmeldung zu ihrer
+$string['checkmarkmailsmall'] = '{$a->grader} hat eine Rückmeldung zu ihrer
 Kreuzerlübungsabgabe für \'{$a->checkmark}\' gegeben. Sie können sie als Anhang an ihre Abgabe einsehen.';
 $string['checkmarkname'] = 'Name der Kreuzerlübung';
 $string['checkmarks'] = 'Kreuzerl';

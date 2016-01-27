@@ -28,7 +28,7 @@ namespace mod_checkmark\task;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class send_notifications handles sending of messages to students if their submissions have been graded.
+ * Class send_notifications handles sending of messages to students if they got new unmailed feedback (grades, comments).
  *
  * @package       mod_checkmark
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
@@ -72,21 +72,21 @@ class send_notifications extends \core\task\scheduled_task {
         } else {
                 $starttime = $endtime - 2 * 24 * 3600;   // Two days earlier?
         }
-        if ($submissions = \checkmark_get_unmailed_submissions($starttime, $endtime)) {
+        if ($feedbacks = \checkmark_get_unmailed_feedbacks($starttime, $endtime)) {
 
             $timenow = time();
 
-            foreach ($submissions as $submission) {
+            foreach ($feedbacks as $feedback) {
 
-                echo 'Processing checkmark submission '.$submission->id."\n";
+                echo 'Processing checkmark feedback '.$feedback->id."\n";
 
-                if (!$user = $DB->get_record('user', array('id' => $submission->userid))) {
+                if (!$user = $DB->get_record('user', array('id' => $feedback->userid))) {
                     echo 'Could not find user '.$user->id."\n";
                     continue;
                 }
 
-                if (!$course = $DB->get_record('course', array('id' => $submission->course))) {
-                    echo 'Could not find course '.$submission->course."\n";
+                if (!$course = $DB->get_record('course', array('id' => $feedback->course))) {
+                    echo 'Could not find course '.$feedback->course."\n";
                     continue;
                 }
 
@@ -96,20 +96,20 @@ class send_notifications extends \core\task\scheduled_task {
                  */
                 \cron_setup_user($user, $course);
 
-                if (!\is_enrolled(\context_course::instance($submission->course), $user->id)) {
+                if (!\is_enrolled(\context_course::instance($feedback->course), $user->id)) {
                     echo fullname($user).' isn\'t an active participant in ' .
                          format_string($course->shortname) . "\n";
                     continue;
                 }
 
-                if (!$teacher = $DB->get_record('user', array('id' => $submission->teacherid))) {
-                    echo 'Could not find teacher '.$submission->teacherid."\n";
+                if (!$grader = $DB->get_record('user', array('id' => $feedback->graderid))) {
+                    echo 'Could not find teacher '.$feedback->graderid."\n";
                     continue;
                 }
 
-                if (!$mod = \get_coursemodule_from_instance('checkmark', $submission->checkmarkid,
+                if (!$mod = \get_coursemodule_from_instance('checkmark', $feedback->checkmarkid,
                                                            $course->id)) {
-                    echo 'Could not find course module for checkmark id '.$submission->checkmarkid."\n";
+                    echo 'Could not find course module for checkmark id '.$feedback->checkmarkid."\n";
                     continue;
                 }
 
@@ -121,14 +121,14 @@ class send_notifications extends \core\task\scheduled_task {
                 $strcheckmark  = \get_string('modulename', 'checkmark');
 
                 $checkmarkinfo = new \stdClass();
-                $checkmarkinfo->teacher = \fullname($teacher);
-                $checkmarkinfo->checkmark = \format_string($submission->name, true);
+                $checkmarkinfo->grader = \fullname($grader);
+                $checkmarkinfo->checkmark = \format_string($feedback->name, true);
                 $checkmarkinfo->url = $CFG->wwwroot.'/mod/checkmark/view.php?id='.$mod->id;
 
                 $postsubject = $course->shortname.': '.$strcheckmarks.': '.
-                               \format_string($submission->name, true);
+                               \format_string($feedback->name, true);
                 $posttext  = $course->shortname.' -> '.$strcheckmarks.' -> '.
-                             \format_string($submission->name, true)."\n".
+                             \format_string($feedback->name, true)."\n".
                              "---------------------------------------------------------------------\n".
                              \get_string('checkmarkmail', 'checkmark', $checkmarkinfo)."\n".
                              "---------------------------------------------------------------------\n";
@@ -138,7 +138,7 @@ class send_notifications extends \core\task\scheduled_task {
                     '<a href="'.$CFG->wwwroot.'/course/view.php?id='.$course->id.'">'.$course->shortname.'</a> '.
                     '-><a href="'.$CFG->wwwroot.'/mod/checkmark/index.php?id='.$course->id.'">'.$strcheckmarks.'</a> '.
                     '-><a href="'.$CFG->wwwroot.'/mod/checkmark/view.php?id='.$mod->id.'">'.
-                    \format_string($submission->name, true).'</a></font></p>'.
+                    \format_string($feedback->name, true).'</a></font></p>'.
                     '<hr /><font face="sans-serif">'.
                     '<p>'.\get_string('checkmarkmailhtml', 'checkmark', $checkmarkinfo).'</p>'.
                     '</font><hr />';
@@ -150,7 +150,7 @@ class send_notifications extends \core\task\scheduled_task {
                 $message = new \core\message\message();
                 $message->component         = 'mod_checkmark';
                 $message->name              = 'checkmark_updates';
-                $message->userfrom          = $teacher;
+                $message->userfrom          = $grader;
                 $message->userto            = $user;
                 $message->subject           = $postsubject;
                 $message->fullmessage       = $posttext;
@@ -163,7 +163,7 @@ class send_notifications extends \core\task\scheduled_task {
                 $message->contexturlname    = $checkmarkinfo->checkmark;
 
                 \message_send($message);
-                $DB->set_field('checkmark_submissions', 'mailed', '1', array('id' => $submission->id));
+                $DB->set_field('checkmark_feedbacks', 'mailed', '1', array('id' => $feedback->id));
             }
 
             \cron_setup_user();

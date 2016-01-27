@@ -81,14 +81,14 @@ class mod_checkmark_grading_form extends moodleform {
 
         $this->add_feedback_section();
 
-        if ($this->_customdata->submission->timemarked) {
-            $datestring = userdate($this->_customdata->submission->timemarked).'&nbsp; ('.
-                                   format_time(time() - $this->_customdata->submission->timemarked).
+        if ($this->_customdata->feedbackobj !== false) {
+            $datestring = userdate($this->_customdata->feedbackobj->timemodified).'&nbsp; ('.
+                                   format_time(time() - $this->_customdata->feedbackobj->timemodified).
                                    ')';
             $mform->addElement('header', 'Last Grade', get_string('lastgrade', 'checkmark'));
             $mform->addElement('static', 'picture',
-                               $OUTPUT->user_picture($this->_customdata->teacher),
-                               fullname($this->_customdata->teacher).'<br/>'.$datestring);
+                               $OUTPUT->user_picture($this->_customdata->grader),
+                               fullname($this->_customdata->grader).'<br/>'.$datestring);
         }
         // Buttons we need!
         $this->add_grading_buttons();
@@ -111,7 +111,9 @@ class mod_checkmark_grading_form extends moodleform {
 
         $mform->addElement('header', 'Grades', get_string('grades', 'grades'));
         $mform->addElement('select', 'xgrade', get_string('grade').':', $grademenu, $attributes);
-        $mform->setDefault('xgrade', $this->_customdata->submission->grade );
+        if ($this->_customdata->feedbackobj !== false) {
+            $mform->setDefault('xgrade', $this->_customdata->feedbackobj->grade );
+        }
         $mform->setType('xgrade', PARAM_INT);
 
         if (!empty($this->_customdata->enableoutcomes)) {
@@ -162,12 +164,11 @@ class mod_checkmark_grading_form extends moodleform {
         } else {
             // Visible elements!
 
-            $mform->addElement('editor', 'submissioncomment_editor',
+            $mform->addElement('editor', 'feedback_editor',
                                get_string('feedback', 'checkmark').':', null,
                                $this->get_editor_options() );
-            $mform->setType('submissioncomment_editor', PARAM_RAW); // To be cleaned before display!
-            $mform->setDefault('submissioncomment_editor',
-                               $this->_customdata->submission->submissioncomment);
+            $mform->setType('feedback_editor', PARAM_RAW); // To be cleaned before display!
+            $mform->setDefault('feedback_editor', $this->_customdata->feedback);
             $mform->addElement('hidden', 'mailinfo_h', '0');
             $mform->setType('mailinfo_h', PARAM_INT);
             $mform->addElement('checkbox', 'mailinfo',
@@ -246,13 +247,14 @@ class mod_checkmark_grading_form extends moodleform {
             $data->textformat = $data->format;
         }
 
-        if (!empty($this->_customdata->submission->id)) {
-            $itemid = $this->_customdata->submission->id;
+        if (($this->_customdata->feedbackobj !== false)
+            && !empty($this->_customdata->feedbackobj->id)) {
+            $itemid = $this->_customdata->feedbackobj->id;
         } else {
             $itemid = null;
         }
 
-        $data = file_prepare_standard_editor($data, 'submissioncomment', $editoroptions,
+        $data = file_prepare_standard_editor($data, 'feedback', $editoroptions,
                                              $editoroptions['context'], $editoroptions['component'],
                                              $editoroptions['filearea'], $itemid);
         return parent::set_data($data);
@@ -267,18 +269,17 @@ class mod_checkmark_grading_form extends moodleform {
     public function get_data() {
         $data = parent::get_data();
 
-        if (!empty($this->_customdata->submission->id)) {
-            $itemid = $this->_customdata->submission->id;
-        } else {
-            $itemid = null; // TODO: this is wrong, itemid MUST be known when saving files! (skodak)!
-        }
+        if (($this->_customdata->feedbackobj !== false)
+            && $this->_customdata->feedbackobj->id) {
+            $itemid = $this->_customdata->feedbackobj->id;
 
-        if ($data) {
-            $editoroptions = $this->get_editor_options();
-            $data = file_postupdate_standard_editor($data, 'submissioncomment', $editoroptions,
-                                                    $this->_customdata->context,
-                                                    $editoroptions['component'],
-                                                    $editoroptions['filearea'], $itemid);
+            if ($data) {
+                $editoroptions = $this->get_editor_options();
+                $data = file_postupdate_standard_editor($data, 'feedback', $editoroptions,
+                                                        $this->_customdata->context,
+                                                        $editoroptions['component'],
+                                                        $editoroptions['filearea'], $itemid);
+            }
         }
         return $data;
     }
