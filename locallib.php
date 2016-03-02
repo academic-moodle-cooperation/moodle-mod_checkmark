@@ -764,7 +764,7 @@ class checkmark {
             $activegroup = 0;
         }
 
-        list($esql, $params) = get_enrolled_sql($context, 'mod/checkmark:view', $activegroup);
+        list($esql, $params) = get_enrolled_sql($context, 'mod/checkmark:submit', $activegroup);
         switch ($filter) {
             case self::FILTER_SELECTED:
                 // Prepare list with selected users!
