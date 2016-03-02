@@ -778,13 +778,13 @@ class checkmark {
                        ' AND u.id '.$sqluserids;
                 break;
             case self::FILTER_REQUIRE_GRADING:
-                $wherefilter = ' AND (f.timemodified < s.timemodified) ';
-                $sql = '  SELECT u.id FROM {user} u
+                $wherefilter = ' AND (COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0)) ';
+                $sql = '  SELECT u.id
+                            FROM {user} u
                        LEFT JOIN ('.$esql.') eu ON eu.id=u.id
                        LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid)
                        LEFT JOIN {checkmark_feedbacks} f ON s.userid = f.userid AND s.checkmarkid = f.checkmarkid
                            WHERE u.deleted = 0
-                                 AND eu.id=u.id
                                  AND s.checkmarkid = :checkmarkid'.
                        $wherefilter;
                        $params = array_merge_recursive($params,
@@ -804,6 +804,7 @@ class checkmark {
         }
 
         $users = $DB->get_records_sql($sql, $params);
+
         if ($users == null) {
             $result['status'] = GRADE_UPDATE_OK;
             if ($countonly) {
