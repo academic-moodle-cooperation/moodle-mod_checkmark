@@ -2976,10 +2976,10 @@ class checkmark {
                 $tablecolumns[] = 'grade';
                 $columnformat[] = array(array('align' => 'R'));
             }
-            if (!$this->column_is_hidden('comment')) {
+            if (!$this->column_is_hidden('feedback')) {
                 $cellwidth[] = array('mode' => 'Relativ', 'value' => '50');
                 $tableheaders[] = get_string('comment', 'checkmark');
-                $tablecolumns[] = 'comment';
+                $tablecolumns[] = 'feedback';
                 $columnformat[] = array(array('align' => 'L'));
             }
             if ($usesoutcomes && !$this->column_is_hidden('outcome')) {
@@ -3257,7 +3257,7 @@ class checkmark {
                     $grademax = $gradinginfo->items[0]->grademax;
                     $finalgrade->formatted_grade = round($finalgrade->grade, 2)
                                                     .' / '.round($grademax, 2);
-                        $lockedoroverridden = 'locked';
+                    $lockedoroverridden = 'locked';
                     if ($finalgrade->overridden) {
                         $lockedoroverridden = 'overridden';
                     }
@@ -3418,7 +3418,7 @@ class checkmark {
                             }
                             $row[] = $feedback;
                         } else if (empty($dataonly)) {
-                            $row[] = ' ';
+                            $row[] = '&nbsp;';
                         }
                     } else {
                         if (!$this->column_is_hidden('grade')) {
@@ -3438,6 +3438,8 @@ class checkmark {
                                 }
                             }
                             $row[] = $grade;
+                        } else if (empty($dataonly)) {
+                            $row[] = ' ';
                         }
 
                         if (!$this->column_is_hidden('feedback')) {
@@ -3457,6 +3459,8 @@ class checkmark {
                                 }
                             }
                             $row[] = $feedback;
+                        } else if (empty($dataonly)) {
+                            $row[] = ' ';
                         }
                     }
 
