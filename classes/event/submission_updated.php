@@ -62,8 +62,8 @@ class submission_updated extends \core\event\base {
     public static function create_from_object(\stdClass $cm, \stdClass $submission) {
         // Trigger overview event.
         $event = self::create(array(
-            'objectid'    => $submission->id,
-            'context'     => \context_module::instance($cm->id),
+            'objectid'      => $submission->id,
+            'context'       => \context_module::instance($cm->id),
             'relateduserid' => $submission->userid,
         ));
         $event->add_record_snapshot('checkmark_submissions', $submission);
@@ -76,7 +76,7 @@ class submission_updated extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '".$this->userid."' updated the submission for user with id '".$this->relateduser.
+        return "The user with id '".$this->userid."' updated the submission for user with id '".$this->relateduserid.
                "' in ".$this->objecttable." with course module id '$this->contextinstanceid'.";
     }
 
