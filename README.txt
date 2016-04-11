@@ -67,6 +67,17 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2016012002
+-------------------------
+*) Fix bug where grades won't get written to gradebook anymore!
+
+v 2016012001
+-------------------------
+*) Fixed hidden comment column breaking exports
+*) Fixed wrong amount of affected users in message when autograding
+*) Fixed autograding for submissions without feedback when autograding submissions
+   with feedback required
+
 v 2016012000
 -------------------------
 *) Separated DB table for submissions and feedbacks, students without submission
