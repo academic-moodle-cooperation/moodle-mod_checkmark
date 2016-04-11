@@ -1796,7 +1796,7 @@ class checkmark {
         if ($filter == self::FILTER_SUBMITTED) {
             $where .= 's.timemodified > 0 AND ';
         } else if ($filter == self::FILTER_REQUIRE_GRADING) {
-            $where .= 'f.timemodified < s.timemodified AND ';
+            $where .= 'COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0) AND ';
         }
         $params = array();
         if ($users) {
@@ -2240,7 +2240,7 @@ class checkmark {
             if ($filter == self::FILTER_SUBMITTED) {
                 $wherefilter = ' AND s.timemodified > 0';
             } else if ($filter == self::FILTER_REQUIRE_GRADING) {
-                $wherefilter = ' AND f.timemodified < s.timemodified ';
+                $wherefilter = ' AND COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0) ';
             }
 
             $params['checkmarkid'] = $this->checkmark->id;
@@ -2339,7 +2339,7 @@ class checkmark {
         if ($filter == self::FILTER_SUBMITTED) {
             $where .= 's.timemodified > 0 AND ';
         } else if ($filter == self::FILTER_REQUIRE_GRADING) {
-            $where .= 'f.timemodified < s.timemodified AND ';
+            $where .= 'COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0) AND ';
         }
 
         if ($sort = $table->get_sql_sort()) {
@@ -2901,19 +2901,21 @@ class checkmark {
             if ($filter == self::FILTER_SUBMITTED) {
                 $wherefilter = ' AND s.timemodified > 0';
             } else if ($filter == self::FILTER_REQUIRE_GRADING) {
-                $wherefilter = ' AND f.timemodified < s.timemodified ';
+                $wherefilter = ' AND COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0) ';
             }
             $params['checkmarkid'] = $this->checkmark->id;
             $params['checkmarkid2'] = $this->checkmark->id;
             $sql = "SELECT u.id FROM {user} u
                  LEFT JOIN (".$esql.") eu ON eu.id=u.id
                  LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid) AND s.checkmarkid = :checkmarkid
-                 LEFT JOIN {checkmark_submissions} f ON (u.id = s.userid) AND f.checkmarkid = :checkmarkid2
+                 LEFT JOIN {checkmark_feedbacks} f ON (u.id = f.userid) AND f.checkmarkid = :checkmarkid2
                      WHERE u.deleted = 0
                            AND eu.id=u.id ".$sqluserids."
                            ".$wherefilter;
         }
+
         $users = $DB->get_records_sql($sql, $params);
+
         if (!empty($users)) {
             $users = array_keys($users);
         }
@@ -3076,7 +3078,7 @@ class checkmark {
         if ($filter == self::FILTER_SUBMITTED) {
             $where .= 's.timemodified > 0 AND ';
         } else if ($filter == self::FILTER_REQUIRE_GRADING) {
-            $where .= 'f.timemodified < s.timemodified AND ';
+            $where .= 'COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0) AND ';
         }
 
         $sort = '';
