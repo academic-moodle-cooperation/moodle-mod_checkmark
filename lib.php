@@ -456,10 +456,9 @@ function checkmark_get_user_grades($checkmark, $userid=0) {
 
     $sql = 'SELECT u.id, u.id AS userid, f.grade AS rawgrade, f.feedback AS feedback,
                    f.format AS feedbackformat, f.graderid AS usermodified,
-                   f.timemodified AS dategraded, s.timemodified AS datesubmitted
+                   f.timemodified AS dategraded
               FROM {user} u, {checkmark_feedbacks} f
-         LEFT JOIN {checkmark_submissions} s ON f.userid = s.userid AND f.checkmarkid = s.checkmarkid
-             WHERE u.id = s.userid AND f.checkmarkid = :aid'.
+             WHERE u.id = f.userid AND f.checkmarkid = :aid'.
             $user;
     return $DB->get_records_sql($sql, $params);
 }

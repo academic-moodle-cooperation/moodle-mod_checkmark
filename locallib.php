@@ -4269,7 +4269,7 @@ EOS;
 
         $feedback = $this->get_feedback($userid);
 
-        if (!feedback !== false) {
+        if ($feedback !== false) {
             return $feedback; // Return existing feedback if there is one...
         }
 
