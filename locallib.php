@@ -4123,7 +4123,7 @@ EOS;
               || $gradinginfo->items[0]->grades[$formdata->userid]->overridden) ) {
             $feedback->grade = $formdata->xgrade;
             $feedback->feedback = $formdata->feedback_editor['text'];
-            $feedback->teacherid = $USER->id;
+            $feedback->graderid = $USER->id;
             if (!empty($formdata->mailinfo)) {
                 $feedback->mailed = 0;       // Make sure mail goes out (again, even)!
             } else {
@@ -4281,7 +4281,7 @@ EOS;
         $feedback->grade = -1;
         $feedback->feedback = '';
         $feedback->format = 0;
-        $feedback->graderid = 0;
+        $feedback->graderid = $USER->id;
         $feedback->mailed = 1;
         $feedback->timecreated = time();
         $feedback->timemodified = $feedback->timecreated;
