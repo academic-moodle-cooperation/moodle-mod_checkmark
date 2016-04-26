@@ -67,9 +67,14 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2016012003
+-------------------------
+*) Correct the grades in gradebook affected from the bug fixed in 2016012002!
+
 v 2016012002
 -------------------------
 *) Fix bug where grades won't get written to gradebook anymore!
+*) Fix broken filter "require grading" in submissions and print-preview tab!
 
 v 2016012001
 -------------------------

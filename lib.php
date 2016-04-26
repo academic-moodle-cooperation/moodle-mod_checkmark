@@ -1721,9 +1721,12 @@ function checkmark_extend_settings_navigation(settings_navigation $settings,
         $checkmarknode->add($string, $link, navigation_node::TYPE_SETTING);
     }
 
-    if (is_object($checkmarkinstance)
-        && method_exists($checkmarkinstance, 'extend_settings_navigation')) {
-        $checkmarkinstance->extend_settings_navigation($checkmarknode);
+    if (is_siteadmin()) {
+        // Show link to check for submissions affected by a bug in 2.9.1 causing grades not to be written to gradebook!
+        // TODO: remove this link in 2-3 versions from 2.9.2 on!
+        $link = new moodle_url('/mod/checkmark/db/fixmissinggradebookgrade.php');
+        $string = get_string('checkbrokengradebookgrades', 'checkmark');
+        $checkmarknode->add($string, $link, navigation_node::TYPE_SETTING);
     }
 }
 

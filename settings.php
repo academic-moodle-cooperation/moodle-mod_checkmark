@@ -68,3 +68,10 @@ if ($ADMIN->fulltree) {
                                                   25,
                                                   $options));
 }
+
+// TODO: should we remove this link and script someday?
+if ($hassiteconfig) { // Needs this condition or there is error on login page!
+    $ADMIN->add('grades', new admin_externalpage('checkmark',
+            get_string('pluginname', 'checkmark').': '.get_string('checkbrokengradebookgrades', 'checkmark'),
+            new moodle_url('/mod/checkmark/db/fixmissinggradebookgrade.php')));
+}

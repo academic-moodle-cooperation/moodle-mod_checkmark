@@ -61,6 +61,11 @@ $string['cantfixevent'] = 'Konnte Kalendereintrag mit der ID {$a->id}, Name {$a-
 $string['cfg_nowarning'] = 'keine Warnung';
 $string['cfg_pdfexampleswarning'] = 'Beispielanzahl-Limit für Warnung PDF Export';
 $string['cfg_pdfexampleswarning_desc'] = 'Ab wie vielen Beispielen in einer Instanz eine Warnung gezeigt wird, dass kein ordentlicher PDF-Export mehr garantiert werden kann. Üblicherweise muss dieser Wert nicht verändert werden, es sei denn, man möchte diese Warnung gar nicht anzeigen, oder sie für die konkrete Installation etwas verfeinern.';
+$string['checkbrokengradebookgrades'] = 'Auf fehlerhafte Gradebook-Einträge prüfen';
+$string['checkbrokengradebookgrades_desc'] = 'Aufgrund eines Bugs in Version 2.9.1 wurden Bewertungen nicht korrekt ins Gradebook übertragen.
+Die folgenden Abgaben sind davon betroffen:';
+$string['checkbrokengradebookgrades_mail'] = 'Aufgrund eines Bugs in Version 2.9.1 wurden Bewertungen nicht korrekt ins Gradebook übertragen.
+Die folgenden Abgaben waren davon betroffen und wurden automatisch repariert:';
 $string['checkmark_overviewsummary'] = 'Sie haben {$a->checked_examples} / {$a->total_examples} Beispiele ({$a->checked_grade} / {$a->total_grade} Punkte) gekreuzt<br />{$a->grade}<br />';
 $string['checkmark_summary'] = 'Sie haben <span id="examples">{$a->checked_examples}</span> von {$a->total_examples} Beispielen gekreuzt.<br />(<span id="grade">{$a->checked_grade}</span> von maximal {$a->total_grade} Punkten)';
 $string['checkmarkstatstitle'] = 'Kursübersicht Kreuzerlübungen';

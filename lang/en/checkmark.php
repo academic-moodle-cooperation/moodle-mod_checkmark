@@ -61,6 +61,11 @@ $string['cantfixevent'] = 'Couldn\'t fix event with ID {$a->id}, named {$a->name
 $string['cfg_nowarning'] = 'No warning';
 $string['cfg_pdfexampleswarning'] = 'Amount of examples to display a warning for PDF export';
 $string['cfg_pdfexampleswarning_desc'] = 'Minimum amount of examples above which a warning is displayed, that no reasonable PDF export can be guaranteed. Usually you don\'t have to change this, except you don\'t want to have it shown at all or if you want to tweak it for your installation.';
+$string['checkbrokengradebookgrades'] = 'Check broken gradebook grades';
+$string['checkbrokengradebookgrades_desc'] = 'Due to a bug in version 2.9.1 of the Checkmark, grades have not been transfered to gradebook correctly.
+The following submissions have been affected by this bug:';
+$string['checkbrokengradebookgrades_mail'] = 'Due to a bug in version 2.9.1 of the Checkmark, grades have not been transfered to gradebook correctly.
+The following submissions have been affected by this bug and were automatically fixed:';
 $string['checkmark_overviewsummary'] = 'You\'ve checked {$a->checked_examples} / {$a->total_examples} examples ({$a->checked_grade} / {$a->total_grade} points)<br />{$a->grade}<br />';
 $string['checkmark_summary'] = 'You\'ve checked <span id="examples">{$a->checked_examples}</span> out of {$a->total_examples} examples.<br />(<span id="grade">{$a->checked_grade}</span> out of a maximum of {$a->total_grade} points)';
 $string['checkmarkstatstitle'] = 'Course overview checkmark';
