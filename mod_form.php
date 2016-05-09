@@ -27,7 +27,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-//  It must be included from a Moodle page!
+// It must be included from a Moodle page!
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');
 }

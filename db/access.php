@@ -70,17 +70,16 @@ defined('MOODLE_INTERNAL') || die;
  */
 
 $capabilities = array(
-        'mod/checkmark:addinstance' => array(
-                'captype' => 'write',
-                'contextlevel' => CONTEXT_COURSE,
-                'legacy' => array(
-                        'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW,
-                )
-        ),
+    'mod/checkmark:addinstance' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'legacy' => array(
+                'editingteacher' => CAP_ALLOW,
+                'manager' => CAP_ALLOW,
+        )
+    ),
 
     'mod/checkmark:view' => array(
-
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
@@ -88,11 +87,10 @@ $capabilities = array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
-)
-),
+        )
+    ),
 
     'mod/checkmark:view_preview' => array(
-
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
@@ -100,17 +98,16 @@ $capabilities = array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
-)
-),
+        )
+    ),
 
     'mod/checkmark:submit' => array(
-
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'student' => CAP_ALLOW
-)
-),
+        )
+    ),
 
     'mod/checkmark:grade' => array(
         'riskbitmask' => RISK_XSS,
@@ -121,8 +118,8 @@ $capabilities = array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
-)
-),
+        )
+    ),
 );
 
 

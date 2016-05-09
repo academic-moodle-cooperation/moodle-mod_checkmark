@@ -27,16 +27,14 @@
  /**
   * @module mod_grouptool/submission
   */
-define(['jquery', 'core/log'],
-       function($, log) {
+define(['jquery', 'core/log'], function($, log) {
 
     /**
      * @constructor
      * @alias module:mod_grouptool/submission
      */
     var Submission = function() {
-        /** @access private */
-        // examples = {exkey: {grade: exgrade, name: exname}}
+        // Structure: examples = {exkey: {grade: exgrade, name: exname}}!
         this.examples = [];
     };
 
@@ -47,14 +45,14 @@ define(['jquery', 'core/log'],
     Submission.prototype.update_summary = function(e) {
         var examples_new = 0;
         var grade_new = 0;
-        //defining local variables improves readability
+        // Defining local variables improves readability!
         var examples = e.data.examples;
 
-        //calculate values using flexible naming (var1 = names[], var2 = grades[])
+        // Calculate values using flexible naming (var1 = names[], var2 = grades[])!
         $.each(examples, function(key, cur) {
             var is_checked = null;
             if ($("input#example".concat(key.toString())) === null) {
-                //compatibility to pre 2.2
+                // Compatibility to pre 2.2 and current needed ID - TODO: do we need this anymore?
                 is_checked = $("input[type=checkbox]#id_example".concat(key.toString())).prop('checked');
             } else {
                 is_checked = $("input[type=checkbox]#example".concat(key.toString())).prop('checked');
@@ -107,16 +105,16 @@ define(['jquery', 'core/log'],
             $.each(this.examples, function(key) {
                 id_fieldname = 'input#example'.concat(key.toString());
                 log.debug('Attach click handler to ' + id_fieldname, 'checkmark');
-                $(id_fieldname).click(instance, instance.update_summary);    //register event listener
+                $(id_fieldname).click(instance, instance.update_summary);    // Register event listener!
             });
 
-            //register event-listener on reset-button to ensure proper data to be displayed on form-reset
+            // Register event-listener on reset-button to ensure proper data to be displayed on form-reset!
             $('#id_resetbutton').click(this, this.reset_submission_form);
 
-            //reset the formular after init to ensure correct checkbox-states after page-reload
+            // Reset the formular after init to ensure correct checkbox-states after page-reload!
             $("#mform1")[0].reset();
 
-            //update summary to display correct data after form-reset
+            // Update summary to display correct data after form-reset!
             this.update_summary({data: this});
 
             return true;

@@ -27,15 +27,13 @@
  /**
   * @module mod_grouptool/settings
   */
-define(['jquery', 'core/log'],
-       function($, log) {
+define(['jquery', 'core/log'], function($, log) {
 
     /**
      * @constructor
      * @alias module:mod_grouptool/settings
      */
     var Settings = function() {
-        /** @access private */
         this.dividing_symbol = ',';
     };
 
@@ -105,12 +103,12 @@ define(['jquery', 'core/log'],
     };
 
     Settings.prototype.stripper = function(e) {
-        if ((e !== null) && (e.which <= 46)) { //no written character
+        if ((e !== null) && (e.which <= 46)) { // That means: no written character!
             return true;
         }
         var examplegrades_selector = '#examplegrades';
         if (!$(examplegrades_selector).length) {
-            // Compatibility to pre 2.2
+            // Compatibility to pre 2.2 and current needed ID - TODO: do we need this anymore?
             examplegrades_selector = '#id_examplegrades';
         }
         var regex = new RegExp("[^0-9" + e.data.dividing_symbol + "]", "g");

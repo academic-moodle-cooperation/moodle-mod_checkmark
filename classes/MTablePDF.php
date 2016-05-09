@@ -173,23 +173,23 @@ class MTablePDF extends \pdf {
             $border = 0;
             $height = 4;
             $this->SetFont('', 'B');
-            $this->Cell(/*8*/15 * $scale, $height, $header[0], $border, false, 'L', 0, '', 1, false/*, 'M', 'M'*/);
+            $this->Cell(15 * $scale, $height, $header[0], $border, false, 'L', 0, '', 1, false);
             $this->SetFont('', '');
-            $this->Cell(31 * $scale, $height, $header[1], $border, false, 'R', 0, '', 1, false/*, 'M', 'M'*/);
-            $this->Cell(/*8*/15 * $scale, $height, "", $border, false, 'C', 0, '', 1, false/*, 'M', 'M'*/);
+            $this->Cell(31 * $scale, $height, $header[1], $border, false, 'R', 0, '', 1, false);
+            $this->Cell(15 * $scale, $height, "", $border, false, 'C', 0, '', 1, false);
 
             $this->SetFont('', 'B');
-            $this->Cell(21 * $scale, $height, $header[2], $border, false, 'L', 0, '', 1, false/*, '1', '0'*/);
+            $this->Cell(21 * $scale, $height, $header[2], $border, false, 'L', 0, '', 1, false);
             $this->SetFont('', '');
 
             $this->SetFont('', '');
-            $this->Cell(41 * $scale, $height, $header[3], $border, false, 'R', 0, '', 1, false/*, '1', '0'*/);
-            $this->Cell(/*8*/15 * $scale, $height, "", $border, false, 'C', 0, '', 1, false/*, '1', '0'*/);
+            $this->Cell(41 * $scale, $height, $header[3], $border, false, 'R', 0, '', 1, false);
+            $this->Cell(15 * $scale, $height, "", $border, false, 'C', 0, '', 1, false);
 
             $this->SetFont('', 'B');
-            $this->Cell(15 * $scale, $height, $header[4], $border, false, 'L', 0, '', 1, false/*, '1', '0'*/);
+            $this->Cell(15 * $scale, $height, $header[4], $border, false, 'L', 0, '', 1, false);
             $this->SetFont('', '');
-            $this->Cell(31 * $scale, $height, $header[5], $border, false, 'R', 0, '', 1, false/*, '1', '0'*/);
+            $this->Cell(31 * $scale, $height, $header[5], $border, false, 'R', 0, '', 1, false);
 
             $this->Ln();
 
@@ -197,25 +197,25 @@ class MTablePDF extends \pdf {
             $height = 4;
 
             $this->SetFont('', 'B');
-            $this->Cell(/*8*/15 * $scale, $height, $header[6], $border, false, 'L', 0, '', 1, false);
+            $this->Cell(15 * $scale, $height, $header[6], $border, false, 'L', 0, '', 1, false);
 
             $this->SetFont('', '');
-            $this->Cell(31 * $scale, $height, $header[7], $border, false, 'R', 0, '', 1, false/*, '1', '0'*/);
-            $this->Cell(/*8*/15 * $scale, $height, "", $border, false, 'C', 0, '', 1, false/*, '1', '0'*/);
+            $this->Cell(31 * $scale, $height, $header[7], $border, false, 'R', 0, '', 1, false);
+            $this->Cell(15 * $scale, $height, "", $border, false, 'C', 0, '', 1, false);
 
             $this->SetFont('', 'B');
-            $this->Cell(21 * $scale, $height, $header[8], $border, false, 'L', 0, '', 1, false/*, '1', '0'*/);
+            $this->Cell(21 * $scale, $height, $header[8], $border, false, 'L', 0, '', 1, false);
             $this->SetFont('', '');
 
             $this->SetFont('', '');
-            $this->Cell(41 * $scale, $height, $header[9], $border, false, 'R', 0, '', 1, false/*, '1', '0'*/);
+            $this->Cell(41 * $scale, $height, $header[9], $border, false, 'R', 0, '', 1, false);
 
-            $this->Cell(/*8*/15 * $scale, $height, "", $border, false, 'C', 0, '', 1, false/*, '1', '0'*/);
+            $this->Cell(15 * $scale, $height, "", $border, false, 'C', 0, '', 1, false);
 
             $this->SetFont('', 'B');
-            $this->Cell(15 * $scale, $height, $header[10], $border, false, 'L', 0, '', 1, false/*, '1', '0'*/);
+            $this->Cell(15 * $scale, $height, $header[10], $border, false, 'L', 0, '', 1, false);
             $this->SetFont('', '');
-            $this->Cell(31 * $scale, $height, $header[11], $border, false, 'R', 0, '', 1, false/*, '1', '0'*/);
+            $this->Cell(31 * $scale, $height, $header[11], $border, false, 'R', 0, '', 1, false);
 
             $this->Ln();
             $this->SetFontSize($oldfontsize);

@@ -684,9 +684,8 @@ function checkmark_refresh_events($course = 0) {
             $event->instance    = $checkmark->id;
             $event->eventtype   = 'course';
             $event->timeduration = 0;
-            $event->visible     = $DB->get_field('course_modules', 'visible',
-                                                 array('module'   => $moduleid,
-                                                       'instance' => $checkmark->id));
+            $event->visible     = $DB->get_field('course_modules', 'visible', array('module'   => $moduleid,
+                                                                                    'instance' => $checkmark->id));
             add_event($event);
         }
 
@@ -1174,9 +1173,8 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
     $a->total_grade = $maxcheckedgrades;
     $a->name = $checkmark->name;
 
-    if ($submission && $feedback = $DB->get_record('checkmark_feedbacks',
-                                                   array('checkmarkid' => $checkmark->id,
-                                                         'userid'      => $submission->userid))) {
+    if ($submission && $feedback = $DB->get_record('checkmark_feedbacks', array('checkmarkid' => $checkmark->id,
+                                                                                'userid'      => $submission->userid))) {
         /*
          * Cache scales for each checkmark
          * they might have different scales!
@@ -1437,31 +1435,22 @@ function checkmark_print_overview($courses, &$htmlarray) {
                 } else {
                     $str .= checkmark_getsummarystring($submission, $checkmark);
                 }
-                $statistics[$checkmark->course][] = checkmark_getsubmissionstats($submission, $checkmark);
-                $idx = count($statistics[$checkmark->course]) - 1;
-
-                if (!isset($statistics[$checkmark->course][0]->name)) {
-                    $statistics[$checkmark->course][0]->name = get_string('strsum', 'checkmark');
-                }
-                $statistics[$checkmark->course][0]->checked_examples += $statistics[$checkmark->course][$idx]->checked_examples;
-                $statistics[$checkmark->course][0]->total_examples += $statistics[$checkmark->course][$idx]->total_examples;
-                $statistics[$checkmark->course][0]->checked_grade += $statistics[$checkmark->course][$idx]->checked_grade;
-                $statistics[$checkmark->course][0]->total_grade += $statistics[$checkmark->course][$idx]->total_grade;
             } else {
+
+                $submission = false;
                 $str .= $strnotsubmittedyet . ' ' . checkmark_display_lateness(time(), $checkmark->timedue);
-
-                $statistics[$checkmark->course][] = checkmark_getsubmissionstats(false, $checkmark);
-
-                $idx = count($statistics[$checkmark->course]) - 1;
-
-                if (!isset($statistics[$checkmark->course][0]->name)) {
-                    $statistics[$checkmark->course][0]->name = get_string('strsum', 'checkmark');
-                }
-                $statistics[$checkmark->course][0]->checked_examples += $statistics[$checkmark->course][$idx]->checked_examples;
-                $statistics[$checkmark->course][0]->total_examples += $statistics[$checkmark->course][$idx]->total_examples;
-                $statistics[$checkmark->course][0]->checked_grade += $statistics[$checkmark->course][$idx]->checked_grade;
-                $statistics[$checkmark->course][0]->total_grade += $statistics[$checkmark->course][$idx]->total_grade;
             }
+
+            $statistics[$checkmark->course][] = checkmark_getsubmissionstats($submission, $checkmark);
+            $idx = count($statistics[$checkmark->course]) - 1;
+            if (!isset($statistics[$checkmark->course][0]->name)) {
+                $statistics[$checkmark->course][0]->name = get_string('strsum', 'checkmark');
+            }
+            $statistics[$checkmark->course][0]->checked_examples += $statistics[$checkmark->course][$idx]->checked_examples;
+            $statistics[$checkmark->course][0]->total_examples += $statistics[$checkmark->course][$idx]->total_examples;
+            $statistics[$checkmark->course][0]->checked_grade += $statistics[$checkmark->course][$idx]->checked_grade;
+            $statistics[$checkmark->course][0]->total_grade += $statistics[$checkmark->course][$idx]->total_grade;
+
             $str .= '</div>';
         }
         $str .= '</div>';

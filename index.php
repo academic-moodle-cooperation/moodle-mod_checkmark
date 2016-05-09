@@ -75,9 +75,9 @@ $timenow = time();
 $table = new html_table();
 
 if ($usesections) {
-    $table->head  = array ($strsectionname, $strname, $strduedate, $strsubmitted, $strgrade);
+    $table->head  = array($strsectionname, $strname, $strduedate, $strsubmitted, $strgrade);
 } else {
-    $table->head  = array ($strname, $strduedate, $strsubmitted, $strgrade);
+    $table->head  = array($strname, $strduedate, $strsubmitted, $strgrade);
 }
 
 $currentsection = '';
@@ -91,9 +91,8 @@ foreach ($modinfo->instances['checkmark'] as $cm) {
     // Show dimmed if the mod is hidden!
     $class = $cm->visible ? '' : 'dimmed';
 
-    $link = html_writer::tag('a', format_string($cm->name),
-                             array('href'  => 'view.php?id='.$cm->id,
-                                   'class' => $class));
+    $link = html_writer::tag('a', format_string($cm->name), array('href'  => 'view.php?id='.$cm->id,
+                                                                  'class' => $class));
 
     $printsection = '';
     if ($usesections) {

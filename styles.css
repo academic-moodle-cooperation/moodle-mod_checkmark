@@ -182,7 +182,6 @@
 
 .path-mod-checkmark div.examplelist .unchecked {
     text-decoration: line-through;
-    /*color:#e0e0e0;*/
     color:#999999;
 }
 
@@ -239,7 +238,6 @@
 .path-mod-checkmark .allsubmitted, .checkmark .allsubmitted {background-color:#99FF99;}
 
 .path-mod-checkmark #autogradingfieldset {
-    /*width: 100%;*/
     margin-top: 2em;
     padding-top: 1em;
 }
@@ -271,7 +269,6 @@
 
 .checkmark.overview.statistics > .details .name {
     display: inline-block;
-    /*padding-left: 1em;*/
     margin-left: 0px;
     margin-right: 1em;
     vertical-align:top;
@@ -280,29 +277,22 @@
 
 .checkmark.overview.statistics > .details .examples {
     display: inline-block;
-    /*padding-left: 1em;*/
     margin-right: 1em;
     vertical-align:top;
     white-space:nowrap;
-    /*width: 5em;*/
 }
 
 .checkmark.overview.statistics > .details .grades {
     display: inline-block;
-    /*padding-left: 1em;*/
     margin-right: 1em;
     vertical-align:top;
     white-space:nowrap;
-    /*width: 5em;*/
 }
 
 .checkmark.overview.statistics > .details .grade {
     display: inline-block;
-    /*padding-left: 1em;*/
-    /*padding-right: 1em;*/
     vertical-align:top;
     white-space:nowrap;
-    /*width: 10em;*/
 }
 
 .checkmark.overview.statistics > .details .total {

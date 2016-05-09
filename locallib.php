@@ -1967,9 +1967,8 @@ class checkmark {
         foreach ($submission->examples as $key => $example) {
             $stateupdate = new stdClass();
             $stateupdate->exampleid = $key;
-            if (!$id = $DB->get_field('checkmark_checks', 'id',
-                                      array('submissionid' => $submission->id,
-                                            'exampleid'    => $key), IGNORE_MISSING)) {
+            if (!$id = $DB->get_field('checkmark_checks', 'id', array('submissionid' => $submission->id,
+                                                                      'exampleid'    => $key), IGNORE_MISSING)) {
                 $DB->insert_record('checkmark_checks', array('submissionid' => $submission->id,
                                                              'exampleid'    => $key,
                                                              'state'        => $example->state));
@@ -2553,16 +2552,14 @@ class checkmark {
                                                   'name'  => 'oldfeedback['.$auser->id.']',
                                                   'value' => trim($auser->feedback));
                                 $oldfeedback = html_writer::empty_tag('input', $inputarr);
-                                $content = html_writer::tag('textarea', $auser->feedback,
-                                                            array('tabindex' => $tabindex++,
-                                                                  'name'     => 'feedback['.
-                                                                                $auser->id.']',
-                                                                  'id'       => 'feedback'.
-                                                                                $auser->id,
-                                                                  'rows'     => 2,
-                                                                  'cols'     => 20));
-                                $feedback = html_writer::tag('div', $content.$oldfeedback,
-                                                             array('id' => 'com'.$auser->id));
+                                $content = html_writer::tag('textarea', $auser->feedback, array('tabindex' => $tabindex++,
+                                                                                                'name'     => 'feedback['.
+                                                                                                              $auser->id.']',
+                                                                                                'id'       => 'feedback'.
+                                                                                                              $auser->id,
+                                                                                                'rows'     => 2,
+                                                                                                'cols'     => 20));
+                                $feedback = html_writer::tag('div', $content.$oldfeedback, array('id' => 'com'.$auser->id));
                                 if ($auser->timemarked > 0) {
                                     $date = userdate($auser->timemarked);
                                     $teachermodified = html_writer::tag('div', $date,
@@ -2626,19 +2623,16 @@ class checkmark {
                                                   'value' => trim($auser->feedback));
                                 $oldfeedback = html_writer::empty_tag('input', $inputarr);
 
-                                $content = html_writer::tag('textarea', $auser->feedback,
-                                                            array('tabindex=' => $tabindex++,
-                                                                  'name'      => 'feedback['.
-                                                                                 $auser->id.']',
-                                                                  'id'        => 'feedback'.
-                                                                                 $auser->id,
-                                                                  'rows'      => '2',
-                                                                  'cols'      => '20'));
-                                $feedback = html_writer::tag('div', $content.$oldfeedback,
-                                                             array('id' => 'com'.$auser->id));
+                                $content = html_writer::tag('textarea', $auser->feedback, array('tabindex=' => $tabindex++,
+                                                                                                'name'      => 'feedback['.
+                                                                                                               $auser->id.']',
+                                                                                                'id'        => 'feedback'.
+                                                                                                               $auser->id,
+                                                                                                'rows'      => '2',
+                                                                                                'cols'      => '20'));
+                                $feedback = html_writer::tag('div', $content.$oldfeedback, array('id' => 'com'.$auser->id));
                             } else {
-                                $feedback = html_writer::tag('div', '&nbsp;',
-                                                            array('id' => 'com'.$auser->id));
+                                $feedback = html_writer::tag('div', '&nbsp;', array('id' => 'com'.$auser->id));
                             }
                         }
 
@@ -2754,58 +2748,38 @@ class checkmark {
             $emailnotification = html_writer::empty_tag('input', array('type'  => 'hidden',
                                                                        'name'  => 'mailinfo',
                                                                        'value' => 0)).
-                                 html_writer::checkbox('mailinfo', 1, $mailinfopref,
-                                                       get_string('enablenotification',
-                                                                  'checkmark'));
+                                 html_writer::checkbox('mailinfo', 1, $mailinfopref, get_string('enablenotification', 'checkmark'));
 
             $emailnotification .= $OUTPUT->help_icon('enablenotification', 'checkmark');
-            $returnstring .= html_writer::tag('div', $emailnotification,
-                                              array('class' => 'emailnotification'));
+            $returnstring .= html_writer::tag('div', $emailnotification, array('class' => 'emailnotification'));
 
-            $savefeedback = html_writer::empty_tag('input',
-                                                   array('type'  => 'submit',
-                                                         'name'  => 'fastg',
-                                                         'value' => get_string('saveallfeedback',
-                                                                               'checkmark')));
-            $returnstring .= html_writer::tag('div', $savefeedback,
-                                              array('class' => 'fastgbutton optionspref'));
+            $savefeedback = html_writer::empty_tag('input', array('type'  => 'submit',
+                                                                  'name'  => 'fastg',
+                                                                  'value' => get_string('saveallfeedback', 'checkmark')));
+            $returnstring .= html_writer::tag('div', $savefeedback, array('class' => 'fastgbutton optionspref'));
         }
 
-        $autogradefieldset = html_writer::tag('legend',
-                                              $OUTPUT->help_icon('autograde_str', 'checkmark').
-                                              get_string('autogradebuttonstitle', 'checkmark',
-                                                         $checkmark->name));
+        $autogradefieldset = html_writer::tag('legend', $OUTPUT->help_icon('autograde_str', 'checkmark').
+                                                        get_string('autogradebuttonstitle', 'checkmark', $checkmark->name));
         if (($this->checkmark->grade <= 0)) {
             // No autograde possible if no numeric grades are selected!
-            $autogradefieldset .= $OUTPUT->notification(get_string('autograde_non_numeric_grades',
-                                                                   'checkmark'),
-                                                        'notifyproblem');
+            $autogradefieldset .= $OUTPUT->notification(get_string('autograde_non_numeric_grades', 'checkmark'), 'notifyproblem');
         } else {
-            $autogradecustom = html_writer::empty_tag('input',
-                                                      array('type'  => 'submit',
-                                                            'name'  => 'autograde_custom_submit',
-                                                            'value' => get_string('autograde_custom',
-                                                                                  'checkmark')));
-            $autogradefieldset .= html_writer::tag('div', $autogradecustom,
-                                                   array('class' => 'autogradingform'));
-            $autogradereq = html_writer::empty_tag('input',
-                                                   array('type'  => 'submit',
-                                                         'name'  => 'autograde_req_submit',
-                                                         'value' => get_string('autograde_req',
-                                                                               'checkmark')));
-            $autogradefieldset .= html_writer::tag('div', $autogradereq,
-                                                   array('class' => 'autogradingform'));
-            $autograde = html_writer::empty_tag('input',
-                                                array('type'  => 'submit',
-                                                      'name'  => 'autograde_all_submit',
-                                                      'value' => get_string('autograde_all',
-                                                                            'checkmark')));
-            $autogradefieldset .= html_writer::tag('div', $autograde,
-                                                   array('class' => 'autogradingform'));
+            $autogradecustom = html_writer::empty_tag('input', array('type'  => 'submit',
+                                                                     'name'  => 'autograde_custom_submit',
+                                                                     'value' => get_string('autograde_custom', 'checkmark')));
+            $autogradefieldset .= html_writer::tag('div', $autogradecustom, array('class' => 'autogradingform'));
+            $autogradereq = html_writer::empty_tag('input', array('type'  => 'submit',
+                                                                  'name'  => 'autograde_req_submit',
+                                                                  'value' => get_string('autograde_req', 'checkmark')));
+            $autogradefieldset .= html_writer::tag('div', $autogradereq, array('class' => 'autogradingform'));
+            $autograde = html_writer::empty_tag('input', array('type'  => 'submit',
+                                                               'name'  => 'autograde_all_submit',
+                                                               'value' => get_string('autograde_all', 'checkmark')));
+            $autogradefieldset .= html_writer::tag('div', $autograde, array('class' => 'autogradingform'));
         }
-        $returnstring .= html_writer::tag('fieldset', $autogradefieldset,
-                                  array('class' => 'clearfix',
-                                        'id'    => 'autogradingfieldset'));
+        $returnstring .= html_writer::tag('fieldset', $autogradefieldset, array('class' => 'clearfix',
+                                                                                'id'    => 'autogradingfieldset'));
 
         $returnstring .= html_writer::end_tag('form');
 
@@ -2819,8 +2793,7 @@ class checkmark {
         $returnstring = '';
         // TODO tscpr: should we make this form in a seperate file and handle there the saving of options?
         $formaction = new moodle_url('/mod/checkmark/submissions.php', array('id' => $this->cm->id));
-        $mform = new MoodleQuickForm('optionspref', 'post', $formaction, '',
-                                     array('class' => 'optionspref'));
+        $mform = new MoodleQuickForm('optionspref', 'post', $formaction, '', array('class' => 'optionspref'));
 
         $mform->addElement('hidden', 'updatepref');
         $mform->setDefault('updatepref', 1);
@@ -2832,8 +2805,7 @@ class checkmark {
 
         $mform->setDefault('filter', $filter);
 
-        $mform->addElement('text', 'perpage', get_string('pagesize', 'checkmark'),
-                           array('size' => 1));
+        $mform->addElement('text', 'perpage', get_string('pagesize', 'checkmark'), array('size' => 1));
         $mform->setDefault('perpage', $perpage);
 
         $mform->addElement('checkbox', 'quickgrade', get_string('quickgrade', 'checkmark'));
@@ -3319,26 +3291,6 @@ class checkmark {
                             }
                         }
 
-                        if (!$this->column_is_hidden('summary') && (!empty($sumabs) || !empty($sumrel))) {
-                            if (!empty($sumabs) && !empty($sumrel)) {
-                                // Both values!
-                                $summary = $auser->checks.'/'.$examplecount.' ('.
-                                           round($auser->summary, 2).'%)';
-                            } else if (!empty($sumabs)) {
-                                // Summary abs!
-                                $summary = $auser->checks.'/'.$examplecount;
-                            } else {
-                                // Summary rel!
-                                $summary = round($auser->summary, 2).'%';
-                            }
-                            if (!empty($dataonly)) {
-                                $row[] = $summary;
-                            } else {
-                                $row[] = html_writer::tag('div', $summary, array('id' => 'sum'.$auser->id));
-                            }
-                        } else if (empty($dataonly) && (!empty($sumabs) || !empty($sumrel))) {
-                            $row[] = '&nbsp;';
-                        }
                     } else {
                         foreach ($this->checkmark->examples as $key => $example) {
                             $columnname = 'example'.$key;
@@ -3355,27 +3307,27 @@ class checkmark {
                                 $row[] = '&nbsp;';
                             }
                         }
+                    }
 
-                        if (!$this->column_is_hidden('summary') && (!empty($sumabs) || !empty($sumrel))) {
-                            if (!empty($sumabs) && !empty($sumrel)) {
-                                // Both values!
-                                $summary = $auser->checks.'/'.$examplecount.' ('.
-                                           round($auser->summary, 2).'%)';
-                            } else if (!empty($sumabs)) {
-                                // Summary abs!
-                                $summary = $auser->checks.'/'.$examplecount;
-                            } else {
-                                // Summary rel!
-                                $summary = round($auser->summary, 2).'%';
-                            }
-                            if (!empty($dataonly)) {
-                                $row[] = $summary;
-                            } else {
-                                $row[] = html_writer::tag('div', $summary, array('id' => 'sum'.$auser->id));
-                            }
-                        } else if (empty($dataonly) && (!empty($sumabs) || !empty($sumrel))) {
-                            $row[] = '&nbsp;';
+                    if (!$this->column_is_hidden('summary') && (!empty($sumabs) || !empty($sumrel))) {
+                        if (!empty($sumabs) && !empty($sumrel)) {
+                            // Both values!
+                            $summary = $auser->checks.'/'.$examplecount.' ('.
+                                       round($auser->summary, 2).'%)';
+                        } else if (!empty($sumabs)) {
+                            // Summary abs!
+                            $summary = $auser->checks.'/'.$examplecount;
+                        } else {
+                            // Summary rel!
+                            $summary = round($auser->summary, 2).'%';
                         }
+                        if (!empty($dataonly)) {
+                            $row[] = $summary;
+                        } else {
+                            $row[] = html_writer::tag('div', $summary, array('id' => 'sum'.$auser->id));
+                        }
+                    } else if (empty($dataonly) && (!empty($sumabs) || !empty($sumrel))) {
+                        $row[] = '&nbsp;';
                     }
 
                     if (!empty($auser->feedbackid)) {
@@ -3862,9 +3814,9 @@ class checkmark {
 
         $usrlst = optional_param_array('selected', array(), PARAM_INT);
         // Get orientation (P/L)!
-        $orientation = optional_param('pageorientation', 0, PARAM_INT) ?
-                       \mod_checkmark\MTablePDF::PORTRAIT :
-                       \mod_checkmark\MTablePDF::LANDSCAPE;
+        $portrait = \mod_checkmark\MTablePDF::PORTRAIT;
+        $landscape = \mod_checkmark\MTablePDF::LANDSCAPE;
+        $orientation = optional_param('pageorientation', 0, PARAM_INT) ? $portrait : $landscape;
         $printheader = optional_param('printheader', false, PARAM_BOOL);
         $textsize = optional_param('textsize', 1, PARAM_INT);
         $format = optional_param('format', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF, PARAM_INT);
@@ -3920,16 +3872,13 @@ class checkmark {
 
         $pdf = new \mod_checkmark\MTablePDF($orientation, $cellwidth);
 
+        $timeavailablestr = !empty($timeavailable) ? userdate($timeavailable) : $notactivestr;
         $pdf->setHeaderText(get_string('course').':', $coursename,
-                            get_string('availabledate', 'checkmark').':', !empty($timeavailable) ?
-                                                                          userdate($timeavailable) :
-                                                                          $notactivestr,
+                            get_string('availabledate', 'checkmark').':', $timeavailablestr,
                             get_string('strprintpreview', 'checkmark'), $viewname,
                             // Second header row!
                             get_string('strassignment', 'checkmark').':', $checkmarkname,
-                            get_string('duedate', 'checkmark').':', !empty($timedue) ?
-                                                                    userdate($timedue) :
-                                                                    $notactivestr,
+                            get_string('duedate', 'checkmark').':', !empty($timedue) ? userdate($timedue) : $notactivestr,
                             get_string('groups') . ':', $grpname);
 
         $pdf->ShowHeaderFooter($printheader);
@@ -4031,10 +3980,9 @@ class checkmark {
             }
         }
 
-        $hiddenstate = html_writer::empty_tag('input',
-                                              array('type'  => 'hidden',
-                                                    'name'  => 'checkbox_controller'.$groupid,
-                                                    'value' => $newselectvalue));
+        $hiddenstate = html_writer::empty_tag('input', array('type'  => 'hidden',
+                                                             'name'  => 'checkbox_controller'.$groupid,
+                                                             'value' => $newselectvalue));
 
         $checkboxcontrollername = 'nosubmit_checkbox_controller' . $groupid;
 
@@ -4197,9 +4145,8 @@ EOS;
             $userid = $USER->id;
         }
 
-        $submission = $DB->get_record('checkmark_submissions',
-                                      array('checkmarkid' => $this->checkmark->id,
-                                            'userid'      => $userid));
+        $submission = $DB->get_record('checkmark_submissions', array('checkmarkid' => $this->checkmark->id,
+                                                                     'userid'      => $userid));
         $examples = $this->get_examples();
         if ($submission || !$createnew) {
             if ($submission) {
@@ -4230,7 +4177,7 @@ EOS;
             return $submission;
         }
 
-        // New empty submission!
+        // Create a new and empty submission!
         $newsubmission = $this->prepare_new_submission($userid, $teachermodified);
         $sid = $DB->insert_record('checkmark_submissions', $newsubmission);
 
@@ -4240,9 +4187,8 @@ EOS;
                                                          'state'        => null));
         }
 
-        $submission = $DB->get_record('checkmark_submissions',
-                                      array('checkmarkid' => $this->checkmark->id,
-                                            'userid'      => $userid));
+        $submission = $DB->get_record('checkmark_submissions', array('checkmarkid' => $this->checkmark->id,
+                                                                     'userid'      => $userid));
         $submission->examples = $DB->get_records_sql('SELECT exampleid AS id, state
                                                         FROM {checkmark_checks} chks
                                                        WHERE submissionid = :subid',
@@ -4303,9 +4249,8 @@ EOS;
             $userid = $USER->id;
         }
 
-        if (!$feedback = $DB->get_record('checkmark_feedbacks',
-                                         array('checkmarkid' => $this->checkmark->id,
-                                               'userid'      => $userid))) {
+        if (!$feedback = $DB->get_record('checkmark_feedbacks', array('checkmarkid' => $this->checkmark->id,
+                                                                      'userid'      => $userid))) {
             return false;
         }
 
