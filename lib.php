@@ -1286,8 +1286,8 @@ function checkmark_print_overview($courses, &$htmlarray) {
     $rs = $DB->get_recordset_sql('SELECT s.id, s.checkmarkid, s.userid
                                     FROM {checkmark_submissions} s
                                LEFT JOIN {checkmark_feedbacks} f ON s.userid = f.userid AND s.checkmarkid = f.checkmarkid
-                                   WHERE graderid = 0
-                                     AND f.timemodified = 0
+                                   WHERE graderid IS NULL
+                                     AND f.timemodified IS NULL
                                      AND s.checkmarkid '.$sqlcheckmarkids, $checkmarkidparams);
 
     $unmarkedsubmissions = array();
@@ -1295,7 +1295,6 @@ function checkmark_print_overview($courses, &$htmlarray) {
         $unmarkedsubmissions[$rd->checkmarkid][$rd->userid] = $rd->id;
     }
     $rs->close();
-
     $rs = $DB->get_recordset_sql('SELECT checkmarkid, count(DISTINCT userid) AS amount
                                     FROM {checkmark_submissions}
                                    WHERE checkmarkid '.$sqlcheckmarkids.' '.
