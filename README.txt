@@ -67,6 +67,10 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2016012004
+-------------------------
+*) Fixed bug causing amount of unmarked submissions to always be 0 on dashboard!
+
 v 2016012003
 -------------------------
 *) Correct the grades in gradebook affected from the bug fixed in 2016012002!
