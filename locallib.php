@@ -2413,8 +2413,8 @@ class checkmark {
                 $pageorientation = optional_param('pageorientation', 0, PARAM_INT);
                 set_user_preference('checkmark_pageorientation', $pageorientation);
 
-                $pageorientation = optional_param('printheader', 0, PARAM_INT);
-                set_user_preference('checkmark_printheader', $pageorientation);
+                $printheader = optional_param('printheader', 0, PARAM_INT);
+                set_user_preference('checkmark_printheader', $printheader);
             }
 
             $filter = optional_param('datafilter', self::FILTER_ALL, PARAM_INT);
@@ -2529,15 +2529,17 @@ class checkmark {
                            2 => get_string('strlarge', 'checkmark'));
         $mform->addElement('select', 'textsize', get_string('pdftextsize', 'checkmark'),  $textsizes);
         $mform->disabledIf('textsize', 'format', 'neq', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->setDefault('textsize', $textsize);
 
         $pageorientations = array(0 => get_string('strlandscape', 'checkmark'),
                                   1 => get_string('strportrait', 'checkmark'));
         $mform->addElement('select', 'pageorientation', get_string('pdfpageorientation', 'checkmark'),  $pageorientations);
         $mform->disabledIf('pageorientation', 'format', 'neq', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->setDefault('pageorientation', $pageorientation);
 
         $mform->addElement('advcheckbox', 'printheader', get_string('pdfprintheader', 'checkmark'));
         $mform->addHelpButton('printheader', 'pdfprintheader', 'checkmark');
-        $mform->setDefault('printheader', 1);
+        $mform->setDefault('printheader', $printheader);
         $mform->disabledIf('printheader', 'format', 'neq', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
 
         $mform->addElement('submit', 'submittoprint', get_string('strprint', 'checkmark'));
@@ -2647,8 +2649,8 @@ class checkmark {
                 $pageorientation = optional_param('pageorientation', 0, PARAM_INT);
                 set_user_preference('checkmark_pageorientation', $pageorientation);
 
-                $pageorientation = optional_param('printheader', 0, PARAM_INT);
-                set_user_preference('checkmark_printheader', $pageorientation);
+                $printheader = optional_param('printheader', 0, PARAM_INT);
+                set_user_preference('checkmark_printheader', $printheader);
             }
 
             $filter = optional_param('datafilter', self::FILTER_ALL, PARAM_INT);
