@@ -73,6 +73,9 @@ class submissionstable extends \table_sql {
         $this->set_attribute('class', 'submissions generaltable generalbox');
 
         $this->set_attribute('width', '100%');
+
+        // Save status of table(s) persistent as user preference!
+        $this->is_persistent(true);
     }
 
     /**
