@@ -51,7 +51,7 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         $checkmark = new backup_nested_element('checkmark', array('id'), array(
             'name', 'intro', 'introformat', 'alwaysshowdescription', 'resubmit',
             'cutoffdate', 'emailteachers', 'timedue', 'timeavailable', 'exampleprefix',
-            'grade', 'timemodified'));
+            'grade', 'trackattendance', 'attendancegradelink', 'timemodified'));
 
         $submissions = new backup_nested_element('submissions');
 
@@ -61,7 +61,7 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         $feedbacks = new backup_nested_element('feedbacks');
 
         $feedback = new backup_nested_element('feedback', array('id'), array(
-            'userid', 'grade', 'feedback', 'format', 'graderid', 'mailed',
+            'userid', 'grade', 'feedback', 'format', 'attendance', 'graderid', 'mailed',
             'timecreated', 'timemodified'));
 
         $examples = new backup_nested_element('examples');
