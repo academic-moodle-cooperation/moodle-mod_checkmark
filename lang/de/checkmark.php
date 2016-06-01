@@ -47,6 +47,7 @@ $string['attendancegradebook'] = 'Anwesenheit in Kursbewertung erfassen';
 $string['attendancegradebook_help'] = 'Wenn Sie diese Funktion aktivieren, wird die Anwesenheit in den Kursbewertung als Bewertungsaspekt angezeigt: <ul><li>Leere Bewertung - wenn Status unbekannt</li><li>Wert 0 - wenn abwesend</li><li>Wert 1- wenn anwesend</li></ul>';
 $string['attendancegradelink'] = 'Anwesenheit an Bewertung koppeln';
 $string['attendancegradelink_help'] = 'Aktivieren Sie diese Funktion, um die gespeicherten Anwesenheiten mit der Bewertung der Kreuzerlübung zu verknüpfen. Punkte der Kreuzerlübung werden nur dann aggregiert, wenn die Person als anwesend gekennzeichnet wurde.';
+$string['attendancegradelink_hint'] = 'Hinweis: Bewertung ist an Anwesenheit gekoppelt.';
 $string['attendant'] = 'Anwesend';
 $string['autograde_all'] = 'Alle Abgaben bewerten';
 $string['autograde_custom'] = 'Ausgewählte bewerten';

@@ -408,6 +408,8 @@ class checkmark {
         echo "\n";
         $this->view_dates();
         echo "\n";
+        $this->view_attendancehint();
+        echo "\n";
         if (is_enrolled($this->context, $USER)) {
             if ($editmode) {
                 echo $OUTPUT->box_start('generalbox boxaligncenter', 'checkmarkform');
@@ -542,6 +544,18 @@ class checkmark {
         }
         echo html_writer::end_tag('table');
         echo $OUTPUT->box_end();
+    }
+
+    /**
+     * Display the hint if attendance is tracked and linked to grades
+     */
+    public function view_attendancehint() {
+        global $OUTPUT;
+        if (!$this->checkmark->trackattendance || !$this->checkmark->attendancegradelink) {
+            return;
+        }
+
+        echo $OUTPUT->box(get_string('attendancegradelink_hint', 'checkmark'), 'generalbox', 'attendancehint');
     }
 
     /**

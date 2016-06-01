@@ -47,6 +47,7 @@ $string['attendancegradebook'] = 'Record attendance in gradebook';
 $string['attendancegradebook_help'] = 'If you activate this feature, attendances will be visible in gradebook as separate grade item: <ul><li>Empty grade - status unknown</li><li>Grade 0 - if absent</li><li>Grade 1 - if attendant</li></ul>';
 $string['attendancegradelink'] = 'Link attendance to grades';
 $string['attendancegradelink_help'] = 'Activate this setting in order to link the saved attendances with the grades of the checkmark. Points of the checkmark module are only aggregated, when the person\'s attendance was marked accordingly.';
+$string['attendancegradelink_hint'] = 'Note: Grades are linked to the attendance.';
 $string['attendant'] = 'Attendant';
 $string['autograde_all'] = 'Grade all submissions';
 $string['autograde_custom'] = 'Grade selected users';
