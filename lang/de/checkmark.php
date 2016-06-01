@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die;
 
 $string['checkmark:addinstance'] = 'Kreuzerlübung anlegen';
 $string['checkmark:grade'] = 'Kreuzerlübung benoten';
+$string['checkmark:trackattendance'] = 'Anwesenheit erfassen';
 $string['checkmark:submit'] = 'Kreuzerlübung abgeben';
 $string['checkmark:view'] = 'Zeige Kreuzerlübung';
 $string['checkmark:view_preview'] = 'Vorschau ansehen';
@@ -38,6 +39,9 @@ $string['strassignment'] = 'Aufgabe';
 $string['all'] = 'Alle';
 $string['alwaysshowdescription'] = 'Beschreibung immer anzeigen';
 $string['alwaysshowdescription_help'] = 'Wenn diese Option deaktiviert ist, wird die Aufgabenbeschreibung für Teilnehmer/innen erst ab dem Abgabebeginn angezeigt.';
+$string['attendance'] = 'Anwesenheit';
+$string['attendancegradelink'] = 'Anwesenheit an Bewertung koppeln';
+$string['attendancegradelink_help'] = 'Aktivieren Sie diese Funktion, um die gespeicherten Anwesenheiten mit der Bewertung der Kreuzerlübung zu verknüpfen. Punkte der Kreuzerlübung werden nur dann aggregiert, wenn die Person als anwesend gekennzeichnet wurde.';
 $string['autograde_all'] = 'Alle Abgaben bewerten';
 $string['autograde_custom'] = 'Ausgewählte bewerten';
 $string['autograde_req'] = 'Nichtbewertete bewerten';
@@ -148,6 +152,8 @@ $string['pdftextsize'] = 'Textgröße';
 $string['strvalidmsgtime'] = 'Gültigkeitsdauer Benachrichtigung';
 $string['strvalidmsgtimedesc'] = 'Anzahl der Tage, nach denen Benotungsbenachrichtigungen nicht mehr versandt werden';
 $string['str_userid'] = 'Matrikelnummer';
+$string['trackattendance'] = 'Anwesenheit erfassen';
+$string['trackattendance_help'] = 'Aktivieren Sie diese Funktion, um die Anwesenheit bei Teilnehmer/innen zu protokollieren.';
 /*
  * End of Block for checkmark-specific strings
  */

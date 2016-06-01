@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die;
 
 $string['checkmark:addinstance'] = 'Add checkmark instance';
 $string['checkmark:grade'] = 'Grade checkmark';
+$string['checkmark:trackattendance'] = 'Track student\'s attendance';
 $string['checkmark:submit'] = 'Submit checkmark';
 $string['checkmark:view'] = 'View checkmark';
 $string['checkmark:view_preview'] = 'Preview';
@@ -38,6 +39,9 @@ $string['strassignment'] = 'Assignment';
 $string['all'] = 'All';
 $string['alwaysshowdescription'] = 'Always show description';
 $string['alwaysshowdescription_help'] = 'If disabled, the checkmarks description above will only become visible to students at the "Allow submissions from" date.';
+$string['attendance'] = 'Attendance';
+$string['attendancegradelink'] = 'Link attendance to grades';
+$string['attendancegradelink_help'] = 'Activate this setting in order to link the saved attendances with the grades of the checkmark. Points of the checkmark module are only aggregated, when the person\'s attendance was marked accordingly.';
 $string['autograde_all'] = 'Grade all submissions';
 $string['autograde_custom'] = 'Grade selected users';
 $string['autograde_req'] = 'Grade ungraded';
@@ -148,6 +152,8 @@ $string['pdftextsize'] = 'Text size';
 $string['strvalidmsgtime'] = 'Duration of message validity';
 $string['strvalidmsgtimedesc'] = 'Amount of days after which grading notifications to users won\'t be sent any more.';
 $string['str_userid'] = 'Student ID';
+$string['trackattendance'] = 'Track attendance';
+$string['trackattendance_help'] = 'Activate this setting in order to enable tracking of participant\'s attendance.';
 /*
  * End of Block for checkmark specific strings
  */
