@@ -67,6 +67,10 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2016012005
+-------------------------
+*) Fixed bug showing no grade on dashboard if there's no submission!
+
 v 2016012004
 -------------------------
 *) Fixed bug causing amount of unmarked submissions to always be 0 on dashboard!
