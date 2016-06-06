@@ -1193,13 +1193,14 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
             if (empty($scalegrades[$checkmark->id])) {
                 if ($scale = $DB->get_record('scale', array('id' => -($checkmark->grade)))) {
                     $scalegrades[$checkmark->id] = make_menu_from_list($scale->scale);
+                    $a->grade = $scalegrades[$checkmark->id][(int)-$feedback->grade];
                 } else {
                     $a->grade = get_string('notgradedyet', 'checkmark');
                 }
             }
-            if (isset($scalegrades[$checkmark->id][$feedback->grade])) {
+            if (isset($scalegrades[$checkmark->id][(int)-$feedback->grade])) {
                 $a->grade = get_string('graded', 'checkmark').': '.
-                            $scalegrades[$checkmark->id][$feedback->grade];
+                            $scalegrades[$checkmark->id][(int)-$feedback->grade];
             }
         }
     } else {
