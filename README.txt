@@ -15,7 +15,7 @@
 
 /**
  * README.txt
- * @version       2016-01-20
+ * @version       2016-03-14
  * @package       mod_checkmark
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
  * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
@@ -25,7 +25,7 @@
  */
 
 # ---------------------------------------------------------------
-# FOR Moodle 2.9+
+# FOR Moodle 3.0+
 # ---------------------------------------------------------------
 
 Checkmark-Module
@@ -48,7 +48,7 @@ OVERVIEW
 
 REQUIREMENTS
 ================================================================================
-    Moodle <2.9 or later>
+    Moodle <3.0 or later>
 
 INSTALLATION
 ================================================================================
@@ -67,6 +67,15 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2016031400
+-------------------------
+*) fixed a bug concerning submission updated event
+   (related user was not shown, caused problems)
+
+v 2016012005
+-------------------------
+*) Fixed bug showing no grade on dashboard if there's no submission!
+
 v 2016012004
 -------------------------
 *) Fixed bug causing amount of unmarked submissions to always be 0 on dashboard!
