@@ -1173,8 +1173,9 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
     $a->total_grade = $maxcheckedgrades;
     $a->name = $checkmark->name;
 
-    if ($submission && $feedback = $DB->get_record('checkmark_feedbacks', array('checkmarkid' => $checkmark->id,
-                                                                                'userid'      => $submission->userid))) {
+    if (!(empty($submission->userid)
+            || !$feedback = $DB->get_record('checkmark_feedbacks', array('checkmarkid' => $checkmark->id,
+                                                                         'userid'      => $submission->userid)))) {
         /*
          * Cache scales for each checkmark
          * they might have different scales!
@@ -1188,7 +1189,6 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
                 $a->grade = get_string('graded', 'checkmark').': '.(int)$feedback->grade.
                             ' / '.$checkmark->grade;
             }
-
         } else {                                // Scale?
             if (empty($scalegrades[$checkmark->id])) {
                 if ($scale = $DB->get_record('scale', array('id' => -($checkmark->grade)))) {
@@ -1203,6 +1203,7 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
             }
         }
     } else {
+
         $a->grade = get_string('notgradedyet', 'checkmark');
     }
 
@@ -1305,20 +1306,32 @@ function checkmark_print_overview($courses, &$htmlarray) {
     $rs->close();
 
     // Get all user submissions, indexed by checkmark id!
-    $mysubmissions = $DB->get_records_sql('SELECT s.checkmarkid, s.id, s.userid, f.timemodified, f.graderid, f.grade
-                                             FROM {checkmark_submissions} s
-                                        LEFT JOIN {checkmark_feedbacks} f ON s.checkmarkid = f.checkmarkid AND s.userid = f.userid
-                                            WHERE s.userid = ?
-                                              AND s.checkmarkid '.$sqlcheckmarkids,
-                                          array_merge(array($USER->id), $checkmarkidparams));
+    $mysubmissions = $DB->get_records_sql('SELECT c.id AS id, s.id AS submissionid, f.id AS feedbackid,
+                                                  COALESCE(s.userid, f.userid) AS userid,
+                                                  f.timemodified, f.graderid, f.grade
+                                             FROM {checkmark} c
+                                        LEFT JOIN {checkmark_submissions} s ON (s.checkmarkid = c.id) AND s.userid = ?
+                                        LEFT JOIN {checkmark_feedbacks} f ON (f.checkmarkid = c.id) AND f.userid = ?
+                                            WHERE s.id IS NOT NULL OR f.id IS NOT NULL',//c.id '.$sqlcheckmarkids,
+                                          array_merge(array($USER->id, $USER->id), $checkmarkidparams));
     foreach ($mysubmissions as $key => $mysubmission) {
-        $sql = 'SELECT exampleid AS id, name, grade, state
-                  FROM {checkmark_checks} chks
-            RIGHT JOIN {checkmark_examples} ex
-                    ON chks.exampleid = ex.id
-                 WHERE submissionid = :subid';
-        $mysubmissions[$key]->examples = $DB->get_records_sql($sql,
-                                                              array('subid' => $mysubmission->id));
+        if (!empty($mysubmission->submissionid)) {
+            // Gotta get the real checks from DB!
+            $sql = 'SELECT ex.id AS id, name, grade, state
+                  FROM {checkmark_examples} ex
+             LEFT JOIN {checkmark_checks} chks ON chks.exampleid = ex.id
+             LEFT JOIN {checkmark_submissions} sub ON chks.submissionid = sub.id
+                 WHERE ex.checkmarkid = :checkmarkid
+                       AND (sub.userid = :userid OR sub.userid IS NULL)';
+            $mysubmissions[$key]->examples = $DB->get_records_sql($sql, array('userid'      => $USER->id,
+                                                                              'checkmarkid' => $key));
+        } else {
+            // Gotty say, nothing is checked, 'cause there's no submission now!
+            $sql = "SELECT ex.id AS id, name, grade, 0 AS state
+                      FROM {checkmark_examples} ex
+                     WHERE ex.checkmarkid = :checkmarkid";
+            $mysubmissions[$key]->examples = $DB->get_records_sql($sql, array('checkmarkid' => $key));
+        }
     }
 
     // Get all users who submitted something, indexed by checkmarkid!
@@ -1428,21 +1441,18 @@ function checkmark_print_overview($courses, &$htmlarray) {
                 if ($gradinginfo->items[0]->grades[$USER->id]->overridden) {
                     $submission->grade = round($grade->grade, 2);
                 }
-                if ($submission->graderid == 0 && $submission->timemodified == 0) {
-                    $str .= checkmark_getsummarystring($submission, $checkmark);
-                } else if ($submission->grade <= 0) {
-                    $str .= checkmark_getsummarystring($submission, $checkmark);
-                } else {
-                    $str .= checkmark_getsummarystring($submission, $checkmark);
-                }
-            } else {
 
+                $str .= checkmark_getsummarystring($submission, $checkmark);
+
+            } else {
                 $submission = false;
+
                 $str .= $strnotsubmittedyet . ' ' . checkmark_display_lateness(time(), $checkmark->timedue);
             }
 
             $statistics[$checkmark->course][] = checkmark_getsubmissionstats($submission, $checkmark);
             $idx = count($statistics[$checkmark->course]) - 1;
+
             if (!isset($statistics[$checkmark->course][0]->name)) {
                 $statistics[$checkmark->course][0]->name = get_string('strsum', 'checkmark');
             }
@@ -1450,7 +1460,6 @@ function checkmark_print_overview($courses, &$htmlarray) {
             $statistics[$checkmark->course][0]->total_examples += $statistics[$checkmark->course][$idx]->total_examples;
             $statistics[$checkmark->course][0]->checked_grade += $statistics[$checkmark->course][$idx]->checked_grade;
             $statistics[$checkmark->course][0]->total_grade += $statistics[$checkmark->course][$idx]->total_grade;
-
             $str .= '</div>';
         }
         $str .= '</div>';
