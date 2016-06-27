@@ -1393,6 +1393,7 @@ class checkmark {
                      */
 
                     if ($updatedb) {
+                        $feedback->timemodified = time();
 
                         $DB->update_record('checkmark_feedbacks', $feedback);
 
@@ -1400,7 +1401,7 @@ class checkmark {
                         $this->update_grade($feedback);
 
                         // Trigger the event!
-                        \mod_checkmark\event\grade_updated::manual($this->cm, array('userid'       => $feedback->userid,
+                        \mod_checkmark\event\grade_updated::manual($this->cm, array('userid'     => $feedback->userid,
                                                                                     'feedbackid' => $feedback->id))->trigger();
                     }
                 }
