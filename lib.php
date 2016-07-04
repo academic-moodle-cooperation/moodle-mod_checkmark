@@ -110,6 +110,7 @@ function checkmark_delete_instance($id) {
     $mod = $DB->get_field('modules', 'id', array('name' => 'checkmark'));
 
     checkmark_grade_item_delete($checkmark);
+    checkmark_attendance_item_delete($checkmark);
 
     return $result;
 }
@@ -195,6 +196,12 @@ function checkmark_update_instance($checkmark) {
         checkmark_grade_item_update($checkmark);
     }
 
+    if ($checkmark->trackattendance && $checkmark->attendancegradebook) {
+        checkmark_attendance_item_update($checkmark);
+    } else {
+        checkmark_attendance_item_delete($checkmark);
+    }
+
     if (! $cm = get_coursemodule_from_instance('checkmark', $checkmark->id)) {
         echo $OUTPUT->notification('invalidinstance('.$checkmark->id.')', 'notifyproblem');
         $link = '';
@@ -258,6 +265,9 @@ function checkmark_add_instance($checkmark) {
     }
 
     checkmark_grade_item_update($checkmark);
+    if ($checkmark->trackattendance && $checkmark->attendancegradebook) {
+        checkmark_attendance_item_update($checkmark);
+    }
 
     $link = $CFG->wwwroot.'/mod/checkmark/view.php?c='.$returnid;
     $name = $checkmark->name;
@@ -486,6 +496,34 @@ function checkmark_update_grades($checkmark, $userid=0, $nullifnone=true) {
 }
 
 /**
+ * Update activity attendances
+ *
+ * @param object $checkmark
+ * @param int $userid specific user only, 0 means all
+ * @param bool $nullifnone (optional) not used here!
+ */
+function checkmark_update_attendances($checkmark, $userid=0, $nullifnone=true) {
+    global $CFG, $DB;
+    require_once($CFG->libdir.'/gradelib.php');
+
+    if (!$checkmark->trackattendance && !$checkmark->attendancegradebook) {
+        // If there's no gradeitem, we won't do anything!
+        return;
+    }
+
+    $attendances = null;
+    if ($checkmark->trackattendance != 0 && $attendances = checkmark_get_user_attendances($checkmark, $userid)) {
+        foreach ($attendances as $k => $v) {
+            if ($v->rawgrade == -1) {
+                $attendances[$k]->rawgrade = null;
+            }
+        }
+    }
+
+    checkmark_attendance_item_update($checkmark, $attendances);
+}
+
+/**
  * Update all grades in gradebook.
  */
 function checkmark_upgrade_grades() {
@@ -508,6 +546,9 @@ function checkmark_upgrade_grades() {
             $i++;
             upgrade_set_timeout(60 * 5); // Set up timeout, may also abort execution!
             checkmark_update_grades($checkmark);
+            if ($checkmark->trackattendance && $checkmark->attendancegradebook) {
+                checkmark_update_attendances($checkmark);
+            }
             $pbar->update($i, $count, 'Updating checkmark grades ('.$i.'/'.$count.')');
         }
         upgrade_set_timeout(); // Reset to default timeout!
@@ -554,6 +595,48 @@ function checkmark_grade_item_update($checkmark, $grades=null) {
 }
 
 /**
+ * Create attendance item for given checkmark
+ *
+ * @param object $checkmark object with extra cmidnumber
+ * @param object[]|object|string $grades (optional) array/object of grade(s); 'reset' means reset grades in gradebook
+ * @return int 0 if ok, error code otherwise
+ */
+function checkmark_attendance_item_update($checkmark, $grades=null) {
+    global $CFG, $DB;
+    require_once($CFG->libdir.'/gradelib.php');
+
+    if (!$checkmark->trackattendance && !$checkmark->attendancegradebook) {
+        return;
+    }
+
+    if ($checkmark->cmidnumber) {
+        $idnumber = 'A'.$checkmark->cmidnumber;
+    } else {
+        $idnumber = null;
+    }
+    $params = array('itemname' => get_string('attendance', 'checkmark').' '.$checkmark->name,
+                    'idnumber' => $idnumber);
+
+    $params['gradetype'] = GRADE_TYPE_VALUE;
+    $params['grademax']  = 1;
+    $params['grademin']  = 0;
+
+    if ($grades === 'reset') {
+        $params['reset'] = true;
+        $grades = null;
+    }
+    if (!isset($checkmark->id)) {
+        $checkmark->id = $checkmark->instance;
+    }
+
+    // We can't update the category ID because Moodle forces us to stay in 1 grade category!
+
+    $gradeupdate = grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id, 1, $grades, $params);
+
+    return $gradeupdate;
+}
+
+/**
  * Delete grade item for given checkmark
  *
  * @param object $checkmark object
@@ -563,8 +646,20 @@ function checkmark_grade_item_delete($checkmark) {
     global $CFG;
     require_once($CFG->libdir.'/gradelib.php');
 
-    return grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id, 0,
-                        null, array('deleted' => 1));
+    return grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id, 0, null, array('deleted' => 1));
+}
+
+/**
+ * Delete attendance item for given checkmark
+ *
+ * @param object $checkmark object
+ * @return object checkmark
+ */
+function checkmark_attendance_item_delete($checkmark) {
+    global $CFG;
+    require_once($CFG->libdir.'/gradelib.php');
+
+    return grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id, 1, null, array('deleted' => 1));
 }
 
 /**
@@ -1193,14 +1288,14 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
             if (empty($scalegrades[$checkmark->id])) {
                 if ($scale = $DB->get_record('scale', array('id' => -($checkmark->grade)))) {
                     $scalegrades[$checkmark->id] = make_menu_from_list($scale->scale);
-                    $a->grade = $scalegrades[$checkmark->id][(int)-$feedback->grade];
+                    $a->grade = $scalegrades[$checkmark->id][-(int)$feedback->grade];
                 } else {
                     $a->grade = get_string('notgradedyet', 'checkmark');
                 }
             }
-            if (isset($scalegrades[$checkmark->id][(int)-$feedback->grade])) {
+            if (isset($scalegrades[$checkmark->id][-(int)$feedback->grade])) {
                 $a->grade = get_string('graded', 'checkmark').': '.
-                            $scalegrades[$checkmark->id][(int)-$feedback->grade];
+                            $scalegrades[$checkmark->id][-(int)$feedback->grade];
             }
         }
     } else {
@@ -1313,7 +1408,7 @@ function checkmark_print_overview($courses, &$htmlarray) {
                                              FROM {checkmark} c
                                         LEFT JOIN {checkmark_submissions} s ON (s.checkmarkid = c.id) AND s.userid = ?
                                         LEFT JOIN {checkmark_feedbacks} f ON (f.checkmarkid = c.id) AND f.userid = ?
-                                            WHERE s.id IS NOT NULL OR f.id IS NOT NULL',//c.id '.$sqlcheckmarkids,
+                                            WHERE s.id IS NOT NULL OR f.id IS NOT NULL',
                                           array_merge(array($USER->id, $USER->id), $checkmarkidparams));
     foreach ($mysubmissions as $key => $mysubmission) {
         if (!empty($mysubmission->submissionid)) {

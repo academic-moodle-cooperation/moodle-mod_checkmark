@@ -913,5 +913,43 @@ function xmldb_checkmark_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2016012003, 'checkmark');
     }
 
+    if ($oldversion < 2016053100) {
+
+        // Define field trackattendance to be added to checkmark.
+        $table = new xmldb_table('checkmark');
+        $fields = array(
+                new xmldb_field('trackattendance', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'exampleprefix'),
+                new xmldb_field('attendancegradelink', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'trackattendance'),
+                new xmldb_field('attendancegradebook', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0',
+                                'attendancegradelink')
+                );
+
+        // Conditionally launch add field trackattendance.
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        // Define field attendance to be added to checkmark_feedbacks.
+        $table = new xmldb_table('checkmark_feedbacks');
+        $field = new xmldb_field('attendance', XMLDB_TYPE_INTEGER, '4', null, null, null, null, 'format');
+
+        // Conditionally launch add field attendance.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $index = new xmldb_index('attendance', XMLDB_INDEX_NOTUNIQUE, array('attendance'));
+
+        // Conditionally launch add index attendance.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2016053100, 'checkmark');
+    }
+
     return true;
 }

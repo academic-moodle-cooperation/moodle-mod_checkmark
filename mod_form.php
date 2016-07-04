@@ -180,6 +180,8 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->disabledIf('examplegrades', 'flexiblenaming', 'notchecked');
         $mform->setAdvanced('examplegrades');
 
+        $this->add_attendance_elements();
+
         $coursecontext = context_course::instance($COURSE->id);
         plagiarism_get_form_elements_module($mform, $coursecontext);
 
@@ -219,6 +221,32 @@ class mod_checkmark_mod_form extends moodleform_mod {
             $mform->setDefault('grade', $stdexamplecount);
         }
         $mform->setExpanded('modstandardgrade');
+    }
+
+    /**
+     * Helper method to add attendance grading items!
+     */
+    public function add_attendance_elements() {
+        global $COURSE;
+
+        $mform =& $this->_form;
+        $isupdate = !empty($this->_cm);
+
+        $mform->addElement('header', 'attendance', get_string('attendance', 'checkmark'));
+
+        // Add select: track attendance yes/no?
+        $mform->addElement('selectyesno', 'trackattendance', get_string('trackattendance', 'checkmark'));
+        $mform->addHelpButton('trackattendance', 'trackattendance', 'checkmark');
+
+        // Add select: attendance influences grade yes/no?
+        $mform->addElement('selectyesno', 'attendancegradelink', get_string('attendancegradelink', 'checkmark'));
+        $mform->disabledIf('attendancegradelink', 'trackattendance', 'eq', 0);
+        $mform->addHelpButton('attendancegradelink', 'attendancegradelink', 'checkmark');
+
+        // Add select: save attendance in gradebook yes/no?
+        $mform->addElement('selectyesno', 'attendancegradebook', get_string('attendancegradebook', 'checkmark'));
+        $mform->disabledIf('attendancegradebook', 'trackattendance', 'eq', 0);
+        $mform->addHelpButton('attendancegradebook', 'attendancegradebook', 'checkmark');
     }
 
     /** Needed by plugin checkmark if it includes a filemanager element in the settings form! */
