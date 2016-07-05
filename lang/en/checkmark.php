@@ -60,6 +60,7 @@ $string['autograde_confirm_continue'] = 'Are you shure you wan\'t to continue?';
 $string['autograde_error'] = 'An error occurred during auto-grading.';
 $string['autograde_failed'] = 'Auto-grading failed!';
 $string['autograde_success'] = 'Auto-grading successful! {$a} submissions updated.';
+$string['autograde_users_with_unknown_attendance'] = 'ATTENTION: {$a} submissions could NOT be graded automatically due to unknown attendance status!';
 $string['autograde_notsupported'] = 'This scale is not supported by automatic grading.';
 $string['autograde_no_users_selected'] = 'You have not selected any user to grade. Select the required users via the checkboxes in the left column of the table below.';
 $string['autograde_non_numeric_grades'] = 'Auto-grading requires a numeric maximum grade to be set. This can be configured in instance-settings.';

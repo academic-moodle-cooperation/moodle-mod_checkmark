@@ -789,6 +789,9 @@ class checkmark {
             }
         }
 
+        // If the attendance is linked to the grades!
+        $attendancecoupled = $this->checkmark->trackattendance && $this->checkmark->attendancegradelink;
+
         // Get all ppl that are allowed to submit checkmarks!
         $context = context_module::instance($this->cm->id);
         // Get groupmode and limit fetched users to current chosen group (or every)!
@@ -815,12 +818,24 @@ class checkmark {
                 list($sqluserids, $userparams) = $DB->get_in_or_equal($usrlst, SQL_PARAMS_NAMED, 'user');
                 $params = array_merge_recursive($params, $userparams);
 
-                $sql = 'SELECT u.id FROM {user} u '.
-                       'WHERE u.deleted = 0'.
-                       ' AND u.id '.$sqluserids;
+                if ($attendancecoupled) {
+                    // If attendence is coupled we have to filter all out, who have no attendance-status!
+                    $sql = "SELECT u.id FROM {user} u
+                         LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid
+                             WHERE u.deleted = 0 AND f.attendance IS NOT NULL AND u.id ".$sqluserids;
+                    $params['checkmarkid'] = $this->checkmark->id;
+                } else {
+                    $sql = 'SELECT u.id FROM {user} u '.
+                            'WHERE u.deleted = 0 AND u.id '.$sqluserids;
+                }
                 break;
             case self::FILTER_REQUIRE_GRADING:
                 $wherefilter = ' AND (COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0)) ';
+                if ($attendancecoupled) {
+                    $attendancefilter = ' AND f.attendance IS NOT NULL ';
+                } else {
+                    $attendancefilter = '';
+                }
                 $sql = '  SELECT u.id
                             FROM {user} u
                        LEFT JOIN ('.$esql.') eu ON eu.id=u.id
@@ -828,20 +843,29 @@ class checkmark {
                        LEFT JOIN {checkmark_feedbacks} f ON s.userid = f.userid AND s.checkmarkid = f.checkmarkid
                            WHERE u.deleted = 0
                                  AND s.checkmarkid = :checkmarkid'.
-                       $wherefilter;
+                       $wherefilter.$attendancefilter;
                        $params = array_merge_recursive($params,
                                                        array('checkmarkid' => $this->checkmark->id));
                 break;
             case self::FILTER_ALL:
             default:
+                if ($attendancecoupled) {
+                    $attendancefilter = ' AND f.attendance IS NOT NULL ';
+                    $attendancejoin = ' LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid2';
+                    $params['checkmarkid2'] = $this->checkmark->id;
+                } else {
+                    $attendancefilter = '';
+                    $attendancejoin = '';
+                }
                 $sql = '  SELECT u.id FROM {user} u
                        LEFT JOIN ('.$esql.') eu ON eu.id=u.id '.
                        // Comment next line to really autograde all (even those without submissions)!
                       'LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid) AND s.checkmarkid = :checkmarkid'.
+                      $attendancejoin.
                           'WHERE u.deleted = 0
-                                 AND eu.id=u.id';
-                       $params = array_merge_recursive($params,
-                                                       array('checkmarkid' => $this->checkmark->id));
+                                 AND eu.id=u.id'.
+                       $attendancefilter;
+                       $params['checkmarkid'] = $this->checkmark->id;
                 break;
         }
 
@@ -873,7 +897,12 @@ class checkmark {
                     }
 
                     $feedback->timemodified = $timemarked;
-                    $calculatedgrade = $this->calculate_grade($currentuser->id);
+                    if ($attendancecoupled && ($feedback->attendance === 0)) {
+                        // We set grade to 0 if it's coupled with attendance and the user was absent!
+                        $calculatedgrade = 0;
+                    } else {
+                        $calculatedgrade = $this->calculate_grade($currentuser->id);
+                    }
                     $feedback->grade = $calculatedgrade;
                     if ($feedback->feedback == null) {
                         $feedback->feedback = get_string('strautograded', 'checkmark');
@@ -1174,11 +1203,11 @@ class checkmark {
                                 $SESSION->checkmark->autograde = new stdClass();
                             }
                             $SESSION->checkmark->autograde->selected = $selected;
+                            $result = $this->autograde_submissions(self::FILTER_SELECTED, true);
                             if (count($selected) == 1) {
                                 $amount = get_string('autograde_stronesubmission', 'checkmark');
                             } else {
-                                $amount = get_string('autograde_strmultiplesubmissions', 'checkmark',
-                                                     count($selected));
+                                $amount = get_string('autograde_strmultiplesubmissions', 'checkmark', $result);
                             }
                             $amountinfo = '';
                             if (isset($selected) && (count($selected) == 0)) {
@@ -1188,20 +1217,22 @@ class checkmark {
                                     $message .= html_writer::empty_tag('br');
                                 }
 
-                                $message .= $OUTPUT->notification(get_string('autograde_no_users_selected',
-                                                                             'checkmark'),
-                                                                 'error');
+                                $message .= $OUTPUT->notification(get_string('autograde_no_users_selected', 'checkmark'), 'error');
                             } else if (($this->checkmark->grade <= 0)) {
                                 // No autograde possible if no numeric grades are selected!
-                                $message .= $OUTPUT->notification(get_string('autograde_non_numeric_grades', 'checkmark'),
-                                                                 'error');
+                                $message .= $OUTPUT->notification(get_string('autograde_non_numeric_grades', 'checkmark'), 'error');
                             } else {
-
+                                $message = '';
+                                if ($this->checkmark->trackattendance && $this->checkmark->attendancegradelink
+                                        && (count($selected) != $result)) {
+                                    $amountinfo = get_string('autograde_users_with_unknown_attendance', 'checkmark',
+                                                       (count($selected) - $result));
+                                }
                                 echo $OUTPUT->header();
                                 $confirmboxcontent = $OUTPUT->notification(get_string('autograde_confirm', 'checkmark', $amount).
                                                                            html_writer::empty_tag('br').$amountinfo, 'info').
                                                      $OUTPUT->confirm(get_string('autograde_confirm_continue', 'checkmark'),
-                                                                      'submissions.php?id='.$this->cm->id.'&bulk=1&bulk_action='.
+                                                                      'submissions.php?id='.$this->cm->id.'&bulk=1&bulkaction='.
                                                                       $bulkaction.'&confirm=1',
                                                                       'submissions.php?id='.$this->cm->id);
                                 echo $OUTPUT->box($confirmboxcontent, 'generalbox');
