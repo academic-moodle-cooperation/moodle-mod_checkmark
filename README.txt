@@ -15,7 +15,7 @@
 
 /**
  * README.txt
- * @version       2016-03-14
+ * @version       2016-07-12
  * @package       mod_checkmark
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
  * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
@@ -25,7 +25,7 @@
  */
 
 # ---------------------------------------------------------------
-# FOR Moodle 3.0+
+# FOR Moodle 3.1+
 # ---------------------------------------------------------------
 
 Checkmark-Module
@@ -48,7 +48,7 @@ OVERVIEW
 
 REQUIREMENTS
 ================================================================================
-    Moodle <3.0 or later>
+    Moodle <3.1 or later>
 
 INSTALLATION
 ================================================================================
@@ -67,6 +67,16 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2016071200
+-------------------------
+*) Add support for attendances tracking!
+*) Improve layout for autograding & (new) attendance tracking bulk actions
+*) Rewrite table creation, harmonize tables (submission & export),
+*) Save column status, sort order, etc. persistently
+*) Bugfix: feedback date not being updated
+*) migrate old unit test to phpunit (long time due)
+*) Update to Moodle 3.1!
+
 v 2016031400
 -------------------------
 *) fixed a bug concerning submission updated event
