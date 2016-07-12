@@ -49,17 +49,12 @@ $string['attendancegradelink'] = 'Anwesenheit an Bewertung koppeln';
 $string['attendancegradelink_help'] = 'Aktivieren Sie diese Funktion, um die gespeicherten Anwesenheiten mit der Bewertung der Kreuzerlübung zu verknüpfen. Punkte der Kreuzerlübung werden nur dann aggregiert, wenn die Person als anwesend gekennzeichnet wurde.';
 $string['attendancegradelink_hint'] = 'Hinweis: Bewertung ist an Anwesenheit gekoppelt.';
 $string['attendant'] = 'Anwesend';
-$string['autograde_all'] = 'Alle Abgaben bewerten';
-$string['autograde_custom'] = 'Ausgewählte bewerten';
-$string['autograde_req'] = 'Nichtbewertete bewerten';
-$string['autograde_str'] = 'Automatische Bewertung';
-$string['autograde_str_help'] = 'Die automatische Bewertung berechnet die Noten der Abgaben anhand der Punkte der gekreuzten Beispiele.<br /><ul><li>Ausgewählte bewerten - hier werden all jene Datensätze bewertet, die links per Häckchen ausgewählt wurden. Falls noch keine Abgabe vorhanden ist, wird eine leere Abgabe hinzugefügt.</li><li>Nichtbewertete Bewerten - hier werden alle Abgaben bewertet, deren Abgabedatum aktueller als die letzte Bewertung ist</li><li>Alle Abgaben bewerten - hier werden alle bereits übermittelten Abgaben bewertet</li></ul><br />Die Punkteberechnung erfolgt aufgrund der eingestellten Beispielbewertungen sowie der angekreuzten Beispiele:<ul><li>Standard-Bewertungen: hier wird jedes Beispiel gleich gewichtet (ganzzahlige Punkteanzahl pro Beispiel). Die Bewertung ergibt sich aus der Summe der gekreuzten Beispiele multipliziert mit dem Quotienten aus Gesamtbewertung und Beispielanzahl.</li><li>individuelle Beispielgewichtungen: Für die Bewertungsberechnung wird für jedes gekreuzte Beispiel die dem Beispiel zugeordnete Punkteanzahl aufsummiert.</li></ul>';
 $string['autograde_strall'] = 'Alle Abgaben';
 $string['autograde_strchanged'] = 'Im Zuge der automatischen Bewertung werden bei <strong>{$a}</strong> Teilnehmer/innen die Punkte geändert.';
 $string['autograde_strmultiplesubmissions'] = '{$a} Abgaben';
 $string['autograde_stronesubmission'] = '1 Abgabe';
 $string['autograde_strreq'] = 'Abgaben, die ein Bewertungsupdate benötigen,';
-$string['autogradebuttonstitle'] = 'Berechne automatisch Abgaben-Bewertungen f&uuml;r Kreuzerlübung {$a}:';
+$string['autogradebuttonstitle'] = 'Berechne automatisch Abgaben-Bewertungen f&uuml;r Kreuzerlübung {$a}';
 $string['autograde_confirm'] = 'Sie sind dabei <strong>{$a}</strong> automatisch zu bewerten. Die bisherigen Bewertungen werden überschrieben!';
 $string['autograde_confirm_continue'] = 'Sind Sie SICHER, dass Sie fortfahren wollen?';
 $string['autograde_error'] = 'Ein Fehler ist während der automatischen Bewertung aufgetreten!';
@@ -80,6 +75,7 @@ Die folgenden Abgaben waren davon betroffen und wurden automatisch repariert:';
 $string['checkmark_overviewsummary'] = 'Sie haben {$a->checked_examples} / {$a->total_examples} Beispiele ({$a->checked_grade} / {$a->total_grade} Punkte) gekreuzt<br />{$a->grade}<br />';
 $string['checkmark_summary'] = 'Sie haben <span id="examples">{$a->checked_examples}</span> von {$a->total_examples} Beispielen gekreuzt.<br />(<span id="grade">{$a->checked_grade}</span> von maximal {$a->total_grade} Punkten)';
 $string['checkmarkstatstitle'] = 'Kursübersicht Kreuzerlübungen';
+$string['choose'] = 'Mit Auswahl...';
 $string['couldfixevent'] = 'Konnte Termin mit der ID {$a->id} und dem Namen {$a->name} erfolgreich reparieren.';
 $string['count_individuals_mismatch'] = 'Die Anzahl der Beispielnamen({$a->namecount}) stimmt nicht mit der Anzahl der Beispielgewichtungen({$a->gradecount}) überein!';
 $string['datasettingstitle'] = 'Dateneinstellungen';
@@ -109,10 +105,13 @@ $string['firstexamplenumber_help'] = 'Nummer des ersten Beispieles. Die restlich
 $string['flexiblenaming'] = 'Individuelle Namen/Punkte';
 $string['flexiblenaming_help'] = 'Wenn aktiviert, werden statt fortlaufend hochgezählten Beispielen, die im Textfeld angegebenen Bezeichnungen verwendet. Weiters werden die Punkte für einzelne Beispiele im darunter liegenden Textfeld angegeben. Die Namen und erreichbaren Punkte der Beispiele werden mittels Komma (",") getrennt.';
 $string['format'] = 'Format';
+$string['grade_automatically'] = 'automatisch bewerten';
 $string['gradesum_mismatch'] = 'Die Summe der Beispielpunkte stimmt nicht mit der Punkteanzahl der Aufgabe überein ({$a->gradesum}/{$a->maxgrade})!';
 $string['grade_mismatch'] = 'Die Punkte müssen ein ganzzahliges Vielfaches der Beispielanzahl sein!';
 $string['grade'] = 'Bewertung';
 $string['grade_help'] = 'Bei aktivierten Individualfunktionen muss die Gesamtbewertung gleich der Summe der Einzelbewertungen der Beispiele sein (max 100).<br />Bei Standardbeispielen ist jedes ganzzahlige Vielfache der Beispielanzahl zulässig. Die Punkte pro Beispiel werden dann in der Modulinstanz automatisch angepasst.<br />Bei aktiviertem Javascript wird die Punktesumme automatisch ausgewählt bzw. nur ganzzahlige Vielfache der Beispielanzahl akzeptiert.';
+$string['informstudents'] = 'Sende Benachrichtigungen';
+$string['informstudents_help'] = 'Wenn aktiviert, werden Teilnehmer/in über den Status ihrer Anwesenheit informiert.';
 $string['nostudents'] = 'Es sind keine Teilnehmer/innen zur Anzeige vorhanden!';
 $string['nostudentsmatching'] = 'Es sind keine Teilnehmer/innen vorhanden, die den aktuellen Einstellungen entsprechen!';
 $string['nosubmission'] = 'Es ist noch keine Abgabe vorhanden.';
@@ -122,7 +121,14 @@ $string['numberofexamples_help'] = 'Anzahl der Beispiele';
 $string['optimum'] = 'Optimal';
 $string['printsettingstitle'] = 'Exporteinstellungen';
 $string['sendnotifications'] = 'Sende Benachrichtigungen';
+$string['select'] = 'Auswählen';
+$string['selection'] = 'Auswahl';
+$string['setabsent'] = 'als abwesend markieren';
+$string['setabsentandgrade'] = 'als abwesend markieren und bewerten';
+$string['setattendant'] = 'als anwesend markieren';
+$string['setattendantandgrade'] = 'als anwesend markieren und bewerten';
 $string['signature'] = 'Unterschrift';
+$string['start'] = 'Start';
 $string['strallononepage'] = 'Alles auf eine Seite';
 $string['strautograded'] = '[automatisch bewertet]';
 $string['strexample'] = 'Beispiel';
@@ -161,6 +167,7 @@ $string['strvalidmsgtimedesc'] = 'Anzahl der Tage, nach denen Benotungsbenachric
 $string['str_userid'] = 'Matrikelnummer';
 $string['trackattendance'] = 'Anwesenheit erfassen';
 $string['trackattendance_help'] = 'Aktivieren Sie diese Funktion, um die Anwesenheit bei Teilnehmer/innen zu protokollieren.';
+$string['ungraded'] = 'Nicht bewertete';
 $string['unknown'] = 'Unbekannt';
 /*
  * End of Block for checkmark-specific strings
@@ -172,6 +179,17 @@ $string['unknown'] = 'Unbekannt';
 $string['allowresubmit'] = 'Erneute Abgabe erlauben';
 $string['allowresubmit_help'] = 'Wenn aktiviert, ist es Teilnehmer/innen erlaubt, nach der Benotung erneut (für eine erneute Benotung) abzugeben.';
 $string['alreadygraded'] = 'Ihre Abgabe wurde bereits benotet und erneutes Abgeben ist daher nicht erlaubt.';
+$string['bulk'] = 'Massenverarbeitung';
+$string['bulk_help'] = 'Hier können Sie Aktionen wie das Setzen der Anwesenheit, automatische Bewertung oder Kombinationen daraus an mehreren Einträgen gleichzeitig ausführen.<br />
+<ul>
+<li><strong>als Anwesend markieren:</strong> Markiert die ausgewählten Teilnehmer/innen als Anwesend</li>
+<li><strong>als Abwesend markieren:</strong> Markiert die ausgewählten Teilnehmer/innen als Abwesend</li>
+<li><strong>automatisch bewerten:</strong> Errechnet und setzt die Bewertung für die ausgewählten Teilnehmer/innen automatisch</li>
+<li><strong>als Anwesend markieren und bewerten:</strong> Markiert die ausgewählten Teilnehmer/innen als Anwesend und bewertet diese anschließend automatisch</li>
+<li><strong>als Abwesend markieren und bewerten:</strong> Markiert die ausgewählten Teilnehmer/innen als Abwesend und bewertet diese anschließend automatisch</li>
+</ul><br />
+Achtung: Wenn die Anwesenheit an die Noten gekoppelt ist werden nur als Anwesend markierte Teilnehmer/innen mit Punkten für gekreuzte Beispiele bewertet.
+Abwesende Teilnehmer/innen erhalten 0 Punkte und Teilnehmer/innen mit unbekanntem Anwesenheitsstatus werden übersprungen!';
 $string['checkmarkdetails'] = 'Kreuzerlübungsdetails';
 $string['checkmarkmail'] = '{$a->grader} hat eine Rückmeldung bezüglich ihrer
 Kreuzerlübungsabgabe für \'{$a->checkmark}\' gepostet.
@@ -223,7 +241,7 @@ $string['emailteachers_help'] = 'Wenn aktiviert, bekommen Trainer/innen eine E-M
 Nur Trainer/innen, die berechtigt sind, diese spezielle Kreuzerlübung zu bewerten, werden benachrichtigt. Zum Beispiel werden, wenn der Kurs separate Gruppen verwendet, Trainer/innen, die auf bestimmte Gruppen beschränkt sind, nur über Teilnehmer/innen in diesen Gruppen informiert, nicht jedoch über Teilnehmer/innen anderer Gruppen.';
 $string['emptysubmission'] = 'Sie haben noch nichts abgegeben.';
 $string['enablenotification'] = 'Sende Benachrichtigungen';
-$string['enablenotification_help'] = 'Wenn aktiviert, werden Teilnehmer/innen benachrichtigt, sobald Ihre Abgaben bewertet wurden.';
+$string['enablenotification_help'] = 'Wenn aktiviert, werden Teilnehmer/innen benachrichtigt, sobald ihre Abgaben bewertet oder ihre Anwesenheit gesetzt wurde.';
 $string['errornosubmissions'] = 'Es sind keine Abgaben zum Download vorhanden';
 $string['failedupdatefeedback'] = 'Aktualisierung der Rückmeldung für Teilnehmer/in {$a} gescheitert';
 $string['feedback'] = 'Rückmeldung';
@@ -286,6 +304,7 @@ $string['submissionsgraded'] = '{$a->graded} von {$a->all} Bewertungen erledigt'
 $string['submissionsnotgraded'] = '{$a->reqgrading} von {$a->all} Bewertungen offen';
 $string['submitcheckmark'] = 'Geben Sie Ihre Kreuzerlübung mit diesem Formular ab';
 $string['submitted'] = 'Abgegeben';
+$string['submitted_entries'] = 'Abgegebene';
 $string['summary_abs'] = 'X/Y Beispiele gekreuzt';
 $string['summary_rel'] = '% der Beispiele gekreuzt';
 $string['usermisconf'] = 'Benutzer/in ist falsch konfiguriert';
@@ -297,3 +316,10 @@ $string['yoursubmission'] = 'Ihre Abgabe';
 /*
  * End of block with standard-strings
  */
+
+// Deprecated since Moodle 3.1!
+$string['autograde_all'] = 'Alle Abgaben bewerten';
+$string['autograde_custom'] = 'Ausgewählte bewerten';
+$string['autograde_req'] = 'Nichtbewertete bewerten';
+$string['autograde_str'] = 'Automatische Bewertung';
+$string['autograde_str_help'] = 'Die automatische Bewertung berechnet die Noten der Abgaben anhand der Punkte der gekreuzten Beispiele.<br /><ul><li>Ausgewählte bewerten - hier werden all jene Datensätze bewertet, die links per Häckchen ausgewählt wurden. Falls noch keine Abgabe vorhanden ist, wird eine leere Abgabe hinzugefügt.</li><li>Nichtbewertete Bewerten - hier werden alle Abgaben bewertet, deren Abgabedatum aktueller als die letzte Bewertung ist</li><li>Alle Abgaben bewerten - hier werden alle bereits übermittelten Abgaben bewertet</li></ul><br />Die Punkteberechnung erfolgt aufgrund der eingestellten Beispielbewertungen sowie der angekreuzten Beispiele:<ul><li>Standard-Bewertungen: hier wird jedes Beispiel gleich gewichtet (ganzzahlige Punkteanzahl pro Beispiel). Die Bewertung ergibt sich aus der Summe der gekreuzten Beispiele multipliziert mit dem Quotienten aus Gesamtbewertung und Beispielanzahl.</li><li>individuelle Beispielgewichtungen: Für die Bewertungsberechnung wird für jedes gekreuzte Beispiel die dem Beispiel zugeordnete Punkteanzahl aufsummiert.</li></ul>';

@@ -692,14 +692,14 @@ function checkmark_attendance_item_update($checkmark, $grades=null) {
     if ($grades != null) {
         // Normalize attendance values here. We should only put 0 or 1 through to gradebook!
         foreach ($grades as $i => $grade) {
-            switch($grade->rawgrade) {
-                case null:
-                case 1:
-                    $grades[$i]->rawgrade = 1.00000;
-                    break;
-                case 0:
-                    $grades[$i]->rawgrade = 0.00000;
-                    break;
+            if (!empty($grade->rawgrade)) {
+                $grades[$i]->rawgrade = 1.00000;
+            } else if ($grade->rawgrade === null) {
+                $grades[$i]->rawgrade = null;
+            } else if ($grade->rawgrade == 0) {
+                $grades[$i]->rawgrade = 0.00000;
+            } else {
+                $grades[$i]->rawgrade = null;
             }
         }
     }

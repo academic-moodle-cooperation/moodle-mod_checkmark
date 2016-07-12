@@ -49,11 +49,6 @@ $string['attendancegradelink'] = 'Link attendance to grades';
 $string['attendancegradelink_help'] = 'Activate this setting in order to link the saved attendances with the grades of the checkmark. Points of the checkmark module are only aggregated, when the person\'s attendance was marked accordingly.';
 $string['attendancegradelink_hint'] = 'Note: Grades are linked to the attendance.';
 $string['attendant'] = 'Attendant';
-$string['autograde_all'] = 'Grade all submissions';
-$string['autograde_custom'] = 'Grade selected users';
-$string['autograde_req'] = 'Grade ungraded';
-$string['autograde_str'] = 'Auto-grading';
-$string['autograde_str_help'] = 'Auto-grading calculates users grades according to points per example and checked examples. It adds the points for each checked example and uses this as the users grade. <ul><li>grade selected users - grades just these users, which are checked in the list. If a user hasn\'t submitted anything, a empty submission get\'s added.</li><li>grade who needs grading - grades every submission which is more up to date than the corresponding grading</li><li>grade all submissions - grades all present submissions (for this instance). Does NOT add empty submissions.</li></ul><br />The grade gets calculated based on chosen example grades and checked examples:<ul><li>standard-grading: here each example is equally weighted (integral grade per example). The grade is calculated by multiplication of the sum of checked examples with the quotient of checkmark-grade and checkmark-count.</li><li>individual example-weights: the grade is the sum of example grades for each checked example (according to instance-settings).</li></ul>';
 $string['autograde_strall'] = 'All submissions';
 $string['autograde_strchanged'] = 'Due to the auto-grading the grades for <strong>{$a}</strong> student(s) will be changed.';
 $string['autograde_strmultiplesubmissions'] = '{$a} submissions';
@@ -80,6 +75,7 @@ The following submissions have been affected by this bug and were automatically 
 $string['checkmark_overviewsummary'] = 'You\'ve checked {$a->checked_examples} / {$a->total_examples} examples ({$a->checked_grade} / {$a->total_grade} points)<br />{$a->grade}<br />';
 $string['checkmark_summary'] = 'You\'ve checked <span id="examples">{$a->checked_examples}</span> out of {$a->total_examples} examples.<br />(<span id="grade">{$a->checked_grade}</span> out of a maximum of {$a->total_grade} points)';
 $string['checkmarkstatstitle'] = 'Course overview checkmark';
+$string['choose'] = 'With Selection...';
 $string['couldfixevent'] = 'Could successfully fix event with ID {$a->id}, named {$a->name}.';
 $string['count_individuals_mismatch'] = 'The amount of individual names({$a->namecount}) doesn\'t match the amount of individual grades({$a->gradecount})!';
 $string['datasettingstitle'] = 'Data settings';
@@ -109,10 +105,13 @@ $string['firstexamplenumber_help'] = 'Number of the first example. The following
 $string['flexiblenaming'] = 'Individual naming/grading';
 $string['flexiblenaming_help'] = 'If activated individual names and grades are being used for each example.';
 $string['format'] = 'Format';
+$string['grade_automatically'] = 'grade automatically';
 $string['gradesum_mismatch'] = 'The sum of the individual grades won\'t match the chosen total grades ({$a->gradesum}/{$a->maxgrade})!';
 $string['grade_mismatch'] = 'The grade has to be an integral multiple of the amount of examples!';
 $string['grade'] = 'Grade';
 $string['grade_help'] = 'When individual functions are activated the grade has to be the sum of all example grades (maximum 100).<br />When you\'re using standard examples the grade has to be a integral multiple of the example count. If so the points per example get automatically adjusted.<br />With activated JavaScript the grade gets selected automatically when using individual functions. In the case of usage of standard-examples with activated JavaScript only integral multiples of the example count will be accepted.';
+$string['informstudents'] = 'Send notifications';
+$string['informstudents_help'] = 'If activated, the participant receives a notification about his/her attendance status.';
 $string['nostudents'] = 'There are no users to be displayed!';
 $string['nostudentsmatching'] = 'There are no users matching the current settings!';
 $string['nosubmission'] = 'No checkmarks have been submitted';
@@ -122,7 +121,14 @@ $string['numberofexamples_help'] = 'Example count in this checkmark.';
 $string['optimum'] = 'Optimum';
 $string['printsettingstitle'] = 'Export settings';
 $string['sendnotifications'] = 'Send notifications';
+$string['select'] = 'Select';
+$string['selection'] = 'Selection';
+$string['setabsent'] = 'mark as absent';
+$string['setabsentandgrade'] = 'mark as absent and grade';
+$string['setattendant'] = 'mark as attendant';
+$string['setattendantandgrade'] = 'mark as attendant and grade';
 $string['signature'] = 'Signature';
+$string['start'] = 'start';
 $string['strallononepage'] = 'Print all on one page';
 $string['strautograded'] = '[auto-graded]';
 $string['strexample'] = 'Example';
@@ -161,6 +167,7 @@ $string['strvalidmsgtimedesc'] = 'Amount of days after which grading notificatio
 $string['str_userid'] = 'Student ID';
 $string['trackattendance'] = 'Track attendance';
 $string['trackattendance_help'] = 'Activate this setting in order to enable tracking of participant\'s attendance.';
+$string['ungraded'] = 'Ungraded';
 $string['unknown'] = 'Unknown';
 /*
  * End of Block for checkmark specific strings
@@ -172,6 +179,17 @@ $string['unknown'] = 'Unknown';
 $string['allowresubmit'] = 'Allow resubmitting';
 $string['allowresubmit_help'] = 'If enabled, students will be allowed to resubmit checkmarks after they have been graded (to be regraded).';
 $string['alreadygraded'] = 'Your submission has already been graded and resubmission is not allowed.';
+$string['bulk'] = 'Bulk processing';
+$string['bulk_help'] = 'Here you can perform actions like "setting attendance", "automatic grading" or combinations thereof on multiple entries.<br />
+<ul>
+<li><strong>mark as attendant:</strong> Mark selected users as attendant</li>
+<li><strong>mark as absent:</strong> Mark selected users as absent</li>
+<li><strong>grade automatically:</strong> Calculate automatic grade for selected users</li>
+<li><strong>mark as attendant and grade:</strong> Mark selected users as attendant and grade them automatically right afterwards</li>
+<li><strong>mark as absent and grade:</strong> Mark selected users as absent and grade them automatically right afterwards</li>
+</ul><br />
+Note: if attendency is linked to the grades only attendant users will be awarded points for checked examples.
+Absent users will be graded with 0 points and users with unknown attendancy will be skipped at all!';
 $string['checkmarkdetails'] = 'Checkmark details';
 $string['checkmarkmail'] = '{$a->grader} posted feedback on your
 checkmark submission for \'{$a->checkmark}\'
@@ -223,7 +241,7 @@ $string['emailteachers_help'] = 'If enabled, teachers receive email notification
 Only teachers who are able to grade the particular checkmark are notified. For example, if the course uses separate groups, teachers restricted to particular groups won\'t receive notification about students in other groups.';
 $string['emptysubmission'] = 'You have not submitted anything yet';
 $string['enablenotification'] = 'Send notifications';
-$string['enablenotification_help'] = 'If enabled, students will be notified once their checkmark submissions are graded.';
+$string['enablenotification_help'] = 'If enabled, students will be notified once their checkmark submissions are graded or their attendancy is marked.';
 $string['errornosubmissions'] = 'There are no submissions available to download';
 $string['failedupdatefeedback'] = 'Failed to update submission feedback for user {$a}';
 $string['feedback'] = 'Feedback';
@@ -286,6 +304,7 @@ $string['submissionsgraded'] = '{$a->graded} of {$a->all} submissions graded';
 $string['submissionsnotgraded'] = '{$a->reqgrading} of {$a->all} submissions not graded';
 $string['submitcheckmark'] = 'Submit your checkmark using this form';
 $string['submitted'] = 'Submitted';
+$string['submitted_entries'] = 'Submitted';
 $string['usermisconf'] = 'User is miss-configured';
 $string['usernosubmit'] = 'Sorry, you are not allowed to submit a checkmark.';
 $string['viewfeedback'] = 'View checkmark grades and feedback';
@@ -297,3 +316,10 @@ $string['yoursubmission'] = 'Your submission';
 /*
  * End of block with standard-strings
  */
+
+// Deprecated since Moodle 3.1!
+$string['autograde_all'] = 'Grade all submissions';
+$string['autograde_custom'] = 'Grade selected users';
+$string['autograde_req'] = 'Grade ungraded';
+$string['autograde_str'] = 'Auto-grading';
+$string['autograde_str_help'] = 'Auto-grading calculates users grades according to points per example and checked examples. It adds the points for each checked example and uses this as the users grade. <ul><li>grade selected users - grades just these users, which are checked in the list. If a user hasn\'t submitted anything, a empty submission get\'s added.</li><li>grade who needs grading - grades every submission which is more up to date than the corresponding grading</li><li>grade all submissions - grades all present submissions (for this instance). Does NOT add empty submissions.</li></ul><br />The grade gets calculated based on chosen example grades and checked examples:<ul><li>standard-grading: here each example is equally weighted (integral grade per example). The grade is calculated by multiplication of the sum of checked examples with the quotient of checkmark-grade and checkmark-count.</li><li>individual example-weights: the grade is the sum of example grades for each checked example (according to instance-settings).</li></ul>';

@@ -40,7 +40,10 @@ And I log in as "teacher1"
 And I follow "Course 1"
 And I follow "Checkmark1"
 And I follow "View 1 submitted checkmarks"
-When I press "Grade ungraded"
+When I follow "Ungraded"
+And I set the following fields to these values:
+      | bulkaction | grade |
+And I press "start"
 Then I press "Continue"
 Then I should see "Auto-grading successful! 1 submissions updated."
 And I follow "Export"

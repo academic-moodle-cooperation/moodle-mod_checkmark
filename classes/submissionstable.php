@@ -46,6 +46,15 @@ class submissionstable extends \table_sql {
     /** formated cells won't contain HTML */
     const FORMAT_DOWNLOAD = 0;
 
+    /** select none */
+    const SEL_NONE = 0;
+    /** select all */
+    const SEL_ALL = 1;
+    /** select submitted */
+    const SEL_SUBMITTED = 2;
+    /** select submissions which require grading */
+    const SEL_REQ_GRADING = 3;
+
     /** @var protected checkmark instance */
     protected $checkmark;
 
@@ -698,6 +707,44 @@ class submissionstable extends \table_sql {
         return $users;
     }
 
+    /**
+     * Renders links to select all/ungraded/submitted/none entries
+     *
+     * @param bool $returnonlylinks if true only the links will be returned without title!
+     */
+    public function checkbox_controller($returnonlylinks = true) {
+        global $CFG, $PAGE;
+
+        $baseurl = $PAGE->url;
+
+        $allurl = new \moodle_url($baseurl, array('select' => self::SEL_ALL));
+        $noneurl = new \moodle_url($baseurl, array('select' => self::SEL_NONE));
+        $reqgradingurl = new \moodle_url($baseurl, array('select' => self::SEL_REQ_GRADING));
+        $submittedurl = new \moodle_url($baseurl, array('select' => self::SEL_SUBMITTED));
+
+        $randomid = \html_writer::random_id('checkboxcontroller');
+        if (!$returnonlylinks) {
+            $title = get_string('select', 'checkmark').':&nbsp;';
+        } else {
+            $title = '';
+        }
+
+        // TODO: Initialize JS!
+        $params = new \stdClass();
+        $params->table = '#mform1 .submissions';
+        $params->id = $randomid;
+        $PAGE->requires->js_call_amd('mod_checkmark/checkboxcontroller', 'initializer', array($params));
+
+        return \html_writer::tag('div', $title.
+                                        \html_writer::link($allurl, get_string('all'), array('class' => 'all')).' / '.
+                                        \html_writer::link($noneurl, get_string('none'), array('class' => 'none')).' / '.
+                                        \html_writer::link($reqgradingurl, get_string('ungraded', 'checkmark'),
+                                                           array('class' => 'ungraded')).' / '.
+                                        \html_writer::link($submittedurl, get_string('submitted', 'checkmark'),
+                                                           array('class' => 'submitted')),
+                                 array('id' => $randomid));
+    }
+
     /***************************************************************
      *** COLUMN OUTPUT METHODS *************************************
      **************************************************************/
@@ -714,8 +761,37 @@ class submissionstable extends \table_sql {
         if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
             return '';
         } else {
-            $selectstate = optional_param('checkbox_controller1', null, PARAM_INT);
-            return \html_writer::checkbox('selected[]', $values->id, $selectstate, null, array('class' => 'checkboxgroup1'));
+            $select = optional_param('select', null, PARAM_INT);
+            $selectstate = false;
+
+            $attr = array('class' => 'checkboxgroup1');
+            if ($select == self::SEL_ALL) {
+                $selectstate = 1;
+            }
+            if ($values->timesubmitted > $values->timemarked) {
+                if ($select == self::SEL_REQ_GRADING) {
+                    $selectstate = 1;
+                }
+                $attr['data-ungraded'] = 1;
+            } else {
+                if ($select == self::SEL_REQ_GRADING) {
+                    $selectstate = 0;
+                }
+                $attr['data-ungraded'] = 0;
+            }
+            if (!empty($values->submissionid)) {
+                if ($select == self::SEL_SUBMITTED) {
+                    $selectstate = 1;
+                }
+                $attr['data-submitted'] = 1;
+            } else {
+                if ($select == self::SEL_SUBMITTED) {
+                    $selectstate = 0;
+                }
+                $attr['data-submitted'] = 0;
+            }
+
+            return \html_writer::checkbox('selected[]', $values->id, $selectstate, null, $attr);
         }
     }
 
@@ -1137,10 +1213,14 @@ class submissionstable extends \table_sql {
             $oldattendance = \html_writer::empty_tag('input', $inputarr);
             $attr = array('tabindex' => $this->tabindex++,
                           'id'       => 'attendance'.$values->id);
-            $options = array('' => get_string('unknown', 'checkmark'),
-                             1  => get_string('attendant', 'checkmark'),
-                             0  => get_string('absent', 'checkmark'));
-            $content = \html_writer::select($options, 'attendance['.$values->id.']', $values->attendance, false, $attr);
+            $options = array(-1 => '? '.strtolower(get_string('unknown', 'checkmark')),
+                             1  => '✓ '.strtolower(get_string('attendant', 'checkmark')),
+                             0  => '✗ '.strtolower(get_string('absent', 'checkmark')));
+            if ($values->attendance === null) {
+                $content = \html_writer::select($options, 'attendance['.$values->id.']', -1, false, $attr);
+            } else {
+                $content = \html_writer::select($options, 'attendance['.$values->id.']', $values->attendance, false, $attr);
+            }
 
             return \html_writer::tag('div', $content.$oldattendance, array('id' => 'att'.$values->id));
         } else {

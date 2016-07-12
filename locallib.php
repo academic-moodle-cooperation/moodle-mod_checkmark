@@ -1104,12 +1104,8 @@ class checkmark {
             $mode = 'saveandnext';
         } else if (optional_param('saveandprevious', null, PARAM_BOOL)) {
             $mode = 'saveandprevious';
-        } else if (optional_param('autograde_all_submit', null, PARAM_BOOL)) {
-            $mode = self::FILTER_ALL;
-        } else if (optional_param('autograde_req_submit', null, PARAM_BOOL)) {
-            $mode = self::FILTER_REQUIRE_GRADING;
-        } else if (optional_param('autograde_custom_submit', null, PARAM_BOOL)) {
-            $mode = self::FILTER_SELECTED;
+        } else if (optional_param('bulk', null, PARAM_BOOL)) {
+            $mode = 'bulk';
         } else {
             $mode = optional_param('mode', 'all', PARAM_ALPHANUM);
         }
@@ -1136,25 +1132,48 @@ class checkmark {
                 }
                 break;
 
-            case self::FILTER_SELECTED:
-            case self::FILTER_REQUIRE_GRADING:
-            case self::FILTER_ALL:
-                $autograde = $mode;
-                if (($autograde != null) && !optional_param('confirm', 0, PARAM_BOOL)) {
-                    $PAGE->set_title(format_string($this->checkmark->name, true));
-                    $PAGE->set_heading($this->course->fullname);
-                    if ($autograde == self::FILTER_SELECTED) {
-                        $selected = optional_param_array('selected', array(), PARAM_INT);
-                        if (!isset($SESSION->checkmark)) {
-                            $SESSION->checkmark = new stdClass();
-                        }
-                        if (!isset($SESSION->checkmark->autograde)) {
-                            $SESSION->checkmark->autograde = new stdClass();
-                        }
-                        $SESSION->checkmark->autograde->selected = $selected;
+            case 'bulk':
+                $bulkaction = optional_param('bulkaction', null, PARAM_ALPHA);
+                $selected = optional_param_array('selected', array(), PARAM_INT);
+                if ($selected == array() && optional_param('confirm', 0, PARAM_BOOL)) {
+                    $selected = $SESSION->checkmark->autograde->selected;
+                }
+                if ($bulkaction && ($selected || ($confirm && !empty($SESSION->checkmark->autograde->selected)))) {
+                    // Process bulk action!
+                    list($select, $params) = $DB->get_in_or_equal($selected);
+                    $select = 'userid '.$select.' AND checkmarkid = ?';
+                    $params[] = $this->checkmark->id;
+                    // Check if some of the selected users don't have a feedback entry and create on if so!
+                    foreach ($selected as $sel) {
+                        $this->prepare_new_feedback($sel); // Make one if missing!
                     }
-                    switch ($autograde) {
-                        case self::FILTER_SELECTED:
+                    // First only the attendance changes!
+                    switch($bulkaction) {
+                        case 'setattendantandgrade':
+                        case 'setattendant':
+                            $this->set_attendance($selected, 1, optional_param('mailinfo', 0, PARAM_BOOL));
+                            break;
+                        case 'setabsentandgrade':
+                        case 'setabsent':
+                            $this->set_attendance($selected, 0, optional_param('mailinfo', 0, PARAM_BOOL));
+                            break;
+                        case 'setunknown':
+                            $this->set_attendance($selected, null, optional_param('mailinfo', 0, PARAM_BOOL));
+                            break;
+                    }
+
+                    // Now all the grading stuff!
+                    if (in_array($bulkaction, array('setattendantandgrade', 'setabsentandgrade', 'grade'))) {
+                        if (!optional_param('confirm', 0, PARAM_BOOL)) {
+                            $PAGE->set_title(format_string($this->checkmark->name, true));
+                            $PAGE->set_heading($this->course->fullname);
+                            if (!isset($SESSION->checkmark)) {
+                                $SESSION->checkmark = new stdClass();
+                            }
+                            if (!isset($SESSION->checkmark->autograde)) {
+                                $SESSION->checkmark->autograde = new stdClass();
+                            }
+                            $SESSION->checkmark->autograde->selected = $selected;
                             if (count($selected) == 1) {
                                 $amount = get_string('autograde_stronesubmission', 'checkmark');
                             } else {
@@ -1162,72 +1181,61 @@ class checkmark {
                                                      count($selected));
                             }
                             $amountinfo = '';
-                            break;
-                        case self::FILTER_REQUIRE_GRADING:
-                            // Count only!
-                            $result = $this->autograde_submissions($autograde, true);
-                            $amount = get_string('autograde_strreq', 'checkmark');
-                            $amountinfo = get_string('autograde_strchanged', 'checkmark', $result);
-                            break;
-                        default:
-                        case self::FILTER_ALL:
-                            // Count only!
-                            $result = $this->autograde_submissions($autograde, true);
-                            $amount = get_string('autograde_strall', 'checkmark');
-                            $amountinfo = get_string('autograde_strchanged', 'checkmark', $result);
-                            break;
-                    }
-                    if (isset($selected) && (count($selected) == 0)) {
-                        if (!isset($message)) {
-                            $message = '';
-                        } else {
-                            $message .= html_writer::empty_tag('br');
-                        }
+                            if (isset($selected) && (count($selected) == 0)) {
+                                if (!isset($message)) {
+                                    $message = '';
+                                } else {
+                                    $message .= html_writer::empty_tag('br');
+                                }
 
-                        $message .= $OUTPUT->notification(get_string('autograde_no_users_selected',
-                                                                     'checkmark'),
-                                                         'notifyproblem');
-                    } else if (($this->checkmark->grade <= 0)) {
-                        // No autograde possible if no numeric grades are selected!
-                        $message .= $OUTPUT->notification(get_string('autograde_non_numeric_grades',
-                                                                     'checkmark'),
-                                                         'notifyproblem');
-                    } else {
-                        echo $OUTPUT->header();
-                        $confirmboxcontent = $OUTPUT->notification(get_string('autograde_confirm', 'checkmark', $amount).
-                                                                   html_writer::empty_tag('br').$amountinfo, 'notifymessage').
-                                             $OUTPUT->confirm(get_string('autograde_confirm_continue', 'checkmark'),
-                                                              'submissions.php?id='.$this->cm->id.'&mode='.
-                                                              $autograde.'&confirm=1', 'submissions.php?id='.$this->cm->id);
-                        echo $OUTPUT->box($confirmboxcontent, 'generalbox');
-                        echo $OUTPUT->footer();
-                        exit;
-                    }
-                } else if ( $autograde != null) {
-                    if (($this->checkmark->grade <= 0)) {
-                        // No autograde possible if no numeric grades are selected!
-                        $message .= $OUTPUT->notification(get_string('autograde_non_numeric_grades',
-                                                                     'checkmark'),
-                                                         'notifyproblem');
-                    } else if (has_capability('mod/checkmark:grade', context_module::instance($this->cm->id))) {
-                        $result = $this->autograde_submissions($autograde);
-                        if (!isset($message)) {
-                            $message = '';
+                                $message .= $OUTPUT->notification(get_string('autograde_no_users_selected',
+                                                                             'checkmark'),
+                                                                 'error');
+                            } else if (($this->checkmark->grade <= 0)) {
+                                // No autograde possible if no numeric grades are selected!
+                                $message .= $OUTPUT->notification(get_string('autograde_non_numeric_grades', 'checkmark'),
+                                                                 'error');
+                            } else {
+
+                                echo $OUTPUT->header();
+                                $confirmboxcontent = $OUTPUT->notification(get_string('autograde_confirm', 'checkmark', $amount).
+                                                                           html_writer::empty_tag('br').$amountinfo, 'info').
+                                                     $OUTPUT->confirm(get_string('autograde_confirm_continue', 'checkmark'),
+                                                                      'submissions.php?id='.$this->cm->id.'&bulk=1&bulk_action='.
+                                                                      $bulkaction.'&confirm=1',
+                                                                      'submissions.php?id='.$this->cm->id);
+                                echo $OUTPUT->box($confirmboxcontent, 'generalbox');
+                                echo $OUTPUT->footer();
+                                exit;
+                            }
                         } else {
-                            $message .= html_writer::empty_tag('br');
+                            if (($this->checkmark->grade <= 0)) {
+                                // No autograde possible if no numeric grades are selected!
+                                $message .= $OUTPUT->notification(get_string('autograde_non_numeric_grades',
+                                                                             'checkmark'),
+                                                                 'notifyproblem');
+                            } else if (has_capability('mod/checkmark:grade', context_module::instance($this->cm->id))) {
+                                $result = $this->autograde_submissions(self::FILTER_SELECTED);
+                                if (!isset($message)) {
+                                    $message = '';
+                                } else {
+                                    $message .= html_writer::empty_tag('br');
+                                }
+                                if ($result['status'] == GRADE_UPDATE_OK) {
+                                    $message .= $OUTPUT->notification(get_string('autograde_success', 'checkmark',
+                                                                                 $result['updated']),
+                                                                      'notifysuccess');
+                                } else {
+                                    $message .= $OUTPUT->notification(get_string('autograde_failed', 'checkmark'),
+                                                                      'notifyproblem');
+                                }
+                            } else {
+                                print_error('autogradegrade_error', 'checkmark');
+                            }
                         }
-                        if ($result['status'] == GRADE_UPDATE_OK) {
-                            $message .= $OUTPUT->notification(get_string('autograde_success', 'checkmark',
-                                                                         $result['updated']),
-                                                              'notifysuccess');
-                        } else {
-                            $message .= $OUTPUT->notification(get_string('autograde_failed', 'checkmark'),
-                                                              'notifyproblem');
-                        }
-                    } else {
-                        print_error('autogradegrade_error', 'checkmark');
                     }
                 }
+
                 $this->display_submissions($message);
                 break;
             case 'all':                          // Main window, display everything!
@@ -1243,7 +1251,7 @@ class checkmark {
 
                 $grades = optional_param_array('menu', array(), PARAM_INT);
                 $feedbacks = optional_param_array('feedback', array(), PARAM_TEXT);
-                $attendances = optional_param_array('attendance', array(), PARAM_RAW);
+                $attendances = optional_param_array('attendance', array(), PARAM_INT);
                 $oldgrades = optional_param_array('oldgrade', array(), PARAM_INT);
                 $oldfeedbacks = optional_param_array('oldfeedback', array(), PARAM_TEXT);
                 $oldattendances = optional_param_array('oldattendance', array(), PARAM_INT);
@@ -1296,6 +1304,11 @@ class checkmark {
                     }
                     if (!array_key_exists($id, $oldattendances)) {
                         $oldattendances[$id] = null;
+                    }
+
+                    // So we have unknown attendance stati included!
+                    if ($attendances[$id] == -1) {
+                        $attendances[$id] = null;
                     }
 
                     if ($attendance && $cantrackattendances) {
@@ -1416,6 +1429,40 @@ class checkmark {
                 echo 'something seriously is wrong!!';
                 break;
         }
+    }
+
+    /**
+     * Sets the attendance for a bunch of users
+     *
+     * @param int[] $selected Array of userids
+     * @param mixed $state 1, 0 or null
+     * @param bool $mailinfo whether or not the users should be notified
+     */
+    protected function set_attendance($selected, $state, $mailinfo) {
+        global $DB, $USER;
+
+        // Normalize state!
+        if ($state === null) {
+            $state = null;
+        } else if (empty($state)) {
+            $state = 0;
+        } else {
+            $state = 1;
+        }
+
+        $DB->set_field_select('checkmark_feedbacks', 'graderid', $USER->id, $select, $params);
+        $DB->set_field_select('checkmark_feedbacks', 'timemodified', time(), $select, $params);
+        $DB->set_field_select('checkmark_feedbacks', 'attendance', $state, $select, $params);
+        if ($mailinfo) {
+            $DB->set_field_select('checkmark_feedbacks', 'mailed', 0, $select, $params);
+        }
+        $grades = array();
+        foreach ($selected as $sel) {
+            $grades[$sel] = new stdClass();
+            $grades[$sel]->userid = $sel;
+            $grades[$sel]->rawgrade = $state;
+        }
+        checkmark_attendance_item_update($this->checkmark, $grades);
     }
 
     /**
@@ -2203,6 +2250,8 @@ class checkmark {
         global $SESSION, $CFG, $DB, $USER, $DB, $OUTPUT, $PAGE;
         require_once($CFG->libdir.'/gradelib.php');
 
+        $PAGE->set_url(new moodle_url($PAGE->url, array('tab' => 'submissions')));
+
         /*
          * First we check to see if the form has just been submitted
          * to request user_preference updates!
@@ -2283,92 +2332,88 @@ class checkmark {
         groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/checkmark/submissions.php?id='.$this->cm->id);
 
         // Print quickgrade form around the table!
-        $formattrs = array();
-        $formattrs['action'] = new moodle_url('/mod/checkmark/submissions.php');
-        $formattrs['id'] = 'fastg';
-        $formattrs['method'] = 'post';
-        $formattrs['class'] = 'mform';
+        $formaction = new moodle_url('/mod/checkmark/submissions.php', array('id'      => $this->cm->id,
+                                                                             'sesskey' => sesskey()));
+        $mform = new MoodleQuickForm('fastg', 'post', $formaction, '', array('class' => 'combinedprintpreviewform'));
 
-        echo html_writer::start_tag('form', $formattrs);
-        echo html_writer::start_tag('div');
-        echo html_writer::empty_tag('input', array('type'  => 'hidden',
-                                                   'name'  => 'id',
-                                                   'value' => $this->cm->id));
-        echo html_writer::empty_tag('input', array('type'  => 'hidden',
-                                                   'name'  => 'mode',
-                                                   'value' => 'fastgrade'));
-        echo html_writer::empty_tag('input', array('type'  => 'hidden',
-                                                   'name'  => 'page',
-                                                   'value' => $page));
-        echo html_writer::empty_tag('input', array('type'  => 'hidden',
-                                                   'name'  => 'sesskey',
-                                                   'value' => sesskey()));
-        echo html_writer::end_tag('div');
+        $mform->addElement('hidden', 'id');
+        $mform->setDefault('id', $this->cm->id);
+        $mform->addElement('hidden', 'mode');
+        $mform->setDefault('mode', 'fastgrade');
+        $mform->addElement('hidden', 'page');
+        $mform->setDefault('page', $page);
 
         $table = \mod_checkmark\submissionstable::create_submissions_table($this->cm->id, $filter);
-
         if ($DB->count_records_sql($table->countsql, $table->countparams)) {
+            ob_start();
             $table->out($perpage, true);
+            $tablehtml = ob_get_contents();
+            ob_end_clean();
+            $mform->addElement('html', $tablehtml);
 
-            echo html_writer::tag('div', $this->add_checkbox_controller(1, null, null, 0), array('class' => 'checkboxcontroller'));
-        } else {
-            if ($filter == self::FILTER_SUBMITTED) {
-                echo $OUTPUT->notification(html_writer::tag('div', get_string('nosubmisson', 'checkmark'),
-                                                            array('class' => 'nosubmission')), 'notifymessage');
-            } else if ($filter == self::FILTER_REQUIRE_GRADING) {
-                echo $OUTPUT->notification(html_writer::tag('div', get_string('norequiregrading', 'checkmark'),
-                                                            array('class' => 'norequiregrading')), 'notifymessage');
-            } else {
-                echo $OUTPUT->notification(html_writer::tag('div', get_string('nostudents', 'checkmark'),
-                                                            array('class' => 'nostudents')), 'notifymessage');
-            }
-        }
-
-        // Print quickgrade form around the table!
-        if ($quickgrade) {
+            $mform->addElement('advcheckbox', 'mailinfo', get_string('enablenotification', 'checkmark'));
+            $mform->addHelpButton('mailinfo', 'enablenotification', 'checkmark');
             $mailinfopref = false;
             if (get_user_preferences('checkmark_mailinfo', 1)) {
                 $mailinfopref = true;
             }
-            $emailnotification = html_writer::empty_tag('input', array('type'  => 'hidden',
-                                                                       'name'  => 'mailinfo',
-                                                                       'value' => 0)).
-                                 html_writer::checkbox('mailinfo', 1, $mailinfopref, get_string('enablenotification', 'checkmark'));
+            $mform->setDefault('mailinfo', $mailinfopref);
 
-            $emailnotification .= $OUTPUT->help_icon('enablenotification', 'checkmark');
-            echo html_writer::tag('div', $emailnotification, array('class' => 'emailnotification'));
+            if ($quickgrade) {
+                $mform->addElement('submit', 'fastg', get_string('saveallfeedback', 'checkmark'));
+            }
 
-            $savefeedback = html_writer::empty_tag('input', array('type'  => 'submit',
-                                                                  'name'  => 'fastg',
-                                                                  'value' => get_string('saveallfeedback', 'checkmark')));
-            echo html_writer::tag('div', $savefeedback, array('class' => 'fastgbutton optionspref'));
-        }
+            $mform->addElement('header', 'bulk_header', get_string('bulk', 'checkmark'));
 
-        $autogradefieldset = html_writer::tag('legend', $OUTPUT->help_icon('autograde_str', 'checkmark').
-                                                        get_string('autogradebuttonstitle', 'checkmark', $checkmark->name));
-        if (($this->checkmark->grade <= 0)) {
-            // No autograde possible if no numeric grades are selected!
-            $autogradefieldset .= $OUTPUT->notification(get_string('autograde_non_numeric_grades', 'checkmark'), 'notifyproblem');
+            $mform->addElement('static', 'checkboxcontroller', get_string('select', 'checkmark'), $table->checkbox_controller());
+
+            $grp = array();
+            $grp[] =& $mform->createElement( 'select', 'bulkaction', '' );
+            if ($this->checkmark->trackattendance
+                && has_capability('mod/checkmark:trackattendance', $this->context)) {
+                $grp[0]->addOption(get_string('setattendant', 'checkmark'), 'setattendant');
+                $grp[0]->addOption(get_string('setabsent', 'checkmark'), 'setabsent');
+                $grp[0]->addOption('---', '', array( 'disabled' => 'disabled' ) );
+            }
+            if (($this->checkmark->grade <= 0)) {
+                // No autograde possible if no numeric grades are selected!
+                $mform->addElement('html',
+                                   $OUTPUT->notification(get_string('autograde_non_numeric_grades', 'checkmark'), 'error'));
+                $grp[0]->addOption(get_string('grade_automatically', 'checkmark'), 'grade', array('disabled' => 'disabled'));
+            } else {
+                $grp[0]->addOption(get_string('grade_automatically', 'checkmark'), 'grade');
+            }
+
+            if ($this->checkmark->trackattendance
+                    && has_capability('mod/checkmark:trackattendance', $this->context)) {
+                if ($this->checkmark->attendancegradelink) {
+                    $mform->addElement('html', $OUTPUT->notification(get_string('attendancegradelink_hint', 'checkmark'), 'info'));
+                }
+                $grp[0]->addOption('---', '', array( 'disabled' => 'disabled' ) );
+                $grp[0]->addOption(get_string('setattendantandgrade', 'checkmark'), 'setattendantandgrade');
+                $grp[0]->addOption(get_string('setabsentandgrade', 'checkmark'), 'setabsentandgrade');
+            }
+
+            $grp[] =& $mform->createElement('submit', 'bulk', get_string('start', 'checkmark'));
+            $mform->addGroup($grp, 'actiongrp', get_string('selection', 'checkmark').'...', ' ', false);
+            $mform->addHelpButton('actiongrp', 'bulk', 'checkmark');
         } else {
-            $autogradecustom = html_writer::empty_tag('input', array('type'  => 'submit',
-                                                                     'name'  => 'autograde_custom_submit',
-                                                                     'value' => get_string('autograde_custom', 'checkmark')));
-            $autogradefieldset .= html_writer::tag('div', $autogradecustom, array('class' => 'autogradingform'));
-            $autogradereq = html_writer::empty_tag('input', array('type'  => 'submit',
-                                                                  'name'  => 'autograde_req_submit',
-                                                                  'value' => get_string('autograde_req', 'checkmark')));
-            $autogradefieldset .= html_writer::tag('div', $autogradereq, array('class' => 'autogradingform'));
-            $autograde = html_writer::empty_tag('input', array('type'  => 'submit',
-                                                               'name'  => 'autograde_all_submit',
-                                                               'value' => get_string('autograde_all', 'checkmark')));
-            $autogradefieldset .= html_writer::tag('div', $autograde, array('class' => 'autogradingform'));
+            if ($filter == self::FILTER_SUBMITTED) {
+                $mform->addElement('html',
+                                   $OUTPUT->notification(html_writer::tag('div', get_string('nosubmisson', 'checkmark'),
+                                                                          array('class' => 'nosubmission')), 'notifymessage'));
+            } else if ($filter == self::FILTER_REQUIRE_GRADING) {
+                $mform->addElement('html',
+                                   $OUTPUT->notification(html_writer::tag('div', get_string('norequiregrading', 'checkmark'),
+                                                                          array('class' => 'norequiregrading')), 'notifymessage'));
+            } else {
+                $mform->addElement('html',
+                                   $OUTPUT->notification(html_writer::tag('div', get_string('nostudents', 'checkmark'),
+                                                                          array('class' => 'nostudents')), 'notifymessage'));
+            }
         }
-        echo html_writer::tag('fieldset', $autogradefieldset, array('class' => 'clearfix',
-                                                                                'id'    => 'autogradingfieldset'));
 
-        echo html_writer::end_tag('form');
-
-        echo html_writer::end_tag('div');
+        $mform->display();
         // End of fast grading form!
 
         echo html_writer::empty_tag('br', array('class' => 'clearfloat'));
@@ -2441,8 +2486,7 @@ class checkmark {
                 $helpicon = new help_icon('data_preview', 'checkmark');
                 echo html_writer::start_tag('div', array('class' => 'fcontainer scroll_forced',
                                                          'id'    => 'table_begin'));
-                $checkboxcontroller = $this->add_checkbox_controller(1, null, null, 1);
-                echo html_writer::tag('div', $checkboxcontroller, array('class' => 'checkboxcontroller'));
+                echo html_writer::tag('div', $table->checkbox_controller(), array('class' => 'checkboxcontroller'));
                 $table->out($perpage, true);
                 echo html_writer::end_tag('div');
                 return $table;
@@ -2474,6 +2518,8 @@ class checkmark {
     public function print_preview_tab($message='') {
         global $SESSION, $CFG, $DB, $USER, $OUTPUT, $PAGE;
         require_once($CFG->libdir.'/gradelib.php');
+
+        $PAGE->set_url(new moodle_url($PAGE->url, array('tab' => 'printpreview')));
 
         $filters = array(self::FILTER_ALL             => get_string('all'),
                          self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
@@ -2908,83 +2954,6 @@ class checkmark {
 
         $pdf->generate($this->course->shortname . '-' . $this->checkmark->name);
         exit();
-    }
-
-    /**
-     * Renders a link to select/deselect all checkboxes of a group
-     *
-     * Based upon moodleform::add_checkbox_controller() but also useable without moodleform
-     * use optional_param 'checkbox_controller'.$group to determin the current state
-     * for the checkboxes.
-     *
-     * @param int    $groupid The id of the group of advcheckboxes this element controls
-     * @param string $text The text of the link. Defaults to selectallornone ('select all/none')
-     * @param array  $attributes associative array of HTML attributes
-     * @param int    $origval The original general state of the checkboxes before the user
-     *                              first clicks this element
-     */
-    public function add_checkbox_controller($groupid, $text=null, $attributes=null, $origval=0) {
-        global $CFG;
-
-        // Set the default text if none was specified!
-        if (empty($text)) {
-            $text = get_string('selectallornone', 'form');
-        }
-
-        $selectvalue = optional_param('checkbox_controller'.$groupid, null, PARAM_INT);
-        // We need this only if JS is deactivated...
-        if (optional_param('nosubmit_checkbox_controller'.$groupid, null, PARAM_BOOL)) {
-            if (empty($selectvalue)) {
-                $newselectvalue = 1;
-            } else {
-                $newselectvalue = 0;
-            }
-        } else {
-            if ($selectvalue == null) {
-                $newselectvalue = $origval;
-            } else {
-                $newselectvalue = $selectvalue;
-            }
-        }
-
-        $hiddenstate = html_writer::empty_tag('input', array('type'  => 'hidden',
-                                                             'name'  => 'checkbox_controller'.$groupid,
-                                                             'value' => $newselectvalue));
-
-        $checkboxcontrollername = 'nosubmit_checkbox_controller' . $groupid;
-
-        // Prepare Javascript for submit element!
-        $js = "\n//<![CDATA[\n";
-        if (!defined('HTML_QUICKFORM_CHECKBOXCONTROLLER_EXISTS')) {
-            $js .= <<<EOS
-function html_quickform_toggle_checkboxes(group) {
-    var checkboxes = document.getElementsByClassName('checkboxgroup' + group);
-    var newvalue = false;
-    var global = eval('html_quickform_checkboxgroup' + group + ';');
-    if (global == 1) {
-        eval('html_quickform_checkboxgroup' + group + ' = 0;');
-        newvalue = '';
-    } else {
-        eval('html_quickform_checkboxgroup' + group + ' = 1;');
-        newvalue = 'checked';
-    }
-
-    for (i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].checked = newvalue;
-    }
-}
-EOS;
-            define('HTML_QUICKFORM_CHECKBOXCONTROLLER_EXISTS', true);
-        }
-        $js .= "\nvar html_quickform_checkboxgroup".$groupid.'='.$origval.";\n";
-
-        $js .= "//]]>\n";
-
-        require_once($CFG->libdir.'/form/submitlink.php');
-        $submitlink = new MoodleQuickForm_submitlink($checkboxcontrollername, $text, $attributes);
-        $submitlink->_js = $js;
-        $submitlink->_onclick = 'html_quickform_toggle_checkboxes('.$groupid.'); return false;';
-        return $hiddenstate.'<div>'.$submitlink->toHTML().'</div>';
     }
 
     /**
