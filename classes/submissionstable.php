@@ -375,6 +375,12 @@ class submissionstable extends \table_sql {
             $where .= 's.timemodified > 0 AND ';
         } else if ($filter == \checkmark::FILTER_REQUIRE_GRADING) {
             $where .= 'COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0) AND ';
+        } else if ($filter == \checkmark::FILTER_ATTENDANT) {
+            $where .= 'f.attendance = 1 AND ';
+        } else if ($filter == \checkmark::FILTER_ABSENT) {
+            $where .= 'f.attendance = 0 AND ';
+        } else if ($filter == \checkmark::FILTER_UNKNOWN) {
+            $where .= 'f.attendance IS NULL AND ';
         }
         $where .= "u.id ".$sqluserids;
         $groupby = " u.id, s.id, f.id, ".$ufields." ".$useridentityfields;
@@ -592,7 +598,7 @@ class submissionstable extends \table_sql {
                   MAX(s.id) AS submissionid, MAX(f.id) AS feedbackid, MAX(f.grade) AS grade,
                   MAX(f.feedback) AS feedback, MAX(s.timemodified) AS timesubmitted,
                   MAX(f.timemodified) AS timemarked, 100 * COUNT( DISTINCT cchks.id ) / :examplecount AS summary,
-                  COUNT( DISTINCT cchks.id ) AS checks, MAX(f.attendance) AS attendance";
+                  COUNT( DISTINCT cchks.id ) AS checks, f.attendance AS attendance";
         if ($table->groupmode != NOGROUPS) {
             $fields .= ", MAX(groups) AS groups";
         }
@@ -610,13 +616,20 @@ class submissionstable extends \table_sql {
                  LEFT JOIN {checkmark_checks} cchks ON cchks.submissionid = s.id AND cchks.state = 1 ".
                 $groupssql;
 
-        $where = '';
+        $where = "u.id ".$sqluserids;
+
         if ($filter == \checkmark::FILTER_SUBMITTED) {
-            $where .= 's.timemodified > 0 AND ';
+            $where .= ' AND s.timemodified > 0';
         } else if ($filter == \checkmark::FILTER_REQUIRE_GRADING) {
-            $where .= 'COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0) AND ';
+            $where .= ' AND COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0)';
+        } else if ($filter == \checkmark::FILTER_ATTENDANT) {
+            $where .= ' AND attendance = 1';
+        } else if ($filter == \checkmark::FILTER_ABSENT) {
+            $where .= ' AND attendance = 0';
+        } else if ($filter == \checkmark::FILTER_UNKNOWN) {
+            $where .= ' AND attendance IS NULL';
         }
-        $where .= "u.id ".$sqluserids;
+
         $groupby = " u.id, s.id, f.id, ".$ufields." ".$useridentityfields.", f.attendance";
 
         $table->set_sql($fields, $from, $where, $params, $groupby);
@@ -1200,9 +1213,9 @@ class submissionstable extends \table_sql {
         }
         if ($finalgrade->locked || $finalgrade->overridden) {
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
-                return $finalgrade->rawgrade;
+                return $finalgrade->grade;
             } else {
-                $symbol = checkmark_get_attendance_symbol($finalgrade->rawgrade);
+                $symbol = checkmark_get_attendance_symbol($finalgrade->grade);
                 return \html_writer::tag('div', $symbol, array('id' => 'com'.$values->id));
             }
         } else if (has_capability('mod/checkmark:trackattendance', $this->context)

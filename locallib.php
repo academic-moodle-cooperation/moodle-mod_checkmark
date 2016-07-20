@@ -58,6 +58,12 @@ class checkmark {
     const FILTER_REQUIRE_GRADING = 3;
     /** FILTER_SELECTED */
     const FILTER_SELECTED = 4;
+    /** FILTER ATTENDANT USERS */
+    const FILTER_ATTENDANT = 5;
+    /** FILTER ABSENT USERS */
+    const FILTER_ABSENT = 6;
+    /** FILTER UNKNOWN */
+    const FILTER_UNKNOWN = 7;
 
     /** DELIMITER Used to connect example-names, example-grades, submission-examplenumbers! */
     const DELIMITER = ',';
@@ -2292,6 +2298,12 @@ class checkmark {
                          self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
                          self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
 
+        if ($this->checkmark->trackattendance) {
+            $filters[self::FILTER_ATTENDANT] = get_string('all_attendant', 'checkmark');
+            $filters[self::FILTER_ABSENT] = get_string('all_absent', 'checkmark');
+            $filters[self::FILTER_UNKNOWN] = get_string('all_unknown', 'checkmark');
+        }
+
         $updatepref = optional_param('updatepref', 0, PARAM_INT);
 
         if (!empty($updatepref)) {
@@ -2555,6 +2567,11 @@ class checkmark {
         $filters = array(self::FILTER_ALL             => get_string('all'),
                          self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
                          self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
+        if ($this->checkmark->trackattendance) {
+            $filters[self::FILTER_ATTENDANT] = get_string('all_attendant', 'checkmark');
+            $filters[self::FILTER_ABSENT] = get_string('all_absent', 'checkmark');
+            $filters[self::FILTER_UNKNOWN] = get_string('all_unknown', 'checkmark');
+        }
 
         $updatepref = optional_param('updatepref', 0, PARAM_INT);
 
@@ -2788,6 +2805,12 @@ class checkmark {
         $filters = array(self::FILTER_ALL             => get_string('all'),
                          self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
                          self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
+        if ($this->checkmark->trackattendance) {
+            $filters[self::FILTER_ATTENDANT] = get_string('all_attendant', 'checkmark');
+            $filters[self::FILTER_ABSENT] = get_string('all_absent', 'checkmark');
+            $filters[self::FILTER_UNKNOWN] = get_string('all_unknown', 'checkmark');
+        }
+
         $formats = array(\mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF        => 'PDF',
                          \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLSX       => 'XLSX',
                          \mod_checkmark\MTablePDF::OUTPUT_FORMAT_ODS        => 'ODS',
