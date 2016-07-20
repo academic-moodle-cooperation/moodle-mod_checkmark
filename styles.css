@@ -208,16 +208,7 @@
 
 .path-mod-checkmark .scroll_forced {
     overflow:auto;
-    border-width: 1px;
-    border-color: #dddddd;
-    border-style: solid;
     padding:0px;
-}
-
-.path-mod-checkmark .scroll_forced .datapreviewtitle {
-    font-weight: bold;
-    margin-top:1em;
-    margin-left:1em;
 }
 
 .path-mod-checkmark .scroll_forced .checkboxcontroller {
