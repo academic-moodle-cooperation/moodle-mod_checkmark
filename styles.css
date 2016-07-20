@@ -11,10 +11,9 @@
  */
 
 /** General Styles **/
-
 .path-mod-checkmark .feedback .disabledfeedback {
-    width: 500px;
     height: 250px;
+    width: 500px;
 }
 
 .path-mod-checkmark .feedback .from {
@@ -35,9 +34,9 @@
 
 /** Styles for submissions.php **/
 #page-mod-checkmark-submissions form#options div {
-    text-align: right;
     margin-left: auto;
     margin-right: 20px;
+    text-align: right;
 }
 
 #page-mod-checkmark-submissions .header .commands {
@@ -48,24 +47,25 @@
     width: 35px;
 }
 
-#page-mod-checkmark-submissions .fullname,#page-mod-checkmark-submissions .timemodified,#page-mod-checkmark-submissions .timemarked
-    {
+#page-mod-checkmark-submissions .fullname,
+#page-mod-checkmark-submissions .timemodified,
+#page-mod-checkmark-submissions .timemarked {
     text-align: left;
 }
 
-#page-mod-checkmark-submissions .submissions .grade,#page-mod-checkmark-submissions .submissions .outcome,#page-mod-checkmark-submissions .submissions .finalgrade
-    {
+#page-mod-checkmark-submissions .submissions .grade,
+#page-mod-checkmark-submissions .submissions .outcome,
+#page-mod-checkmark-submissions .submissions .finalgrade {
     text-align: right;
 }
 
-#page-mod-checkmark-submissions .submissions .header.noheader
-    {
+#page-mod-checkmark-submissions .submissions .header.noheader {
     display: none;
 }
 
 #page-mod-checkmark-submissions .qgprefs #optiontable {
-    text-align: right;
     margin-left: auto;
+    text-align: right;
 }
 
 /** Styles for view.php **/
@@ -73,12 +73,13 @@
     margin: 10px auto;
 }
 
-#page-mod-checkmark-view #checkmark, #page-mod-checkmark-view #checkmarkform {
+#page-mod-checkmark-view #checkmark,
+#page-mod-checkmark-view #checkmarkform {
     margin: 10px auto;
 }
 
 #page-mod-checkmark-view #checkmarkform .mform .fcheckbox input {
-    margin-top:0;
+    margin-top: 0;
 }
 
 #page-mod-checkmark-view .feedback {
@@ -86,8 +87,8 @@
 }
 
 #page-mod-checkmark-view .feedback .left.picture {
-    text-align:right;
-    width:35px;
+    text-align: right;
+    width: 35px;
 }
 
 #page-mod-checkmark-view #online .singlebutton {
@@ -95,8 +96,8 @@
 }
 
 #page-mod-checkmark-view #dates .c0 {
-    text-align: right;
     font-weight: bold;
+    text-align: right;
 }
 
 #page-mod-checkmark-submissions .mform.optionspref .fitem .fitemtitle {
@@ -104,13 +105,13 @@
 }
 
 #page-mod-checkmark-submissions .mform.optionspref .fitem .felement {
-    width: 15%;
     margin-left: 26%;
+    width: 15%;
 }
 
 #page-mod-checkmark-submissions.dir-rtl .mform .fitem .felement {
-    margin-right: 26%;
     margin-left: 0;
+    margin-right: 26%;
 }
 
 #page-mod-checkmark-submissions .optionspref {
@@ -121,7 +122,9 @@
     text-align: center;
 }
 
-#page-mod-checkmark-submissions.dir-rtl .fullname,#page-mod-checkmark-submissions.dir-rtl .timemodified,#page-mod-checkmark-submissions.dir-rtl .timemarked {
+#page-mod-checkmark-submissions.dir-rtl .fullname,
+#page-mod-checkmark-submissions.dir-rtl .timemodified,
+#page-mod-checkmark-submissions.dir-rtl .timemarked {
     text-align: right;
 }
 
@@ -134,42 +137,25 @@
 }
 
 #page-mod-checkmark-submissions  .checkboxcontroller {
-    margin-top:1em;
     margin-left: 1em;
+    margin-top: 1em;
 }
 
 .mod-checkmark-download-link {
     text-align: right;
 }
 
-/** Styles for checkmark in special **/
-.path-mod-checkmark .submissiondetails {
-    text-align: left;
-}
-
-.path-mod-checkmark .autogradingform {
-    display: inline;
-    float: left;
-}
-
-.path-mod-checkmark .xmloutputform {
-    display: inline;
-    float: right;
-}
-
+/** Special styles for checkmark **/
 .path-mod-checkmark .centered {
     text-align: center;
 }
 
-.path-mod-checkmark .uncheckedexample {
-}
-
 .path-mod-checkmark .checkedexample {
-    font-weight:bold;
+    font-weight: bold;
 }
 
 .path-mod-checkmark div.examplelist {
-    white-space:nowrap;
+    white-space: nowrap;
 }
 
 .path-mod-checkmark div.examplelist .checked {
@@ -177,15 +163,15 @@
 }
 
 .path-mod-checkmark div.examplelist .unchecked {
+    color: #999999;
     text-decoration: line-through;
-    color:#999999;
 }
 
 .path-mod-checkmark table.coloredrows {
+    display: block;
+    margin-left: 10px;
+    margin-right: 10px;
     overflow: auto;
-    display:block;
-    margin-left:10px;
-    margin-right:10px;
 }
 
 .path-mod-checkmark table.coloredrows .header {
@@ -194,35 +180,59 @@
 
 .path-mod-checkmark table.coloredrows .r0 {
     background-color: #f0f0f0;
-    white-space:nowrap
+    white-space: nowrap
 }
 
 .path-mod-checkmark table.coloredrows .r1 {
     background-color: #fafafa;
-    white-space:nowrap
+    white-space: nowrap
 }
 
 .path-mod-checkmark .scroll_forced {
-    overflow:auto;
-    padding:0px;
+    overflow: auto;
+    padding: 0;
 }
 
 .path-mod-checkmark .scroll_forced .checkboxcontroller {
-    margin-top:1em;
     margin-left: 1em;
+    margin-top: 1em;
 }
 
 .path-mod-checkmark #id_print_settings_header .fstaticlabel label {
-    font-weight:bold;
+    font-weight: bold;
 }
 
-.path-mod-checkmark .early {background-color:#99FF99;}
-.path-mod-checkmark .soon {background-color:#FFFF99;}
-.path-mod-checkmark .today {background-color:#FFCC99;}
-.path-mod-checkmark .tobegraded, .checkmark .tobegraded {background-color:#FFCC99;}
-.path-mod-checkmark .allgraded, .checkmark .allgraded {background-color:#99FF99;}
-.path-mod-checkmark .submissionsmissing, .checkmark .submissionsmissing {background-color:#FFCC99;}
-.path-mod-checkmark .allsubmitted, .checkmark .allsubmitted {background-color:#99FF99;}
+.path-mod-checkmark .early {
+    background-color:#99FF99;
+}
+
+.path-mod-checkmark .soon {
+    background-color:#FFFF99;
+}
+
+.path-mod-checkmark .today {
+    background-color:#FFCC99;
+}
+
+.path-mod-checkmark .tobegraded,
+.checkmark .tobegraded {
+    background-color:#FFCC99;
+}
+
+.path-mod-checkmark .allgraded,
+.checkmark .allgraded {
+    background-color:#99FF99;
+}
+
+.path-mod-checkmark .submissionsmissing,
+.checkmark .submissionsmissing {
+    background-color:#FFCC99;
+}
+
+.path-mod-checkmark .allsubmitted,
+.checkmark .allsubmitted {
+    background-color:#99FF99;
+}
 
 .path-mod-checkmark #autogradingfieldset {
     margin-top: 2em;
@@ -230,43 +240,42 @@
 }
 
 .checkmark.overview.statistics > .details {
-    max-width:44em;
-    white-space:nowrap;
-    overflow:auto;
-    overflow-x:scroll;
-    padding:1em;
+    border-bottom-color: #dddddd;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+
+    border-left-color: #dddddd;
+    border-left-style: solid;
+    border-left-width: 1px;
+
+    border-right-color: #dddddd;
+    border-right-style: solid;
+    border-right-width: 1px;
 
     border-top-color: #dddddd;
-    border-right-color: #dddddd;
-    border-bottom-color: #dddddd;
-    border-left-color: #dddddd;
-    border-left-color-ltr-source: physical;
-    border-left-color-rtl-source: physical;
-    border-right-color-ltr-source: physical;
-    border-right-color-rtl-source: physical;
     border-top-style: solid;
-    border-right-style: solid;
-    border-bottom-style: solid;
-    border-left-style: solid;
     border-top-width: 1px;
-    border-right-width: 1px;
-    border-bottom-width: 1px;
-    border-left-width: 1px;
+
+    max-width: 44em;
+    overflow: auto;
+    overflow-x: scroll;
+    padding: 1em;
+    white-space: nowrap;
 }
 
 .checkmark.overview.statistics > .details .name {
     display: inline-block;
-    margin-left: 0px;
+    margin-left: 0;
     margin-right: 1em;
-    vertical-align:top;
-    white-space:nowrap;
+    vertical-align: top;
+    white-space: nowrap;
 }
 
 .checkmark.overview.statistics > .details .examples {
     display: inline-block;
     margin-right: 1em;
-    vertical-align:top;
-    white-space:nowrap;
+    vertical-align: top;
+    white-space: nowrap;
 }
 
 .checkmark.overview.statistics > .details .grades {
@@ -278,8 +287,8 @@
 
 .checkmark.overview.statistics > .details .grade {
     display: inline-block;
-    vertical-align:top;
-    white-space:nowrap;
+    vertical-align: top;
+    white-space: nowrap;
 }
 
 .checkmark.overview.statistics > .details .total {
@@ -295,12 +304,12 @@
 }
 
 #page-mod-checkmark-view .reportlink a {
+    background-attachment: scroll;
+    background-clip: border-box;
     background-color: #fcffd8;
     background-image: none;
-    background-repeat: repeat;
-    background-attachment: scroll;
-    background-position: 0% 0%;
-    background-clip: border-box;
     background-origin: padding-box;
+    background-position: 0 0;
+    background-repeat: repeat;
     background-size: auto auto;
 }
