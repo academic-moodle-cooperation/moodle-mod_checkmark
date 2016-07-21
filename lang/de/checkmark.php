@@ -237,7 +237,7 @@ Sie ist hier verfügbar:
 
     {$a->url}';
 $string['emailteachermailhtml'] = '{$a->username} hat eine Kreuzerlübungsabgabe
-für <i>\'{$a->checkmark}\'  am {$a->dayupdated} um {$a->timeupdated}</i>  aktualisiert<br /><br />
+für <i>\'{$a->checkmark}\' am {$a->dayupdated} um {$a->timeupdated}</i> aktualisiert<br /><br />
 Sie ist <a href="{$a->url}">auf dieser Website verfügbar</a>.';
 $string['emailteachers'] = 'E-Mail Benachrichtigung an Trainer/innen';
 $string['emailteachers_help'] = 'Wenn aktiviert, bekommen Trainer/innen eine E-Mail-Benachrichtigung, sobald Teilnehmer/innen eine Kreuzerlübung abgeben bzw. ihre Kreuzerlübungsabgaben aktualisieren.
