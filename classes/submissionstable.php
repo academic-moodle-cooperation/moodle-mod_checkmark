@@ -703,6 +703,10 @@ class submissionstable extends \table_sql {
             $users = array_keys($users);
         }
 
+        if (empty($users)) {
+            return array(-1);
+        }
+
         return $users;
     }
 
