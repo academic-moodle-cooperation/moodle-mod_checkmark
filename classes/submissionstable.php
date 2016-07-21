@@ -1203,6 +1203,9 @@ class submissionstable extends \table_sql {
             }
         } else if (has_capability('mod/checkmark:trackattendance', $this->context)
                     && $this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+            if ($values->attendance === null) {
+                $values->attendance = -1;
+            }
             $inputarr = array('type'  => 'hidden',
                               'name'  => 'oldattendance['.$values->id.']',
                               'value' => $values->attendance);

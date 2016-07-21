@@ -1199,6 +1199,7 @@ class checkmark {
                 break;
 
             case 'bulk':
+                $message = '';
                 $bulkaction = optional_param('bulkaction', null, PARAM_ALPHA);
                 $selected = optional_param_array('selected', array(), PARAM_INT);
                 $confirm = optional_param('confirm', 0, PARAM_BOOL);
@@ -1379,9 +1380,12 @@ class checkmark {
                     if ($attendances[$id] == -1) {
                         $attendances[$id] = null;
                     }
+                    if ($oldattendances[$id] == -1) {
+                        $oldattendances[$id] = null;
+                    }
 
                     if ($attendance && $cantrackattendances) {
-                        $updatedb = $updatedb || ($oldattendances[$id] != $attendances[$id]);
+                        $updatedb = $updatedb || ($oldattendances[$id] !== $attendances[$id]);
 
                         if ($feedback === false) {
                             $feedback = $this->prepare_new_feedback($id);
@@ -1519,6 +1523,20 @@ class checkmark {
         } else {
             $state = 1;
         }
+
+        $select = 'checkmarkid = :checkmarkid';
+        $params = array('checkmarkid' => $this->checkmark->id);
+
+        if (!empty($selected) && is_array($selected)) {
+            list($selsql, $selparams) = $DB->get_in_or_equal($selected, SQL_PARAMS_NAMED);
+            $selsql = ' AND userid '.$selsql;
+        } else {
+            $selsql = ' AND userid = -1';
+            $selparams = array();
+        }
+
+        $select .= $selsql;
+        $params = array_merge($params, $selparams);
 
         $DB->set_field_select('checkmark_feedbacks', 'graderid', $USER->id, $select, $params);
         $DB->set_field_select('checkmark_feedbacks', 'timemodified', time(), $select, $params);
