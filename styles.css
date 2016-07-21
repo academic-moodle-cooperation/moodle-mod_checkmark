@@ -12,11 +12,6 @@
 
 /** General Styles **/
 
-.path-mod-checkmark .feedback .files,.path-mod-checkmark .feedback .grade,.path-mod-checkmark .feedback .outcome,.path-mod-checkmark .feedback .finalgrade
-    {
-    float: right;
-}
-
 .path-mod-checkmark .feedback .disabledfeedback {
     width: 500px;
     height: 250px;
@@ -90,8 +85,9 @@
     margin: 10px auto;
 }
 
-#page-mod-checkmark-view .feedback .grade {
-    text-align: right;
+#page-mod-checkmark-view .feedback .left.picture {
+    text-align:right;
+    width:35px;
 }
 
 #page-mod-checkmark-view #online .singlebutton {

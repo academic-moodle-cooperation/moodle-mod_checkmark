@@ -483,19 +483,19 @@ function checkmark_get_attendance_symbol($attendance = null) {
     global $OUTPUT;
 
     if ($attendance == 1) {
-        $attendantstr = get_string('attendant', 'checkmark');
+        $attendantstr = strtolower(get_string('attendant', 'checkmark'));
         $iconattr = array('src'   => $OUTPUT->pix_url('i/valid'),
                           'alt'   => $attendantstr,
                           'title' => $attendantstr);
         $symbol = \html_writer::empty_tag('img', $iconattr);
     } else if (($attendance == 0) && ($attendance != null)) {
-        $absentstr = get_string('absent', 'checkmark');
+        $absentstr = strtolower(get_string('absent', 'checkmark'));
         $iconattr = array('src'   => $OUTPUT->pix_url('i/invalid'),
                           'alt'   => $absentstr,
                           'title' => $absentstr);
         $symbol = \html_writer::empty_tag('img', $iconattr);
     } else {
-        $unknownstr = get_string('unknown', 'checkmark');
+        $unknownstr = strtolower(get_string('unknown', 'checkmark'));
         $iconattr = array('src'   => $OUTPUT->pix_url('questionmark', 'checkmark'),
                           'alt'   => $unknownstr,
                           'title' => $unknownstr);

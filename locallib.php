@@ -608,44 +608,72 @@ class checkmark {
         $item = $gradinginfo->items[0];
         $grade = $item->grades[$userid];
 
-        if ($grade->hidden || $grade->grade === false) { // Hidden or error!
+        if (($grade->hidden || $grade->grade === false)
+                && (!$this->checkmark->trackattendance || $feedback->attendance === null)) { // Hidden or error!
             return;
         }
 
-        if ($grade->grade === null && empty($grade->str_feedback)) {   // Nothing to show yet!
+        if ($grade->grade === null && empty($grade->str_feedback)
+                && (!$this->checkmark->trackattendance || $feedback->attendance === null)) {   // Nothing to show yet!
             return;
         }
 
         $dategraded = $grade->dategraded;
         $gradedby   = $grade->usermodified;
-
-        // We need the teacher info!
-        if (!$grader = $DB->get_record('user', array('id' => $gradedby))) {
-            print_error('cannotfindteacher');
+        $showfeedback = false;
+        if (empty($gradedby)) {
+            // Only show attendance!
+            $gradedby = $feedback->graderid;
+            $dategraded = $feedback->timemodified;
+            if (!$grader = $DB->get_record('user', array('id' => $gradedby))) {
+                print_error('cannotfindteacher');
+            }
+        } else {
+            // We need the teacher info!
+            if (!$grader = $DB->get_record('user', array('id' => $gradedby))) {
+                print_error('cannotfindteacher');
+            }
+            $showfeedback = true;
         }
 
         // Print the feedback!
         echo $OUTPUT->heading(get_string('feedbackfromteacher', 'checkmark', fullname($grader)));
         if ($grader) {
             $userpicture = $OUTPUT->user_picture($grader);
-            $from = html_writer::tag('div', fullname($grader), array('class' => 'fullname'));
+            $from = html_writer::tag('div', html_writer::tag('strong', fullname($grader)), array('class' => 'fullname'));
         } else {
             $userpicture = '';
             $from = '';
         }
-        $from .= html_writer::tag('div', userdate($dategraded), array('class' => 'time'));
+        $from .= html_writer::tag('div', html_writer::tag('strong', userdate($dategraded)), array('class' => 'time'));
         $topic = html_writer::tag('div', $from, array('class' => 'from'));
         $row = html_writer::tag('td', $userpicture, array('class' => 'left picture'));
         $row .= html_writer::tag('td', $topic, array('class' => 'topic'));
         $tablecontent = html_writer::tag('tr', $row);
         // Second row!
-        $row = html_writer::tag('td', '&nbsp;', array('class' => 'left side'));
-        $content = html_writer::tag('div', get_string('grade').': '.$grade->str_long_grade,
-                                    array('class' => 'grade')).
-                   html_writer::tag('div', '', array('class' => 'clearer')).
-                   html_writer::tag('div', $grade->str_feedback, array('class' => 'comment'));
-        $row .= html_writer::tag('td', $content, array('class' => 'content'));
-        $tablecontent .= html_writer::tag('tr', $row);
+        if ($showfeedback) {
+            $content = html_writer::tag('div', html_writer::tag('strong', get_string('grade').': ').$grade->str_long_grade,
+                                        array('class' => 'grade')).
+                       html_writer::tag('div', '', array('class' => 'clearer')).
+                       html_writer::tag('div', $grade->str_feedback, array('class' => 'comment'));
+            $row = html_writer::tag('td', $content, array('class' => 'content', 'colspan' => 2));
+            $tablecontent .= html_writer::tag('tr', $row);
+        }
+
+        if ($this->checkmark->trackattendance) {
+            if ($feedback->attendance == 1) {
+                $attendancestr = strtolower(get_string('attendant', 'checkmark'));
+            } else if ($feedback->attendance == 0 && $feedback->attendance !== null) {
+                $attendancestr = strtolower(get_string('absent', 'checkmark'));
+            } else {
+                $attendancestr = strtolower(get_string('unknown', 'checkmark'));
+            }
+            $attendance = checkmark_get_attendance_symbol($feedback->attendance).$attendancestr;
+            // Third row --> attendance info!
+            $row = html_writer::tag('td', html_writer::tag('strong', get_string('attendance', 'checkmark').': ').$attendance,
+                                    array('class' => 'content', 'colspan' => 2));
+            $tablecontent .= html_writer::tag('tr', $row);
+        }
 
         echo html_writer::tag('table', $tablecontent, array('cellspacing' => 0, 'class' => 'feedback'));
     }
