@@ -32,36 +32,9 @@ require_once($CFG->libdir . '/plagiarismlib.php');
 $id = optional_param('id', 0, PARAM_INT);  // Course Module ID?
 $c  = optional_param('c', 0, PARAM_INT);   // Checkmark ID?
 
+// Sets url with params and performs require_login!
 $url = new moodle_url('/mod/checkmark/view.php');
-if ($id) {
-    if (! $cm = get_coursemodule_from_id('checkmark', $id)) {
-        print_error('invalidcoursemodule');
-    }
-
-    if (!$checkmark = $DB->get_record('checkmark', array('id' => $cm->instance))) {
-        print_error('invalidid', 'checkmark');
-    }
-
-    if (!$course = $DB->get_record('course', array('id' => $checkmark->course))) {
-        print_error('coursemisconf', 'checkmark');
-    }
-    $url->param('id', $id);
-} else {
-    if (!$checkmark = $DB->get_record('checkmark', array('id' => $c))) {
-        print_error('invalidid', 'checkmark');
-    }
-    if (! $course = $DB->get_record('course', array('id' => $checkmark->course))) {
-        print_error('coursemisconf', 'checkmark');
-    }
-    if (!$cm = get_coursemodule_from_instance('checkmark', $checkmark->id, $course->id)) {
-        print_error('invalidcoursemodule');
-    }
-    $id = $cm->id;
-    $url->param('id', $id);
-}
-
-$PAGE->set_url($url);
-require_login($course, true, $cm);
+list($cm, $checkmark, $course) = \checkmark::init_checks($id, $c, $url);
 
 $checkmarkinstance = new checkmark($cm->id, $checkmark, $cm, $course);
 

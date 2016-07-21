@@ -102,7 +102,7 @@ class checkmark {
      * @param object $course usually null, but if we have it we pass it to save db access
      */
     public function __construct($cmid='staticonly', $checkmark=null, $cm=null, $course=null) {
-        global $COURSE, $DB, $CFG;
+        global $COURSE, $DB;
 
         if ($cmid == 'staticonly') {
             // Use static functions only!
@@ -149,6 +149,47 @@ class checkmark {
     }
 
     /**
+     * Standardizes course module, checkmark and course data objects and checks for login state!
+     *
+     * @param int $id course module id or 0 (either $id or $c have to be set!)
+     * @param int $c checkmark instance id or 0 (either $id or $c have to be set!)
+     * @param moodle_url $url current url of the viewed page
+     * @return object[] Returns array with coursemodule, checkmark and course objects
+     */
+    public static function init_checks($id, $c, $url) {
+        global $PAGE, $DB;
+
+        if ($id) {
+            if (!$cm = get_coursemodule_from_id('checkmark', $id)) {
+                print_error('invalidcoursemodule');
+            }
+            if (!$checkmark = $DB->get_record('checkmark', array('id' => $cm->instance))) {
+                print_error('invalidid', 'checkmark');
+            }
+            if (!$course = $DB->get_record('course', array('id' => $checkmark->course))) {
+                print_error('coursemisconf', 'checkmark');
+            }
+            $url->param('id', $id);
+        } else {
+            if (!$checkmark = $DB->get_record('checkmark', array('id' => $c))) {
+                print_error('invalidcoursemodule');
+            }
+            if (!$course = $DB->get_record('course', array('id' => $checkmark->course))) {
+                print_error('coursemisconf', 'checkmark');
+            }
+            if (!$cm = get_coursemodule_from_instance('checkmark', $checkmark->id, $course->id)) {
+                print_error('invalidcoursemodule');
+            }
+            $url->param('id', $cm->id);
+        }
+
+        $PAGE->set_url($url);
+        require_login($course->id, false, $cm);
+
+        return array($cm, $checkmark, $course);
+    }
+
+    /**
      * Get the examples for this checkmark from the DB
      *
      * Adds the prefix if set and flexible naming is used
@@ -160,7 +201,7 @@ class checkmark {
 
         if (!isset($this->checkmark->examples)) {
             $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $this->checkmark->id));
-            $flexiblenaming = $this->get_flexiblenaming();
+            $flexiblenaming = $this->is_using_flexiblenaming();
 
             if ($flexiblenaming) {
                 $exampleprefix = $this->checkmark->exampleprefix;
@@ -190,7 +231,7 @@ class checkmark {
     public static function get_examples_static($checkmarkid) {
         global $DB;
 
-        $flexiblenaming = self::get_flexiblenaming_static($checkmarkid);
+        $flexiblenaming = self::is_using_flexiblenaming_static($checkmarkid);
 
         $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmarkid));
 
@@ -224,8 +265,7 @@ class checkmark {
 
         $examples = $this->get_examples();
 
-        foreach ($examples as $key => $example) {
-            $name = 'example'.$key;
+        foreach ($examples as $example) {
             switch ($example->grade) {
                 case '1':
                     $pointsstring = get_string('strpoint', 'checkmark');
@@ -1029,7 +1069,6 @@ class checkmark {
      * See lib/formslib.php, 'validation' function for details
      *
      * @param array $data Form data as submitted
-     * @param array $files File data - not used here, because we don't have files!
      * @return array Array of strings with error messages
      */
     public function form_validation($data, $files) {
@@ -2564,6 +2603,65 @@ class checkmark {
     }
 
     /**
+     * Handles all print preference setting (if submitted) and returns the current values!
+     *
+     * @return array print preferences ($filter, $sumabs, $sumrel, $format, $printperpage, $printoptimum, $textsize,
+     *                                  $pageorientation, $printheader)
+     */
+    public function print_preferences() {
+        $updatepref = optional_param('updatepref', 0, PARAM_INT);
+        if ($updatepref && confirm_sesskey()) {
+            $filter = optional_param('datafilter', self::FILTER_ALL, PARAM_INT);
+            set_user_preference('checkmark_filter', $filter);
+            $format = optional_param('format', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF, PARAM_INT);
+            set_user_preference('checkmark_format', $format);
+            $sumabs = optional_param('sumabs', 0, PARAM_INT);
+            set_user_preference('checkmark_sumabs', $sumabs);
+            $sumrel = optional_param('sumrel', 0, PARAM_INT);
+            set_user_preference('checkmark_sumrel', $sumrel);
+            if ($format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
+                $printperpage = optional_param('printperpage', 0, PARAM_INT);
+                $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
+                $printperpage = (($printperpage <= 0) || $printoptimum) ? 0 : $printperpage;
+                set_user_preference('checkmark_pdfprintperpage', $printperpage);
+                $textsize = optional_param('textsize', 0, PARAM_INT);
+                set_user_preference('checkmark_textsize', $textsize);
+                $pageorientation = optional_param('pageorientation', \mod_checkmark\MTablePDF::LANDSCAPE, PARAM_ALPHA);
+                set_user_preference('checkmark_pageorientation', $pageorientation);
+                $printheader = optional_param('printheader', 0, PARAM_INT);
+                set_user_preference('checkmark_printheader', $printheader);
+            }
+        } else {
+            $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
+            $sumabs = get_user_preferences('checkmark_sumabs', 1);
+            $sumrel = get_user_preferences('checkmark_sumrel', 1);
+            $format = get_user_preferences('checkmark_format', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
+        }
+
+        if ($format != \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF
+                || !($updatepref && confirm_sesskey())) {
+            $printperpage    = get_user_preferences('checkmark_pdfprintperpage', 0);
+            if ($printperpage == 0) {
+                $printoptimum = 1;
+            } else {
+                $printoptimum = 0;
+            }
+            $textsize = get_user_preferences('checkmark_textsize', 0);
+            $pageorientation = get_user_preferences('checkmark_pageorientation', \mod_checkmark\MTablePDF::LANDSCAPE);
+            $printheader = get_user_preferences('checkmark_printheader', 1);
+        }
+
+        // Keep compatibility to old user preferences!
+        if ($pageorientation === 1) {
+            $pageorientation = \mod_checkmark\MTablePDF::PORTRAIT;
+        } else if ($pageorientation === 0) {
+            $pageorientation = \mod_checkmark\MTablePDF::LANDSCAPE;
+        }
+
+        return array($filter, $sumabs, $sumrel, $format, $printperpage, $printoptimum, $textsize, $pageorientation, $printheader);
+    }
+
+    /**
      * Echo the print preview tab including a optional message!
      *
      * @param string $message The message to display in the tab!
@@ -2583,57 +2681,12 @@ class checkmark {
             $filters[self::FILTER_UNKNOWN] = get_string('all_unknown', 'checkmark');
         }
 
-        $updatepref = optional_param('updatepref', 0, PARAM_INT);
-
         /*
          * First we check to see if the form has just been submitted
          * to request user_preference updates!
          */
-        if ($updatepref && confirm_sesskey()) {
-            $format = optional_param('format', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF, PARAM_INT);
-            set_user_preference('checkmark_format', $format);
-            if ($format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
-                $printperpage = optional_param('printperpage', 0, PARAM_INT);
-                $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
-                $printperpage = (($printperpage <= 0) || $printoptimum) ? 0 : $printperpage;
-                set_user_preference('checkmark_pdfprintperpage', $printperpage);
-
-                $textsize = optional_param('textsize', 0, PARAM_INT);
-                set_user_preference('checkmark_textsize', $textsize);
-
-                $pageorientation = optional_param('pageorientation', 0, PARAM_INT);
-                set_user_preference('checkmark_pageorientation', $pageorientation);
-
-                $printheader = optional_param('printheader', 0, PARAM_INT);
-                set_user_preference('checkmark_printheader', $printheader);
-            }
-
-            $filter = optional_param('datafilter', self::FILTER_ALL, PARAM_INT);
-            set_user_preference('checkmark_filter', $filter);
-
-            $sumabs = optional_param('sumabs', 0, PARAM_INT);
-            set_user_preference('checkmark_sumabs', $sumabs);
-            $sumrel = optional_param('sumrel', 0, PARAM_INT);
-            set_user_preference('checkmark_sumrel', $sumrel);
-        }
-
-        /*
-         * Next we get perpage (allow quick grade) params
-         * from database!
-         */
-        $printperpage    = get_user_preferences('checkmark_pdfprintperpage', 0);
-        if ($printperpage == 0) {
-            $printoptimum = 1;
-        } else {
-            $printoptimum = 0;
-        }
-        $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
-        $format = get_user_preferences('checkmark_format', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
-        $textsize = get_user_preferences('checkmark_textsize', 0);
-        $pageorientation = get_user_preferences('checkmark_pageorientation', 0);
-        $printheader = get_user_preferences('checkmark_printheader', 1);
-        $sumabs = get_user_preferences('checkmark_sumabs', 1);
-        $sumrel = get_user_preferences('checkmark_sumrel', 1);
+        list($filter, $sumabs, $sumrel, $format, $printperpage, $printoptimum, $textsize, $pageorientation,
+                $printheader) = $this->print_preferences();
 
         $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark', $this->checkmark->id);
 
@@ -2722,8 +2775,8 @@ class checkmark {
         $mform->disabledIf('textsize', 'format', 'neq', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
         $mform->setDefault('textsize', $textsize);
 
-        $pageorientations = array(0 => get_string('strlandscape', 'checkmark'),
-                                  1 => get_string('strportrait', 'checkmark'));
+        $pageorientations = array(\mod_checkmark\MTablePDF::LANDSCAPE => get_string('strlandscape', 'checkmark'),
+                                  \mod_checkmark\MTablePDF::PORTRAIT => get_string('strportrait', 'checkmark'));
         $mform->addElement('select', 'pageorientation', get_string('pdfpageorientation', 'checkmark'),  $pageorientations);
         $mform->disabledIf('pageorientation', 'format', 'neq', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
         $mform->setDefault('pageorientation', $pageorientation);
@@ -2827,57 +2880,12 @@ class checkmark {
                          \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_COMMA  => 'CSV (;)',
                          \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_TAB    => 'CSV (tab)');
 
-        $updatepref = optional_param('updatepref', 0, PARAM_INT);
-
-        /* first we check to see if the form has just been submitted
-         * to request user_preference updates
+        /*
+         * First we check to see if the form has just been submitted
+         * to request user_preference updates! We don't use $printoptimum here, it's implicit in $printperpage!
          */
-        if ($updatepref && confirm_sesskey()) {
-            $format = optional_param('format', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF, PARAM_INT);
-            if ($format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
-                $printperpage = optional_param('printperpage', 0, PARAM_INT);
-                $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
-                $printperpage = (($printperpage <= 0) || $printoptimum) ? 0 : $printperpage;
-                set_user_preference('checkmark_pdfprintperpage', $printperpage);
-
-                $textsize = optional_param('textsize', 0, PARAM_INT);
-                set_user_preference('checkmark_textsize', $textsize);
-
-                $pageorientation = optional_param('pageorientation', 0, PARAM_INT);
-                set_user_preference('checkmark_pageorientation', $pageorientation);
-
-                $printheader = optional_param('printheader', 0, PARAM_INT);
-                set_user_preference('checkmark_printheader', $printheader);
-            }
-
-            $filter = optional_param('datafilter', self::FILTER_ALL, PARAM_INT);
-            set_user_preference('checkmark_filter', $filter);
-
-            $sumabs = optional_param('sumabs', 0, PARAM_INT);
-            set_user_preference('checkmark_sumabs', $sumabs);
-            $sumrel = optional_param('sumrel', 0, PARAM_INT);
-            set_user_preference('checkmark_sumrel', $sumrel);
-        }
-
-        /* next we get perpage (allow quick grade) params
-         * from database
-         */
-        $printperpage = optional_param('printperpage', false, PARAM_INT);
-        if ($printperpage === false) { // Use preference if not overwritten!
-            $printperpage    = get_user_preferences('checkmark_pdfprintperpage', 10);
-        }
-        $filter = optional_param('filter', false, PARAM_INT);
-        if ($filter === false) { // Use preference if not overwritten!
-            $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
-        }
-        $sumabs = optional_param('sumabs', false, PARAM_INT);
-        if ($sumabs === false) { // Use preference if not overwritten!
-            $sumabs = get_user_preferences('checkmark_sumabs', 1);
-        }
-        $sumrel = optional_param('sumrel', false, PARAM_INT);
-        if ($sumrel === false) { // Use preference if not overwritten!
-            $sumrel = get_user_preferences('checkmark_sumrel', 1);
-        }
+        list($filter, $sumabs, $sumrel, $format, $printperpage, , $textsize, $orientation,
+                $printheader) = $this->print_preferences();
 
         $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark',
                                         $this->checkmark->id);
@@ -2891,13 +2899,6 @@ class checkmark {
         }
 
         $usrlst = optional_param_array('selected', array(), PARAM_INT);
-        // Get orientation (P/L)!
-        $portrait = \mod_checkmark\MTablePDF::PORTRAIT;
-        $landscape = \mod_checkmark\MTablePDF::LANDSCAPE;
-        $orientation = optional_param('pageorientation', 0, PARAM_INT) ? $portrait : $landscape;
-        $printheader = optional_param('printheader', false, PARAM_BOOL);
-        $textsize = optional_param('textsize', 1, PARAM_INT);
-        $format = optional_param('format', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF, PARAM_INT);
 
         if (!empty($CFG->enableoutcomes) && !empty($gradinginfo->outcomes)) {
             $usesoutcomes = true;

@@ -74,9 +74,31 @@ class submissionstable extends \table_sql {
      * constructor
      * @param string $uniqueid a string identifying this table.Used as a key in
      *                          session  vars. It gets set automatically with the helper methods!
+     * @param checkmark|int $checkmarkorcmid checkmark object or course module id of checkmark instance
      */
-    public function __construct($uniqueid) {
+    public function __construct($uniqueid, $checkmarkorcmid = null) {
+        global $CFG;
+
         parent::__construct($uniqueid);
+
+        if ($checkmarkorcmid instanceof \checkmark) {
+            $this->checkmark = $checkmarkorcmid;
+        } else if (is_numeric($checkmarkorcmid)) {
+            $this->checkmark = new \checkmark($checkmarkorcmid);
+        } else {
+            print_error('invalidcoursemodule');
+        }
+
+        $this->context = \context_module::instance($this->checkmark->cm->id);
+        $this->groupmode = groups_get_activity_groupmode($this->checkmark->cm);
+        $this->currentgroup = groups_get_activity_group($this->checkmark->cm, true);
+        $this->gradinginfo = grade_get_grades($this->checkmark->course->id, 'mod', 'checkmark', $this->checkmark->checkmark->id);
+        if (!empty($CFG->enableoutcomes) && !empty($this->gradinginfo->outcomes)) {
+            $this->usesoutcomes = true;
+        } else {
+            $this->usesoutcomes = false;
+        }
+
         // Some sensible defaults!
         $this->set_attribute('cellspacing', '0');
         $this->set_attribute('class', 'submissions generaltable generalbox');
@@ -217,37 +239,19 @@ class submissionstable extends \table_sql {
     /**
      * Helper method to create the table for submissions view!
      *
-     * @param checkkmark|id $checkmarkorcmid checkmark object or course module id of checkmark instance
+     * @param checkmark|int $checkmarkorcmid checkmark object or course module id of checkmark instance
      * @param int $filter Which filter to use (FILTER_ALL, FILTER_REQUIRE_GRADING, FILTER_SUBMITTED, ...)
      * @return submissionstable object
      */
     static public function create_submissions_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL) {
         global $CFG, $DB, $OUTPUT;
         // We need to have the same ID to ensure the columns are collapsed if their collapsed in the other table!
-        $table = new submissionstable('mod-checkmark-submissions');
+        $table = new submissionstable('mod-checkmark-submissions', $checkmarkorcmid);
 
         $table->quickgrade = get_user_preferences('checkmark_quickgrade', 0);
         $table->filter = $filter;
         $table->showsubmission = true;
         $table->tabindex = 0;
-
-        if ($checkmarkorcmid instanceof \checkmark) {
-            $table->checkmark = $checkmarkorcmid;
-        } else if (is_numeric($checkmarkorcmid)) {
-            $table->checkmark = new \checkmark($checkmarkorcmid);
-        } else {
-            print_error('invalidcoursemodule');
-        }
-
-        $table->context = \context_module::instance($table->checkmark->cm->id);
-        $table->groupmode = groups_get_activity_groupmode($table->checkmark->cm);
-        $table->currentgroup = groups_get_activity_group($table->checkmark->cm, true);
-        $table->gradinginfo = grade_get_grades($table->checkmark->course->id, 'mod', 'checkmark', $table->checkmark->checkmark->id);
-        if (!empty($CFG->enableoutcomes) && !empty($table->gradinginfo->outcomes)) {
-            $table->usesoutcomes = true;
-        } else {
-            $table->usesoutcomes = false;
-        }
 
         // Adapt table for submissions view (columns, etc.)!
         $tablecolumns = array('selection', 'picture', 'fullname');
@@ -417,7 +421,7 @@ class submissionstable extends \table_sql {
     /**
      * Helper method to create the table for export view!
      *
-     * @param checkkmark|id $checkmarkorcmid checkmark object or course module id of checkmark instance
+     * @param checkmark|int $checkmarkorcmid checkmark object or course module id of checkmark instance
      * @param int $filter which filter to use
      * @param int[] $ids for which user ids to filter
      * @return submissionstable object
@@ -425,7 +429,7 @@ class submissionstable extends \table_sql {
     static public function create_export_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL, $ids = array()) {
         global $CFG, $DB;
         // We need to have the same ID to ensure the columns are collapsed if their collapsed in the other table!
-        $table = new submissionstable('mod-checkmark-submissions');
+        $table = new submissionstable('mod-checkmark-submissions', $checkmarkorcmid);
 
         $table->suppress_initials_output(true);
 
@@ -433,24 +437,6 @@ class submissionstable extends \table_sql {
         $table->sumrel     = get_user_preferences('checkmark_sumrel', 1);
         $table->quickgrade = 0;
         $table->filter = $table;
-
-        if ($checkmarkorcmid instanceof \checkmark) {
-            $table->checkmark = $checkmarkorcmid;
-        } else if (is_numeric($checkmarkorcmid)) {
-            $table->checkmark = new \checkmark($checkmarkorcmid);
-        } else {
-            print_error('invalidcoursemodule');
-        }
-
-        $table->context = \context_module::instance($table->checkmark->cm->id);
-        $table->groupmode = groups_get_activity_groupmode($table->checkmark->cm);
-        $table->currentgroup = groups_get_activity_group($table->checkmark->cm, true);
-        $table->gradinginfo = grade_get_grades($table->checkmark->course->id, 'mod', 'checkmark', $table->checkmark->checkmark->id);
-        if (!empty($CFG->enableoutcomes) && !empty($table->gradinginfo->outcomes)) {
-            $table->usesoutcomes = true;
-        } else {
-            $table->usesoutcomes = false;
-        }
 
         // Adapt table for export view (columns, etc.)!
         $tableheaders = array('', get_string('fullnameuser'));
