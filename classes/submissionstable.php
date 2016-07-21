@@ -174,7 +174,7 @@ class submissionstable extends \table_sql {
      * @return array[] array of arrays containing data in legacy format (compatible with mtablepdf class)
      */
     public function get_data() {
-        global $DB, $SESSION;
+        global $SESSION;
 
         $this->setup();
 
@@ -546,7 +546,7 @@ class submissionstable extends \table_sql {
             $table->no_sorting('example'.$key);
         }
 
-        if (!empty($sumabs) || !empty($sumrel)) {
+        if (!empty($table->sumabs) || !empty($table->sumrel)) {
             $table->column_class('summary', 'summary');
         }
         $table->column_class('grade', 'grade');
@@ -712,7 +712,7 @@ class submissionstable extends \table_sql {
      * @param bool $returnonlylinks if true only the links will be returned without title!
      */
     public function checkbox_controller($returnonlylinks = true) {
-        global $CFG, $PAGE;
+        global $PAGE;
 
         $baseurl = $PAGE->url;
 
@@ -822,7 +822,7 @@ class submissionstable extends \table_sql {
         if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
             return '';
         } else {
-            return $picture = $OUTPUT->user_picture($values);
+            return $OUTPUT->user_picture($values);
         }
     }
 
@@ -873,7 +873,6 @@ class submissionstable extends \table_sql {
         if ($values->feedbackid) {
             // Print grade, dropdown or text!
             if ($finalgrade->locked || $finalgrade->overridden) {
-                $date = userdate($finalgrade->dategraded);
                 $gradeattr = array('id'    => 'g'.$values->id,
                                    'class' => $lockedoroverridden);
                 if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
@@ -1012,11 +1011,7 @@ class submissionstable extends \table_sql {
      */
     public function col_timesubmitted($values) {
         $late = 0;
-        $hassubmission = true;
-        /*
-         * Prints student answer and student modified date!
-         * Refer to print_student_answer in inherited classes.
-         */
+        // Prints student answer and student modified date!
         if ($values->timesubmitted > 0) {
             if ($this->showsubmission) {
                 $content = $this->checkmark->print_student_answer($values->id).userdate($values->timesubmitted);
@@ -1126,10 +1121,9 @@ class submissionstable extends \table_sql {
      * This function is called for each data row to allow processing of the
      * user's outcomes.
      *
-     * @param object $values Contains object with all the values of record.
      * @return $string Return user's outcomes.
      */
-    public function col_outcome($values) {
+    public function col_outcome() {
         $outcomes = '';
         foreach ($this->gradinginfo->outcomes as $n => $outcome) {
             $options = make_grades_menu(-$outcome->scaleid);
@@ -1144,7 +1138,6 @@ class submissionstable extends \table_sql {
                     $outcomes .= ': '.\html_writer::tag('span', $options[$index], array('id' => 'outcome_'.$n.'_'. $auser->id));
                 } else {
                     $attributes = array();
-                    $attributes['tabindex'] = $tabindex++;
                     $attributes['id'] = 'outcome_'.$n.'_'.$auser->id;
                     $usr = $auser->id;
                     $outcomes .= ' '.\html_writer::select($options, 'outcome_'.$n.'['.$usr.']', $outcome->grades[$usr]->grade,
@@ -1239,10 +1232,9 @@ class submissionstable extends \table_sql {
      * This function is called for each data row to allow processing of the
      * user's signature column.
      *
-     * @param object $values Contains object with all the values of record.
      * @return $string Return user's signature column (empty).
      */
-    public function col_signature($values) {
+    public function col_signature() {
         // Print empty signature-cell!
         return '';
     }
@@ -1268,7 +1260,6 @@ class submissionstable extends \table_sql {
             }
             if (!empty($values->submissionid)) {
                 $submission = $this->checkmark->get_submission($values->id);
-                $examples = array();
                 $state = $submission->examples[$match[1]]->state ? $checked : $unchecked;
             } else {
                 $state = $unchecked;

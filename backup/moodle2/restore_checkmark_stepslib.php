@@ -84,7 +84,6 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
         $addexamples = false;
 
         $data = (object)$data;
-        $oldid = $data->id;
         $data->course = $this->get_courseid();
 
         $data->timedue = $this->apply_date_offset($data->timedue);
@@ -147,7 +146,7 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
         if (!empty($addexamples)) {
             foreach ($examplenames as $key => $examplename) {
                 $DB->insert_record('checkmark_examples', array('checkmarkid' => $newitemid,
-                                                               'name'        => $examplenames[$key],
+                                                               'name'        => $examplename,
                                                                'grade'       => $examplegrades[$key]));
             }
         }

@@ -61,7 +61,7 @@ class checkmark_formvalidation_test extends basic_testcase {
         $data['allready_submit'] = false;
 
         // Exercise SUT!
-        $errors = $checkmark->form_validation($data, null);
+        $errors = $checkmark->form_validation($data);
 
         // Validate outcome!
         $a = new stdClass();
@@ -90,7 +90,7 @@ class checkmark_formvalidation_test extends basic_testcase {
         $data['allready_submit'] = false;
 
         // Exercise SUT!
-        $errors = $checkmark->form_validation($data, null);
+        $errors = $checkmark->form_validation($data);
 
         // Validate outcome!
         $a = new stdClass();
@@ -119,7 +119,7 @@ class checkmark_formvalidation_test extends basic_testcase {
         $data['allready_submit'] = false;
 
         // Exercise SUT!
-        $errors = $checkmark->form_validation($data, null);
+        $errors = $checkmark->form_validation($data);
 
         // Validate outcome!
         $a = new stdClass();
@@ -155,7 +155,7 @@ class checkmark_formvalidation_test extends basic_testcase {
         $data['allready_submit'] = false;
 
         // Exercise SUT!
-        $errors = $checkmark->form_validation($data, null);
+        $errors = $checkmark->form_validation($data);
 
         // Validate outcome!
         $this->assertEquals(isset($errors['grade']), false);
@@ -182,7 +182,7 @@ class checkmark_formvalidation_test extends basic_testcase {
         $data['allready_submit'] = false;
 
         // Exercise SUT!
-        $errors = $checkmark->form_validation($data, null);
+        $errors = $checkmark->form_validation($data);
 
         // Validate outcome!
         $this->assertEquals(isset($errors['grade']), false);

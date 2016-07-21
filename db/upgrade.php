@@ -448,7 +448,6 @@ function xmldb_checkmark_upgrade($oldversion) {
                                 "migrate submission ".$subcounter." for instance ".$checkmark->name);
                 $subcounter++;
                 $checkedexamples = explode(',', $submission->checked);
-                $recordspresent = $DB->count_records('checkmark_checks', array('submissionid' => $submission->id));
                 $present = $DB->get_fieldset_select('checkmark_checks', 'exampleid', 'submissionid = ?', array($submission->id));
                 for ($k = 1; $k <= $examplecount; $k++) {
                     if (in_array($ids[$k - 1], $present)) {

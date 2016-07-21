@@ -36,7 +36,7 @@ defined('MOODLE_INTERNAL') || die;
  * @return bool true if OK, else false
  */
 function checkmark_delete_instance($id) {
-    global $CFG, $DB, $OUTPUT, $COURSE;
+    global $DB, $OUTPUT;
 
     // Bad practice, but we had some issues deleting corrupt checkmark instances with >200k examples!
     core_php_time_limit::raise(600);
@@ -107,7 +107,6 @@ function checkmark_delete_instance($id) {
     if (!$DB->delete_records('checkmark', array('id' => $checkmark->id))) {
         $result = false;
     }
-    $mod = $DB->get_field('modules', 'id', array('name' => 'checkmark'));
 
     checkmark_grade_item_delete($checkmark);
     checkmark_attendance_item_delete($checkmark);
@@ -122,7 +121,7 @@ function checkmark_delete_instance($id) {
  * @return bool true if OK, else false
  */
 function checkmark_update_instance($checkmark) {
-    global $COURSE, $CFG, $OUTPUT, $DB;
+    global $CFG, $OUTPUT, $DB;
 
     $checkmark->timemodified = time();
 
@@ -225,7 +224,7 @@ function checkmark_update_instance($checkmark) {
  * @return int new checkmark id
  */
 function checkmark_add_instance($checkmark) {
-    global $COURSE, $CFG, $OUTPUT, $DB;
+    global $DB;
     $checkmark->timemodified = time();
 
     if (!isset($checkmark->flexiblenaming)) {
@@ -268,9 +267,6 @@ function checkmark_add_instance($checkmark) {
     if ($checkmark->trackattendance && $checkmark->attendancegradebook) {
         checkmark_attendance_item_update($checkmark);
     }
-
-    $link = $CFG->wwwroot.'/mod/checkmark/view.php?c='.$returnid;
-    $name = $checkmark->name;
 
     return $returnid;
 }
@@ -338,7 +334,7 @@ function checkmark_update_examples($checkmark) {
         $names = explode(checkmark::DELIMITER, $checkmark->examplenames);
         $grades = explode(checkmark::DELIMITER, $checkmark->examplegrades);
         reset($examples);
-        foreach ($names as $key => $name) {
+        foreach (array_keys($names) as $key) {
             if ($next = current($examples)) {
                 // If there's an old example to update, we reuse them!
                 $next->name = $names[$key];
@@ -424,7 +420,7 @@ function checkmark_user_complete($course, $user, $mod, $checkmark) {
  *                        will know about (most noticeably, an icon).
  */
 function checkmark_get_coursemodule_info($coursemodule) {
-    global $CFG, $DB;
+    global $DB;
 
     $dbparams = array('id' => $coursemodule->instance);
     $fields = 'id, name, alwaysshowdescription, timeavailable, intro, introformat';
@@ -454,7 +450,7 @@ function checkmark_get_coursemodule_info($coursemodule) {
  * @return array array of grades, false if none
  */
 function checkmark_get_user_grades($checkmark, $userid=0) {
-    global $CFG, $DB;
+    global $DB;
 
     if ($userid) {
         $user = 'AND u.id = :userid';
@@ -513,7 +509,7 @@ function checkmark_get_attendance_symbol($attendance = null) {
  * @return array array of grades, false if none
  */
 function checkmark_get_user_attendances($checkmark, $userid=0) {
-    global $CFG, $DB;
+    global $DB;
 
     if ($userid) {
         $user = 'AND u.id = :userid';
@@ -536,10 +532,10 @@ function checkmark_get_user_attendances($checkmark, $userid=0) {
  *
  * @param object $checkmark
  * @param int $userid specific user only, 0 means all
- * @param bool $nullifnone (optional) not used here!
+ * usual param bool $nullifnone (optional) not used here!
  */
-function checkmark_update_grades($checkmark, $userid=0, $nullifnone=true) {
-    global $CFG, $DB;
+function checkmark_update_grades($checkmark, $userid=0) {
+    global $CFG;
     require_once($CFG->libdir.'/gradelib.php');
 
     $grades = null;
@@ -558,10 +554,10 @@ function checkmark_update_grades($checkmark, $userid=0, $nullifnone=true) {
  *
  * @param object $checkmark
  * @param int $userid specific user only, 0 means all
- * @param bool $nullifnone (optional) not used here!
+ * usual param bool $nullifnone (optional) not used here!
  */
-function checkmark_update_attendances($checkmark, $userid=0, $nullifnone=true) {
-    global $CFG, $DB;
+function checkmark_update_attendances($checkmark, $userid=0) {
+    global $CFG;
     require_once($CFG->libdir.'/gradelib.php');
 
     if (!$checkmark->trackattendance && !$checkmark->attendancegradebook) {
@@ -660,7 +656,7 @@ function checkmark_grade_item_update($checkmark, $grades=null) {
  * @return int 0 if ok, error code otherwise
  */
 function checkmark_attendance_item_update($checkmark, $grades=null) {
-    global $CFG, $DB;
+    global $CFG;
     require_once($CFG->libdir.'/gradelib.php');
 
     if (!$checkmark->trackattendance && !$checkmark->attendancegradebook) {
@@ -733,35 +729,6 @@ function checkmark_attendance_item_delete($checkmark) {
     require_once($CFG->libdir.'/gradelib.php');
 
     return grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id, 1, null, array('deleted' => 1));
-}
-
-/**
- * Serves checkmark submissions and other files.
- *
- * @param object $course
- * @param object $cm
- * @param object $context
- * @param string $filearea
- * @param array $args
- * @param bool $forcedownload
- * @return bool false if file not found, does not return if found - just send the file
- */
-function checkmark_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload) {
-    global $CFG, $DB;
-    require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
-
-    if ($context->contextlevel != CONTEXT_MODULE) {
-        return false;
-    }
-
-    require_login($course, false, $cm);
-
-    if (!$checkmark = $DB->get_record('checkmark', array('id' => $cm->instance))) {
-        return false;
-    }
-
-    $checkmarkinstance = new checkmark($cm->id, $checkmark, $cm, $course);
-    return $checkmarkinstance->send_file($filearea, $args);
 }
 
 /**
@@ -894,7 +861,7 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
     $show    = array();
     $grader  = array();
 
-    $showrecentsubmissions = get_config('checkmark', 'showrecentsubmissions');
+    $showrecentsubs = get_config('checkmark', 'showrecentsubmissions');
 
     foreach ($submissions as $submission) {
         if (!array_key_exists($submission->cmid, $modinfo->cms)) {
@@ -913,7 +880,7 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
          * The act of sumbitting of checkmark may be considered private
          * only graders will see it if specified!
          */
-        if (empty($showrecentsubmissions)) {
+        if (empty($showrecentsubs)) {
             if (!array_key_exists($cm->id, $grader)) {
                 $grader[$cm->id] = has_capability('moodle/grade:viewall',
                                                   context_module::instance($cm->id));
@@ -1044,7 +1011,7 @@ function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $c
 
     $show = array();
 
-    $showrecentsubmissions = get_config('checkmark', 'showrecentsubmissions');
+    $showrecentsubs = get_config('checkmark', 'showrecentsubmissions');
 
     foreach ($submissions as $submission) {
         if ($submission->userid == $USER->id) {
@@ -1055,7 +1022,7 @@ function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $c
          * The act of submitting of checkmark may be considered private
          * only graders will see it if specified!
          */
-        if (empty($showrecentsubmissions)) {
+        if (empty($showrecentsubs)) {
             if (!$grader) {
                 continue;
             }
@@ -1090,7 +1057,7 @@ function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $c
     if ($grader) {
         require_once($CFG->libdir.'/gradelib.php');
         $userids = array();
-        foreach ($show as $id => $submission) {
+        foreach ($show as $submission) {
             $userids[] = $submission->userid;
 
         }
@@ -1134,9 +1101,9 @@ function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $c
  * @param object $activity various data to use.
  * @param int $courseid Courses id
  * @param bool $detail Wether to display details or just a summary
- * @param string $modnames not used here!
+ * usual param string $modnames not used here!
  */
-function checkmark_print_recent_mod_activity($activity, $courseid, $detail, $modnames) {
+function checkmark_print_recent_mod_activity($activity, $courseid, $detail) {
     global $CFG, $OUTPUT;
 
     echo '<table border="0" cellpadding="3" cellspacing="0" class="checkmark-recent">';
@@ -1177,7 +1144,7 @@ function checkmark_print_recent_mod_activity($activity, $courseid, $detail, $mod
  * @return array with checkmark name and user firstname and lastname
  */
 function checkmark_log_info($log) {
-    global $CFG, $DB;
+    global $DB;
 
     return $DB->get_record_sql('SELECT a.name, u.firstname, u.lastname
                                 FROM {checkmark} a, {user} u
@@ -1193,7 +1160,7 @@ function checkmark_log_info($log) {
  * @return array
  */
 function checkmark_get_unmailed_feedbacks($starttime, $endtime) {
-    global $CFG, $DB;
+    global $DB;
 
     return $DB->get_records_sql('SELECT s.*, a.course, a.name
                                    FROM {checkmark_feedbacks} s
@@ -1211,7 +1178,7 @@ function checkmark_get_unmailed_feedbacks($starttime, $endtime) {
  * @return int The number of submissions
  */
 function checkmark_count_real_submissions($cm, $groupid=0) {
-    global $CFG, $DB;
+    global $DB;
 
     $context = context_module::instance($cm->id);
 
@@ -1245,7 +1212,7 @@ function checkmark_count_real_submissions($cm, $groupid=0) {
  */
 function checkmark_get_all_submissions($checkmark, $sort='', $dir='DESC') {
     // Return all checkmark submissions by ENROLLED students (even empty)!
-    global $CFG, $DB;
+    global $DB;
 
     if ($sort == 'lastname' or $sort == 'firstname') {
         $sort = 'u.'.$sort.' '.$dir;
@@ -1260,7 +1227,7 @@ function checkmark_get_all_submissions($checkmark, $sort='', $dir='DESC') {
                                      WHERE u.id = a.userid
                                      AND a.checkmarkid = ?
                                      ORDER BY '.$sort, array($checkmark->id));
-    foreach ($records as $key => $record) {
+    foreach ($records as $record) {
         $records->checked = $DB->get_records('checkmark_checks', array('submissionid' => $record->id));
     }
 
@@ -1310,7 +1277,7 @@ function checkmark_getsummarystring($submission, $checkmark) {
  * @return object submissions statistics data
  */
 function checkmark_getsubmissionstats($submission, $checkmark) {
-    global $USER, $CFG, $DB;
+    global $DB;
 
     $checkedexamples = 0;
     $checkedgrades = 0;
@@ -1386,7 +1353,7 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
  * @param string[] $htmlarray array of html snippets to be printed
  */
 function checkmark_print_overview($courses, &$htmlarray) {
-    global $USER, $CFG, $DB, $OUTPUT;
+    global $USER, $CFG, $DB;
 
     if (empty($courses) || !is_array($courses) || count($courses) == 0) {
         return;
@@ -1437,12 +1404,8 @@ function checkmark_print_overview($courses, &$htmlarray) {
 
     $strduedate = get_string('duedate', 'checkmark');
     $strduedateno = get_string('duedateno', 'checkmark');
-    $strgraded = get_string('graded', 'checkmark');
-    $strnotgradedyet = get_string('notgradedyet', 'checkmark');
     $strnotsubmittedyet = get_string('notsubmittedyet', 'checkmark');
-    $strsubmitted = get_string('submitted', 'checkmark');
     $strcheckmark = get_string('modulename', 'checkmark');
-    $strreviewed = get_string('reviewed', 'checkmark');
 
     // NOTE: we do all possible database work here *outside* of the loop to ensure this scales!
     list($sqlcheckmarkids, $checkmarkidparams) = $DB->get_in_or_equal(array_merge($checkmarkids, $overids));
@@ -1536,20 +1499,6 @@ function checkmark_print_overview($courses, &$htmlarray) {
         $context = context_module::instance($checkmark->coursemodule);
 
         if (has_capability('mod/checkmark:grade', $context)) {
-            // Teachers view with information about submitted checkmarks and required gradings!
-            $teachers = get_users_by_capability($context, 'mod/checkmark:grade');
-            $teacherids = array_keys($teachers);
-            $teacherids[] = -1;
-            list($teachersql, $teacherparams) = $DB->get_in_or_equal($teacherids);
-            $teachersubmissions = $DB->count_records_sql("SELECT COUNT(s.id)
-                                                            FROM {checkmark_submissions} s
-                                                           WHERE s.checkmarkid = ? AND s.userid ".$teachersql,
-                                                         array_merge(array($checkmark->id), $teacherparams));
-            $teachersubmissionsgraded = $DB->count_records_sql("SELECT COUNT(id)
-                                                                  FROM {checkmark_feedbacks}
-                                                                 WHERE checkmarkid = ? AND userid ".$teachersql,
-                                                               array_merge(array($checkmark->id), $teacherparams));
-
             // Count how many people can submit!
             $submissions = new stdClass();
             $amount = new stdClass();
@@ -1734,29 +1683,11 @@ function checkmark_display_lateness($timesubmitted, $timedue) {
 }
 
 /**
- * Returns all actions which display data (or something at least)
- *
- * @return string[];
- */
-function checkmark_get_view_actions() {
-    return array('view', 'view submission', 'view submission', 'view print-preview');
-}
-
-/**
- * Returns all actions which post data.
- *
- * @return string[]
- */
-function checkmark_get_post_actions() {
-    return array('upload');
-}
-
-/**
  * Removes all grades from gradebook
  * @param int $courseid
  */
 function checkmark_reset_gradebook($courseid) {
-    global $CFG, $DB;
+    global $DB;
 
     $params = array('courseid' => $courseid);
 
@@ -1809,10 +1740,10 @@ function checkmark_reset_course_form_definition(&$mform) {
 /**
  * Course reset form defaults.
  *
- * @param mixed $course The course, not used here anyway!
+ * usual param mixed $course The course, not used here anyway!
  * @return array Associative array defining defaults for the form
  */
-function checkmark_reset_course_form_defaults($course) {
+function checkmark_reset_course_form_defaults() {
     return array('reset_checkmark_submissions' => 1);
 }
 
@@ -1863,9 +1794,8 @@ function checkmark_supports($feature) {
  * @param settings_navigation $settings The settings navigation object
  * @param navigation_node $checkmarknode The node to add module settings to
  */
-function checkmark_extend_settings_navigation(settings_navigation $settings,
-                                              navigation_node $checkmarknode) {
-    global $PAGE, $DB, $USER, $CFG;
+function checkmark_extend_settings_navigation(settings_navigation $settings, navigation_node $checkmarknode) {
+    global $PAGE, $DB, $CFG;
 
     $checkmarkrow = $DB->get_record('checkmark', array('id' => $PAGE->cm->instance));
     require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
@@ -1900,12 +1830,13 @@ function checkmark_extend_settings_navigation(settings_navigation $settings,
 }
 
 /**
- * Return a list of page types
- * @param string $pagetype current page type
- * @param stdClass $parentcontext Block's parent context
- * @param stdClass $currentcontext Current context of block
+ * Return a list of page types they don't depend on pagetype, parentcontext or currentcontext!
+ * Usual: param string $pagetype current page type
+ * Usual: param stdClass $parentcontext Block's parent context
+ * Usual: param stdClass $currentcontext Current context of block
+ * return string[] array with modules pagetypes!
  */
-function checkmark_page_type_list($pagetype, $parentcontext, $currentcontext) {
+function checkmark_page_type_list() {
     $modulepagetype = array(
         'mod-checkmark-*'           => get_string('page-mod-checkmark-x', 'checkmark'),
         'mod-checkmark-view'        => get_string('page-mod-checkmark-view', 'checkmark'),

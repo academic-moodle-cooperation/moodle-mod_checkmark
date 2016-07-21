@@ -47,7 +47,7 @@ class checkmark_submission_form extends moodleform {
      * Defines the submission form
      */
     public function definition() {
-        global $CFG, $USER, $DB, $PAGE;
+        global $PAGE;
 
         $mform =& $this->_form; // Don't forget the underscore!
 
@@ -65,7 +65,6 @@ class checkmark_submission_form extends moodleform {
             $mform->addElement('advcheckbox', 'example'.$key, null, $example->name.' ('.$example->grade.' '.$pointsstring.')',
                                array('id' => 'example'.$key, 'group' => '1'), array(0, 1));
         }
-        $checkmark = $DB->get_record('checkmark', array('id' => $this->_customdata->checkmarkid), '*', MUST_EXIST);
 
         // Here come the hidden params!
         $mform->addElement('hidden', 'id');

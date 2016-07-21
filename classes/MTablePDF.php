@@ -246,7 +246,6 @@ class MTablePDF extends \pdf {
     public function settitles($titles) {
         if (count($titles) != count($this->columnwidths)) {
             print_error("Error: Title count doesnt match column count");
-            exit();
         }
 
         $this->titles = $titles;
@@ -330,7 +329,7 @@ class MTablePDF extends \pdf {
                     $row[$idx] = array("rowspan" => 0, "data" => $value);
                 } else if (!isset($value["data"])) {
                     print_error("Error: you need to set a value for [\"data\"]");
-                    exit();
+                    return false;
                 } else {
                     if (!isset($value["rowspan"])) {
                         $row[$idx]["rowspan"] = 0;
@@ -439,7 +438,7 @@ class MTablePDF extends \pdf {
                 $allfixed = false;
             } else {
                 print_error("ERROR: unvalid columnwidth format");
-                exit();
+                die();
             }
         }
 
@@ -468,8 +467,6 @@ class MTablePDF extends \pdf {
 
         if (!empty($header)) {
             // Set margins.
-            $prevlmargin = $this->lMargin;
-            $prevrmargin = $this->rMargin;
             $this->lMargin = $this->pagedim[$this->page]['olm'];
             $this->rMargin = $this->pagedim[$this->page]['orm'];
 
@@ -587,7 +584,7 @@ class MTablePDF extends \pdf {
             }
         } else {
             print_error("an unexpected error occured. Please report this to your administrator.");
-            exit();
+            die();
         }
 
         $forcebreakonnextpage = false;
@@ -719,8 +716,6 @@ class MTablePDF extends \pdf {
      * @param MoodleExcelWorkbook $workbook workbook to put data into
      */
     public function fill_workbook(&$workbook) {
-        global $DB;
-
         $time = time();
         $time = userdate($time);
         $worksheet = $workbook->add_worksheet($time);
@@ -768,7 +763,7 @@ class MTablePDF extends \pdf {
         // Table header.
         $i = 0;
         $first = true;
-        foreach ($this->titles as $key => $header) {
+        foreach ($this->titles as $header) {
             if ($first) {
                 $worksheet->write_string($line, $i, $header, $headlinefirst);
                 $first = false;
@@ -920,10 +915,10 @@ class MTablePDF extends \pdf {
         ob_clean();
         header('Content-Type: text/plain');
         header('Content-Length: ' . strlen($filecontent));
-        header('Content-Disposition: attachment; filename="'.$filename.'"; filename*="'.
-                rawurlencode($filename));
-                header('Content-Transfer-Encoding: binary');
-                header('Content-Encoding: utf-8');
-                echo $filecontent;die();
+        header('Content-Disposition: attachment; filename="'.$filename.'"; filename*="'.rawurlencode($filename));
+        header('Content-Transfer-Encoding: binary');
+        header('Content-Encoding: utf-8');
+        echo $filecontent;
+        die();
     }
 }

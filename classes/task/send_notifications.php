@@ -118,7 +118,6 @@ class send_notifications extends \core\task\scheduled_task {
                 }
 
                 $strcheckmarks = \get_string('modulenameplural', 'checkmark');
-                $strcheckmark  = \get_string('modulename', 'checkmark');
 
                 $checkmarkinfo = new \stdClass();
                 $checkmarkinfo->grader = \fullname($grader);
