@@ -148,7 +148,11 @@ class submissionstable extends \table_sql {
         $this->setup();
 
         // We need to access (read only) the collapsed columns!
-        $this->prefs = $SESSION->flextable[$this->uniqueid];
+        if ($this->is_persistent()) {
+            $this->prefs = json_decode(get_user_preferences('flextable_' . $this->uniqueid), true);
+        } else if (isset($SESSION->flextable[$this->uniqueid])) {
+            $this->prefs = $SESSION->flextable[$this->uniqueid];
+        }
 
         // Remove selection column not used for download!
         foreach ($this->columns as $col => $num) {
@@ -209,7 +213,7 @@ class submissionstable extends \table_sql {
      * @return submissionstable object
      */
     static public function create_submissions_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL) {
-        global $CFG, $DB;
+        global $CFG, $DB, $OUTPUT;
         // We need to have the same ID to ensure the columns are collapsed if their collapsed in the other table!
         $table = new submissionstable('mod-checkmark-submissions');
 
@@ -239,35 +243,51 @@ class submissionstable extends \table_sql {
         // Adapt table for submissions view (columns, etc.)!
         $tablecolumns = array('selection', 'picture', 'fullname');
         $tableheaders = array('', '', get_string('fullnameuser'));
+        $helpicons = array(null, null, null);
 
         $useridentity = get_extra_user_fields($table->context);
         foreach ($useridentity as $cur) {
             $tablecolumns[] = $cur;
             $tableheaders[] = ($cur == 'phone1') ? get_string('phone') : get_string($cur);
+            $helpicons[] = null;
         }
         if ($table->groupmode != NOGROUPS) {
             $tableheaders[] = get_string('group');
             $tablecolumns[] = 'groups';
+            $helpicons[] = null;
         }
         $tableheaders[] = get_string('grade');
         $tablecolumns[] = 'grade';
+        $helpicons[] = null;
         $tableheaders[] = get_string('comment', 'checkmark');
         $tablecolumns[] = 'feedback';
+        $helpicons[] = null;
         $tableheaders[] = get_string('lastmodified').' ('.get_string('submission', 'checkmark').')';
         $tablecolumns[] = 'timesubmitted';
+        $helpicons[] = null;
         $tableheaders[] = get_string('lastmodified').' ('.get_string('grade').')';
         $tablecolumns[] = 'timemarked';
+        $helpicons[] = null;
+        if ($table->checkmark->checkmark->trackattendance) {
+            $tableheaders[] = get_string('attendance', 'checkmark');
+            $tablecolumns[] = 'attendance';
+            $helpicons[] = new \help_icon('attendance', 'checkmark');
+        }
         $tableheaders[] = get_string('status');
         $tablecolumns[] = 'status';
+        $helpicons[] = null;
         $tableheaders[] = get_string('finalgrade', 'grades');
         $tablecolumns[] = 'finalgrade';
+        $helpicons[] = null;
         if ($table->usesoutcomes) {
             $tableheaders[] = get_string('outcome', 'grades');
             $tablecolumns[] = 'outcome'; // No sorting based on outcomes column!
+            $helpicons[] = null;
         }
 
         $table->define_columns($tablecolumns);
         $table->define_headers($tableheaders);
+        $table->define_help_for_headers($helpicons);
         $table->define_baseurl($CFG->wwwroot.'/mod/checkmark/submissions.php?id='.$table->checkmark->cm->id.
                                '&amp;currentgroup='.$table->currentgroup);
 
@@ -322,7 +342,10 @@ class submissionstable extends \table_sql {
         }
         $fields = "u.id, ' ' AS selection, ' ' AS picture, ".$ufields." ".$useridentityfields.",
                   s.id AS submissionid, f.id AS feedbackid, f.grade, f.feedback,
-                  s.timemodified AS timesubmitted, f.timemodified AS timemarked ";
+                  s.timemodified AS timesubmitted, f.timemodified AS timemarked";
+        if ($table->checkmark->checkmark->trackattendance) {
+            $fields .= ", f.attendance AS attendance";
+        }
         if ($table->groupmode != NOGROUPS) {
             $fields .= ", groups";
         }
@@ -419,6 +442,7 @@ class submissionstable extends \table_sql {
         $tablecolumns = array('selection', 'fullname');
         $table->cellwidth = array(array('mode' => 'Relativ', 'value' => '25'));
         $table->columnformat = array('fullname' => array('align' => 'L'));
+        $helpicons = array(null, null);
 
         $useridentity = get_extra_user_fields($table->context);
         foreach ($useridentity as $cur) {
@@ -426,18 +450,21 @@ class submissionstable extends \table_sql {
             $tablecolumns[] = $cur;
             $table->cellwidth[] = array('mode' => 'Relativ', 'value' => '20');
             $table->columnformat[$cur] = array('align' => 'L');
+            $helpicons[] = null;
         }
         if ($table->groupmode != NOGROUPS) {
             $tableheaders[] = get_string('group');
             $tablecolumns[] = 'groups';
             $table->cellwidth[] = array('mode' => 'Relativ', 'value' => '20');
             $table->columnformat['groups'] = array('align' => 'L');
+            $helpicons[] = null;
         }
 
         $tablecolumns[] = 'timesubmitted';
         $tableheaders[] = get_string('lastmodified').' ('.get_string('submission', 'checkmark').')';
         $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '30');
         $table->columnformat['timesubmitted'] = array('align' => 'L');
+        $helpicons[] = null;
 
         // Dynamically add examples!
         foreach ($table->checkmark->checkmark->examples as $key => $example) {
@@ -446,6 +473,7 @@ class submissionstable extends \table_sql {
             $tablecolumns[] = 'example'.$key;
             $table->cellwidth[] = array('mode' => 'Fixed', 'value' => $width);
             $table->columnformat['example'.$key] = array('align' => 'C');
+            $helpicons[] = null;
         }
 
         if ((!empty($table->sumabs) || !empty($table->sumrel))) {
@@ -453,32 +481,46 @@ class submissionstable extends \table_sql {
             $tablecolumns[] = 'summary';
             $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
             $table->columnformat['summary'] = array('align' => 'L');
+            $helpicons[] = null;
         }
 
         $tableheaders[] = get_string('grade');
         $tablecolumns[] = 'grade';
         $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '15');
         $table->columnformat['grade'] = array('align' => 'R');
+        $helpicons[] = null;
 
         $tableheaders[] = get_string('comment', 'checkmark');
         $tablecolumns[] = 'feedback';
         $table->cellwidth[] = array('mode' => 'Relativ', 'value' => '50');
         $table->columnformat['feedback'] = array('align' => 'L');
+        $helpicons[] = null;
 
         if ($table->usesoutcomes) {
             $tableheaders[] = get_string('outcome', 'grades');
             $tablecolumns[] = 'outcome';
             $table->cellwidth[] = array('mode' => 'Relativ', 'value' => '50');
             $table->columnformat['outcome'] = array('align' => 'L');
+            $helpicons[] = null;
+        }
+
+        if ($table->checkmark->checkmark->trackattendance) {
+            $tableheaders[] = get_string('attendance', 'checkmark');
+            $helpicons[] = new \help_icon('attendance', 'checkmark');
+            $tablecolumns[] = 'attendance';
+            $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
+            $table->columnformat['attendance'] = array('align' => 'R');
         }
 
         $tableheaders[] = get_string('signature', 'checkmark');
         $tablecolumns[] = 'signature';
         $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '30');
         $table->columnformat['signature'] = array('align' => 'L');
+        $helpicons[] = null;
 
         $table->define_columns($tablecolumns);
         $table->define_headers($tableheaders);
+        $table->define_help_for_headers($helpicons);
         $table->define_baseurl($CFG->wwwroot.'/mod/checkmark/submissions.php?id='.$table->checkmark->cm->id.
                                '&amp;currentgroup='.$table->currentgroup);
 
@@ -541,7 +583,7 @@ class submissionstable extends \table_sql {
                   MAX(s.id) AS submissionid, MAX(f.id) AS feedbackid, MAX(f.grade) AS grade,
                   MAX(f.feedback) AS feedback, MAX(s.timemodified) AS timesubmitted,
                   MAX(f.timemodified) AS timemarked, 100 * COUNT( DISTINCT cchks.id ) / :examplecount AS summary,
-                  COUNT( DISTINCT cchks.id ) AS checks";
+                  COUNT( DISTINCT cchks.id ) AS checks, MAX(f.attendance) AS attendance";
         if ($table->groupmode != NOGROUPS) {
             $fields .= ", MAX(groups) AS groups";
         }
@@ -1061,6 +1103,56 @@ class submissionstable extends \table_sql {
             return $summary;
         } else {
             return \html_writer::tag('div', $summary, array('id' => 'sum'.$values->id));
+        }
+    }
+
+    /**
+     * This function is called for each data row to allow processing of the
+     * user's attendance column.
+     *
+     * @param object $values Contains object with all the values of record.
+     * @return $string Return user's signature column (empty).
+     */
+    public function col_attendance($values) {
+        // Print attendance symbol or quickgrading checkboxes!
+        if (!empty($this->checkmark->attendancegradebook)) {
+            $finalgrade = $this->gradinginfo->items[1]->grades[$values->id];
+        } else {
+            $finalgrade = new \stdClass();
+            $finalgrade->locked = 0;
+            $finalgrade->overridden = 0;
+        }
+        if ($finalgrade->locked || $finalgrade->overridden) {
+            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                return $finalgrade->rawgrade;
+            } else {
+                $symbol = checkmark_get_attendance_symbol($finalgrade->rawgrade);
+                return \html_writer::tag('div', $symbol, array('id' => 'com'.$values->id));
+            }
+        } else if (has_capability('mod/checkmark:trackattendance', $this->context)
+                    && $this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+            $inputarr = array('type'  => 'hidden',
+                              'name'  => 'oldattendance['.$values->id.']',
+                              'value' => $values->attendance);
+            $oldattendance = \html_writer::empty_tag('input', $inputarr);
+            $attr = array('tabindex' => $this->tabindex++,
+                          'id'       => 'attendance'.$values->id);
+            $options = array('' => get_string('unknown', 'checkmark'),
+                             1  => get_string('attendant', 'checkmark'),
+                             0  => get_string('absent', 'checkmark'));
+            $content = \html_writer::select($options, 'attendance['.$values->id.']', $values->attendance, false, $attr);
+
+            return \html_writer::tag('div', $content.$oldattendance, array('id' => 'att'.$values->id));
+        } else {
+            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                if ($values->attendance == null) {
+                    $values->attendance = '?';
+                }
+                return $values->attendance;
+            } else {
+                $symbol = checkmark_get_attendance_symbol($values->attendance);
+                return \html_writer::tag('div', $symbol, array('id' => 'com'.$values->id));
+            }
         }
     }
 

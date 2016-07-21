@@ -1022,7 +1022,7 @@ class checkmark {
     }
 
     /**
-     * Update grade item for this feedback.
+     * Update grade item and attendance item for this feedback.
      *
      * @param object $feedback Feedback object
      */
@@ -1194,24 +1194,37 @@ class checkmark {
 
             case 'fastgrade':
                 // Do the fast grading stuff  - this process should work for all 3 subclasses!
+                $attendance = false;
                 $grading    = false;
                 $commenting = false;
                 $col        = false;
 
                 $grades = optional_param_array('menu', array(), PARAM_INT);
                 $feedbacks = optional_param_array('feedback', array(), PARAM_TEXT);
+                $attendances = optional_param_array('attendance', array(), PARAM_RAW);
                 $oldgrades = optional_param_array('oldgrade', array(), PARAM_INT);
                 $oldfeedbacks = optional_param_array('oldfeedback', array(), PARAM_TEXT);
+                $oldattendances = optional_param_array('oldattendance', array(), PARAM_INT);
+
+                $cantrackattendances = has_capability('mod/checkmark:trackattendance',  $this->context);
+
+                $ids = array();
+
+                if (!empty($attendances) && $cantrackattendances) {
+                    $col = 'attendance';
+                    $attendance = true;
+                    $ids = array_unique(array_merge($ids, array_keys($attendances)));
+                }
 
                 if (!empty($feedbacks)) {
                     $col = 'feedback';
                     $commenting = true;
-                    $ids = array_keys($feedbacks);
+                    $ids = array_unique(array_merge($ids, array_keys($feedbacks)));
                 }
                 if (!empty($grades)) {
                     $col = 'menu';
                     $grading = true;
-                    $ids = array_keys($grades);
+                    $ids = array_unique(array_merge($ids, array_keys($grades)));
                 }
 
                 if (!(data_submitted() && confirm_sesskey())) {
@@ -1219,10 +1232,11 @@ class checkmark {
                 }
 
                 if (!$col) {
-                    // Both submissioncomment and grade columns collapsed!
+                    // All columns (submissioncomment, grade & attendance) were collapsed!
                     $this->display_submissions();
                     break;
                 }
+
                 foreach ($ids as $id) {
 
                     $this->process_outcomes($id);
@@ -1238,8 +1252,22 @@ class checkmark {
                     if (!array_key_exists($id, $oldfeedbacks)) {
                         $oldfeedbacks[$id] = null;
                     }
+                    if (!array_key_exists($id, $oldattendances)) {
+                        $oldattendances[$id] = null;
+                    }
 
-                    if ($grading && (((int)$grades[$id] != -1) || !empty($feedbacks[$id]))) {
+                    if ($attendance && $cantrackattendances) {
+                        $updatedb = $updatedb || ($oldattendances[$id] != $attendances[$id]);
+
+                        if ($feedback === false) {
+                            $feedback = $this->prepare_new_feedback($id);
+                        }
+                        $feedback->attendance = $attendances[$id];
+                    } else {
+                        unset($feedback->attendance); // Don't need to update this.
+                    }
+
+                    if ($grading && key_exists($id, $grades)) {
                         $grade = $grades[$id];
                         $updatedb = $updatedb || ($oldgrades[$id] != $grade);
                         if ($feedback === false) {
@@ -1250,7 +1278,7 @@ class checkmark {
                         unset($feedback->grade);  // Don't need to update this.
                     }
 
-                    if ($commenting) {
+                    if ($commenting && key_exists($id, $feedbacks)) {
                         $feedbackvalue = trim($feedbacks[$id]);
                         $updatedb = $updatedb || (trim($oldfeedbacks[$id]) != $feedbackvalue);
                         if ($feedback === false) {
@@ -1273,6 +1301,7 @@ class checkmark {
                      */
 
                     if ($updatedb) {
+
                         $DB->update_record('checkmark_feedbacks', $feedback);
 
                         // Trigger grade event!
@@ -2254,7 +2283,7 @@ class checkmark {
         }
 
         // Print quickgrade form around the table!
-        if ($quickgrade && $table->started_output && !empty($users)) {
+        if ($quickgrade) {
             $mailinfopref = false;
             if (get_user_preferences('checkmark_mailinfo', 1)) {
                 $mailinfopref = true;

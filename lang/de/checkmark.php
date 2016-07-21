@@ -41,6 +41,7 @@ $string['all'] = 'Alle';
 $string['alwaysshowdescription'] = 'Beschreibung immer anzeigen';
 $string['alwaysshowdescription_help'] = 'Wenn diese Option deaktiviert ist, wird die Aufgabenbeschreibung für Teilnehmer/innen erst ab dem Abgabebeginn angezeigt.';
 $string['attendance'] = 'Anwesenheit';
+$string['attendance_help'] = 'In der Spalte wird die Anwesenheit des Teilnehmers/der Teilnehmerin angezeigt:<br /><ul><li>? - unbekannt</li><li>✓ - anwesend</li><li>✖ - abwesend</li></ul>';
 $string['attendancestatus'] = 'Aktueller Status ihrer Anwesenheit';
 $string['attendancegradebook'] = 'Anwesenheit in Kursbewertung erfassen';
 $string['attendancegradebook_help'] = 'Wenn Sie diese Funktion aktivieren, wird die Anwesenheit in den Kursbewertung als Bewertungsaspekt angezeigt: <ul><li>Leere Bewertung - wenn Status unbekannt</li><li>Wert 0 - wenn abwesend</li><li>Wert 1- wenn anwesend</li></ul>';
