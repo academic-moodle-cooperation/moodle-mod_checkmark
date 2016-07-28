@@ -807,11 +807,12 @@ class checkmark {
      * grades submissions from this checkmark-instance (either all or those which require grading)
      *
      * @param int $filter (optional) which entrys to filter (self::FILTER_ALL, self::FILTER_REQUIRE_GRADING)
+     * @param int[] $selected (optional) selected users, used if filter equals self::FILTER_SELECTED
      * @param bool $countonly (optional) defaults to false, should we only count the submissions or grade them?
      * @return int 0 if everything's ok, otherwise error code
      */
-    public function autograde_submissions($filter = self::FILTER_ALL, $countonly = false) {
-        global $CFG, $DB, $USER, $SESSION;
+    public function autograde_submissions($filter = self::FILTER_ALL, $selected = array(), $countonly = false) {
+        global $CFG, $DB, $USER;
         require_once($CFG->libdir.'/gradelib.php');
         require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
 
@@ -859,7 +860,7 @@ class checkmark {
         switch ($filter) {
             case self::FILTER_SELECTED:
                 // Prepare list with selected users!
-                $usrlst = $SESSION->checkmark->autograde->selected;
+                $usrlst = $selected;
 
                 list($sqluserids, $userparams) = $DB->get_in_or_equal($usrlst, SQL_PARAMS_NAMED, 'user');
                 $params = array_merge_recursive($params, $userparams);
@@ -933,16 +934,16 @@ class checkmark {
                 if (empty($grades) || !is_array($grades)) {
                     $grades = array();
                 }
+                $timemarked = time();
                 foreach ($users as $currentuser) {
                     $feedback = $this->get_feedback($currentuser->id, false); // Get feedback!
-                    $timemarked = time();
                     if ($feedback === false) { // Or make a new feedback!
                         $feedback = $this->prepare_new_feedback($currentuser->id);
                         $feedback->timecreated = $timemarked;
                     }
 
                     $feedback->timemodified = $timemarked;
-                    if ($attendancecoupled && ($feedback->attendance === 0)) {
+                    if ($attendancecoupled && ($feedback->attendance == 0)) {
                         // We set grade to 0 if it's coupled with attendance and the user was absent!
                         $calculatedgrade = 0;
                     } else {
@@ -1245,7 +1246,7 @@ class checkmark {
                                 $SESSION->checkmark->autograde = new stdClass();
                             }
                             $SESSION->checkmark->autograde->selected = $selected;
-                            $result = $this->autograde_submissions(self::FILTER_SELECTED, true);
+                            $result = $this->autograde_submissions(self::FILTER_SELECTED, $selected, true);
                             if (count($selected) == 1) {
                                 $amount = get_string('autograde_stronesubmission', 'checkmark');
                             } else {
@@ -1253,18 +1254,11 @@ class checkmark {
                             }
                             $amountinfo = '';
                             if (isset($selected) && (count($selected) == 0)) {
-                                if (!isset($message)) {
-                                    $message = '';
-                                } else {
-                                    $message .= html_writer::empty_tag('br');
-                                }
-
                                 $message .= $OUTPUT->notification(get_string('autograde_no_users_selected', 'checkmark'), 'error');
                             } else if (($this->checkmark->grade <= 0)) {
                                 // No autograde possible if no numeric grades are selected!
                                 $message .= $OUTPUT->notification(get_string('autograde_non_numeric_grades', 'checkmark'), 'error');
                             } else {
-                                $message = '';
                                 if ($this->checkmark->trackattendance && $this->checkmark->attendancegradelink
                                         && (count($selected) != $result)) {
                                     $amountinfo = get_string('autograde_users_with_unknown_attendance', 'checkmark',
@@ -1288,7 +1282,7 @@ class checkmark {
                                                                              'checkmark'),
                                                                  'notifyproblem');
                             } else if (has_capability('mod/checkmark:grade', context_module::instance($this->cm->id))) {
-                                $result = $this->autograde_submissions(self::FILTER_SELECTED);
+                                $result = $this->autograde_submissions(self::FILTER_SELECTED, $selected);
                                 if (!isset($message)) {
                                     $message = '';
                                 } else {
