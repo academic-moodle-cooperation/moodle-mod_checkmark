@@ -1377,14 +1377,14 @@ class checkmark {
                     }
 
                     // So we have unknown attendance stati included!
-                    if ($attendances[$id] == -1) {
+                    if ($attendance && $cantrackattendances && (!key_exists($id, $attendances) || $attendances[$id] == -1)) {
                         $attendances[$id] = null;
                     }
-                    if ($oldattendances[$id] == -1) {
+                    if ($attendance && $cantrackattendances && (!key_exists($id, $oldattendances) || $oldattendances[$id] == -1)) {
                         $oldattendances[$id] = null;
                     }
 
-                    if ($attendance && $cantrackattendances) {
+                    if ($attendance && $cantrackattendances && ($oldattendances[$id] !== $attendances[$id])) {
                         $updatedb = $updatedb || ($oldattendances[$id] !== $attendances[$id]);
 
                         if ($feedback === false) {
@@ -1395,7 +1395,8 @@ class checkmark {
                         unset($feedback->attendance); // Don't need to update this.
                     }
 
-                    if ($grading && key_exists($id, $grades)) {
+                    if ($grading && key_exists($id, $grades) && (($oldgrades[$id] != $grades[$id])
+                            && !($oldgrades[$id] === null && $grades[$id] == -1))) {
                         $grade = $grades[$id];
                         $updatedb = $updatedb || ($oldgrades[$id] != $grade);
                         if ($feedback === false) {
@@ -1406,7 +1407,7 @@ class checkmark {
                         unset($feedback->grade);  // Don't need to update this.
                     }
 
-                    if ($commenting && key_exists($id, $feedbacks)) {
+                    if ($commenting && key_exists($id, $feedbacks) && (trim($oldfeedbacks[$id]) != trim($feedbacks[$id]))) {
                         $feedbackvalue = trim($feedbacks[$id]);
                         $updatedb = $updatedb || (trim($oldfeedbacks[$id]) != $feedbackvalue);
                         if ($feedback === false) {
