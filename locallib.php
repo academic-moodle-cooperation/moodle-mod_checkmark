@@ -636,11 +636,14 @@ class checkmark {
             $userid = $feedback->userid;
         }
 
+        if ($feedback == false) {
+            return;
+        }
+
         // Check if the user can submit?
         $cansubmit = has_capability('mod/checkmark:submit', $this->context, $userid, false);
         // If not then check if the user still has the view cap and has a previous submission?
-        $cansubmit = $cansubmit || (($feedback !== false)
-                     && has_capability('mod/checkmark:view', $this->context, $userid, false));
+        $cansubmit = $cansubmit || (($feedback !== false) && has_capability('mod/checkmark:view', $this->context, $userid, false));
 
         if (!$cansubmit) {
             // Can not submit checkmarks -> no feedback!
