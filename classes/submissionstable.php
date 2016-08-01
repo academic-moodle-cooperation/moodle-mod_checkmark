@@ -70,6 +70,9 @@ class submissionstable extends \table_sql {
     /** @var protected suppress_initials shows whether or not the intials bars should be printed */
     protected $suppressinitials = false;
 
+    /** @var protected defaultselectstate whether or not the select checkboxes should be checked or not checked by default */
+    protected $defaultselectstate = false;
+
     /**
      * constructor
      * @param string $uniqueid a string identifying this table.Used as a key in
@@ -252,6 +255,7 @@ class submissionstable extends \table_sql {
         $table->filter = $filter;
         $table->showsubmission = true;
         $table->tabindex = 0;
+        $table->defaultselectstate = false;
 
         // Adapt table for submissions view (columns, etc.)!
         $tablecolumns = array('selection', 'picture', 'fullname');
@@ -437,6 +441,7 @@ class submissionstable extends \table_sql {
         $table->sumrel     = get_user_preferences('checkmark_sumrel', 1);
         $table->quickgrade = 0;
         $table->filter = $table;
+        $table->defaultselectstate = true; // Select all checkboxes by default!
 
         // Adapt table for export view (columns, etc.)!
         $tableheaders = array('', get_string('fullnameuser'));
@@ -765,31 +770,34 @@ class submissionstable extends \table_sql {
             return '';
         } else {
             $select = optional_param('select', null, PARAM_INT);
-            $selectstate = false;
+            // All get selected by default in export table, not selected in submissions table!
+            $selectstate = $this->defaultselectstate;
 
             $attr = array('class' => 'checkboxgroup1');
             if ($select == self::SEL_ALL) {
-                $selectstate = 1;
+                $selectstate = true;
+            } else if ($select === self::SEL_NONE) {
+                $selectstate = false;
             }
             if ($values->timesubmitted > $values->timemarked) {
                 if ($select == self::SEL_REQ_GRADING) {
-                    $selectstate = 1;
+                    $selectstate = true;
                 }
                 $attr['data-ungraded'] = 1;
             } else {
                 if ($select == self::SEL_REQ_GRADING) {
-                    $selectstate = 0;
+                    $selectstate = false;
                 }
                 $attr['data-ungraded'] = 0;
             }
             if (!empty($values->submissionid)) {
                 if ($select == self::SEL_SUBMITTED) {
-                    $selectstate = 1;
+                    $selectstate = true;
                 }
                 $attr['data-submitted'] = 1;
             } else {
                 if ($select == self::SEL_SUBMITTED) {
-                    $selectstate = 0;
+                    $selectstate = false;
                 }
                 $attr['data-submitted'] = 0;
             }
