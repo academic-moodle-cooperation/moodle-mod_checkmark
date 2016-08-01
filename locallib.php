@@ -2863,14 +2863,8 @@ class checkmark {
         }
 
         if (empty($usrlst)) {
-            echo $OUTPUT->header();
-            $url = new moodle_url($PAGE->url);
-            $button = new single_button($url, get_string('continue'));
-            echo $this->confirm($OUTPUT->notification(get_string('nousers', 'checkmark'),
-                                                        'notifyproblem'),
-                                $button);
-            echo $OUTPUT->footer();
-            die();
+            redirect($PAGE->url, get_string('nousers', 'checkmark'), null, 'notifyproblem');
+            return;
         }
 
         // Get data!
