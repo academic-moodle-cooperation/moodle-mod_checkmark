@@ -444,9 +444,9 @@ class submissionstable extends \table_sql {
         $table->defaultselectstate = true; // Select all checkboxes by default!
 
         // Adapt table for export view (columns, etc.)!
-        $tableheaders = array('', get_string('fullnameuser'));
+        $tableheaders = array('', get_string('name'));
         $tablecolumns = array('selection', 'fullname');
-        $table->cellwidth = array(array('mode' => 'Relativ', 'value' => '25'));
+        $table->cellwidth = array(array('mode' => 'Fixed', 'value' => '25'));
         $table->columnformat = array('fullname' => array('align' => 'L'));
         $helpicons = array(null, null);
 
@@ -956,11 +956,10 @@ class submissionstable extends \table_sql {
         if ($values->feedbackid) {
             // Print Comment!
             if ($finalgrade->locked || $finalgrade->overridden) {
-                $shrtfeedback = shorten_text(strip_tags($finalgrade->str_feedback), 15);
                 if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
-                    return $shrtfeedback;
+                    return $finalgrade->str_feedback;
                 } else {
-                    return \html_writer::tag('div', $shrtfeedback, array('id' => 'com'.$values->id));
+                    return \html_writer::tag('div', $finalgrade->str_feedback, array('id' => 'com'.$values->id));
                 }
             } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
                 $inputarr = array('type'  => 'hidden',
@@ -968,19 +967,16 @@ class submissionstable extends \table_sql {
                                   'value' => trim($values->feedback));
                 $oldfeedback = \html_writer::empty_tag('input', $inputarr);
                 $content = \html_writer::tag('textarea', $values->feedback, array('tabindex' => $this->tabindex++,
-                                                                                  'name'     => 'feedback['.
-                                                                                                $values->id.']',
-                                                                                  'id'       => 'feedback'.
-                                                                                                $values->id,
+                                                                                  'name'     => 'feedback['.$values->id.']',
+                                                                                  'id'       => 'feedback'.$values->id,
                                                                                   'rows'     => 2,
                                                                                   'cols'     => 20));
                 return \html_writer::tag('div', $content.$oldfeedback, array('id' => 'com'.$values->id));
             } else {
-                $shortfeedback = shorten_text(strip_tags($values->feedback), 15);
                 if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
-                    return $shortfeedback;
+                    return $values->feedback;
                 } else {
-                    return \html_writer::tag('div', $shortfeedback, array('id' => 'com'.$values->id));
+                    return \html_writer::tag('div', $values->feedback, array('id' => 'com'.$values->id));
                 }
             }
         } else {
@@ -997,10 +993,8 @@ class submissionstable extends \table_sql {
                 $oldfeedback = \html_writer::empty_tag('input', $inputarr);
 
                 $content = \html_writer::tag('textarea', $values->feedback, array('tabindex'  => $this->tabindex++,
-                                                                                  'name'      => 'feedback['.
-                                                                                                 $values->id.']',
-                                                                                  'id'        => 'feedback'.
-                                                                                                 $values->id,
+                                                                                  'name'      => 'feedback['.$values->id.']',
+                                                                                  'id'        => 'feedback'.$values->id,
                                                                                   'rows'      => '2',
                                                                                   'cols'      => '20'));
                 return \html_writer::tag('div', $content.$oldfeedback, array('id' => 'com'.$values->id));
@@ -1026,9 +1020,10 @@ class submissionstable extends \table_sql {
         // Prints student answer and student modified date!
         if ($values->timesubmitted > 0) {
             if ($this->showsubmission) {
-                $content = $this->checkmark->print_student_answer($values->id).userdate($values->timesubmitted);
+                $content = $this->checkmark->print_student_answer($values->id).userdate($values->timesubmitted,
+                                                                                        get_string('strftimedatetime'));
             } else {
-                $content = userdate($values->timesubmitted);
+                $content = userdate($values->timesubmitted, get_string('strftimedatetime'));
             }
             if ($values->timesubmitted >= $this->checkmark->checkmark->timedue) {
                 $content .= $this->checkmark->display_lateness($values->timesubmitted);
@@ -1061,14 +1056,14 @@ class submissionstable extends \table_sql {
     public function col_timemarked($values) {
         $finalgrade = $this->gradinginfo->items[0]->grades[$values->id];
         if ($finalgrade->locked || $finalgrade->overridden) {
-            $date = userdate($finalgrade->dategraded);
+            $date = userdate($finalgrade->dategraded, get_string('strftimedatetime'));
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return $date;
             } else {
                 return \html_writer::tag('div', $date, array('id' => 'tt'.$values->id));
             }
         } else if ($values->feedbackid && $values->timemarked > 0) {
-            $date = userdate($values->timemarked);
+            $date = userdate($values->timemarked, get_string('strftimedatetime'));
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return $date;
             } else {
