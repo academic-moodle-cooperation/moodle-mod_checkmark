@@ -65,8 +65,8 @@ $string['autograde_failed'] = 'Auto-grading failed!';
 $string['autograde_success'] = 'Auto-grading successful! {$a} submissions updated.';
 $string['autograde_users_with_unknown_attendance'] = 'ATTENTION: {$a} submissions could NOT be graded automatically due to unknown attendance status!';
 $string['autograde_notsupported'] = 'This scale is not supported by automatic grading.';
-$string['autograde_no_users_selected'] = 'You have not selected any user to grade. Select the required users via the checkboxes in the left column of the table below.';
 $string['autograde_non_numeric_grades'] = 'Auto-grading requires a numeric maximum grade to be set. This can be configured in instance-settings.';
+$string['bulk_no_users_selected'] = 'You haven\'t selected any user. Select the required users via the checkboxes in the left column of the table below.';
 $string['cantfixevent'] = 'Couldn\'t fix event with ID {$a->id}, named {$a->name} ({$a->matches} matches).';
 $string['cfg_nowarning'] = 'No warning';
 $string['cfg_pdfexampleswarning'] = 'Amount of examples to display a warning for PDF export';
@@ -324,6 +324,7 @@ $string['yoursubmission'] = 'Your submission';
 // Deprecated since Moodle 3.1!
 $string['autograde_all'] = 'Grade all submissions';
 $string['autograde_custom'] = 'Grade selected users';
+$string['autograde_no_users_selected'] = 'You have not selected any user to grade. Select the required users via the checkboxes in the left column of the table below.';
 $string['autograde_req'] = 'Grade ungraded';
 $string['autograde_str'] = 'Auto-grading';
 $string['autograde_str_help'] = 'Auto-grading calculates users grades according to points per example and checked examples. It adds the points for each checked example and uses this as the users grade. <ul><li>grade selected users - grades just these users, which are checked in the list. If a user hasn\'t submitted anything, a empty submission get\'s added.</li><li>grade who needs grading - grades every submission which is more up to date than the corresponding grading</li><li>grade all submissions - grades all present submissions (for this instance). Does NOT add empty submissions.</li></ul><br />The grade gets calculated based on chosen example grades and checked examples:<ul><li>standard-grading: here each example is equally weighted (integral grade per example). The grade is calculated by multiplication of the sum of checked examples with the quotient of checkmark-grade and checkmark-count.</li><li>individual example-weights: the grade is the sum of example grades for each checked example (according to instance-settings).</li></ul>';

@@ -1210,6 +1210,9 @@ class checkmark {
                 if ($selected == array() && $confirm) {
                     $selected = $SESSION->checkmark->autograde->selected;
                 }
+                if (isset($selected) && (count($selected) == 0)) {
+                    $message .= $OUTPUT->notification(get_string('bulk_no_users_selected', 'checkmark'), 'error');
+                }
                 if ($bulkaction && ($selected || ($confirm && !empty($SESSION->checkmark->autograde->selected)))) {
                     // Process bulk action!
                     list($select, $params) = $DB->get_in_or_equal($selected);
@@ -1253,9 +1256,7 @@ class checkmark {
                                 $amount = get_string('autograde_strmultiplesubmissions', 'checkmark', $result);
                             }
                             $amountinfo = '';
-                            if (isset($selected) && (count($selected) == 0)) {
-                                $message .= $OUTPUT->notification(get_string('autograde_no_users_selected', 'checkmark'), 'error');
-                            } else if (($this->checkmark->grade <= 0)) {
+                            if (($this->checkmark->grade <= 0)) {
                                 // No autograde possible if no numeric grades are selected!
                                 $message .= $OUTPUT->notification(get_string('autograde_non_numeric_grades', 'checkmark'), 'error');
                             } else {

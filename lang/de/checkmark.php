@@ -65,8 +65,8 @@ $string['autograde_failed'] = 'Automatische Bewertung fehlgeschlagen!';
 $string['autograde_success'] = 'Automatische Bewertung erfolgreich! {$a} Abgabenbewertungen wurden aktualisiert.';
 $string['autograde_users_with_unknown_attendance'] = 'ACHTUNG: {$a} Abgabe konnte NICHT automatisch bewertet werden, da die Anwesenheit noch nicht erfasst wurde!';
 $string['autograde_notsupported'] = 'Diese Notenskala wird von der automatischen Bewertung nicht unterstützt.';
-$string['autograde_no_users_selected'] = 'Sie haben keine Teilnehmer/in zur Bewertung ausgewählt. Wählen Sie die gewünschten Teilnehmer/innen über die Checkboxen der linken Tabellenspalte aus.';
 $string['autograde_non_numeric_grades'] = 'Die automatische Bewertung benötigt numerische Angaben für die Bewertung. Dies kann in den Instanzeinstellungen sichergestellt werden.';
+$string['bulk_no_users_selected'] = 'Sie haben keine Teilnehmer/in ausgewählt. Wählen Sie die gewünschten Teilnehmer/innen über die Checkboxen der linken Tabellenspalte aus.';
 $string['cantfixevent'] = 'Konnte Kalendereintrag mit der ID {$a->id}, Name {$a->name} nicht reparieren ({$a->matches} treffer).';
 $string['cfg_nowarning'] = 'keine Warnung';
 $string['cfg_pdfexampleswarning'] = 'Beispielanzahl-Limit für Warnung PDF Export';
@@ -324,6 +324,7 @@ $string['yoursubmission'] = 'Ihre Abgabe';
 // Deprecated since Moodle 3.1!
 $string['autograde_all'] = 'Alle Abgaben bewerten';
 $string['autograde_custom'] = 'Ausgewählte bewerten';
+$string['autograde_no_users_selected'] = 'Sie haben keine Teilnehmer/in zur Bewertung ausgewählt. Wählen Sie die gewünschten Teilnehmer/innen über die Checkboxen der linken Tabellenspalte aus.';
 $string['autograde_req'] = 'Nichtbewertete bewerten';
 $string['autograde_str'] = 'Automatische Bewertung';
 $string['autograde_str_help'] = 'Die automatische Bewertung berechnet die Noten der Abgaben anhand der Punkte der gekreuzten Beispiele.<br /><ul><li>Ausgewählte bewerten - hier werden all jene Datensätze bewertet, die links per Häckchen ausgewählt wurden. Falls noch keine Abgabe vorhanden ist, wird eine leere Abgabe hinzugefügt.</li><li>Nichtbewertete Bewerten - hier werden alle Abgaben bewertet, deren Abgabedatum aktueller als die letzte Bewertung ist</li><li>Alle Abgaben bewerten - hier werden alle bereits übermittelten Abgaben bewertet</li></ul><br />Die Punkteberechnung erfolgt aufgrund der eingestellten Beispielbewertungen sowie der angekreuzten Beispiele:<ul><li>Standard-Bewertungen: hier wird jedes Beispiel gleich gewichtet (ganzzahlige Punkteanzahl pro Beispiel). Die Bewertung ergibt sich aus der Summe der gekreuzten Beispiele multipliziert mit dem Quotienten aus Gesamtbewertung und Beispielanzahl.</li><li>individuelle Beispielgewichtungen: Für die Bewertungsberechnung wird für jedes gekreuzte Beispiel die dem Beispiel zugeordnete Punkteanzahl aufsummiert.</li></ul>';
