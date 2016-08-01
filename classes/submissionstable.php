@@ -67,7 +67,7 @@ class submissionstable extends \table_sql {
     /** @var protected if formated cells should contain html */
     protected $format = self::FORMAT_HTML;
 
-    /** @var protected suppress_initials shows whether or not the intials bars should be printed */
+    /** @var protected suppressinitials shows whether or not the intials bars should be printed */
     protected $suppressinitials = false;
 
     /** @var protected defaultselectstate whether or not the select checkboxes should be checked or not checked by default */
