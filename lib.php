@@ -1599,51 +1599,51 @@ function checkmark_print_overview($courses, &$htmlarray) {
     if (!$courses) {
         return;
     }
+
     foreach ($courses as $currentcourse) {
+        $table = new html_table();
+        $table->id = 'overviewstats'.$currentcourse;
+        $table->data = array();
+
+        $table->colclasses = array('name', 'examples', 'grades', 'grade');
+
+        $table->align = array('left', 'right', 'right', 'left');
+
         $str = '';
         $context = context_course::instance(intval($currentcourse));
 
         $str .= html_writer::start_tag('div', array('class' => 'checkmark overview statistics')).
-                html_writer::tag('div', get_string('checkmarkstatstitle', 'checkmark'),
-                                 array('class' => 'name'));
+                html_writer::tag('div', get_string('checkmarkstatstitle', 'checkmark'), array('class' => 'name'));
         if (!key_exists($currentcourse, $statistics)) {
             continue;
         }
-        $strname = html_writer::start_tag('div', array('class' => 'name'));
-        $strexamples = html_writer::start_tag('div', array('class' => 'examples'));
-        $strgrades = html_writer::start_tag('div', array('class' => 'grades'));
-        $strgrade = html_writer::start_tag('div', array('class' => 'grade'));
-        $str .= html_writer::start_tag('div', array('class' => 'details'));
 
         foreach ($statistics[$currentcourse] as $key => $statistic) {
+            $row = array();
             if ($key != 0) {
-                $strname .= html_writer::tag('div', $statistic->name, array('class' => 'element'));
-                $strexamples .= html_writer::tag('div', $statistic->checked_examples.' / '.
-                                                        $statistic->total_examples,
-                                                 array('class' => 'element'));
-                $strgrades .= html_writer::tag('div', $statistic->checked_grade.' / '.
-                                                      $statistic->total_grade,
-                                               array('class' => 'element'));
-                $strgrade .= html_writer::tag('div', $statistic->grade, array('class' => 'element'));
+                $row[] = new html_table_cell(html_writer::tag('div', $statistic->name, array('class' => 'element')));
+                $checked = $statistic->checked_examples.' / '.$statistic->total_examples;
+                $row[] = new html_table_cell(html_writer::tag('div', $checked, array('class' => 'element')));
+                $grade = $statistic->checked_grade.' / '.$statistic->total_grade;
+                $row[] = new html_table_cell(html_writer::tag('div', $grade, array('class' => 'element')));
+                $row[] = new html_table_cell(html_writer::tag('div', $statistic->grade, array('class' => 'element')));
             }
+            $table->data[] = new html_table_row($row);
         }
 
         $statistic = $statistics[$currentcourse][0];
-        $strname .= html_writer::tag('div', $statistic->name, array('class' => 'element total'));
-        $strexamples .= html_writer::tag('div', $statistic->checked_examples.' / '.
-                                                $statistic->total_examples,
-                                         array('class' => 'element total'));
-        $strgrades .= html_writer::tag('div', $statistic->checked_grade.' / '.
-                                              $statistic->total_grade,
-                                       array('class' => 'element total'));
+        $row = array();
+        $row[] = new html_table_cell(html_writer::tag('div', $statistic->name, array('class' => 'element total')));
+        $row[] = new html_table_cell(html_writer::tag('div', $statistic->checked_examples.' / '.$statistic->total_examples,
+                                     array('class' => 'element total')));
+        $row[] = new html_table_cell(html_writer::tag('div', $statistic->checked_grade.' / '.$statistic->total_grade,
+                                     array('class' => 'element total')));
+        foreach ($row as $i => $cur) {
+            $row[$i]->header = true;
+        }
+        $table->data[] = new html_table_row($row);
 
-        $strname .= html_writer::end_tag('div');
-        $strexamples .= html_writer::end_tag('div');
-        $strgrades .= html_writer::end_tag('div');
-        $strgrade .= html_writer::end_tag('div');
-
-        $str .= $strname . $strexamples . $strgrades . $strgrade;
-        $str .= html_writer::end_tag('div');
+        $str .= html_writer::table($table);
         $str .= html_writer::end_tag('div');
 
         if (empty($htmlarray[strval($currentcourse)]['checkmark'])) {

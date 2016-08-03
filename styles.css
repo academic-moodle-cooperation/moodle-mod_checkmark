@@ -239,55 +239,21 @@
     padding-top: 1em;
 }
 
-.checkmark.overview.statistics > .details {
-    border-bottom-color: #dddddd;
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
+.checkmark.overview.statistics > .name {
+    font-weight:bold;
+    margin-bottom:5px;
+    margin-top:5px;
+}
 
-    border-left-color: #dddddd;
-    border-left-style: solid;
-    border-left-width: 1px;
-
-    border-right-color: #dddddd;
-    border-right-style: solid;
-    border-right-width: 1px;
-
-    border-top-color: #dddddd;
-    border-top-style: solid;
-    border-top-width: 1px;
-
-    max-width: 44em;
+.checkmark.overview.statistics > table {
     overflow: auto;
     overflow-x: scroll;
     padding: 1em;
-    white-space: nowrap;
 }
 
-.checkmark.overview.statistics > .details .name {
-    display: inline-block;
-    margin-left: 0;
-    margin-right: 1em;
-    vertical-align: top;
-    white-space: nowrap;
-}
-
-.checkmark.overview.statistics > .details .examples {
-    display: inline-block;
-    margin-right: 1em;
-    vertical-align: top;
-    white-space: nowrap;
-}
-
-.checkmark.overview.statistics > .details .grades {
-    display: inline-block;
-    margin-right: 1em;
-    vertical-align:top;
-    white-space:nowrap;
-}
-
-.checkmark.overview.statistics > .details .grade {
-    display: inline-block;
-    vertical-align: top;
+.checkmark.overview.statistics > table .examples,
+.checkmark.overview.statistics > table .grades,
+.checkmark.overview.statistics > table .grade {
     white-space: nowrap;
 }
 
