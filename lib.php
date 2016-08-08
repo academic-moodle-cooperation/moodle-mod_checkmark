@@ -197,6 +197,7 @@ function checkmark_update_instance($checkmark) {
 
     if ($checkmark->trackattendance && $checkmark->attendancegradebook) {
         checkmark_attendance_item_update($checkmark);
+        checkmark_update_attendances($checkmark);
     } else {
         checkmark_attendance_item_delete($checkmark);
     }
@@ -560,13 +561,13 @@ function checkmark_update_attendances($checkmark, $userid=0) {
     global $CFG;
     require_once($CFG->libdir.'/gradelib.php');
 
-    if (!$checkmark->trackattendance && !$checkmark->attendancegradebook) {
+    if (!$checkmark->trackattendance || !$checkmark->attendancegradebook) {
         // If there's no gradeitem, we won't do anything!
         return;
     }
 
     $attendances = null;
-    if ($checkmark->trackattendance != 0 && $attendances = checkmark_get_user_attendances($checkmark, $userid)) {
+    if ($attendances = checkmark_get_user_attendances($checkmark, $userid)) {
         foreach ($attendances as $k => $v) {
             if ($v->rawgrade == -1) {
                 $attendances[$k]->rawgrade = null;
