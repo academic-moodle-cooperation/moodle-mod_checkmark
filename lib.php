@@ -474,6 +474,64 @@ function checkmark_get_user_grades($checkmark, $userid=0) {
 }
 
 /**
+ * returns symbol for the attendance value (1, 0, other)
+ *
+ * @param bool|mixed $attendance 1, 0 or other value (incl. null)
+ * @return string HTML snippet with attendance symbol
+ */
+function checkmark_get_attendance_symbol($attendance = null) {
+    global $OUTPUT;
+
+    if ($attendance == 1) {
+        $attendantstr = get_string('attendant', 'checkmark');
+        $iconattr = array('src'   => $OUTPUT->pix_url('i/valid'),
+                          'alt'   => $attendantstr,
+                          'title' => $attendantstr);
+        $symbol = \html_writer::empty_tag('img', $iconattr);
+    } else if (($attendance == 0) && ($attendance != null)) {
+        $absentstr = get_string('absent', 'checkmark');
+        $iconattr = array('src'   => $OUTPUT->pix_url('i/invalid'),
+                          'alt'   => $absentstr,
+                          'title' => $absentstr);
+        $symbol = \html_writer::empty_tag('img', $iconattr);
+    } else {
+        $unknownstr = get_string('unknown', 'checkmark');
+        $iconattr = array('src'   => $OUTPUT->pix_url('questionmark', 'checkmark'),
+                          'alt'   => $unknownstr,
+                          'title' => $unknownstr);
+        $symbol = \html_writer::empty_tag('img', $iconattr);
+    }
+
+    return $symbol;
+}
+
+/**
+ * Return attendance for given user or all users.
+ *
+ * @param object $checkmark checkmark object
+ * @param int $userid optional user id, 0 means all users
+ * @return array array of grades, false if none
+ */
+function checkmark_get_user_attendances($checkmark, $userid=0) {
+    global $CFG, $DB;
+
+    if ($userid) {
+        $user = 'AND u.id = :userid';
+        $params = array('userid' => $userid);
+    } else {
+        $user = '';
+    }
+    $params['aid'] = $checkmark->id;
+
+    $sql = 'SELECT u.id, u.id AS userid, f.attendance AS rawgrade, f.graderid AS usermodified,
+                   f.timemodified AS dategraded
+              FROM {user} u, {checkmark_feedbacks} f
+             WHERE u.id = f.userid AND f.checkmarkid = :aid'.
+            $user;
+    return $DB->get_records_sql($sql, $params);
+}
+
+/**
  * Update activity grades
  *
  * @param object $checkmark
@@ -524,7 +582,7 @@ function checkmark_update_attendances($checkmark, $userid=0, $nullifnone=true) {
 }
 
 /**
- * Update all grades in gradebook.
+ * Update all grades (including attendances) in gradebook.
  */
 function checkmark_upgrade_grades() {
     global $DB;
@@ -630,6 +688,21 @@ function checkmark_attendance_item_update($checkmark, $grades=null) {
     }
 
     // We can't update the category ID because Moodle forces us to stay in 1 grade category!
+
+    if ($grades != null) {
+        // Normalize attendance values here. We should only put 0 or 1 through to gradebook!
+        foreach ($grades as $i => $grade) {
+            switch($grade->rawgrade) {
+                case null:
+                case 1:
+                    $grades[$i]->rawgrade = 1.00000;
+                    break;
+                case 0:
+                    $grades[$i]->rawgrade = 0.00000;
+                    break;
+            }
+        }
+    }
 
     $gradeupdate = grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id, 1, $grades, $params);
 
@@ -1696,6 +1769,9 @@ function checkmark_reset_gradebook($courseid) {
     if ($checkmarks = $DB->get_records_sql($sql, $params)) {
         foreach ($checkmarks as $checkmark) {
             checkmark_grade_item_update($checkmark, 'reset');
+            if ($checkmark->trackattendance) {
+                checkmark_attendance_item_update($checkmark, 'reset');
+            }
         }
     }
 }

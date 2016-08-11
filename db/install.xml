@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/checkmark/db" VERSION="20160115" COMMENT="XMLDB file for Moodle mod/checkmark"
+<XMLDB PATH="mod/checkmark/db" VERSION="20160531" COMMENT="XMLDB file for Moodle mod/checkmark"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -53,6 +53,7 @@
         <FIELD NAME="grade" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5"/>
         <FIELD NAME="feedback" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="format" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="attendance" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="graderid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="mailed" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -67,6 +68,7 @@
       <INDEXES>
         <INDEX NAME="mailed" UNIQUE="false" FIELDS="mailed"/>
         <INDEX NAME="timemodified" UNIQUE="false" FIELDS="timemodified"/>
+        <INDEX NAME="attendance" UNIQUE="false" FIELDS="attendance"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="checkmark_examples" COMMENT="1 entry per example containing name and exampleweight (replaces old comma separated lists in checkmarks table)">

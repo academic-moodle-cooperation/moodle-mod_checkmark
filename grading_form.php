@@ -77,7 +77,6 @@ class mod_checkmark_grading_form extends moodleform {
                            $this->_customdata->lateness );
 
         $this->add_submission_content();
-        $this->add_grades_section();
 
         $this->add_feedback_section();
 
@@ -96,11 +95,54 @@ class mod_checkmark_grading_form extends moodleform {
     }
 
     /**
-     * Add the grades section to the form.
+     * Add the feedback section to the form.
      */
-    public function add_grades_section() {
-        global $CFG;
+    public function add_feedback_section() {
+        global $OUTPUT;
         $mform =& $this->_form;
+        $mform->addElement('header', 'Feed Back', get_string('feedback', 'grades'));
+        $mform->setExpanded('Feed Back');
+
+        // Grades elements!
+        $this->add_grades_elements();
+
+        // Outcomes elements!
+        $this->add_outcomes_elements();
+
+        // Oldgrade elements!
+        $this->add_old_grade();
+
+        // Feedback elements!
+        if ($this->_customdata->gradingdisabled) {
+            $gradeitem = $this->_customdata->grading_info->items[0];
+            $feedback = $gradeitem->grades[$this->_customdata->userid]->str_feedback;
+            $mform->addElement('static', 'disabledfeedback', '', $feedback);
+        } else {
+            // Visible elements!
+            $mform->addElement('editor', 'feedback_editor',
+                               get_string('feedback', 'checkmark').':', null,
+                               $this->get_editor_options() );
+            $mform->setType('feedback_editor', PARAM_RAW); // To be cleaned before display!
+            $mform->setDefault('feedback_editor', $this->_customdata->feedback);
+        }
+
+        // Attendance elements!
+        $this->add_attendance_elements();
+
+        $mform->addElement('hidden', 'mailinfo_h', '0');
+        $mform->setType('mailinfo_h', PARAM_INT);
+        $mform->addElement('checkbox', 'mailinfo',
+                           get_string('enablenotification', 'checkmark').
+                           $OUTPUT->help_icon('enablenotification', 'checkmark') .':' );
+        $mform->setType('mailinfo', PARAM_INT);
+    }
+
+    /**
+     * Adds the grade elements!
+     */
+    public function add_grades_elements() {
+        $mform =& $this->_form;
+
         $attributes = array();
         if ($this->_customdata->gradingdisabled) {
             $attributes['disabled'] = 'disabled';
@@ -109,12 +151,18 @@ class mod_checkmark_grading_form extends moodleform {
         $grademenu = make_grades_menu($this->_customdata->checkmark->grade);
         $grademenu['-1'] = get_string('nograde');
 
-        $mform->addElement('header', 'Grades', get_string('grades', 'grades'));
         $mform->addElement('select', 'xgrade', get_string('grade').':', $grademenu, $attributes);
         if ($this->_customdata->feedbackobj !== false) {
             $mform->setDefault('xgrade', $this->_customdata->feedbackobj->grade );
         }
         $mform->setType('xgrade', PARAM_INT);
+    }
+
+    /**
+     * Adds the outcome elements if used!
+     */
+    public function add_outcomes_elements() {
+        $mform =& $this->_form;
 
         if (!empty($this->_customdata->enableoutcomes)) {
             foreach ($this->_customdata->grading_info->outcomes as $n => $outcome) {
@@ -133,6 +181,16 @@ class mod_checkmark_grading_form extends moodleform {
                 }
             }
         }
+    }
+
+    /**
+     * Displays the current grade
+     */
+    public function add_old_grade() {
+        global $CFG;
+
+        $mform =& $this->_form;
+
         $coursecontext = context_module::instance($this->_customdata->cm->id);
         if (has_capability('gradereport/grader:view', $coursecontext)
             && has_capability('moodle/grade:viewall', $coursecontext)) {
@@ -150,31 +208,32 @@ class mod_checkmark_grading_form extends moodleform {
     }
 
     /**
-     * Add the feedback section to the form.
+     * Adds the attendance elements to the form!
      */
-    public function add_feedback_section() {
-        global $OUTPUT;
+    public function add_attendance_elements() {
         $mform =& $this->_form;
-        $mform->addElement('header', 'Feed Back', get_string('feedback', 'grades'));
+        $context = context_module::instance($this->_customdata->cm->id);
 
-        if ($this->_customdata->gradingdisabled) {
-            $gradeitem = $this->_customdata->grading_info->items[0];
-            $feedback = $gradeitem->grades[$this->_customdata->userid]->str_feedback;
-            $mform->addElement('static', 'disabledfeedback', '', $feedback);
-        } else {
-            // Visible elements!
-
-            $mform->addElement('editor', 'feedback_editor',
-                               get_string('feedback', 'checkmark').':', null,
-                               $this->get_editor_options() );
-            $mform->setType('feedback_editor', PARAM_RAW); // To be cleaned before display!
-            $mform->setDefault('feedback_editor', $this->_customdata->feedback);
-            $mform->addElement('hidden', 'mailinfo_h', '0');
-            $mform->setType('mailinfo_h', PARAM_INT);
-            $mform->addElement('checkbox', 'mailinfo',
-                               get_string('enablenotification', 'checkmark').
-                               $OUTPUT->help_icon('enablenotification', 'checkmark') .':' );
-            $mform->setType('mailinfo', PARAM_INT);
+        // Attendance section!
+        if ($this->_customdata->trackattendance) {
+            if ($this->_customdata->attendancedisabled || !has_capability('mod/checkmark:trackattendance', $context)) {
+                if ($this->_customdata->attendancegradebook) {
+                    $attendance = $this->_customdata->grading_info->items[1]->grades[$this->_customdata->userid]->grade;
+                } else {
+                    // If he has no right to grade and there's no attendance in gradebook, we have to use the regular attendance!
+                    $attendance = $this->_customdata->attendance;
+                }
+                $symbol = checkmark_get_attendance_symbol($attendance);
+                $mform->addElement('static', 'disabledattendance', get_string('attendance', 'checkmark').':', $symbol);
+            } else {
+                // TODO: if there's time, we add JS to show a beautiful select with symbols!
+                $options = array(-1 => '? '.strtolower(get_string('unknown', 'checkmark')),
+                                 1  => '✓ '.strtolower(get_string('attendant', 'checkmark')),
+                                 0  => '✗ '.strtolower(get_string('absent', 'checkmark')));
+                $mform->addElement('select', 'attendance', get_string('attendance', 'checkmark').':', $options);
+                $mform->setType('attendance', PARAM_INT); // To be cleaned before display!
+                $mform->setDefault('attendance', $this->_customdata->attendance);
+            }
         }
     }
 

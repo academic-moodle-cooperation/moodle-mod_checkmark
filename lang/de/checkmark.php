@@ -34,6 +34,7 @@ $string['checkmark:submit'] = 'Kreuzerlübung abgeben';
 $string['checkmark:view'] = 'Zeige Kreuzerlübung';
 $string['checkmark:view_preview'] = 'Vorschau ansehen';
 
+$string['absent'] = 'Nicht anwesend';
 $string['activateindividuals'] = 'Individualfunktionen aktivieren';
 $string['strassignment'] = 'Aufgabe';
 $string['all'] = 'Alle';
@@ -45,6 +46,7 @@ $string['attendancegradebook'] = 'Anwesenheit in Kursbewertung erfassen';
 $string['attendancegradebook_help'] = 'Wenn Sie diese Funktion aktivieren, wird die Anwesenheit in den Kursbewertung als Bewertungsaspekt angezeigt: <ul><li>Leere Bewertung - wenn Status unbekannt</li><li>Wert 0 - wenn abwesend</li><li>Wert 1- wenn anwesend</li></ul>';
 $string['attendancegradelink'] = 'Anwesenheit an Bewertung koppeln';
 $string['attendancegradelink_help'] = 'Aktivieren Sie diese Funktion, um die gespeicherten Anwesenheiten mit der Bewertung der Kreuzerlübung zu verknüpfen. Punkte der Kreuzerlübung werden nur dann aggregiert, wenn die Person als anwesend gekennzeichnet wurde.';
+$string['attendant'] = 'Anwesend';
 $string['autograde_all'] = 'Alle Abgaben bewerten';
 $string['autograde_custom'] = 'Ausgewählte bewerten';
 $string['autograde_req'] = 'Nichtbewertete bewerten';
@@ -157,6 +159,7 @@ $string['strvalidmsgtimedesc'] = 'Anzahl der Tage, nach denen Benotungsbenachric
 $string['str_userid'] = 'Matrikelnummer';
 $string['trackattendance'] = 'Anwesenheit erfassen';
 $string['trackattendance_help'] = 'Aktivieren Sie diese Funktion, um die Anwesenheit bei Teilnehmer/innen zu protokollieren.';
+$string['unknown'] = 'Unbekannt';
 /*
  * End of Block for checkmark-specific strings
  */

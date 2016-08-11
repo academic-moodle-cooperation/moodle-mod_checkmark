@@ -1028,6 +1028,9 @@ class checkmark {
      */
     public function update_grade($feedback) {
         checkmark_update_grades($this->checkmark, $feedback->userid);
+        if ($this->checkmark->trackattendance) {
+            checkmark_update_attendances($this->checkmark, $feedback->userid);
+        }
     }
 
     /**
@@ -1777,8 +1780,13 @@ class checkmark {
 
         $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark',
                                         $this->checkmark->id, array($user->id));
-        $gradingdisabled = $gradinginfo->items[0]->grades[$userid]->locked
-                           || $gradinginfo->items[0]->grades[$userid]->overridden;
+        $gradingdisabled = $gradinginfo->items[0]->grades[$userid]->locked || $gradinginfo->items[0]->grades[$userid]->overridden;
+        if ($this->checkmark->attendancegradebook) {
+            $attendancedisabled = $gradinginfo->items[1]->grades[$userid]->locked
+                                      || $gradinginfo->items[1]->grades[$userid]->overridden;
+        } else {
+            $attendancedisabled = false;
+        }
 
         // Construct SQL, using current offset to find the data of the next student!
         $course     = $this->course;
@@ -1904,6 +1912,13 @@ class checkmark {
         $mformdata->feedbackobj = $feedback;
         $mformdata->feedback = ($feedback !== false) ? $feedback->feedback : '';
         $mformdata->feedbackformat = ($feedback !== false) ? $feedback->format : 0;
+        if ($this->checkmark->trackattendance) {
+            $mformdata->attendance = ($feedback !== false) ? $feedback->attendance : -1;
+            $mformdata->trackattendance = 1;
+            $mformdata->attendancegradebook = $this->checkmark->attendancegradebook;
+        } else {
+            $mformdata->trackattendance = 0;
+        }
         $mformdata->lateness = $this->display_lateness($submission->timemodified);
         $mformdata->auser = $auser;
         $mformdata->user = $user;
@@ -1914,6 +1929,7 @@ class checkmark {
         $mformdata->enableoutcomes = $CFG->enableoutcomes;
         $mformdata->grade = $this->checkmark->grade;
         $mformdata->gradingdisabled = $gradingdisabled;
+        $mformdata->attendancedisabled = $attendancedisabled;
         $mformdata->nextid = $nextid;
         $mformdata->previousid = $previousid;
         $mformdata->submission_content = $this->print_user_submission($user->id, true);
@@ -2947,6 +2963,8 @@ EOS;
             $feedback->timemodified = time();
         }
 
+        $update = false;
+
         if (!($gradinginfo->items[0]->grades[$formdata->userid]->locked
               || $gradinginfo->items[0]->grades[$formdata->userid]->overridden) ) {
             $feedback->grade = $formdata->xgrade;
@@ -2957,7 +2975,33 @@ EOS;
             } else {
                 $feedback->mailed = 1;       // Treat as already mailed!
             }
+            $update = true;
+        }
+        if ($this->checkmark->attendancegradebook) {
+            $lockedoroverridden = $gradinginfo->items[1]->grades[$formdata->userid]->locked
+                                      || $gradinginfo->items[1]->grades[$formdata->userid]->overridden;
+        } else {
+            $lockedoroverridden = false;
+        }
+        $cantrackattendances = has_capability('mod/checkmark:trackattendance', $this->context);
+        if ($this->checkmark->trackattendance && $cantrackattendances && !$lockedoroverridden) {
+            if (($formdata->attendance === '') || ($formdata->attendance == -1)) {
+                $feedback->attendance = null;
+            } else if ($formdata->attendance == 1) {
+                $feedback->attendance = 1;
+            } else if ($formdata->attendance == 0) {
+                $feedback->attendance = 0;
+            }
+            $feedback->graderid = $USER->id;
+            if (!empty($formdata->mailinfo)) {
+                $feedback->mailed = 0;       // Make sure mail goes out (again, even)!
+            } else {
+                $feedback->mailed = 1;       // Treat as already mailed!
+            }
+            $update = true;
+        }
 
+        if ($update) {
             $DB->update_record('checkmark_feedbacks', $feedback);
 
             // Trigger grade event!
@@ -3107,6 +3151,7 @@ EOS;
         $feedback->grade = -1;
         $feedback->feedback = '';
         $feedback->format = 0;
+        $feedback->attendance = null;
         $feedback->graderid = $USER->id;
         $feedback->mailed = 1;
         $feedback->timecreated = time();
