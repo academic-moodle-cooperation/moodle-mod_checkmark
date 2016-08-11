@@ -1904,7 +1904,9 @@ class checkmark {
      * provide a 'Next submission' button.
      * to process submissions before they are graded
      * This method gets its arguments from the page parameters userid and offset
-     * TODO look through this method - it's pretty old and I don't know if we should update it someday
+     * TODO look through this method - it's pretty old and I want to update it in 3.2! It uses it's own code to get
+     *      the next/previous entries from the table (if there are any)!
+     *      We should rewrite that to a better alternative considering submissionstable class!
      *
      * @param int $offset (optional)
      * @param int $userid (optional)
@@ -2181,20 +2183,18 @@ class checkmark {
                                '&amp;tab=printpreview', get_string('strprintpreview', 'checkmark'),
                                get_string('strprintpreviewtabalt', 'checkmark'), false);
 
+        if (!isset($SESSION->checkmark)) {
+            $SESSION->checkmark = new stdClass();
+        }
+
         $tab = optional_param('tab', null, PARAM_ALPHAEXT);
         if ($tab) {
-            if (empty($SESSION->checkmark)) {
-                $SESSION->checkmark = new stdClass();
-            }
             $SESSION->checkmark->currenttab = $tab;
         }
 
         if (isset($SESSION->checkmark->currenttab)) {
             $currenttab = $SESSION->checkmark->currenttab;
         } else {
-            if (!isset($SESSION->checkmark)) {
-                $SESSION->checkmark = new stdClass();
-            }
             $SESSION->checkmark->currenttab = 'submissions';
             $currenttab = 'submissions';
         }
@@ -2216,6 +2216,9 @@ class checkmark {
 
         $thide = optional_param('thide', null, PARAM_ALPHANUMEXT);
         if ($thide) { // Hide table-column!
+            if (!isset($SESSION->checkmark->columns)) {
+                $SESSION->checkmark->columns = array();
+            }
             if (!isset($SESSION->checkmark->columns[$thide])) {
                 $SESSION->checkmark->columns[$thide] = new stdClass();
             }
@@ -2224,6 +2227,9 @@ class checkmark {
 
         $tshow = optional_param('tshow', null, PARAM_ALPHANUMEXT);
         if ($tshow) { // Show table-column!
+            if (!isset($SESSION->checkmark->columns)) {
+                $SESSION->checkmark->columns = array();
+            }
             if (!isset($SESSION->checkmark->columns[$thide])) {
                 $SESSION->checkmark->columns[$thide] = new stdClass();
             }
@@ -2232,6 +2238,9 @@ class checkmark {
 
         $tsort = optional_param('tsort', null, PARAM_ALPHANUMEXT);
         if ($tsort) { // Sort table by column!
+            if (!isset($SESSION->checkmark->columns)) {
+                $SESSION->checkmark->columns = array();
+            }
             if (!isset($SESSION->checkmark->columns[$tsort]->sortable)
                 || ($SESSION->checkmark->columns[$tsort]->sortable != false)) {
                 if (isset($SESSION->checkmark->orderby)
