@@ -67,9 +67,14 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2016071201
+-------------------------
+*) Removed accidently doubled upgrade code for attendances with lesser version number!
+
 v 2016071200
 -------------------------
 *) Add support for attendances tracking!
+*) Fixed wrong terms used in some German language strings concerning due dates
 *) Improve layout for autograding & (new) attendance tracking bulk actions
 *) Rewrite table creation, harmonize tables (submission & export),
 *) Save column status, sort order, etc. persistently
