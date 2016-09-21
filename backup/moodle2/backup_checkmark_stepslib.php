@@ -49,9 +49,9 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         $userinfo = $this->get_setting_value('userinfo');
         // Define each element separated!
         $checkmark = new backup_nested_element('checkmark', array('id'), array(
-            'name', 'intro', 'introformat', 'alwaysshowdescription', 'resubmit',
-            'cutoffdate', 'emailteachers', 'timedue', 'timeavailable', 'exampleprefix',
-            'grade', 'trackattendance', 'attendancegradelink', 'timemodified'));
+            'name', 'intro', 'introformat', 'alwaysshowdescription', 'resubmit', 'cutoffdate', 'emailteachers', 'timedue',
+            'timeavailable', 'exampleprefix', 'grade', 'trackattendance', 'attendancegradelink', 'presentationgrading',
+            'presentationgrade', 'presentationgradebook', 'timemodified'));
 
         $submissions = new backup_nested_element('submissions');
 
@@ -61,8 +61,8 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         $feedbacks = new backup_nested_element('feedbacks');
 
         $feedback = new backup_nested_element('feedback', array('id'), array(
-            'userid', 'grade', 'feedback', 'format', 'attendance', 'graderid', 'mailed',
-            'timecreated', 'timemodified'));
+            'userid', 'grade', 'feedback', 'format', 'attendance', 'presentationgrade', 'presentationfeedback',
+            'presentationformat', 'graderid', 'mailed', 'timecreated', 'timemodified'));
 
         $examples = new backup_nested_element('examples');
 
@@ -101,6 +101,7 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
 
         // Define id annotations!
         $checkmark->annotate_ids('scale', 'grade');
+        $checkmark->annotate_ids('scale', 'presentationgrade');
         $submission->annotate_ids('user', 'userid');
         $feedback->annotate_ids('user', 'userid');
         $feedback->annotate_ids('user', 'graderid');

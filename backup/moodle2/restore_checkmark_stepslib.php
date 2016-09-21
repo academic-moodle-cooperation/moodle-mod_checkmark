@@ -108,6 +108,10 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
             $data->grade = -($this->get_mappingid('scale', abs($data->grade)));
         }
 
+        if ($data->presentationgrade < 0 ) { // Scale found, get mapping!
+            $data->grade = -($this->get_mappingid('scale', abs($data->grade)));
+        }
+
         if (isset($data->flexiblenaming) && isset($data->examplenames) && isset($data->examplegrades)) {
             // Prepare processing of old flexiblenaming backup!
             $addexamples = true;
@@ -188,6 +192,8 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
             unset($data->submissioncomment);
             $feedback->format = $data->format;
             unset($data->format);
+            // Attendances were not implemented before v3.1.0 so no need to cover those!
+            // Presentationgrades were not implemented before v3.2.0 so no need to cover those!
             $feedback->graderid = $data->teacherid;
             unset($data->teacherid);
             $feedback->mailed = $data->mailed;
