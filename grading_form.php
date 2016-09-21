@@ -282,7 +282,7 @@ class mod_checkmark_grading_form extends moodleform {
         $editoroptions['context'] = context_module::instance($this->_customdata->cm->id);
         $editoroptions['component'] = 'mod_checkmark';
         $editoroptions['filearea'] = 'feedback';
-        $editoroptions['noclean'] = false;
+        $editoroptions['format'] = FORMAT_HTML;
         $editoroptions['maxfiles'] = 0;
         return $editoroptions;
     }
@@ -296,13 +296,13 @@ class mod_checkmark_grading_form extends moodleform {
      */
     public function set_data($data) {
         $editoroptions = $this->get_editor_options();
-        if (!isset($data->text)) {
-            $data->text = '';
+        if (!isset($data->feedback)) {
+            $data->feedback = '';
         }
         if (!isset($data->format)) {
-            $data->textformat = FORMAT_HTML;
+            $data->feedbackformat = FORMAT_HTML;
         } else {
-            $data->textformat = $data->format;
+            $data->feedbackformat = $data->format;
         }
 
         if (($this->_customdata->feedbackobj !== false)
