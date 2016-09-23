@@ -654,14 +654,28 @@ class checkmark {
                                         $this->checkmark->id, $userid);
         $item = $gradinginfo->items[CHECKMARK_GRADE_ITEM];
         $grade = $item->grades[$userid];
+        if ($this->checkmark->attendancegradebook) {
+            $attendanceitem = $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM];
+            $attendancegrade = $attendanceitem->grades[$userid];
+        }
+        if ($this->checkmark->presentationgradebook) {
+            $presentationitem = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM];
+            $presentationgrade = $presentationitem->grades[$userid];
+        }
 
         if (($grade->hidden || $grade->grade === false)
-                && (!$this->checkmark->trackattendance || $feedback->attendance === null)) { // Hidden or error!
+                && (!$this->checkmark->trackattendance || ($this->checkmark->attendancegradebook && $attendanceitem->hidden))
+                && (!$this->checkmark->presentationgrading || ($this->checkmark->presentationgradebook
+                                                               && $presentationitem->hidden))) { // Hidden or error!
             return;
         }
 
         if ($grade->grade === null && empty($grade->str_feedback)
-                && (!$this->checkmark->trackattendance || $feedback->attendance === null)) {   // Nothing to show yet!
+                && (!$this->checkmark->trackattendance || $feedback->attendance === null)
+                && (!$this->checkmark->presentationgrading
+                    || (!$this->checkmark->presentationgrade && $feedback->presentationfeedback === null)
+                    || ($this->checkmark->presentationgrade && $feedback->presentationgrade === null
+                        && $feedback->presentationfeedback === null))) {   // Nothing to show yet!
             return;
         }
 
@@ -669,7 +683,7 @@ class checkmark {
         $gradedby   = $grade->usermodified;
         $showfeedback = false;
         if (empty($gradedby)) {
-            // Only show attendance!
+            // Only show attendance or presentationgrade!
             $gradedby = $feedback->graderid;
             $dategraded = $feedback->timemodified;
             if (!$grader = $DB->get_record('user', array('id' => $gradedby))) {
@@ -719,6 +733,33 @@ class checkmark {
             // Third row --> attendance info!
             $row = html_writer::tag('td', html_writer::tag('strong', get_string('attendance', 'checkmark').': ').$attendance,
                                     array('class' => 'content', 'colspan' => 2));
+            $tablecontent .= html_writer::tag('tr', $row);
+        }
+
+        if ($this->checkmark->presentationgrading) {
+            $content = "";
+            if ($this->checkmark->presentationgrade && $this->checkmark->presentationgradebook) {
+                $presgrade = $presentationgrade->str_long_grade;
+            } else if ($this->checkmark->presentationgrade > 0) {
+                // Points to show!
+                $presgrade = round($feedback->presentationgrade, 2).' / '.$this->checkmark->presentationgrade;
+            } else if ($this->checkmark->presentationgrade < 0) {
+                $scale = grade_scale::fetch(array('id' => -$this->checkmark->presentationgrade));
+                $scaleitems = $scale->load_items();
+                $presgrade = $scaleitems[$feedback->presentationgrade];
+            } else {
+                $presgrade = "";
+            }
+            if ($this->checkmark->presentationgradebook) {
+                $presfeedback = $presentationgrade->str_feedback;
+            } else {
+                $presfeedback = $feedback->presentationfeedback;
+            }
+            $content = html_writer::tag('div', html_writer::tag('strong', get_string('presentationgrade', 'checkmark').': ').
+                                               $presgrade, array('class' => 'grade')).
+                       html_writer::tag('div', '', array('class' => 'clearer')).
+                       html_writer::tag('div', $presfeedback, array('class' => 'comment'));
+            $row = html_writer::tag('td', $content, array('class' => 'content', 'colspan' => 2));
             $tablecontent .= html_writer::tag('tr', $row);
         }
 
