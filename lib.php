@@ -344,8 +344,8 @@ function checkmark_user_outline($course, $user, $mod, $checkmark) {
     require_once('$CFG->libdir/gradelib.php');
     $instance = new checkmark($mod->id, $checkmark, $mod, $course);
     $grades = grade_get_grades($course->id, 'mod', 'checkmark', $checkmark->id, $user->id);
-    if (!empty($grades->items[0]->grades)) {
-        return $instance->user_outline(reset($grades->items[0]->grades));
+    if (!empty($grades->items[CHECKMARK_GRADE_ITEM]->grades)) {
+        return $instance->user_outline(reset($grades->items[CHECKMARK_GRADE_ITEM]->grades));
     } else {
         return null;
     }
@@ -369,10 +369,10 @@ function checkmark_user_complete($course, $user, $mod, $checkmark) {
 
     $instance = new checkmark($mod->id, $checkmark, $mod, $course);
     $grades = grade_get_grades($course->id, 'mod', 'checkmark', $checkmark->id, $user->id);
-    if (empty($grades->items[0]->grades)) {
+    if (empty($grades->items[CHECKMARK_GRADE_ITEM]->grades)) {
         $grade = false;
     } else {
-        $grade = reset($grades->items[0]->grades);
+        $grade = reset($grades->items[CHECKMARK_GRADE_ITEM]->grades);
     }
     return $instance->user_complete($user, $grade);
 }
@@ -1211,7 +1211,7 @@ function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $c
         $tmpactivity->timestamp    = $submission->timemodified;
 
         if ($grader) {
-            $tmpactivity->grade = $grades->items[0]->grades[$submission->userid]->str_long_grade;
+            $tmpactivity->grade = $grades->items[CHECKMARK_GRADE_ITEM]->grades[$submission->userid]->str_long_grade;
         }
 
         $userfields = explode(',', user_picture::fields());
@@ -1691,9 +1691,9 @@ function checkmark_print_overview($courses, &$htmlarray) {
                 // Is grade in gradebook more actual?
                 $gradinginfo = grade_get_grades($checkmark->course, 'mod', 'checkmark',
                                                 $checkmark->id, $USER->id);
-                $item = $gradinginfo->items[0];
+                $item = $gradinginfo->items[CHECKMARK_GRADE_ITEM];
                 $grade = $item->grades[$USER->id];
-                if ($gradinginfo->items[0]->grades[$USER->id]->overridden) {
+                if ($gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$USER->id]->overridden) {
                     $submission->grade = round($grade->grade, 2);
                 }
 

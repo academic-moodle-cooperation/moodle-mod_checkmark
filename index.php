@@ -112,8 +112,9 @@ foreach ($modinfo->instances['checkmark'] as $cm) {
     $submitted = $checkmarkinstance->submittedlink(true);
 
     $gradinginfo = grade_get_grades($course->id, 'mod', 'checkmark', $cm->instance, $USER->id);
-    if (isset($gradinginfo->items[0]) && !$gradinginfo->items[0]->grades[$USER->id]->hidden ) {
-        $grade = $gradinginfo->items[0]->grades[$USER->id]->str_grade;
+    if (isset($gradinginfo->items[CHECKMARK_GRADE_ITEM])
+        && !$gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$USER->id]->hidden ) {
+        $grade = $gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$USER->id]->str_grade;
     } else {
         $grade = '-';
     }

@@ -875,8 +875,8 @@ class submissionstable extends \table_sql {
      * @return $string Return user's grade.
      */
     public function col_grade($values) {
-        $finalgrade = $this->gradinginfo->items[0]->grades[$values->id];
-        $grademax = $this->gradinginfo->items[0]->grademax;
+        $finalgrade = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$values->id];
+        $grademax = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grademax;
         $finalgrade->formatted_grade = round($finalgrade->grade, 2).' / '.round($grademax, 2);
         $lockedoroverridden = 'locked';
         if ($finalgrade->overridden) {
@@ -952,7 +952,7 @@ class submissionstable extends \table_sql {
      * @return $string Return user's feedback.
      */
     public function col_feedback($values) {
-        $finalgrade = $this->gradinginfo->items[0]->grades[$values->id];
+        $finalgrade = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$values->id];
         if ($values->feedbackid) {
             // Print Comment!
             if ($finalgrade->locked || $finalgrade->overridden) {
@@ -1054,7 +1054,7 @@ class submissionstable extends \table_sql {
      * @return $string Return user's time of grading.
      */
     public function col_timemarked($values) {
-        $finalgrade = $this->gradinginfo->items[0]->grades[$values->id];
+        $finalgrade = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$values->id];
         if ($finalgrade->locked || $finalgrade->overridden) {
             $date = userdate($finalgrade->dategraded, get_string('strftimedatetime'));
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
@@ -1116,7 +1116,7 @@ class submissionstable extends \table_sql {
      * @return $string Return user's final grade.
      */
     public function col_finalgrade($values) {
-        $finalgrade = $this->gradinginfo->items[0]->grades[$values->id];
+        $finalgrade = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$values->id];
         if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
             return $finalgrade->str_grade;
         } else {
@@ -1191,7 +1191,7 @@ class submissionstable extends \table_sql {
     public function col_attendance($values) {
         // Print attendance symbol or quickgrading checkboxes!
         if (!empty($this->checkmark->attendancegradebook)) {
-            $finalgrade = $this->gradinginfo->items[1]->grades[$values->id];
+            $finalgrade = $this->gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM]->grades[$values->id];
         } else {
             $finalgrade = new \stdClass();
             $finalgrade->locked = 0;

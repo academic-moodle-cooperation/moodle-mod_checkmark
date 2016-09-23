@@ -652,7 +652,7 @@ class checkmark {
 
         $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark',
                                         $this->checkmark->id, $userid);
-        $item = $gradinginfo->items[0];
+        $item = $gradinginfo->items[CHECKMARK_GRADE_ITEM];
         $grade = $item->grades[$userid];
 
         if (($grade->hidden || $grade->grade === false)
@@ -1985,10 +1985,11 @@ class checkmark {
 
         $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark',
                                         $this->checkmark->id, array($user->id));
-        $gradingdisabled = $gradinginfo->items[0]->grades[$userid]->locked || $gradinginfo->items[0]->grades[$userid]->overridden;
+        $gradingdisabled = $gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$userid]->locked
+                               || $gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$userid]->overridden;
         if ($this->checkmark->attendancegradebook) {
-            $attendancedisabled = $gradinginfo->items[1]->grades[$userid]->locked
-                                      || $gradinginfo->items[1]->grades[$userid]->overridden;
+            $attendancedisabled = $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM]->grades[$userid]->locked
+                                      || $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM]->grades[$userid]->overridden;
         } else {
             $attendancedisabled = false;
         }
@@ -3028,16 +3029,16 @@ class checkmark {
 
         $update = false;
 
-        if (!($gradinginfo->items[0]->grades[$formdata->userid]->locked
-              || $gradinginfo->items[0]->grades[$formdata->userid]->overridden) ) {
+        if (!($gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$formdata->userid]->locked
+              || $gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$formdata->userid]->overridden) ) {
             $feedback->grade = $formdata->xgrade;
             $feedback->feedback = $formdata->feedback_editor['text'];
             $feedback->graderid = $USER->id;
             $update = true;
         }
         if ($this->checkmark->attendancegradebook) {
-            $lockedoroverridden = $gradinginfo->items[1]->grades[$formdata->userid]->locked
-                                      || $gradinginfo->items[1]->grades[$formdata->userid]->overridden;
+            $lockedoroverridden = $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM]->grades[$formdata->userid]->locked
+                                      || $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM]->grades[$formdata->userid]->overridden;
         } else {
             $lockedoroverridden = false;
         }
