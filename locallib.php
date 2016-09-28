@@ -2289,8 +2289,8 @@ class checkmark {
             if (!isset($SESSION->checkmark->columns)) {
                 $SESSION->checkmark->columns = array();
             }
-            if (!isset($SESSION->checkmark->columns[$thide])) {
-                $SESSION->checkmark->columns[$thide] = new stdClass();
+            if (!isset($SESSION->checkmark->columns[$tshow])) {
+                $SESSION->checkmark->columns[$tshow] = new stdClass();
             }
             $SESSION->checkmark->columns[$tshow]->visibility = 1;
         }
