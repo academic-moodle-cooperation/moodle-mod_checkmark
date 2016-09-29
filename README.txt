@@ -69,6 +69,10 @@ CHANGELOG
 ================================================================================
 v 2016031400
 -------------------------
+*) Fixed old checkmark_refresh_dates() function to be compatible with 3.0.6 updates onwards!
+
+v 2016031400
+-------------------------
 *) fixed a bug concerning submission updated event
    (related user was not shown, caused problems)
 
