@@ -657,6 +657,8 @@ class checkmark {
         if ($this->checkmark->attendancegradebook) {
             $attendanceitem = $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM];
             $attendancegrade = $attendanceitem->grades[$userid];
+        } else {
+            $attendanceitem = false;
         }
         if ($this->checkmark->presentationgradebook) {
             $presentationitem = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM];
@@ -722,6 +724,9 @@ class checkmark {
         }
 
         if ($this->checkmark->trackattendance) {
+            if ($attendancegrade->locked || $attendancegrade->overridden) {
+                $feedback->attendance = $attendancegrade->grade;
+            }
             if ($feedback->attendance == 1) {
                 $attendancestr = strtolower(get_string('attendant', 'checkmark'));
             } else if ($feedback->attendance == 0 && $feedback->attendance !== null) {
@@ -877,6 +882,13 @@ class checkmark {
 
         // If the attendance is linked to the grades!
         $attendancecoupled = $this->checkmark->trackattendance && $this->checkmark->attendancegradelink;
+        $attendancegradebook = $this->checkmark->trackattendance && $this->checkmark->attendancegradebook;
+        if ($attendancegradebook) {
+            $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark', $this->checkmark->id);
+            $attendanceitem = $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM];
+        } else {
+            $attendanceitem = false;
+        }
 
         // Get all ppl that are allowed to submit checkmarks!
         $context = context_module::instance($this->cm->id);
@@ -906,9 +918,20 @@ class checkmark {
 
                 if ($attendancecoupled) {
                     // If attendence is coupled we have to filter all out, who have no attendance-status!
+                    if (!$attendanceitem) {
+                        $attendancefilter = " AND f.attendance IS NOT NULL ";
+                        $attendancesql = "";
+                    } else {
+                        $attendancefilter = " AND (((g.locked > 0 OR g.overridden > 0) AND g.rawgrade IS NOT NULL)
+                                                    OR (f.attendance IS NOT NULL)) ";
+                        $attendancesql = "LEFT JOIN {grade_grades} g ON u.id = g.userid AND g.itemid = :itemid";
+                        $params['itemid'] = $attendanceitem->id;
+                    }
                     $sql = "SELECT u.id FROM {user} u
-                         LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid
-                             WHERE u.deleted = 0 AND f.attendance IS NOT NULL AND u.id ".$sqluserids;
+                         LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid ".
+                         $attendancesql."
+                             WHERE u.deleted = 0 AND u.id ".$sqluserids.
+                                   $attendancefilter;
                     $params['checkmarkid'] = $this->checkmark->id;
                 } else {
                     $sql = 'SELECT u.id FROM {user} u '.
@@ -918,17 +941,27 @@ class checkmark {
             case self::FILTER_REQUIRE_GRADING:
                 $wherefilter = ' AND (COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0)) ';
                 if ($attendancecoupled) {
-                    $attendancefilter = ' AND f.attendance IS NOT NULL ';
+                    if (!$attendanceitem) {
+                        $attendancefilter = " AND f.attendance IS NOT NULL ";
+                        $attendancesql = "";
+                    } else {
+                        $attendancefilter = " AND (((g.locked > 0 OR g.overridden > 0) AND g.rawgrade IS NOT NULL)
+                                                    OR (f.attendance IS NOT NULL)) ";
+                        $attendancesql = "LEFT JOIN {grade_grades} g ON u.id = g.userid AND g.itemid = :itemid";
+                        $params['itemid'] = $attendanceitem->id;
+                    }
                 } else {
                     $attendancefilter = '';
+                    $attendancesql = "";
                 }
-                $sql = '  SELECT u.id
+                $sql = "  SELECT u.id
                             FROM {user} u
-                       LEFT JOIN ('.$esql.') eu ON eu.id=u.id
+                       LEFT JOIN (".$esql.") eu ON eu.id=u.id
                        LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid)
-                       LEFT JOIN {checkmark_feedbacks} f ON s.userid = f.userid AND s.checkmarkid = f.checkmarkid
+                       LEFT JOIN {checkmark_feedbacks} f ON s.userid = f.userid AND s.checkmarkid = f.checkmarkid ".
+                        $attendancesql."
                            WHERE u.deleted = 0
-                                 AND s.checkmarkid = :checkmarkid'.
+                                 AND s.checkmarkid = :checkmarkid".
                        $wherefilter.$attendancefilter;
                        $params = array_merge_recursive($params,
                                                        array('checkmarkid' => $this->checkmark->id));
@@ -936,9 +969,16 @@ class checkmark {
             case self::FILTER_ALL:
             default:
                 if ($attendancecoupled) {
-                    $attendancefilter = ' AND f.attendance IS NOT NULL ';
                     $attendancejoin = ' LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid2';
                     $params['checkmarkid2'] = $this->checkmark->id;
+                    if (!$attendanceitem) {
+                        $attendancefilter = " AND f.attendance IS NOT NULL ";
+                    } else {
+                        $attendancefilter = " AND (((g.locked > 0 OR g.overridden > 0) AND g.rawgrade IS NOT NULL)
+                                                    OR (f.attendance IS NOT NULL)) ";
+                        $attendancejoin .= " LEFT JOIN {grade_grades} g ON u.id = g.userid AND g.itemid = :itemid ";
+                        $params['itemid'] = $attendanceitem->id;
+                    }
                 } else {
                     $attendancefilter = '';
                     $attendancejoin = '';
@@ -956,6 +996,25 @@ class checkmark {
         }
 
         $users = $DB->get_records_sql($sql, $params);
+
+        // Get the grades for the selected users!
+        $userids = array_keys($users);
+        if ($attendancegradebook) {
+            $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark', $this->checkmark->id, $userids);
+            $attendanceitem = $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM];
+
+            if ($attendancecoupled) {
+                foreach ($users as $user) {
+                    if (($attendanceitem->grades[$user->id]->locked || $attendanceitem->grades[$user->id]->overridden)) {
+                        if (($attendanceitem->grades[$user->id]->grade != 1)
+                                && ($attendanceitem->grades[$user->id]->grade != 0)) {
+                            // Undefined state!
+                            unset($users[$user->id]);
+                        }
+                    }
+                }
+            }
+        }
 
         if ($users == null) {
             $result['status'] = GRADE_UPDATE_OK;
@@ -982,7 +1041,14 @@ class checkmark {
                     }
 
                     $feedback->timemodified = $timemarked;
-                    if ($attendancecoupled && ($feedback->attendance == 0)) {
+                    if ($attendanceitem) {
+                        $lockedoroverridden = $attendanceitem->grades[$currentuser->id]->locked
+                                                  || $attendanceitem->grades[$currentuser->id]->overridden;
+                    } else {
+                        $lockedoroverridden = false;
+                    }
+                    if ($attendancecoupled && ((!$lockedoroverridden && $feedback->attendance == 0)
+                                               || ($lockedoroverridden && $attendanceitem->grades[$currentuser->id]->grade == 0))) {
                         // We set grade to 0 if it's coupled with attendance and the user was absent!
                         $calculatedgrade = 0;
                     } else {

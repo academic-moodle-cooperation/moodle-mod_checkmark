@@ -895,8 +895,8 @@ function checkmark_refresh_events($course = 0, $checkmarkid = 0) {
     if ($checkmarks) {
         foreach ($checkmarks as $checkmark) {
             $cm = get_coursemodule_from_instance('checkmark', $checkmark->id);
+            $event = new stdClass();
             if ($checkmark->timedue) {
-                $event = new stdClass();
 
                 if ($event->id = $DB->get_field('event', 'id', array('modulename' => 'checkmark',
                                                                      'instance'   => $checkmark->id))) {

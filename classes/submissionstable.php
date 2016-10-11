@@ -1296,13 +1296,14 @@ class submissionstable extends \table_sql {
      */
     public function col_attendance($values) {
         // Print attendance symbol or quickgrading checkboxes!
-        if (!empty($this->checkmark->attendancegradebook)) {
+        if (!empty($this->checkmark->checkmark->attendancegradebook)) {
             $finalgrade = $this->gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM]->grades[$values->id];
         } else {
             $finalgrade = new \stdClass();
             $finalgrade->locked = 0;
             $finalgrade->overridden = 0;
         }
+
         if ($finalgrade->locked || $finalgrade->overridden) {
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return $finalgrade->grade;
