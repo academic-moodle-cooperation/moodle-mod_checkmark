@@ -261,6 +261,7 @@ class submissionstable extends \table_sql {
         $tablecolumns = array('selection', 'picture', 'fullname');
         $tableheaders = array('', '', get_string('fullnameuser'));
         $helpicons = array(null, null, null);
+        $table->add_colgroup(1, 'sel');
 
         $useridentity = get_extra_user_fields($table->context);
         foreach ($useridentity as $cur) {
@@ -268,10 +269,12 @@ class submissionstable extends \table_sql {
             $tableheaders[] = ($cur == 'phone1') ? get_string('phone') : get_string($cur);
             $helpicons[] = null;
         }
+        $table->add_colgroup(count($useridentity) + 2, 'user');
         if ($table->groupmode != NOGROUPS) {
             $tableheaders[] = get_string('group');
             $tablecolumns[] = 'groups';
             $helpicons[] = null;
+            $table->add_colgroup(1, 'group');
         }
         $tableheaders[] = get_string('grade');
         $tablecolumns[] = 'grade';
@@ -279,16 +282,19 @@ class submissionstable extends \table_sql {
         $tableheaders[] = get_string('comment', 'checkmark');
         $tablecolumns[] = 'feedback';
         $helpicons[] = null;
+        $table->add_colgroup(2, 'feedback');
         $tableheaders[] = get_string('lastmodified').' ('.get_string('submission', 'checkmark').')';
         $tablecolumns[] = 'timesubmitted';
         $helpicons[] = null;
         $tableheaders[] = get_string('lastmodified').' ('.get_string('grade').')';
         $tablecolumns[] = 'timemarked';
         $helpicons[] = null;
+        $table->add_colgroup(2, 'changedates');
         if ($table->checkmark->checkmark->trackattendance) {
             $tableheaders[] = get_string('attendance', 'checkmark');
             $tablecolumns[] = 'attendance';
             $helpicons[] = new \help_icon('attendance', 'checkmark');
+            $table->add_colgroup(1, 'attendance');
         }
         $tableheaders[] = get_string('status');
         $tablecolumns[] = 'status';
@@ -300,6 +306,9 @@ class submissionstable extends \table_sql {
             $tableheaders[] = get_string('outcome', 'grades');
             $tablecolumns[] = 'outcome'; // No sorting based on outcomes column!
             $helpicons[] = null;
+            $table->add_colgroup(3, 'status_and_gradebook');
+        } else {
+            $table->add_colgroup(2, 'status_and_gradebook');
         }
 
         $table->define_columns($tablecolumns);
@@ -449,6 +458,7 @@ class submissionstable extends \table_sql {
         $table->cellwidth = array(array('mode' => 'Fixed', 'value' => '25'));
         $table->columnformat = array('fullname' => array('align' => 'L'));
         $helpicons = array(null, null);
+        $table->add_colgroup(1, 'sel');
 
         $useridentity = get_extra_user_fields($table->context);
         foreach ($useridentity as $cur) {
@@ -458,12 +468,14 @@ class submissionstable extends \table_sql {
             $table->columnformat[$cur] = array('align' => 'L');
             $helpicons[] = null;
         }
+        $table->add_colgroup(count($useridentity) + 1, 'user');
         if ($table->groupmode != NOGROUPS) {
             $tableheaders[] = get_string('group');
             $tablecolumns[] = 'groups';
             $table->cellwidth[] = array('mode' => 'Relativ', 'value' => '20');
             $table->columnformat['groups'] = array('align' => 'L');
             $helpicons[] = null;
+            $table->add_colgroup(1, 'group');
         }
 
         $tablecolumns[] = 'timesubmitted';
@@ -471,6 +483,7 @@ class submissionstable extends \table_sql {
         $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '30');
         $table->columnformat['timesubmitted'] = array('align' => 'L');
         $helpicons[] = null;
+        $table->add_colgroup(1, 'timesubmitted');
 
         // Dynamically add examples!
         foreach ($table->checkmark->checkmark->examples as $key => $example) {
@@ -481,6 +494,7 @@ class submissionstable extends \table_sql {
             $table->columnformat['example'.$key] = array('align' => 'C');
             $helpicons[] = null;
         }
+        $table->add_colgroup(count($table->checkmark->checkmark->examples), 'examples');
 
         if ((!empty($table->sumabs) || !empty($table->sumrel))) {
             $tableheaders[] = get_string('checkmarks', 'checkmark');
@@ -488,6 +502,7 @@ class submissionstable extends \table_sql {
             $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
             $table->columnformat['summary'] = array('align' => 'L');
             $helpicons[] = null;
+            $table->add_colgroup(1, 'summary');
         }
 
         $tableheaders[] = get_string('grade');
@@ -508,6 +523,9 @@ class submissionstable extends \table_sql {
             $table->cellwidth[] = array('mode' => 'Relativ', 'value' => '50');
             $table->columnformat['outcome'] = array('align' => 'L');
             $helpicons[] = null;
+            $table->add_colgroup(3, 'feedback outcomes');
+        } else {
+            $table->add_colgroup(2, 'feedback outcomes');
         }
 
         if ($table->checkmark->checkmark->trackattendance) {
@@ -516,6 +534,7 @@ class submissionstable extends \table_sql {
             $tablecolumns[] = 'attendance';
             $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
             $table->columnformat['attendance'] = array('align' => 'R');
+            $table->add_colgroup(1, 'attendance');
         }
 
         $tableheaders[] = get_string('signature', 'checkmark');
@@ -523,6 +542,7 @@ class submissionstable extends \table_sql {
         $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '30');
         $table->columnformat['signature'] = array('align' => 'L');
         $helpicons[] = null;
+        $table->add_colgroup(1, 'signature');
 
         $table->define_columns($tablecolumns);
         $table->define_headers($tableheaders);
@@ -632,6 +652,36 @@ class submissionstable extends \table_sql {
         return $table;
     }
 
+    /**
+     * Adds a new colgroup!
+     *
+     * @param int $span how many cols the group should span
+     * @param string $class the col groups css class(es)
+     */
+    function add_colgroup($span = 1, $class) {
+        $colgrp = new \stdClass();
+        $colgrp->span = $span;
+        $colgrp->class = $class;
+
+        $this->colgroups[] = $colgrp;
+    }
+
+    /**
+     * Here we extend the moodle sql_table with the ability to output colgroups!
+     */
+    function start_html() {
+        parent::start_html();
+        if (!empty($this->colgroups)) {
+            foreach ($this->colgroups as $colgrp) {
+                echo \html_writer::start_tag('colgroup', array('class' => $colgrp->class,
+                                                               'span'  => $colgrp->span));
+                for($i=0;$i<$colgrp->span;$i++) {
+                    echo \html_writer::empty_tag('col');
+                }
+                echo \html_writer::end_tag('colgroup');
+            }
+        }
+    }
     /**
      * Used to suppress initials bar if flag is set!
      */
