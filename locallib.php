@@ -724,7 +724,7 @@ class checkmark {
         }
 
         if ($this->checkmark->trackattendance) {
-            if ($attendancegrade->locked || $attendancegrade->overridden) {
+            if ($attendanceitem && ($attendancegrade->locked || $attendancegrade->overridden)) {
                 $feedback->attendance = $attendancegrade->grade;
             }
             if ($feedback->attendance == 1) {
@@ -2168,7 +2168,7 @@ class checkmark {
                                         $this->checkmark->id, array($user->id));
         $gradingdisabled = $gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$userid]->locked
                                || $gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$userid]->overridden;
-        if ($this->checkmark->attendancegradebook) {
+        if ($this->checkmark->trackattendance && $this->checkmark->attendancegradebook) {
             $attendancedisabled = $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM]->grades[$userid]->locked
                                       || $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM]->grades[$userid]->overridden;
         } else {
@@ -2313,9 +2313,9 @@ class checkmark {
             $mformdata->presentationgrading = true;
             $mformdata->instance_presentationgrade = $this->checkmark->presentationgrade;
             $mformdata->presentationgradebook = $this->checkmark->presentationgradebook;
-            $mformdata->presentationgrade = $feedback->presentationgrade;
-            $mformdata->presentationfeedback = $feedback->presentationfeedback;
-            $mformdata->presentationformat = $feedback->presentationformat;
+            $mformdata->presentationgrade = ($feedback !== false) ? $feedback->presentationgrade : -1;
+            $mformdata->presentationfeedback = ($feedback !== false) ? $feedback->presentationfeedback : '';
+            $mformdata->presentationformat = ($feedback !== false) ? $feedback->presentationformat : FORMAT_HTML;
             $mformdata->presentationgradedisabled = $presentationgradedisabled;
         }
         $mformdata->lateness = $this->display_lateness($submission->timemodified);

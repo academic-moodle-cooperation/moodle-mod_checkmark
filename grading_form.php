@@ -272,7 +272,7 @@ class mod_checkmark_grading_form extends moodleform {
                 $mform->setType('presentationgrade', PARAM_INT);
                 $mform->setDefault('presentationgrade', $presentationgrade);
             }
-            if ($this->_customdata->presentationgradedisabled /*|| !has_capability('mod/checkmark:gradepresentation', $context)*/) {
+            if ($this->_customdata->presentationgradedisabled || !has_capability('mod/checkmark:gradepresentation', $context)) {
                 if ($this->_customdata->instance_presentationgrade) {
                     $mform->freeze('presentationgrade');
                 }
