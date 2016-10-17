@@ -31,6 +31,14 @@ env:
   - DB=pgsql
   - DB=mysqli
 
+# This section defines who's going to receive the notifications!
+notifications:
+  email:
+    recipients:
+      - office@phager.at
+    on_success: always # default: change
+    on_failure: always # default: always
+
 # This lists steps that are run before the installation step.
 before_install:
 # This disables XDebug which should speed up the build.  One reason to remove this
