@@ -35,7 +35,17 @@ env:
 notifications:
   email:
     recipients:
-      - office@phager.at
+        # I'm going to receive all reports, no matter what status they have or had (my encrypted e-mail-adress)!
+      - secure: "wvrbHUFW97rRKj6LOPj3qWdwBjQFrXtczU3TFd3f48aDOeN3qxKOA3Ycuj3HnpHOvq+EEUeVIjubhAvQfJgiJ2n8/PORdtTU2ARTAUx9z/c8ik5jXTpMXcwEDSSTHhhqKABpzun4qLoqAaBdkqb0jTaNQOfPr9hRoRsTXi07jMNBUsKB0dSy4W8CiGNB93r8uZRIBo2ZlKbZoVbA9EMJQO+wXYuabBiV8mLD7R/qTxBX5qix/gHnKKnDnbwtfUBMVu/XhJihP0aGznQF2xG5PiWaTXPWayv+VIm4Ryx+3cQhOqZmyIRaZvR6Ukvyd16ijrNm+BwaCVJGoaHwOr1YYp+3wY6vV/cyJFMU4Ome+wIyJKjEWa5ZkEfXda8Shs/PmSZEN9Wi5y145SSXe/n3hv/1qWj7t3sD8FsbAsH5I5yNkVUcAYkmZjWqR4kTMlL2tVqSXck71nVRZ9PS0x1bXrX84WNaPMJk4eCeAvVhmtYHviZaGVe++hDAn4aDKi3rf/fB7xhwQhx3k6NpRQfmr6EaYf6E6CllRwUWYb65D/KM7lQt7chrgQryT65CqI6/DqHA9ZdG2iwRIiKlRavaCIg6JQxAi3pDHtg5coVE5uGfP+DxoywF0CQsDyREueRZ+u4yNFWHo5I3XoGd9k1IE0uqyzL6Jcg/i3BCYh+Pu3I="
+    on_success: always # default: change
+    on_failure: always # default: always
+  slack:
+    # This is the value "[Slack-Organisation]:[API-Key]#[channel]" just encrypted!
+    rooms:
+        #travisci channel
+      - secure: "D1PsxyGmPjfYKSG2Onymek1h8L6LGk/e3JGj9E5+Lvt91fLKd1bOJ7g+QtJsET8+L4uQesf5Aa2OlHrgKU0k6M3VY4isu9UXMyCI6SV/NULAyvtDYKjHvTg2IqSLCwBdE/lbjxTC5/0XxouZOcLhjPIG+zKky3AEpFbeRZS2xrqEb3xEiye6dpuUL4rIgbuGvmD7CLhu0u+6WbMFJUM0YH0s2myYiyBvCBq67zgDMbI8tXS3jXc9HAeCIPyKgPd3PKLws9lYIv16hv8lQyQixMeNoqfAi9YrSCxAU47N0PiRlgjPVLM81HfTE7UeilDN9n7RHAktFq/R6FhvMErszSFOuYrhbXinj3wlTr58TpBnwa2NkVkD1Z3iGLVverqaxRJSFeOSQ4Ewq0INW6O/zlSWueXBtOjLwvrMY6jjBAWD1yoKD56maBXwbZ0al6AxQaSAB79GbHEqFq40Vmm9o3ezv6s+sDw9++vELyI9fv5FQSCh5tMLI5hcZmpYWfp4QHOzGa31hVdwhK6YxjY1ydsbrO2lsAKtZvBOxDH4eidfdufKKV9VIBRMd7qhKtSErhL25pTvBEXVv6FoP8DKGrJehaCP9qcg7Jg47AhDldga59no9QZ/WuS5WjiltjbKTTlqNYnhINSTMOuLm1zksdP9M/oXzjnMhdtc5keUNx0="
+        #mod_checkmark channel
+      - secure: "J1mHILZBVN/7ygPFrFdAMCBG5t+TX1496ulI8/E3ff7504zrm+URuX9gBlWPlz4z9Ax7KggAG5l02vpQafqC0VIJ0WyT/o8pGuP+PM5Na/NsumQk2qEOCxS2XgGQ0jtrhPd2I/25ok2ZbG1cPsdPs5664LL9VK5SVPXdtGBIB0vFBq1oGPxPYOORXFhemp/WH2ptZ5xA9fUzCgYHiGeHeKz9aZcVb1nPT5scFIC6X213tzqtcOJco8s6RukBM2bxFTF6Yevaj68ESh5PkiafukR/fP0AUNgFcyXVJBj/i/QXf05XqSwoRIqkj6lJF6x0NuqKLnzP2BaSe+Wu7nlsHwdAL7Cfpg0+5k216Ys1Pk6jxdVv5n2p24uw9kZr9tiL6vEquSJ9gUxdRtglkbTV+kWVanLT6ZO0f0dl05iptTmZZZMZWefA+/lxZQ9HbFkn/PZ4Rd31xpPY8OA5IjOxpqOMooQyzcJf8t3Vy60/OJfK4qe01HL00sBXguTql25RFLJo6Xf5w/KVbtcI5k2h7GNoVRFroGao7VvOJ6HDEy+y01nOsirFTEdx7a1EzoolqPrOn0oVSNCXFSnZzyNFgX3JUUmStdlItzCefQnjgqIjtwDvRmJOqEAtr912QU0LQVw6MkoZN9GzsciH4wkfRmDyQppRRaoyYv4R5w/KFdA="
     on_success: always # default: change
     on_failure: always # default: always
 
@@ -90,7 +100,9 @@ script:
   - moodle-plugin-ci validate
 # This step runs the PHPUnit tests of your plugin.  If your plugin has PHPUnit tests,
 # then it is highly recommended that you keep this step.
-  - moodle-plugin-ci phpunit
+  - moodle-plugin-ci phpunit --coverage-clover
 # This step runs the Behat tests of your plugin.  If your plugin has Behat tests, then
 # it is highly recommended that you keep this step.
   - moodle-plugin-ci behat
+# Now we view the coverage file!
+  - if [ -e "coverage.xml" ]; then echo "Show PHPUnit code coverage:"; cat coverage.xml; fi
