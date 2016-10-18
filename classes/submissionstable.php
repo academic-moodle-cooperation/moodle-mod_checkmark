@@ -715,7 +715,7 @@ class submissionstable extends \table_sql {
      * @param int $span how many cols the group should span
      * @param string $class the col groups css class(es)
      */
-    function add_colgroup($span = 1, $class) {
+    protected function add_colgroup($span = 1, $class) {
         $colgrp = new \stdClass();
         $colgrp->span = $span;
         $colgrp->class = $class;
@@ -726,19 +726,20 @@ class submissionstable extends \table_sql {
     /**
      * Here we extend the moodle sql_table with the ability to output colgroups!
      */
-    function start_html() {
+    public function start_html() {
         parent::start_html();
         if (!empty($this->colgroups)) {
             foreach ($this->colgroups as $colgrp) {
                 echo \html_writer::start_tag('colgroup', array('class' => $colgrp->class,
                                                                'span'  => $colgrp->span));
-                for($i=0;$i<$colgrp->span;$i++) {
+                for ($i = 0; $i < $colgrp->span; $i++) {
                     echo \html_writer::empty_tag('col');
                 }
                 echo \html_writer::end_tag('colgroup');
             }
         }
     }
+
     /**
      * Used to suppress initials bar if flag is set!
      */

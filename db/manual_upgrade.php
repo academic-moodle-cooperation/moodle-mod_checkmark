@@ -24,5 +24,6 @@
  * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once('../../../config.php');
 
 require_once('./upgradeoldcheckmarks.php');

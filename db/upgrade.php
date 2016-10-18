@@ -985,14 +985,14 @@ function xmldb_checkmark_upgrade($oldversion) {
                 }
             }
         } catch (Throwable $t) {
-            // Executed only in PHP 7, will not match in PHP 5.x
+            // Executed only in PHP 7, will not match in PHP 5.x!
             echo "errored!".html_writer::empty_tag('br');
 
             echo $OUTPUT->notification($t->getMessage(), 'error');
 
             return false;
         } catch (Exception $e) {
-            // Executed only in PHP 5.x, will not be reached in PHP 7
+            // Executed only in PHP 5.x, will not be reached in PHP 7!
             echo "errored!".html_writer::empty_tag('br');
 
             echo $OUTPUT->notification($e->getMessage(), 'error');
