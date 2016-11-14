@@ -64,7 +64,7 @@
 }
 
 #page-mod-checkmark-submissions .submissions colgroup.presentationgrade {
-    border-left:2px solid rgba(153, 153, 153, 0.95);
+    border-left: 2px solid rgba(153, 153, 153, 0.95);
 }
 
 #page-mod-checkmark-submissions .qgprefs #optiontable {
@@ -167,7 +167,7 @@
 }
 
 .path-mod-checkmark div.examplelist .unchecked {
-    color: #999999;
+    color: #999;
     text-decoration: line-through;
 }
 
@@ -179,17 +179,17 @@
 }
 
 .path-mod-checkmark table.coloredrows .header {
-    white-space:nowrap;
+    white-space: nowrap;
 }
 
 .path-mod-checkmark table.coloredrows .r0 {
     background-color: #f0f0f0;
-    white-space: nowrap
+    white-space: nowrap;
 }
 
 .path-mod-checkmark table.coloredrows .r1 {
     background-color: #fafafa;
-    white-space: nowrap
+    white-space: nowrap;
 }
 
 .path-mod-checkmark .scroll_forced {
@@ -207,35 +207,35 @@
 }
 
 .path-mod-checkmark .early {
-    background-color:#99FF99;
+    background-color: #9f9;
 }
 
 .path-mod-checkmark .soon {
-    background-color:#FFFF99;
+    background-color: #ff9;
 }
 
 .path-mod-checkmark .today {
-    background-color:#FFCC99;
+    background-color: #fc9;
 }
 
 .path-mod-checkmark .tobegraded,
 .checkmark .tobegraded {
-    background-color:#FFCC99;
+    background-color: #fc9;
 }
 
 .path-mod-checkmark .allgraded,
 .checkmark .allgraded {
-    background-color:#99FF99;
+    background-color: #9f9;
 }
 
 .path-mod-checkmark .submissionsmissing,
 .checkmark .submissionsmissing {
-    background-color:#FFCC99;
+    background-color: #fc9;
 }
 
 .path-mod-checkmark .allsubmitted,
 .checkmark .allsubmitted {
-    background-color:#99FF99;
+    background-color: #9f9;
 }
 
 .path-mod-checkmark #autogradingfieldset {
@@ -244,9 +244,9 @@
 }
 
 .checkmark.overview.statistics > .name {
-    font-weight:bold;
-    margin-bottom:5px;
-    margin-top:5px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    margin-top: 5px;
 }
 
 .checkmark.overview.statistics > table {
