@@ -1445,9 +1445,13 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
     $a->total_grade = $maxcheckedgrades;
     $a->name = $checkmark->name;
 
-    if (!(empty($submission->userid)
-            || !$feedback = $DB->get_record('checkmark_feedbacks', array('checkmarkid' => $checkmark->id,
-                                                                         'userid'      => $submission->userid)))) {
+    if (empty($submission->userid)) {
+        $feedback = false;
+    } else {
+        $feedback = $DB->get_record('checkmark_feedbacks', array('checkmarkid' => $checkmark->id,
+                                                                 'userid'      => $submission->userid));
+    }
+    if (!empty($submission->userid) && $feedback && ($feedback->grade != -1)) {
         /*
          * Cache scales for each checkmark
          * they might have different scales!
@@ -1463,11 +1467,12 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
             }
         } else {                                // Scale?
             if (empty($scalegrades[$checkmark->id])) {
-                if ($scale = $DB->get_record('scale', array('id' => -($checkmark->grade)))) {
-                    $scalegrades[$checkmark->id] = make_menu_from_list($scale->scale);
-                    $a->grade = $scalegrades[$checkmark->id][(int)$feedback->grade];
-                } else {
+                if (!$scale = grade_scale::fetch(array('id' => -$checkmark->grade))) {
                     $a->grade = get_string('notgradedyet', 'checkmark');
+                } else {
+                    $scale->load_items();
+                    $scalegrades[$checkmark->id] = $scale->scale_items;
+                    $a->grade = $scalegrades[$checkmark->id][(int)$feedback->grade];
                 }
             }
             if (isset($scalegrades[$checkmark->id][(int)$feedback->grade])) {
@@ -1476,7 +1481,6 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
             }
         }
     } else {
-
         $a->grade = get_string('notgradedyet', 'checkmark');
     }
 
