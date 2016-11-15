@@ -729,6 +729,18 @@ function checkmark_attendance_item_update($checkmark, $grades=null) {
 
     $gradeupdate = grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id, CHECKMARK_ATTENDANCE_ITEM,
                                 $grades, $params);
+    // Move attendance item directly after grade item, if it exists in the same category!
+    $params = array('courseid'     => $checkmark->course,
+                    'itemtype'     => 'mod',
+                    'itemmodule'   => 'checkmark',
+                    'iteminstance' => $checkmark->id);
+    if ($attendanceitem = grade_item::fetch($params + array('itemnumber' => CHECKMARK_ATTENDANCE_ITEM))) {
+        if ($gradeitem = grade_item::fetch($params + array('itemnumber' => CHECKMARK_GRADE_ITEM))) {
+            if ($gradeitem->categoryid == $attendanceitem->categoryid) {
+                $attendanceitem->move_after_sortorder($gradeitem->get_sortorder());
+            }
+        }
+    }
 
     return $gradeupdate;
 }
@@ -768,8 +780,27 @@ function checkmark_presentation_item_update($checkmark, $grades=null) {
         $checkmark->id = $checkmark->instance;
     }
 
-    return grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id, CHECKMARK_PRESENTATION_ITEM,
-                        $grades, $params);
+    $gradeupdate =  grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id,
+                                 CHECKMARK_PRESENTATION_ITEM, $grades, $params);
+
+    // Move presentation item attendance item directly after attendance or grade item, if one of them exists!
+    $params = array('courseid'     => $checkmark->course,
+                    'itemtype'     => 'mod',
+                    'itemmodule'   => 'checkmark',
+                    'iteminstance' => $checkmark->id);
+    if ($presentationitem = grade_item::fetch($params + array('itemnumber' => CHECKMARK_PRESENTATION_ITEM))) {
+        if ($attendanceitem = grade_item::fetch($params + array('itemnumber' => CHECKMARK_ATTENDANCE_ITEM))) {
+            if ($attendanceitem->categoryid == $presentationitem->categoryid) {
+                $presentationitem->move_after_sortorder($attendanceitem->get_sortorder());
+            }
+        } else if ($gradeitem = grade_item::fetch($params + array('itemnumber' => CHECKMARK_GRADE_ITEM))) {
+            if ($presentationitem->categoryid == $gradeitem->categoryid) {
+                $presentationitem->move_after_sortorder($gradeitem->get_sortorder());
+            }
+        }
+    }
+
+    return $gradeupdate;
 }
 
 /**
