@@ -140,7 +140,11 @@ function checkmark_update_instance($checkmark) {
 
     $checkmark->id = $checkmark->instance;
 
-    if (empty($checkmark->presentationgrading)) {
+    if (!empty($checkmark->presentationfeedbackpresent)) {
+        // If there are presentation feedbacks present we won't change these settings!
+        unset($checkmark->presentationgrading);
+        unset($checkmark->presentationgrade);
+    } else if (empty($checkmark->presentationgrading)) {
         $checkmark->presentationgrade = 0;
         $checkmark->presentationgradebook = 0;
         checkmark_presentation_item_delete($checkmark);
@@ -176,11 +180,15 @@ function checkmark_update_instance($checkmark) {
         checkmark_attendance_item_delete($checkmark);
     }
 
-    if (!empty($checkmark->presentationgrading) && ($checkmark->presentationgrade['modgrade_type'] != 'none')
-            && !empty($checkmark->presentationgradebook)) {
-        checkmark_presentation_item_update($checkmark);
-        checkmark_update_presentation_grades($checkmark);
-    } else {
+    if (empty($checkmark->presentationfeedbackpresent)) {
+        if (!empty($checkmark->presentationgrading) && !empty($checkmark->presentationgradebook)) {
+            checkmark_presentation_item_update($checkmark);
+            checkmark_update_presentation_grades($checkmark);
+        } else {
+            checkmark_presentation_item_delete($checkmark);
+        }
+    } else if (empty($checkmark->presentationgradeook)) {
+        // We have all the data save in our own table, so we can restore it anytime!
         checkmark_presentation_item_delete($checkmark);
     }
 
@@ -232,8 +240,7 @@ function checkmark_add_instance($checkmark) {
         checkmark_attendance_item_update($checkmark);
     }
 
-    if (!empty($checkmark->presentationgrading) && ($checkmark->presentationgrade['modgrade_type'] != 'none')
-        && !empty($checkmark->presentationgradebook)) {
+    if (!empty($checkmark->presentationgrading) && !empty($checkmark->presentationgradebook)) {
         checkmark_presentation_item_update($checkmark);
     }
 
@@ -589,7 +596,7 @@ function checkmark_update_presentation_grades($checkmark, $userid=0) {
     }
 
     $grades = null;
-    if ($checkmark->presentationgrade != 0 && $grades = checkmark_get_user_presentation_grades($checkmark, $userid)) {
+    if ($grades = checkmark_get_user_presentation_grades($checkmark, $userid)) {
         foreach ($grades as $k => $v) {
             if ($v->rawgrade == -1) {
                 $grades[$k]->rawgrade = null;

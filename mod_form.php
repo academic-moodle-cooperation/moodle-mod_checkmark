@@ -171,11 +171,13 @@ class mod_checkmark_mod_form extends moodleform_mod {
                                                  'iteminstance' => $this->_cm->instance,
                                                  'itemnumber' => 3,
                                                  'courseid' => $COURSE->id));
+            $select = "checkmarkid = ? AND (presentationgrade >= 0 OR presentationfeedback IS NOT NULL)";
+            $presentationfeedbackpresent = $DB->record_exists_select('checkmark_feedbacks', $select, array($this->_cm->instance));
             if ($gradeitem) {
                 $gradeoptions['currentgrade'] = $gradeitem->grademax;
                 $gradeoptions['currentgradetype'] = $gradeitem->gradetype;
                 $gradeoptions['currentscaleid'] = $gradeitem->scaleid;
-                $gradeoptions['hasgrades'] = $gradeitem->has_grades();
+                $gradeoptions['hasgrades'] = $gradeitem->has_grades() || $presentationfeedbackpresent;
                 $ingradebook = true;
             } else {
                 // Get gradeoption infos from instance record!
@@ -199,15 +201,28 @@ class mod_checkmark_mod_form extends moodleform_mod {
                     $gradeoptions['currentgradetype'] = 'none';
                     $gradeoptions['currentgrade'] = $CFG->gradepointdefault;
                 }
+                if ($presentationfeedbackpresent) {
+                    $gradeoptions['hasgrades'] = true;
+                }
             }
         } else {
             $gradeoptions['currentgrade'] = $CFG->gradepointdefault;
             $gradeoptions['currentgradetype'] = 'none';
         }
 
+        if (key_exists('hasgrades', $gradeoptions) && ($gradeoptions['hasgrades'] == true)) {
+            $mform->addElement('hidden', 'presentationfeedbackpresent', 1);
+        } else {
+            $mform->addElement('hidden', 'presentationfeedbackpresent', 0);
+        }
+        $mform->setType('presentationfeedbackpresent', PARAM_BOOL);
+
         $mform->addElement('selectyesno', 'presentationgrading', get_string('presentationgrading', 'checkmark'));
         $mform->addHelpButton('presentationgrading', 'presentationgrading', 'checkmark');
         $mform->setDefault('presentationgrading', 0);
+        if (key_exists('hasgrades', $gradeoptions) && ($gradeoptions['hasgrades'] == true)) {
+            $mform->freeze('presentationgrading');
+        }
 
         $mform->addElement('modgrade', 'presentationgrade', get_string('presentationgrading_grade', 'checkmark'), $gradeoptions);
         $mform->addHelpButton('presentationgrade', 'presentationgrading_grade', 'checkmark');
@@ -219,7 +234,6 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->addElement('selectyesno', 'presentationgradebook', get_string('presentationgradebook', 'checkmark'));
         $mform->addHelpButton('presentationgradebook', 'presentationgradebook', 'checkmark');
         $mform->setDefault('presentationgradebook', $ingradebook);
-        $mform->disabledIf('presentationgradebook', 'presentationgrade[modgrade_type]', 'eq', 'none');
         $mform->disabledIf('presentationgradebook', 'presentationgrading', 'eq', 0);
     }
 
