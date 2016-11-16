@@ -758,12 +758,14 @@ class checkmark {
             } else {
                 $presfeedback = $feedback->presentationfeedback;
             }
-            $content = html_writer::tag('div', html_writer::tag('strong', get_string('presentationgrade', 'checkmark').': ').
-                                               $presgrade, array('class' => 'grade')).
-                       html_writer::tag('div', '', array('class' => 'clearer')).
-                       html_writer::tag('div', $presfeedback, array('class' => 'comment'));
-            $row = html_writer::tag('td', $content, array('class' => 'content', 'colspan' => 2));
-            $tablecontent .= html_writer::tag('tr', $row);
+            if ($presgrade != "" || $presfeedback != "") {
+                $content = html_writer::tag('div', html_writer::tag('strong', get_string('presentationgrade', 'checkmark').': ').
+                                                   $presgrade, array('class' => 'grade')).
+                           html_writer::tag('div', '', array('class' => 'clearer')).
+                           html_writer::tag('div', $presfeedback, array('class' => 'comment'));
+                $row = html_writer::tag('td', $content, array('class' => 'content', 'colspan' => 2));
+                $tablecontent .= html_writer::tag('tr', $row);
+            }
         }
 
         echo html_writer::tag('table', $tablecontent, array('cellspacing' => 0, 'class' => 'feedback'));
