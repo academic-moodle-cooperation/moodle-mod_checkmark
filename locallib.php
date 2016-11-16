@@ -745,10 +745,7 @@ class checkmark {
             $content = "";
             if ($this->checkmark->presentationgrade && $this->checkmark->presentationgradebook) {
                 $presgrade = $presentationgrade->str_long_grade;
-            } else if ($this->checkmark->presentationgrade > 0) {
-                // Points to show!
-                $presgrade = round($feedback->presentationgrade, 2).' / '.$this->checkmark->presentationgrade;
-            } else if ($this->checkmark->presentationgrade < 0) {
+            } else if (!empty($this->checkmark->presentationgrade)) {
                 $presgrade = $this->display_grade($feedback->presentationgrade, CHECKMARK_PRESENTATION_ITEM);
             } else {
                 $presgrade = "";
