@@ -1502,13 +1502,18 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
                     $a->grade = get_string('notgradedyet', 'checkmark');
                 } else {
                     $scale->load_items();
-                    $scalegrades[$checkmark->id] = $scale->scale_items;
-                    $a->grade = $scalegrades[$checkmark->id][(int)$feedback->grade];
+                    // This is to ensure compatibility with make_grades_menu(), because every scale is a 1-indexed-array
+                    $scalegrades[$checkmark->id] = array();
+                    foreach ($scale->scale_items as $key => $item) {
+                        $scalegrades[$checkmark->id][$key+1] = $item;
+                    }
                 }
             }
-            if (isset($scalegrades[$checkmark->id][(int)$feedback->grade])) {
+            if (key_exists((int)$feedback->grade, $scalegrades[$checkmark->id])) {
                 $a->grade = get_string('graded', 'checkmark').': '.
                             $scalegrades[$checkmark->id][(int)$feedback->grade];
+            } else {
+                $a->grade = get_string('notgradedyet', 'checkmark');
             }
         }
     } else {
