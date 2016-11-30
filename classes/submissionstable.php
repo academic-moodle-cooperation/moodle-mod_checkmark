@@ -17,12 +17,10 @@
 /**
  * submissionstable.php
  *
- * @package       mod_checkmark
- * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
- * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
- * @author        Andreas Windbichler
- * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
- * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_checkmark
+ * @author    Philipp Hager
+ * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_checkmark;
 
@@ -33,12 +31,10 @@ require_once($CFG->libdir.'/gradelib.php');
 /**
  * submissionstable class handles display of submissions for print preview and submissions view...
  *
- * @package       mod_checkmark
- * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
- * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
- * @author        Andreas Windbichler
- * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
- * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_checkmark
+ * @author    Philipp Hager
+ * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class submissionstable extends \table_sql {
     /** formated cells contain HTML */

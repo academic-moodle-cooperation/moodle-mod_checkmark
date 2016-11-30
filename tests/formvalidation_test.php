@@ -17,14 +17,10 @@
 /**
  * Unit tests for (some of) mod_checkmark's methods.
  *
- * TODO update to new test-framework!
- *
- * @package       mod_checkmark
- * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
- * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
- * @author        Philipp Hager
- * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
- * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_checkmark
+ * @author    Philipp Hager
+ * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 if (!defined('MOODLE_INTERNAL')) {
@@ -38,12 +34,10 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php'); // Include the code
 /**
  * This class contains the test cases for the formular validation.
  *
- * @package       mod_checkmark
- * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
- * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
- * @author        Philipp Hager
- * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
- * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_checkmark
+ * @author    Philipp Hager
+ * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class checkmark_formvalidation_test extends basic_testcase {
     /**

@@ -17,12 +17,10 @@
 /**
  * backup/moodle2/backup_checkmark_activity_task.class.php
  *
- * @package       mod_checkmark
- * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
- * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
- * @author        Philipp Hager
- * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
- * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_checkmark
+ * @author    Philipp Hager
+ * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
@@ -33,12 +31,10 @@ require_once($CFG->dirroot.'/mod/checkmark/backup/moodle2/backup_checkmark_steps
 /**
  * checkmark backup task that provides all the settings and steps to perform one complete backup of the activity
  *
- * @package       mod_checkmark
- * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
- * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
- * @author        Philipp Hager
- * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
- * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_checkmark
+ * @author    Philipp Hager
+ * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_checkmark_activity_task extends backup_activity_task {
 

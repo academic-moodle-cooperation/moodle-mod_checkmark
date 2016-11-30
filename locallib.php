@@ -17,12 +17,10 @@
 /**
  * This file contains checkmark-class with all logic-methods used by checkmark
  *
- * @package       mod_checkmark
- * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
- * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
- * @author        Philipp Hager
- * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
- * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_checkmark
+ * @author    Philipp Hager
+ * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
@@ -43,11 +41,10 @@ require_once($CFG->dirroot.'/calendar/lib.php');
 /**
  * This class provides all the basic functionality for an checkmark-module
  *
- * @package       mod_checkmark
- * @author        Philipp Hager
- * @copyright     2012 Philipp Hager
- * @since         Moodle 2.2
- * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_checkmark
+ * @author    Philipp Hager
+ * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class checkmark {
 

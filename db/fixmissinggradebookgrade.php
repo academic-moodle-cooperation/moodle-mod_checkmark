@@ -17,17 +17,14 @@
 /**
  * fixmissinggradebookgrade.php
  *
- *
  * Checks if there are any missing gradebook entries for checkmark
  * instances and updates them if necessary, this happened due to a bug in version 2.9.1
  * causing grades not being written to gradebook anymore, after a DB layout change in checkmark!
  *
- * @package       mod_checkmark
- * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
- * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
- * @author        Philipp Hager
- * @copyright     2016 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
- * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_checkmark
+ * @author    Philipp Hager
+ * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once('../../../config.php');
 $PAGE->set_url($CFG->wwwroot.'/mod/checkmark/db/fixmissinggradebookgrade.php');
