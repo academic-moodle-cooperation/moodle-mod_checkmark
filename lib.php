@@ -787,8 +787,8 @@ function checkmark_presentation_item_update($checkmark, $grades=null) {
         $checkmark->id = $checkmark->instance;
     }
 
-    $gradeupdate =  grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id,
-                                 CHECKMARK_PRESENTATION_ITEM, $grades, $params);
+    $gradeupdate = grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id,
+                                CHECKMARK_PRESENTATION_ITEM, $grades, $params);
 
     // Move presentation item attendance item directly after attendance or grade item, if one of them exists!
     $params = array('courseid'     => $checkmark->course,
@@ -1509,10 +1509,10 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
                     $a->grade = get_string('notgradedyet', 'checkmark');
                 } else {
                     $scale->load_items();
-                    // This is to ensure compatibility with make_grades_menu(), because every scale is a 1-indexed-array
+                    // This is to ensure compatibility with make_grades_menu(), because every scale is a 1-indexed-array!
                     $scalegrades[$checkmark->id] = array();
                     foreach ($scale->scale_items as $key => $item) {
-                        $scalegrades[$checkmark->id][$key+1] = $item;
+                        $scalegrades[$checkmark->id][$key + 1] = $item;
                     }
                 }
             }
