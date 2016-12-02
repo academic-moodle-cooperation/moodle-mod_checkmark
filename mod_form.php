@@ -106,6 +106,8 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         $this->add_attendance_elements();
 
+        $this->add_presentation_elements();
+
         $coursecontext = context_course::instance($COURSE->id);
         plagiarism_get_form_elements_module($mform, $coursecontext);
 
@@ -144,6 +146,81 @@ class mod_checkmark_mod_form extends moodleform_mod {
             $mform->setDefault('grade', $stdexamplecount);
         }
         $mform->setExpanded('modstandardgrade');
+    }
+
+    /**
+     * Adds the elements used for presentation grading!
+     */
+    public function add_presentation_elements() {
+        global $COURSE, $CFG, $DB;
+        $mform =& $this->_form;
+        $isupdate = !empty($this->_cm);
+
+        $mform->addElement('header', 'presentationheader', get_string('presentationheader', 'checkmark'));
+
+        $gradeoptions = array('isupdate' => $isupdate,
+                              'currentgrade' => false,
+                              'hasgrades'    => false,
+                              'canrescale'   => $this->_features->canrescale,
+                              'useratings'   => $this->_features->rating);
+        $ingradebook = false;
+
+        if ($isupdate) {
+            $gradeitem = grade_item::fetch(array('itemtype' => 'mod',
+                                                 'itemmodule' => $this->_cm->modname,
+                                                 'iteminstance' => $this->_cm->instance,
+                                                 'itemnumber' => 3,
+                                                 'courseid' => $COURSE->id));
+            if ($gradeitem) {
+                $gradeoptions['currentgrade'] = $gradeitem->grademax;
+                $gradeoptions['currentgradetype'] = $gradeitem->gradetype;
+                $gradeoptions['currentscaleid'] = $gradeitem->scaleid;
+                $gradeoptions['hasgrades'] = $gradeitem->has_grades();
+                $ingradebook = true;
+            } else {
+                // Get gradeoption infos from instance record!
+                if ($record = $DB->get_record('checkmark', array('id' => $this->_cm->instance),
+                                              'presentationgrading, presentationgrade', MUST_EXIST)) {
+                    if (($record->presentationgrading == 0) || ($record->presentationgrade == 0)) {
+                        $gradeoptions['currentgradetype'] = 'none';
+                        $gradeoptions['currentgrade'] = $CFG->gradepointdefault;
+                        $gradeoptions['currentscaleid'] = 0;
+                    } else {
+                        if ($record->presentationgrade > 0) {
+                            $gradeoptions['currentgradetype'] = 'point';
+                            $gradeoptions['currentgrade'] = $record->presentationgrade;
+                        } else {
+                            $gradeoptions['currentradetype'] = 'scale';
+                            $gradeoptions['currentgrade'] = $CFG->gradepointdefault;
+                            $gradeoptions['currentscaleid'] = -$record->presentationgrade;
+                        }
+                    }
+                } else {
+                    $gradeoptions['currentgradetype'] = 'none';
+                    $gradeoptions['currentgrade'] = $CFG->gradepointdefault;
+                }
+            }
+        } else {
+            $gradeoptions['currentgrade'] = $CFG->gradepointdefault;
+            $gradeoptions['currentgradetype'] = 'none';
+        }
+
+        $mform->addElement('selectyesno', 'presentationgrading', get_string('presentationgrading', 'checkmark'));
+        $mform->addHelpButton('presentationgrading', 'presentationgrading', 'checkmark');
+        $mform->setDefault('presentationgrading', 0);
+
+        $mform->addElement('modgrade', 'presentationgrade', get_string('presentationgrading_grade', 'checkmark'), $gradeoptions);
+        $mform->addHelpButton('presentationgrade', 'presentationgrading_grade', 'checkmark');
+        $mform->setDefault('presentationgrade[modgrade_point]', $CFG->gradepointdefault);
+        $mform->disabledIf('presentationgrade[modgrade_type]', 'presentationgrading', 'eq', 0);
+        $mform->disabledIf('presentationgrade[modgrade_scale]', 'presentationgrading', 'eq', 0);
+        $mform->disabledIf('presentationgrade[modgrade_point]', 'presentationgrading', 'eq', 0);
+
+        $mform->addElement('selectyesno', 'presentationgradebook', get_string('presentationgradebook', 'checkmark'));
+        $mform->addHelpButton('presentationgradebook', 'presentationgradebook', 'checkmark');
+        $mform->setDefault('presentationgradebook', $ingradebook);
+        $mform->disabledIf('presentationgradebook', 'presentationgrade[modgrade_type]', 'eq', 'none');
+        $mform->disabledIf('presentationgradebook', 'presentationgrading', 'eq', 0);
     }
 
     /**

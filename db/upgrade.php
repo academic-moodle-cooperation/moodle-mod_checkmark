@@ -950,5 +950,61 @@ function xmldb_checkmark_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2016053100, 'checkmark');
     }
 
+    if ($oldversion < 2016071203) {
+        echo html_writer::empty_tag('br')."Install new database fields for presentation grading...";
+
+        try {
+            // Define field presentationgrading, presentationgrade and presentationgradebook to be added to checkmark.
+            $table = new xmldb_table('checkmark');
+            $fields = array(new xmldb_field('presentationgrading', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0',
+                                            'attendancegradelink'),
+                            new xmldb_field('presentationgrade', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0',
+                                            'presentationgrading'),
+                            new xmldb_field('presentationgradebook', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0',
+                                            'presentationgrade'));
+
+            // Conditionally launch add field presentationgrading.
+            foreach ($fields as $field) {
+                if (!$dbman->field_exists($table, $field)) {
+                    $dbman->add_field($table, $field);
+                }
+            }
+
+            // Define field presentationgrade to be added to checkmark_feedbacks.
+            $table = new xmldb_table('checkmark_feedbacks');
+            $fields = array(new xmldb_field('presentationgrade', XMLDB_TYPE_NUMBER, '10, 5', null, null, null, null, 'attendance'),
+                            new xmldb_field('presentationfeedback', XMLDB_TYPE_TEXT, null, null, null, null, null,
+                                            'presentationgrade'),
+                            new xmldb_field('presentationformat', XMLDB_TYPE_INTEGER, '4', null, null, null, null,
+                                            'presentationfeedback'));
+
+            // Conditionally launch add field presentationgrade.
+            foreach ($fields as $field) {
+                if (!$dbman->field_exists($table, $field)) {
+                    $dbman->add_field($table, $field);
+                }
+            }
+        } catch (Throwable $t) {
+            // Executed only in PHP 7, will not match in PHP 5.x
+            echo "errored!".html_writer::empty_tag('br');
+
+            echo $OUTPUT->notification($t->getMessage(), 'error');
+
+            return false;
+        } catch (Exception $e) {
+            // Executed only in PHP 5.x, will not be reached in PHP 7
+            echo "errored!".html_writer::empty_tag('br');
+
+            echo $OUTPUT->notification($e->getMessage(), 'error');
+
+            return false;
+        }
+
+        echo "OK!".html_writer::empty_tag('br');
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2016071203, 'checkmark');
+    }
+
     return true;
 }
