@@ -30,6 +30,7 @@ defined('MOODLE_INTERNAL') || die;
 $string['checkmark:addinstance'] = 'Kreuzerlübung anlegen';
 $string['checkmark:grade'] = 'Kreuzerlübung benoten';
 $string['checkmark:trackattendance'] = 'Anwesenheit erfassen';
+$string['checkmark:gradepresentation'] = 'Tafelleistung benoten';
 $string['checkmark:submit'] = 'Kreuzerlübung abgeben';
 $string['checkmark:view'] = 'Zeige Kreuzerlübung';
 $string['checkmark:view_preview'] = 'Vorschau ansehen';
