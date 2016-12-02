@@ -141,9 +141,9 @@ function checkmark_update_instance($checkmark) {
     $checkmark->id = $checkmark->instance;
 
     if (!empty($checkmark->presentationfeedbackpresent)) {
-        // If there are presentation feedbacks present we won't change these settings!
-        unset($checkmark->presentationgrading);
-        unset($checkmark->presentationgrade);
+        /* If there are presentation feedbacks present we won't change these settings,
+         * so get presentationgrade, everything else hasn't changed! */
+        $checkmark->presentationgrade = $DB->get_field('checkmark', 'presentationgrade', array('id' => $checkmark->instance));
     } else if (empty($checkmark->presentationgrading)) {
         $checkmark->presentationgrade = 0;
         $checkmark->presentationgradebook = 0;
@@ -187,9 +187,12 @@ function checkmark_update_instance($checkmark) {
         } else {
             checkmark_presentation_item_delete($checkmark);
         }
-    } else if (empty($checkmark->presentationgradeook)) {
+    } else if (empty($checkmark->presentationgradebook)) {
         // We have all the data save in our own table, so we can restore it anytime!
         checkmark_presentation_item_delete($checkmark);
+    } else {
+        checkmark_presentation_item_update($checkmark);
+        checkmark_update_presentation_grades($checkmark);
     }
 
     if (! $cm = get_coursemodule_from_instance('checkmark', $checkmark->id)) {

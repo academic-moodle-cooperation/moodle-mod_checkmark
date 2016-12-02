@@ -169,7 +169,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
             $gradeitem = grade_item::fetch(array('itemtype' => 'mod',
                                                  'itemmodule' => $this->_cm->modname,
                                                  'iteminstance' => $this->_cm->instance,
-                                                 'itemnumber' => 3,
+                                                 'itemnumber' => CHECKMARK_PRESENTATION_ITEM,
                                                  'courseid' => $COURSE->id));
             $select = "checkmarkid = ? AND (presentationgrade >= 0 OR presentationfeedback IS NOT NULL)";
             $presentationfeedbackpresent = $DB->record_exists_select('checkmark_feedbacks', $select, array($this->_cm->instance));
