@@ -286,19 +286,18 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $stdexamplestart = get_config('checkmark', 'stdexamplestart');
         $mform->setDefault('examplestart', $stdexamplestart);
 
+        $mform->addElement('text', 'exampleprefix', get_string('exampleprefix', 'checkmark'));
+        $mform->setType('exampleprefix', PARAM_TEXT);
+        $mform->addHelpButton('exampleprefix', 'exampleprefix', 'checkmark');
+        $mform->setDefault('exampleprefix', get_string('strexample', 'checkmark').' ');
+        $mform->setAdvanced('exampleprefix');
+
         $mform->addElement('advcheckbox', 'flexiblenaming', get_string('flexiblenaming', 'checkmark'),
                            get_string('activateindividuals', 'checkmark'), array('id' => 'id_flexiblenaming', 'group' => 1),
                            array('0', '1'));
         $mform->addHelpButton('flexiblenaming', 'flexiblenaming', 'checkmark');
 
         $mform->setAdvanced('flexiblenaming');
-
-        $mform->addElement('text', 'exampleprefix', get_string('exampleprefix', 'checkmark'));
-        $mform->setType('exampleprefix', PARAM_TEXT);
-        $mform->addHelpButton('exampleprefix', 'exampleprefix', 'checkmark');
-        $mform->setDefault('exampleprefix', get_string('strexample', 'checkmark'));
-        $mform->disabledIf('exampleprefix', 'flexiblenaming', 'notchecked');
-        $mform->setAdvanced('exampleprefix');
 
         $mform->addElement('text', 'examplenames', get_string('examplenames', 'checkmark').' ('.checkmark::DELIMITER.')');
         // We clean these by ourselves!

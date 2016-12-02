@@ -203,11 +203,7 @@ class checkmark {
             $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $this->checkmark->id));
             $flexiblenaming = $this->is_using_flexiblenaming();
 
-            if ($flexiblenaming) {
-                $exampleprefix = $this->checkmark->exampleprefix;
-            } else {
-                $exampleprefix = get_string('strexample', 'checkmark').' ';
-            }
+            $exampleprefix = $this->checkmark->exampleprefix;
 
             foreach ($examples as $key => $cur) {
                 $examples[$key]->shortname = $cur->name;
@@ -235,11 +231,7 @@ class checkmark {
 
         $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmarkid));
 
-        if ($flexiblenaming) {
-            $exampleprefix = $DB->get_field('checkmark', 'exampleprefix', array('id' => $checkmarkid));
-        } else {
-            $exampleprefix = get_string('strexample', 'checkmark').' ';
-        }
+        $exampleprefix = $DB->get_field('checkmark', 'exampleprefix', array('id' => $checkmarkid));
 
         foreach ($examples as $key => $cur) {
             $examples[$key]->shortname = $cur->name;
