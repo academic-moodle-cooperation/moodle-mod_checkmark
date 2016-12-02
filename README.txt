@@ -70,6 +70,7 @@ CHANGELOG
 v 2016071202
 -------------------------
 *) Fixed old checkmark_refresh_dates() function to be compatible with 3.1.2 updates onwards!
+*) Added presentation grade as additional grade item
 
 v 2016071201
 -------------------------
