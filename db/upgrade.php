@@ -1006,5 +1006,8 @@ function xmldb_checkmark_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2016071203, 'checkmark');
     }
 
+    // Moodle v3.2.0 release upgrade line.
+    // Put any upgrade step following this!
+
     return true;
 }
