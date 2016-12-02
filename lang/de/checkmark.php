@@ -124,6 +124,7 @@ $string['numberofexamples'] = 'Beispielanzahl';
 $string['numberofexamples_help'] = 'Anzahl der Beispiele';
 $string['optimum'] = 'Optimal';
 $string['printsettingstitle'] = 'Exporteinstellungen';
+$string['search:activity'] = 'Kreuzerlübung - Aktivitätsinformation';
 $string['sendnotifications'] = 'Sende Benachrichtigungen';
 $string['select'] = 'Auswählen';
 $string['selection'] = 'Auswahl';

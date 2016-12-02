@@ -124,6 +124,7 @@ $string['numberofexamples'] = 'Number of examples';
 $string['numberofexamples_help'] = 'Example count in this checkmark.';
 $string['optimum'] = 'Optimum';
 $string['printsettingstitle'] = 'Export settings';
+$string['search:activity'] = 'Checkmark - activity information';
 $string['sendnotifications'] = 'Send notifications';
 $string['select'] = 'Select';
 $string['selection'] = 'Selection';
