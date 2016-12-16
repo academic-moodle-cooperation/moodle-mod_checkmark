@@ -149,14 +149,14 @@ class send_notifications extends \core\task\scheduled_task {
                 $message = new \core\message\message();
                 $message->component         = 'mod_checkmark';
                 $message->name              = 'checkmark_updates';
+                $message->courseid          = $course->id;
                 $message->userfrom          = $grader;
                 $message->userto            = $user;
                 $message->subject           = $postsubject;
                 $message->fullmessage       = $posttext;
                 $message->fullmessageformat = FORMAT_HTML;
                 $message->fullmessagehtml   = $posthtml;
-                $message->smallmessage      = \get_string('checkmarkmailsmall', 'checkmark',
-                                                          $checkmarkinfo);
+                $message->smallmessage      = \get_string('checkmarkmailsmall', 'checkmark', $checkmarkinfo);
                 $message->notification      = 1;
                 $message->contexturl        = $checkmarkinfo->url;
                 $message->contexturlname    = $checkmarkinfo->checkmark;

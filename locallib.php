@@ -3538,6 +3538,7 @@ class checkmark {
                 $message = new \core\message\message();
                 $message->component         = 'mod_checkmark';
                 $message->name              = 'checkmark_updates';
+                $message->courseid          = $this->checkmark->course;
                 $message->userfrom          = $user;
                 $message->userto            = $teacher;
                 $message->subject           = $postsubject;

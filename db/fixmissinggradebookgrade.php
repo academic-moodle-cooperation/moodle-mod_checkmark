@@ -400,6 +400,7 @@ if ($affectedrecords && empty($selectedcourses)) {
         $message->fullmessagehtml = str_replace("\n", "<br />\n", $messagetxt);
         $message->smallmessage = $messagetxt;
         foreach ($digest->records as $feedbackid => $record) {
+            $message->courseid = $record->courseid;
             // Add individual data to fullmessage, fullmessagehtml and smallmessage!
             $courseurl = $CFG->wwwroot."/course/view.php?id=".$record->courseid;
             $checkmarkurl = $CFG->wwwroot."/mod/checkmark/submissions.php?id=".$checkmarks[$record->checkmarkid]->cm->id;
