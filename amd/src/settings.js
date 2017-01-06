@@ -50,8 +50,8 @@ define(['jquery', 'core/log'], function($, log) {
         // First we strip everything we don't need!
         e.data.stripper(e);
 
-        var type_selector = '#id_modgrade_type';
-        var point_selector = '#id_modgrade_point';
+        var type_selector = '#id_grade_modgrade_type';
+        var point_selector = '#id_grade_modgrade_point';
         var flexiblenaming_selector = '#id_flexiblenaming';
         var examplegrades_selector = '#id_examplegrades';
         var examplenames_selector = '#id_examplenames';
@@ -122,27 +122,27 @@ define(['jquery', 'core/log'], function($, log) {
      * initializer(config) prepares settings form for JS-functionality
      */
     instance.initializer = function(config) {
-        this.dividing_symbol = config.dividing_symbol;
+        instance.dividing_symbol = config.dividing_symbol;
 
         log.info('Initialize settings JS', 'checkmark');
 
-        var type_selector = '#id_modgrade_type';
+        var type_selector = '#id_grade_modgrade_type';
         var flexiblenaming_selector = "#id_flexiblenaming";
         var examplegrades_selector = "#id_examplegrades";
         var examplenames_selector = "#id_examplenames";
         var examplecount_selector = "#id_examplecount";
-        $(flexiblenaming_selector).click(this, this.update_settings);
-        $(type_selector).change(this, this.update_settings);
-        $(examplegrades_selector).change(this, this.update_settings);
-        $(examplenames_selector).change(this, this.update_settings);
-        $(examplecount_selector).change(this, this.update_settings);
-        $(examplegrades_selector).blur(this, this.update_settings);
-        $(examplenames_selector).blur(this, this.update_settings);
-        $(examplecount_selector).blur(this, this.update_settings);
-        $(examplegrades_selector).keyup(this, this.stripper);
+        $(flexiblenaming_selector).click(instance, instance.update_settings);
+        $(type_selector).change(instance, instance.update_settings);
+        $(examplegrades_selector).change(instance, instance.update_settings);
+        $(examplenames_selector).change(instance, instance.update_settings);
+        $(examplecount_selector).change(instance, instance.update_settings);
+        $(examplegrades_selector).blur(instance, instance.update_settings);
+        $(examplenames_selector).blur(instance, instance.update_settings);
+        $(examplecount_selector).blur(instance, instance.update_settings);
+        $(examplegrades_selector).keyup(instance, instance.stripper);
 
         if($("input[name=allready_submit]").val() === 'no') {
-            this.update_settings({data: this});
+            instance.update_settings({data: instance});
         }
     };
 
