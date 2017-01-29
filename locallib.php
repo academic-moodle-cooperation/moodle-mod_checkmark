@@ -633,6 +633,7 @@ class checkmark {
                                         $this->checkmark->id, $userid);
         $item = $gradinginfo->items[CHECKMARK_GRADE_ITEM];
         $grade = $item->grades[$userid];
+
         if ($this->checkmark->attendancegradebook) {
             $attendanceitem = $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM];
             $attendancegrade = $attendanceitem->grades[$userid];
@@ -647,7 +648,7 @@ class checkmark {
         if (($feedback == false)
                 && (!$item || !$grade || (($grade->grade == null) && ($grade->feedback == null)))
                 && (!$attendanceitem || !$attendancegrade || ($attendancegrade->grade == null))
-                && (!$presentationitem || !$presentationgrade
+                && (empty($presentationitem) || empty($presentationgrade)
                     || (($presentationgrade->grade == null) && ($presentationgrade->feedback == null)))) {
             return;
         } else if ($feedback == false) {
@@ -747,10 +748,14 @@ class checkmark {
         $tablecontent = html_writer::tag('tr', $row);
         // Second row!
         if ($showfeedback) {
-            $content = html_writer::tag('div', html_writer::tag('strong', get_string('grade').': ').$grade->str_long_grade,
-                                        array('class' => 'grade')).
-                       html_writer::tag('div', '', array('class' => 'clearer')).
-                       html_writer::tag('div', $grade->str_feedback, array('class' => 'comment'));
+            if ($this->checkmark->grade) {
+                $content = html_writer::tag('div', html_writer::tag('strong', get_string('grade').': ').$grade->str_long_grade,
+                                            array('class' => 'grade'));
+            } else {
+                $content = '';
+            }
+            $content .= html_writer::tag('div', '', array('class' => 'clearer')).
+                        html_writer::tag('div', $grade->str_feedback, array('class' => 'comment'));
             $row = html_writer::tag('td', $content, array('class' => 'content', 'colspan' => 2));
             $tablecontent .= html_writer::tag('tr', $row);
         }

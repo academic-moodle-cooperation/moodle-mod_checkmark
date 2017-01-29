@@ -544,7 +544,7 @@ function checkmark_update_grades($checkmark, $userid=0) {
     require_once($CFG->libdir.'/gradelib.php');
 
     $grades = null;
-    if ($checkmark->grade != 0 && $grades = checkmark_get_user_grades($checkmark, $userid)) {
+    if ($grades = checkmark_get_user_grades($checkmark, $userid)) {
         foreach ($grades as $k => $v) {
             if ($v->rawgrade == -1) {
                 $grades[$k]->rawgrade = null;
