@@ -439,6 +439,8 @@ class submissionstable extends \table_sql {
             $table->presentationgrademenu = make_grades_menu($table->checkmark->checkmark->presentationgrade);
         }
 
+        $table->setup();
+
         return $table;
     }
 
@@ -705,6 +707,8 @@ class submissionstable extends \table_sql {
 
         $table->gradinginfo = grade_get_grades($table->checkmark->course->id, 'mod', 'checkmark', $table->checkmark->checkmark->id,
                                                $users);
+
+        $table->setup();
 
         return $table;
     }
