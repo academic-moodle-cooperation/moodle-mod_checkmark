@@ -260,7 +260,7 @@ $string['emailteachers_help'] = 'If enabled, teachers receive email notification
 Only teachers who are able to grade the particular checkmark are notified. For example, if the course uses separate groups, teachers restricted to particular groups won\'t receive notification about students in other groups.';
 $string['emptysubmission'] = 'You have not submitted anything yet';
 $string['enablenotification'] = 'Send notifications';
-$string['enablenotification_help'] = 'If enabled, students will be notified once their checkmark submissions are graded or their attendancy is marked.';
+$string['enablenotification_help'] = 'If enabled, students will be notified once their checkmark submissions (or corresponding presentations) are graded or their attendancy is marked.';
 $string['errornosubmissions'] = 'There are no submissions available to download';
 $string['failedupdatefeedback'] = 'Failed to update submission feedback for user {$a}';
 $string['feedback'] = 'Feedback';

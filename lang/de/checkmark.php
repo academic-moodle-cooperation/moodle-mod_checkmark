@@ -260,7 +260,7 @@ $string['emailteachers_help'] = 'Wenn aktiviert, bekommen Trainer/innen eine E-M
 Nur Trainer/innen, die berechtigt sind, diese spezielle Kreuzerlübung zu bewerten, werden benachrichtigt. Zum Beispiel werden, wenn der Kurs separate Gruppen verwendet, Trainer/innen, die auf bestimmte Gruppen beschränkt sind, nur über Teilnehmer/innen in diesen Gruppen informiert, nicht jedoch über Teilnehmer/innen anderer Gruppen.';
 $string['emptysubmission'] = 'Sie haben noch nichts abgegeben.';
 $string['enablenotification'] = 'Sende Benachrichtigungen';
-$string['enablenotification_help'] = 'Wenn aktiviert, werden Teilnehmer/innen benachrichtigt, sobald ihre Abgaben bewertet oder ihre Anwesenheit gesetzt wurde.';
+$string['enablenotification_help'] = 'Wenn aktiviert, werden Teilnehmer/innen benachrichtigt, sobald ihre Abgaben (oder zugehörige Tafelleistungen) bewertet oder ihre Anwesenheit gesetzt wurde.';
 $string['errornosubmissions'] = 'Es sind keine Abgaben zum Download vorhanden';
 $string['failedupdatefeedback'] = 'Aktualisierung der Rückmeldung für Teilnehmer/in {$a} gescheitert';
 $string['feedback'] = 'Rückmeldung';
