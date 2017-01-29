@@ -984,7 +984,7 @@ class submissionstable extends \table_sql {
     public function col_grade($values) {
         $finalgrade = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$values->id];
         $grademax = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grademax;
-        $finalgrade->formatted_grade = round($finalgrade->grade, 2).' / '.round($grademax, 2);
+        $finalgrade->formatted_grade = $this->checkmark->display_grade($finalgrade->grade, CHECKMARK_GRADE_ITEM);
         $lockedoroverridden = 'locked';
         if ($finalgrade->overridden) {
             $lockedoroverridden = 'overridden';
@@ -1361,7 +1361,7 @@ class submissionstable extends \table_sql {
         if ($presentationgradebook) {
             $finalgrade = $this->gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$values->id];
             $grademax = $this->gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grademax;
-            $finalgrade->formatted_grade = round($finalgrade->grade, 2).' / '.round($grademax, 2);
+            $finalgrade->formatted_grade = $this->checkmark->display_grade($finalgrade->grade, CHECKMARK_PRESENTATION_ITEM);
             $lockedoroverridden = 'locked';
             if ($finalgrade->overridden) {
                 $lockedoroverridden = 'overridden';
