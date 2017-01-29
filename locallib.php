@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->dirroot . '/mod/checkmark/lib.php');
 require_once($CFG->libdir.'/formslib.php');
+require_once($CFG->libdir.'/gradelib.php');
 require_once($CFG->dirroot.'/mod/checkmark/submission_form.php');
 require_once($CFG->dirroot.'/mod/checkmark/grading_form.php');
 
@@ -887,8 +888,6 @@ class checkmark {
      */
     public function autograde_submissions($filter = self::FILTER_ALL, $selected = array(), $countonly = false) {
         global $CFG, $DB, $USER;
-        require_once($CFG->libdir.'/gradelib.php');
-        require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
 
         $result = array();
         $result['status'] = false;
@@ -1654,7 +1653,7 @@ class checkmark {
      * @param bool $mailinfo whether or not the users should be notified
      */
     protected function set_attendance($selected, $state, $mailinfo) {
-        global $DB, $USER;
+        global $DB, $USER, $OUTPUT;
 
         // Normalize state!
         if ($state === null) {
@@ -1663,6 +1662,20 @@ class checkmark {
             $state = 0;
         } else {
             $state = 1;
+        }
+
+        // Check if any grade is locked or overridden and output some messages concerning these entries!
+        if ($this->checkmark->trackattendance
+                && $this->checkmark->attendancegradebook) {
+            $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark', $this->checkmark->id, $selected);
+            $item = $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM];
+            foreach ($selected as $key => $cur) {
+                if (key_exists($cur, $item->grades) && ($item->grades[$cur]->locked || $item->grades[$cur]->overridden)) {
+                    $user = $DB->get_record('user', array('id' => $cur));
+                    echo $OUTPUT->notification(get_string('attendance_not_set_grade_locked', 'checkmark', fullname($user)), 'info');
+                    unset($selected[$key]);
+                }
+            }
         }
 
         $select = 'checkmarkid = :checkmarkid';
