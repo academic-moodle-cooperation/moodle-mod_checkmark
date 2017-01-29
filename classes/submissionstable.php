@@ -276,9 +276,11 @@ class submissionstable extends \table_sql {
             $helpicons[] = null;
             $table->add_colgroup(1, 'group');
         }
-        $tableheaders[] = get_string('grade');
-        $tablecolumns[] = 'grade';
-        $helpicons[] = null;
+        if ($table->checkmark->checkmark->grade != 0) {
+            $tableheaders[] = get_string('grade');
+            $tablecolumns[] = 'grade';
+            $helpicons[] = null;
+        }
         $tableheaders[] = get_string('comment', 'checkmark');
         $tablecolumns[] = 'feedback';
         $helpicons[] = null;
@@ -535,11 +537,13 @@ class submissionstable extends \table_sql {
             $table->add_colgroup(1, 'summary');
         }
 
-        $tableheaders[] = get_string('grade');
-        $tablecolumns[] = 'grade';
-        $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '15');
-        $table->columnformat['grade'] = array('align' => 'R');
-        $helpicons[] = null;
+        if ($table->checkmark->checkmark->grade != 0) {
+            $tableheaders[] = get_string('grade');
+            $tablecolumns[] = 'grade';
+            $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '15');
+            $table->columnformat['grade'] = array('align' => 'R');
+            $helpicons[] = null;
+        }
 
         $tableheaders[] = get_string('comment', 'checkmark');
         $tablecolumns[] = 'feedback';
