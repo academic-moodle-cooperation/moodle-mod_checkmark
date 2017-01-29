@@ -1143,6 +1143,9 @@ class checkmark {
         if ($this->checkmark->trackattendance) {
             checkmark_update_attendances($this->checkmark, $feedback->userid);
         }
+        if ($this->checkmark->presentationgrading && $this->checkmark->presentationgradebook) {
+            checkmark_update_presentation_grades($this->checkmark, $feedback->userid);
+        }
     }
 
     /**
@@ -1565,7 +1568,7 @@ class checkmark {
         static $scalegrades = array();
 
         if ($this->checkmark->grade > 0) {    // Normal number?
-            if ($grade == -1) {
+            if (($grade == -1) || ($grade === null)) {
                 return '-';
             } else {
                 return round($grade, 2).' / '.$this->checkmark->grade;
@@ -1989,6 +1992,12 @@ class checkmark {
         } else {
             $attendancedisabled = false;
         }
+        if ($this->checkmark->presentationgradebook) {
+            $presentationgradedisabled = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$userid]->locked
+                                            || $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$userid]->overridden;
+        } else {
+            $presentationgradedisabled = false;
+        }
 
         // Construct SQL, using current offset to find the data of the next student!
         $context = context_module::instance($this->cm->id);
@@ -2117,6 +2126,15 @@ class checkmark {
             $mformdata->attendancegradebook = $this->checkmark->attendancegradebook;
         } else {
             $mformdata->trackattendance = 0;
+        }
+        if ($this->checkmark->presentationgrading) {
+            $mformdata->presentationgrading = true;
+            $mformdata->instance_presentationgrade = $this->checkmark->presentationgrade;
+            $mformdata->presentationgradebook = $this->checkmark->presentationgradebook;
+            $mformdata->presentationgrade = $feedback->presentationgrade;
+            $mformdata->presentationfeedback = $feedback->presentationfeedback;
+            $mformdata->presentationformat = $feedback->presentationformat;
+            $mformdata->presentationgradedisabled = $presentationgradedisabled;
         }
         $mformdata->lateness = $this->display_lateness($submission->timemodified);
         $mformdata->auser = $auser;
@@ -3015,11 +3033,6 @@ class checkmark {
             $feedback->grade = $formdata->xgrade;
             $feedback->feedback = $formdata->feedback_editor['text'];
             $feedback->graderid = $USER->id;
-            if (!empty($formdata->mailinfo)) {
-                $feedback->mailed = 0;       // Make sure mail goes out (again, even)!
-            } else {
-                $feedback->mailed = 1;       // Treat as already mailed!
-            }
             $update = true;
         }
         if ($this->checkmark->attendancegradebook) {
@@ -3038,15 +3051,36 @@ class checkmark {
                 $feedback->attendance = 0;
             }
             $feedback->graderid = $USER->id;
+            $update = true;
+        }
+        if ($this->checkmark->presentationgradebook) {
+            $presitem = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM];
+            $presentationgradedisabled = $presitem->grades[$formdata->userid]->locked
+                                            || $presitem->grades[$formdata->userid]->overridden;
+        } else {
+            $presentationgradedisabled = false;
+        }
+        if ($this->checkmark->presentationgrading && has_capability('mod/checkmark:gradepresentation', $this->context)
+            && !$presentationgradedisabled) {
+            if ($this->checkmark->presentationgrade) {
+                $feedback->presentationgrade = $formdata->presentationgrade;
+                if ($formdata->presentationgrade == -1) {
+                    // Normalize the presentationgrade!
+                    $feedback->presentationgrade = null;
+                }
+            }
+            $feedback->presentationfeedback = $formdata->presentationfeedback_editor['text'];
+            $feedback->presentationformat = $formdata->presentationfeedback_editor['format'];
+            $feedback->graderid = $USER->id;
+            $update = true;
+        }
+
+        if ($update) {
             if (!empty($formdata->mailinfo)) {
                 $feedback->mailed = 0;       // Make sure mail goes out (again, even)!
             } else {
                 $feedback->mailed = 1;       // Treat as already mailed!
             }
-            $update = true;
-        }
-
-        if ($update) {
             $DB->update_record('checkmark_feedbacks', $feedback);
 
             // Trigger grade event!

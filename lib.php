@@ -583,6 +583,11 @@ function checkmark_update_presentation_grades($checkmark, $userid=0) {
     global $CFG;
     require_once($CFG->libdir.'/gradelib.php');
 
+    if (!$checkmark->presentationgrading || !$checkmark->presentationgradebook) {
+        // If there's no gradeitem, we won't do anything!
+        return;
+    }
+
     $grades = null;
     if ($checkmark->presentationgrade != 0 && $grades = checkmark_get_user_presentation_grades($checkmark, $userid)) {
         foreach ($grades as $k => $v) {
