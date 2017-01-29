@@ -744,9 +744,7 @@ class checkmark {
                 // Points to show!
                 $presgrade = round($feedback->presentationgrade, 2).' / '.$this->checkmark->presentationgrade;
             } else if ($this->checkmark->presentationgrade < 0) {
-                $scale = grade_scale::fetch(array('id' => -$this->checkmark->presentationgrade));
-                $scaleitems = $scale->load_items();
-                $presgrade = $scaleitems[$feedback->presentationgrade];
+                $presgrade = $this->display_grade($feedback->presentationgrade, CHECKMARK_PRESENTATION_ITEM);
             } else {
                 $presgrade = "";
             }
@@ -1356,19 +1354,26 @@ class checkmark {
 
             case 'fastgrade':
                 // Do the fast grading stuff  - this process should work for all 3 subclasses!
-                $attendance = false;
-                $grading    = false;
-                $commenting = false;
-                $col        = false;
+                $attendance     = false;
+                $presgrading    = false;
+                $prescommenting = false;
+                $grading        = false;
+                $commenting     = false;
+                $col            = false;
 
                 $grades = optional_param_array('menu', array(), PARAM_INT);
                 $feedbacks = optional_param_array('feedback', array(), PARAM_TEXT);
                 $attendances = optional_param_array('attendance', array(), PARAM_INT);
+                $presgrades = optional_param_array('presentationgrade', array(), PARAM_INT);
+                $presfeedbacks = optional_param_array('presentationfeedback', array(), PARAM_TEXT);
                 $oldgrades = optional_param_array('oldgrade', array(), PARAM_INT);
                 $oldfeedbacks = optional_param_array('oldfeedback', array(), PARAM_TEXT);
                 $oldattendances = optional_param_array('oldattendance', array(), PARAM_INT);
+                $oldpresgrades = optional_param_array('oldpresentationgrade', array(), PARAM_INT);
+                $oldpresfeedbacks = optional_param_array('oldpresentationfeedback', array(), PARAM_TEXT);
 
                 $cantrackattendances = has_capability('mod/checkmark:trackattendance',  $this->context);
+                $cangradepresentations = has_capability('mod/checkmark:gradepresentation', $this->context);
 
                 $ids = array();
 
@@ -1376,6 +1381,19 @@ class checkmark {
                     $col = 'attendance';
                     $attendance = true;
                     $ids = array_unique(array_merge($ids, array_keys($attendances)));
+                }
+
+                if (!empty($presgrades) && $this->checkmark->presentationgrading && !empty($this->checkmark->presentationgrade)
+                        && $cangradepresentations) {
+                    $col = 'presentationgrade';
+                    $presgrading = true;
+                    $ids = array_unique(array_merge($ids, array_keys($presgrades)));
+                }
+
+                if (!empty($presfeedbacks) && $this->checkmark->presentationgrading && $cangradepresentations) {
+                    $col = 'presentationfeedback';
+                    $prescommenting = true;
+                    $ids = array_unique(array_merge($ids, array_keys($presfeedbacks)));
                 }
 
                 if (!empty($feedbacks)) {
@@ -1417,6 +1435,12 @@ class checkmark {
                     if (!array_key_exists($id, $oldattendances)) {
                         $oldattendances[$id] = null;
                     }
+                    if (!array_key_exists($id, $oldpresgrades)) {
+                        $oldpresgrades[$id] = null;
+                    }
+                    if (!array_key_exists($id, $oldpresfeedbacks)) {
+                        $oldpresfeedbacks[$id] = null;
+                    }
 
                     // So we have unknown attendance stati included!
                     if ($attendance && $cantrackattendances && (!key_exists($id, $attendances) || $attendances[$id] == -1)) {
@@ -1435,6 +1459,33 @@ class checkmark {
                         $feedback->attendance = $attendances[$id];
                     } else {
                         unset($feedback->attendance); // Don't need to update this.
+                    }
+
+                    if ($presgrading && key_exists($id, $presgrades) && (($oldpresgrades[$id] != $presgrades[$id])
+                            && !($oldpresgrades[$id] === null && $presgrades[$id] == -1))) {
+                        $presgrade = $presgrades[$id];
+                        if ($presgrade == -1) {
+                            $presgrade = null;
+                        }
+                        $updatedb = $updatedb || ($oldpresgrades[$id] != $presgrade);
+                        if ($feedback === false) {
+                            $feedback = $this->prepare_new_feedback($id);
+                        }
+                        $feedback->presentationgrade = $presgrade;
+                    } else {
+                        unset($feedback->presentationgrade);
+                    }
+
+                    if ($prescommenting && key_exists($id, $presfeedbacks)
+                            && (trim($oldpresfeedbacks[$id]) != trim($presfeedbacks[$id]))) {
+                        $presfeedbackvalue = trim($presfeedbacks[$id]);
+                        $updatedb = $updatedb || (trim($oldpresfeedbacks[$id]) != $presfeedbackvalue);
+                        if ($feedback === false) {
+                            $feedback = $this->prepare_new_feedback($id);
+                        }
+                        $feedback->presentationfeedback = str_replace('\n', '<br />', $presfeedbackvalue);
+                    } else {
+                        unset($feedback->presentationfeedback);  // Don't need to update this.
                     }
 
                     if ($grading && key_exists($id, $grades) && (($oldgrades[$id] != $grades[$id])
@@ -1600,30 +1651,53 @@ class checkmark {
      *  Return a grade in user-friendly form, whether it's a scale or not
      *
      * @param mixed $grade
+     * @param int $gradeitem Which gradeitem to use (CHECKMARK_GRADE_ITEM, CHECKMARK_PRESENTATION_ITEM)
      * @return string User-friendly representation of grade
      */
-    public function display_grade($grade) {
+    public function display_grade($grade, $gradeitem=CHECKMARK_GRADE_ITEM) {
         global $DB;
 
         // Cache scales for each checkmark - they might have different scales!
         static $scalegrades = array();
+        static $presentationscales = array();
 
-        if ($this->checkmark->grade > 0) {    // Normal number?
+        switch ($gradeitem) {
+            case CHECKMARK_PRESENTATION_ITEM:
+                $maxgrade = (int)$this->checkmark->presentationgrade;
+                break;
+            default:
+            case CHECKMARK_GRADE_ITEM:
+                $maxgrade = (int)$this->checkmark->grade;
+                break;
+        }
+
+        if ($maxgrade > 0) {    // Normal number?
             if (($grade == -1) || ($grade === null)) {
                 return '-';
             } else {
-                return round($grade, 2).' / '.$this->checkmark->grade;
+                return round($grade, 2).' / '.$maxgrade;
             }
         } else {                                // Scale?
-            if (empty($scalegrades[$this->checkmark->id])) {
-                if ($scale = $DB->get_record('scale', array('id' => -($this->checkmark->grade)))) {
-                    $scalegrades[$this->checkmark->id] = make_menu_from_list($scale->scale);
+            switch ($gradeitem) {
+                case CHECKMARK_PRESENTATION_ITEM:
+                    $scaletouse = -$this->checkmark->presentationgrade;
+                    $scalecache = 'presentationscales';
+                    break;
+                default:
+                case CHECKMARK_GRADE_ITEM:
+                    $scaletouse = -$this->checkmark->grade;
+                    $scalecache = 'scalegrades';
+                    break;
+            }
+            if (empty(${$scalecache}[$this->checkmark->id])) {
+                if ($scale = $DB->get_record('scale', array('id' => $scaletouse))) {
+                    ${$scalecache}[$this->checkmark->id] = make_menu_from_list($scale->scale);
                 } else {
                     return '-';
                 }
             }
-            if (isset($scalegrades[$this->checkmark->id][$grade])) {
-                return $scalegrades[$this->checkmark->id][$grade];
+            if (isset(${$scalecache}[$this->checkmark->id][(int)$grade])) {
+                return ${$scalecache}[$this->checkmark->id][(int)$grade];
             }
             return '-';
         }

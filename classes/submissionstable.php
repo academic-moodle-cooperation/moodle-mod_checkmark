@@ -310,6 +310,19 @@ class submissionstable extends \table_sql {
         } else {
             $table->add_colgroup(2, 'status_and_gradebook');
         }
+        if ($table->checkmark->checkmark->presentationgrading) {
+            $span = 1;
+            if ($table->checkmark->checkmark->presentationgrade) {
+                $tableheaders[] = get_string('presentationgrade_table', 'checkmark');
+                $tablecolumns[] = 'presentationgrade';
+                $helpicons[] = null;
+                $span++;
+            }
+            $tableheaders[] = get_string('presentationfeedback_table', 'checkmark');
+            $tablecolumns[] = 'presentationfeedback';
+            $helpicons[] = null;
+            $table->add_colgroup($span, 'presentationgrade');
+        }
 
         $table->define_columns($tablecolumns);
         $table->define_headers($tableheaders);
@@ -339,6 +352,12 @@ class submissionstable extends \table_sql {
         $table->column_class('finalgrade', 'finalgrade');
         if ($table->usesoutcomes) {
             $table->column_class('outcome', 'outcome');
+        }
+        if ($table->checkmark->checkmark->presentationgrading) {
+            if ($table->checkmark->checkmark->presentationgrade) {
+                $table->column_class('presentationgrade', 'presentationgrade');
+            }
+            $table->column_class('presentationfeedback', 'presentationfeedback');
         }
 
         $table->no_sorting('finalgrade');
@@ -371,6 +390,12 @@ class submissionstable extends \table_sql {
                   s.timemodified AS timesubmitted, f.timemodified AS timemarked";
         if ($table->checkmark->checkmark->trackattendance) {
             $fields .= ", f.attendance AS attendance";
+        }
+        if ($table->checkmark->checkmark->presentationgrading) {
+            if ($table->checkmark->checkmark->presentationgrade) {
+                $fields .= ", f.presentationgrade AS presentationgrade";
+            }
+            $fields .= ", f.presentationfeedback AS presentationfeedback";
         }
         if ($table->groupmode != NOGROUPS) {
             $fields .= ", groups";
@@ -410,6 +435,9 @@ class submissionstable extends \table_sql {
         $table->strupdate = get_string('update');
         $table->strgrade = get_string('grade');
         $table->grademenu = make_grades_menu($table->checkmark->checkmark->grade);
+        if ($table->checkmark->checkmark->presentationgrading && $table->checkmark->checkmark->presentationgrade) {
+            $table->presentationgrademenu = make_grades_menu($table->checkmark->checkmark->presentationgrade);
+        }
 
         return $table;
     }
@@ -536,6 +564,23 @@ class submissionstable extends \table_sql {
             $table->columnformat['attendance'] = array('align' => 'R');
             $table->add_colgroup(1, 'attendance');
         }
+        if ($table->checkmark->checkmark->presentationgrading) {
+            $span = 1;
+            if ($table->checkmark->checkmark->presentationgrade) {
+                $tableheaders[] = get_string('presentationgrade_table', 'checkmark');
+                $helpicons[] = null;
+                $tablecolumns[] = 'presentationgrade';
+                $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
+                $table->columnformat['presentationgrade'] = array('align' => 'R');
+                $span++;
+            }
+            $tableheaders[] = get_string('presentationfeedback_table', 'checkmark');
+            $helpicons[] = null;
+            $tablecolumns[] = 'presentationfeedback';
+            $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '50');
+            $table->columnformat['presentationfeedback'] = array('align' => 'L');
+            $table->add_colgroup($span, 'presentationgrade');
+        }
 
         $tableheaders[] = get_string('signature', 'checkmark');
         $tablecolumns[] = 'signature';
@@ -580,6 +625,12 @@ class submissionstable extends \table_sql {
             $table->column_class('outcome', 'outcome');
             $table->no_sorting('outcome');
         }
+        if ($table->checkmark->checkmark->presentationgrading) {
+            if ($table->checkmark->checkmark->presentationgrade) {
+                $table->column_class('presentationgrade', 'presentationgrade');
+            }
+            $table->column_class('presentationfeedback', 'presentationfeedback');
+        }
 
         $table->column_class('signature', 'signature');
         $table->no_sorting('signature');
@@ -610,6 +661,12 @@ class submissionstable extends \table_sql {
                   MAX(f.feedback) AS feedback, MAX(s.timemodified) AS timesubmitted,
                   MAX(f.timemodified) AS timemarked, 100 * COUNT( DISTINCT cchks.id ) / :examplecount AS summary,
                   COUNT( DISTINCT cchks.id ) AS checks, f.attendance AS attendance";
+        if ($table->checkmark->checkmark->presentationgrading) {
+            if ($table->checkmark->checkmark->presentationgrade) {
+                $fields .= ", f.presentationgrade AS presentationgrade";
+            }
+            $fields .= ", f.presentationfeedback AS presentationfeedback";
+        }
         if ($table->groupmode != NOGROUPS) {
             $fields .= ", MAX(groups) AS groups";
         }
@@ -787,7 +844,6 @@ class submissionstable extends \table_sql {
             $title = '';
         }
 
-        // TODO: Initialize JS!
         $params = new \stdClass();
         $params->table = '#mform1 .submissions';
         $params->id = $randomid;
@@ -1284,6 +1340,124 @@ class submissionstable extends \table_sql {
             } else {
                 $symbol = checkmark_get_attendance_symbol($values->attendance);
                 return \html_writer::tag('div', $symbol, array('id' => 'com'.$values->id));
+            }
+        }
+    }
+
+    /**
+     * This function is called for each data row to allow processing of the
+     * user's presentationgrade.
+     *
+     * @param object $values Contains object with all the values of record.
+     * @return $string Return user's grade.
+     */
+    public function col_presentationgrade($values) {
+        if (!$this->checkmark->checkmark->presentationgrading || !$this->checkmark->checkmark->presentationgrade) {
+            return '';
+        }
+        $presentationgradebook = $this->checkmark->checkmark->presentationgradebook;
+        if ($presentationgradebook) {
+            $finalgrade = $this->gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$values->id];
+            $grademax = $this->gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grademax;
+            $finalgrade->formatted_grade = round($finalgrade->grade, 2).' / '.round($grademax, 2);
+            $lockedoroverridden = 'locked';
+            if ($finalgrade->overridden) {
+                $lockedoroverridden = 'overridden';
+            }
+        }
+
+        // Print grade, dropdown or text!
+        if ($presentationgradebook && ($finalgrade->locked || $finalgrade->overridden)) {
+            $gradeattr = array('id'    => 'pg'.$values->id,
+                               'class' => $lockedoroverridden);
+            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                return $finalgrade->formatted_grade;
+            } else {
+                return \html_writer::tag('div', $finalgrade->formatted_grade, $gradeattr);
+            }
+        } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+            if ($values->presentationgrade === null) {
+                $values->presentationgrade = -1;
+            }
+            $attributes = array();
+            $attributes['tabindex'] = $this->tabindex++;
+            $menu = \html_writer::select($this->presentationgrademenu,
+                                        'presentationgrade['.$values->id.']',
+                                        (int)$values->presentationgrade,
+                                        array(-1 => get_string('nograde')),
+                                        $attributes);
+            $oldgradeattr = array('type'  => 'hidden',
+                                  'name'  => 'oldpresentationgrade['.$values->id.']',
+                                  'value' => (int)$values->presentationgrade);
+            $oldgrade = \html_writer::empty_tag('input', $oldgradeattr);
+            return \html_writer::tag('div', $menu.$oldgrade, array('id' => 'pg'.$values->id));
+        } else {
+            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                if ($values->feedbackid) {
+                    return $this->checkmark->display_grade($values->presentationgrade, CHECKMARK_PRESENTATION_ITEM);
+                } else {
+                    return '-';
+                }
+            } else {
+                if ($values->feedbackid) {
+                    return \html_writer::tag('div', $this->checkmark->display_grade($values->presentationgrade,
+                                                                                    CHECKMARK_PRESENTATION_ITEM),
+                                             array('id' => 'pg'.$values->id));
+                } else {
+                    return \html_writer::tag('div', '-', array('id' => 'pg'.$values->id));
+                }
+            }
+        }
+    }
+
+    /**
+     * This function is called for each data row to allow processing of the
+     * user's presentation feedback.
+     *
+     * @param object $values Contains object with all the values of record.
+     * @return $string Return user's feedback.
+     */
+    public function col_presentationfeedback($values) {
+        if (!$this->checkmark->checkmark->presentationgrading) {
+            return '';
+        }
+        $presentationgradebook = $this->checkmark->checkmark->presentationgradebook;
+        if ($presentationgradebook) {
+            $finalgrade = $this->gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$values->id];
+        }
+
+        // Print Comment!
+        if ($presentationgradebook && ($finalgrade->locked || $finalgrade->overridden)) {
+            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                return $finalgrade->str_feedback;
+            } else {
+                return \html_writer::tag('div', $finalgrade->str_feedback, array('id' => 'pcom'.$values->id));
+            }
+        } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+            $inputarr = array('type'  => 'hidden',
+                              'name'  => 'oldpresentationfeedback['.$values->id.']',
+                              'value' => trim(str_replace('<br />', '<br />\n', $values->presentationfeedback)));
+            $oldfeedback = \html_writer::empty_tag('input', $inputarr);
+            $attr = array('tabindex' => $this->tabindex++,
+                          'name'     => 'presentationfeedback['.$values->id.']',
+                          'id'       => 'presentationfeedback'.$values->id,
+                          'rows'     => 2,
+                          'cols'     => 20);
+            $content = \html_writer::tag('textarea', trim(str_replace('<br />', '<br />\n', $values->presentationfeedback)), $attr);
+            return \html_writer::tag('div', $content.$oldfeedback, array('id' => 'pcom'.$values->id));
+        } else {
+            if ($values->feedbackid) {
+                if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                    return ($values->presentationfeedback === null) ? '' : $values->presentationfeedback;
+                } else {
+                    return \html_writer::tag('div', $values->presentationfeedback, array('id' => 'pcom'.$values->id));
+                }
+            } else {
+                if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                    return '';
+                } else {
+                    return \html_writer::tag('div', '&nbsp;', array('id' => 'com'.$values->id));
+                }
             }
         }
     }

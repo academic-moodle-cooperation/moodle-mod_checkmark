@@ -63,6 +63,10 @@
     display: none;
 }
 
+#page-mod-checkmark-submissions .submissions colgroup.presentationgrade {
+    border-left:2px solid rgba(153, 153, 153, 0.95);
+}
+
 #page-mod-checkmark-submissions .qgprefs #optiontable {
     margin-left: auto;
     text-align: right;
