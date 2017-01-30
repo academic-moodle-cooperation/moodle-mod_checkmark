@@ -1710,14 +1710,14 @@ function checkmark_print_overview($courses, &$htmlarray) {
             $submissions->all = $studentsubmissions;
             $submissions->graded = $submissions->all - $submissions->reqgrading;
             if ($amount->total == $amount->submitted) { // Everyone has submitted!
-                $submittedclass = 'allsubmitted';
+                $submittedclass = 'text-success';
             } else {
-                $submittedclass = 'submissionsmissing';
+                $submittedclass = 'text-error';
             }
             if ($submissions->reqgrading > 0) {
-                $reqgradingclass = 'tobegraded';
+                $reqgradingclass = 'text-error';
             } else {
-                $reqgradingclass = 'allgraded';
+                $reqgradingclass = 'text-success';
             }
             $link = new moodle_url('/mod/checkmark/submissions.php',
                                    array('id' => $checkmark->coursemodule));
@@ -1856,16 +1856,16 @@ function checkmark_display_lateness($timesubmitted, $timedue) {
 
     if ($time >= 7 * 24 * 60 * 60) { // More than 7 days?
         $timetext = get_string('early', 'checkmark', format_time($time));
-        return ' (<span class="early">'.$timetext.'</span>)';
+        return ' (<span class="text-success">'.$timetext.'</span>)';
     } else if ($time >= 24 * 60 * 60) { // More than 1 day but less than 7 days?
         $timetext = get_string('early', 'checkmark', format_time($time));
-        return ' (<span class="soon">'.$timetext.'</span>)';
+        return ' (<span class="text-info">'.$timetext.'</span>)';
     } else if ($time >= 0) { // In the future but less than 1 day?
         $timetext = get_string('early', 'checkmark', format_time($time));
-        return ' (<span class="today">'.$timetext.'</span>)';
+        return ' (<span class="text-warning">'.$timetext.'</span>)';
     } else {
         $timetext = get_string('late', 'checkmark', format_time($time));
-        return ' (<span class="late">'.$timetext.'</span>)';
+        return ' (<span class="text-error">'.$timetext.'</span>)';
     }
 }
 

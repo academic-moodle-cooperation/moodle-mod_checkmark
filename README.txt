@@ -71,6 +71,7 @@ v 2016071202
 -------------------------
 *) Fixed old checkmark_refresh_dates() function to be compatible with 3.1.2 updates onwards!
 *) Added presentation grade as additional grade item
+*) Replace custom CSS classes for late/early/soon/etc. styling with bootstrap classes
 
 v 2016071201
 -------------------------

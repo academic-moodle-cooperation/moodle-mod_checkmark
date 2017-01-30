@@ -530,7 +530,7 @@ class checkmark {
         groups_print_activity_menu($this->cm,
                                    $CFG->wwwroot . '/mod/checkmark/view.php?id=' . $this->cm->id);
 
-        echo html_writer::tag('div', $this->submittedlink(), array('class' => 'reportlink'));
+        echo html_writer::tag('div', $this->submittedlink(), array('class' => 'text-info'));
         echo html_writer::tag('div', '', array('class' => 'clearer'));
     }
 
@@ -797,9 +797,9 @@ class checkmark {
                         $date = userdate($submission->timemodified);
                         if ($submission->timemodified <= $this->checkmark->timedue
                             || empty($this->checkmark->timedue)) {
-                            $submitted = html_writer::tag('span', $date, array('class' => 'early'));
+                            $submitted = html_writer::tag('span', $date, array('class' => 'text-success'));
                         } else {
-                            $submitted = html_writer::tag('span', $date, array('class' => 'late'));
+                            $submitted = html_writer::tag('span', $date, array('class' => 'text-error'));
                         }
                     }
                 }

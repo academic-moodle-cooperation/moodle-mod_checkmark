@@ -28,10 +28,6 @@
     white-space: nowrap;
 }
 
-.path-mod-checkmark .late {
-    color: red;
-}
-
 /** Styles for submissions.php **/
 #page-mod-checkmark-submissions form#options div {
     margin-left: auto;
@@ -206,38 +202,6 @@
     font-weight: bold;
 }
 
-.path-mod-checkmark .early {
-    background-color: #9f9;
-}
-
-.path-mod-checkmark .soon {
-    background-color: #ff9;
-}
-
-.path-mod-checkmark .today {
-    background-color: #fc9;
-}
-
-.path-mod-checkmark .tobegraded,
-.checkmark .tobegraded {
-    background-color: #fc9;
-}
-
-.path-mod-checkmark .allgraded,
-.checkmark .allgraded {
-    background-color: #9f9;
-}
-
-.path-mod-checkmark .submissionsmissing,
-.checkmark .submissionsmissing {
-    background-color: #fc9;
-}
-
-.path-mod-checkmark .allsubmitted,
-.checkmark .allsubmitted {
-    background-color: #9f9;
-}
-
 .path-mod-checkmark #autogradingfieldset {
     margin-top: 2em;
     padding-top: 1em;
@@ -271,15 +235,4 @@
 
 .path-mod-checkmark .clearfloat {
     clear: both;
-}
-
-#page-mod-checkmark-view .reportlink a {
-    background-attachment: scroll;
-    background-clip: border-box;
-    background-color: #fcffd8;
-    background-image: none;
-    background-origin: padding-box;
-    background-position: 0 0;
-    background-repeat: repeat;
-    background-size: auto auto;
 }
