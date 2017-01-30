@@ -867,8 +867,6 @@ function checkmark_presentation_item_delete($checkmark) {
 function checkmark_scale_used($checkmarkid, $scaleid) {
     global $DB;
 
-    $return = false;
-
     if (empty($scaleid) || ($scaleid < 0)) {
         return false;
     }
@@ -889,7 +887,7 @@ function checkmark_scale_used_anywhere($scaleid) {
     global $DB;
 
     if (($scaleid > 0) && $DB->record_exists_select('checkmark', "grade = ? OR (presentationgrading = 1 AND presentationgrade = ?)",
-                                                    array($checkmarkid, -$scaleid, -$scaleid))) {
+                                                    array(-$scaleid, -$scaleid))) {
         return true;
     } else {
         return false;
@@ -932,7 +930,6 @@ function checkmark_refresh_events($course = 0, $checkmarkid = 0) {
         return true;
     }
 
-    $moduleid = $DB->get_field('modules', 'id', array('name' => 'checkmark'));
     if ($checkmarks) {
         foreach ($checkmarks as $checkmark) {
             $cm = get_coursemodule_from_instance('checkmark', $checkmark->id);
@@ -1851,8 +1848,8 @@ function checkmark_print_overview($courses, &$htmlarray) {
                                      array('class' => 'element total')));
         $row[] = new html_table_cell(html_writer::tag('div', $statistic->checked_grade.' / '.$statistic->total_grade,
                                      array('class' => 'element total')));
-        foreach ($row as $i => $cur) {
-            $row[$i]->header = true;
+        foreach ($row as &$cur) {
+            $cur->header = true;
         }
         $table->data[] = new html_table_row($row);
 

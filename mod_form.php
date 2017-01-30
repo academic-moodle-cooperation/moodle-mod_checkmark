@@ -172,12 +172,12 @@ class mod_checkmark_mod_form extends moodleform_mod {
                                                  'itemnumber' => CHECKMARK_PRESENTATION_ITEM,
                                                  'courseid' => $COURSE->id));
             $select = "checkmarkid = ? AND (presentationgrade >= 0 OR presentationfeedback IS NOT NULL)";
-            $presentationfeedbackpresent = $DB->record_exists_select('checkmark_feedbacks', $select, array($this->_cm->instance));
+            $presfbpresent = $DB->record_exists_select('checkmark_feedbacks', $select, array($this->_cm->instance));
             if ($gradeitem) {
                 $gradeoptions['currentgrade'] = $gradeitem->grademax;
                 $gradeoptions['currentgradetype'] = $gradeitem->gradetype;
                 $gradeoptions['currentscaleid'] = $gradeitem->scaleid;
-                $gradeoptions['hasgrades'] = $gradeitem->has_grades() || $presentationfeedbackpresent;
+                $gradeoptions['hasgrades'] = $gradeitem->has_grades() || $presfbpresent;
                 $ingradebook = true;
             } else {
                 // Get gradeoption infos from instance record!
@@ -201,7 +201,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
                     $gradeoptions['currentgradetype'] = 'none';
                     $gradeoptions['currentgrade'] = $CFG->gradepointdefault;
                 }
-                if ($presentationfeedbackpresent) {
+                if ($presfbpresent) {
                     $gradeoptions['hasgrades'] = true;
                 }
             }
