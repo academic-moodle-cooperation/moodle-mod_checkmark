@@ -79,6 +79,7 @@ Die folgenden Abgaben sind davon betroffen:';
 $string['checkbrokengradebookgrades_mail'] = 'Aufgrund eines Bugs in Version 2.9.1 wurden Bewertungen nicht korrekt ins Gradebook übertragen.
 Die folgenden Abgaben waren davon betroffen und wurden automatisch repariert:';
 $string['checkmark_overviewsummary'] = 'Sie haben {$a->checked_examples} / {$a->total_examples} Beispiele ({$a->checked_grade} / {$a->total_grade} Punkte) gekreuzt<br />{$a->grade}<br />';
+$string['checkmark_overviewsummary_nograde'] = 'Sie haben {$a->checked_examples} / {$a->total_examples} Beispiele gekreuzt<br />{$a->grade}<br />';
 $string['checkmark_summary'] = 'Sie haben <span id="examples">{$a->checked_examples}</span> von {$a->total_examples} Beispielen gekreuzt.<br />(<span id="grade">{$a->checked_grade}</span> von maximal {$a->total_grade} Punkten)';
 $string['checkmarkstatstitle'] = 'Kursübersicht Kreuzerlübungen';
 $string['choose'] = 'Mit Auswahl...';

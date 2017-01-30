@@ -1440,7 +1440,11 @@ function checkmark_getsummarystring($submission, $checkmark) {
 
     $a = checkmark_getsubmissionstats($submission, $checkmark);
 
-    $output = get_string('checkmark_overviewsummary', 'checkmark', $a);
+    if ($checkmark->grade == 0) {
+        $output = get_string('checkmark_overviewsummary_nograde', 'checkmark', $a);
+    } else {
+        $output = get_string('checkmark_overviewsummary', 'checkmark', $a);
+    }
 
     return $output;
 }
@@ -1455,7 +1459,7 @@ function checkmark_getsummarystring($submission, $checkmark) {
  * @return object submissions statistics data
  */
 function checkmark_getsubmissionstats($submission, $checkmark) {
-    global $DB;
+    global $DB, $USER;
 
     $checkedexamples = 0;
     $checkedgrades = 0;
@@ -1488,25 +1492,40 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
 
     if (empty($submission->userid)) {
         $feedback = false;
+        $userid = $USER->id;
     } else {
         $feedback = $DB->get_record('checkmark_feedbacks', array('checkmarkid' => $checkmark->id,
                                                                  'userid'      => $submission->userid));
+        $userid = $submission->userid;
     }
-    if (!empty($submission->userid) && $feedback && ($feedback->grade != -1)) {
+
+    $gradinginfo = grade_get_grades($checkmark->course, 'mod', 'checkmark', $checkmark->id, $userid);
+    $item = $gradinginfo->items[CHECKMARK_GRADE_ITEM];
+    $grade = $item->grades[$userid];
+    if ($feedback == false) {
+        $feedback = new stdClass();
+        $feedback->grade = $grade->grade;
+        $feedback->feedback = $grade->feedback;
+    } else if ($grade->overridden || $grade->locked) {
+        $feedback->grade = $grade->grade;
+        $feedback->feedback = $grade->feedback;
+    }
+
+    if (!empty($userid) && $feedback) {
         /*
          * Cache scales for each checkmark
          * they might have different scales!
          */
         static $scalegrades = array();
 
-        if ($checkmark->grade >= 0) {    // Normal number?
+        if ($checkmark->grade > 0) {    // Normal number?
             if ($feedback->grade == -1) {
                 $a->grade = get_string('notgradedyet', 'checkmark');
             } else {
                 $a->grade = get_string('graded', 'checkmark').': '.(int)$feedback->grade.
                             ' / '.$checkmark->grade;
             }
-        } else {                                // Scale?
+        } else if ($checkmark->grade < 0) {                                // Scale?
             if (empty($scalegrades[$checkmark->id])) {
                 if (!$scale = grade_scale::fetch(array('id' => -$checkmark->grade))) {
                     $a->grade = get_string('notgradedyet', 'checkmark');
@@ -1522,6 +1541,13 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
             if (key_exists((int)$feedback->grade, $scalegrades[$checkmark->id])) {
                 $a->grade = get_string('graded', 'checkmark').': '.
                             $scalegrades[$checkmark->id][(int)$feedback->grade];
+            } else {
+                $a->grade = get_string('notgradedyet', 'checkmark');
+            }
+        } else {
+            // Just comments!
+            if ($feedback->feedback != null) {
+                $a->grade = get_string('graded', 'checkmark');
             } else {
                 $a->grade = get_string('notgradedyet', 'checkmark');
             }
