@@ -1,0 +1,174 @@
+CHANGELOG
+=========
+
+3.2.0 (201?-??-??)
+------------------
+
+* Moodle 3.2 compatible version
+
+
+3.1.3 (2016-12-05)
+------------------
+
+* [FEATURE] Added presentation grade as additional grade item
+* [FEATURE] #3710 Made description and name searchable
+* [FEATURE] #3737 We now use regular text editor for submission feedbacks
+* [FEATURE] #3610 We now use gradebook values for presentation grade and attendance if overwritten
+* [FIXED] #3989 Fix overwritten presentationgrades not showing correctly in grading form
+* [FIXED] #3986 Fix overwritten grades in general feedback not shown correctly
+* [FIXED] #3949 Fix user count in messages related to automatic grading
+* [CHANGED] #3985 Add notifications if attendances are locked/overriden while trying to set them via bulk actions
+* [CHANGED] #3941 Show feedback for instances without grades
+* [CHANGED] #3936 Hide grade columns if there is no grade to show and only feedback comments are active
+* [CHANGED] #4011 Replace custom CSS classes for late/early/soon/etc. styling with bootstrap classes
+* and various smaller bugfixes, fixed warning messages, etc.
+
+
+3.1.2 (2016-10-03)
+------------------
+
+* [FIXED] #3758 Fixed old checkmark_refresh_dates() function to be compatible with 3.1.2 updates
+  onwards
+
+
+3.1.1 (2016-08-24)
+------------------
+
+* [FIXED] #3649 Removed accidently doubled upgrade code for attendances with lesser version number
+
+
+3.1.0 (2016-07-12)
+------------------
+
+* Moodle 3.1 compatible version
+* [FEATURE] #2812 Add support for attendances tracking
+* [FEATURE] #3255 Save column status, sort order, etc. persistently
+* [FEATURE] #2815 Improve layout for autograding & (new) attendance tracking bulk action
+* [CHANGED] #3226 Rewrite table creation, harmonize tables (submission & export)
+* [CHANGED] Migrate old unit test to phpunit
+* [FIXED] #3600 Fixed wrong terms used in some German language strings concerning due dates
+* [FIXED] #3321, #3575 feedback date not being updated
+
+
+3.0.1 (2016-10-03)
+------------------
+
+* [FIXED] #3758 Fixed old checkmark_refresh_dates() function to be compatible with 3.1.2 updates
+  onwards
+
+
+3.0.0 (2016-03-14)
+------------------
+
+* Moodle 3.0 compatible version
+* [FIXED] #3180 Bug concerning submission updated event (related user was not shown, caused problems)
+
+
+2.9.5 (2016-06-10)
+------------------
+
+* [FIXED] #3301 Bug showing no grade on dashboard if there's no submission
+
+
+2.9.4
+-----
+
+* [FIXED] #3268 Bug causing amount of unmarked submissions to always be 0 on dashboard
+
+
+2.9.3
+-----
+
+* [FIXED] #3225 Correct the grades in gradebook affected from the bug fixed in 2016012002
+
+
+2.9.2
+-----
+
+* [FIXED] #3214 Bug where grades won't get written to gradebook anymore
+* [FIXED] #3215 Broken filter "require grading" in submissions and print-preview tab
+
+
+2.9.1
+-----
+
+* [FIXED] #2953 Hidden comment column breaking exports
+* [FIXED] #2953 Wrong amount of affected users in message when autograding
+* [FIXED] #2954 Autograding for submissions without feedback when autograding submissions with
+  feedback required
+
+
+2.9.0 (2016-01-20)
+------------------
+
+* Moodle 2.9 compatible version.
+* [FEATURE] New setting: checkmark/pdfexampleswarning = amount of exampes in instance to trigger
+  warning about possibly unreasonable layouted PDF documents if too many examples are displayed
+* [CHANGE] #2808 Separated DB table for submissions and feedbacks, students without submission wont
+  get an empty submission when the feedback is given anymore
+* [CHANGE] Change alternative identifier parameter in view.php from 'a' to 'c'
+* Add first behat tests
+
+
+2.8.4 (2015-10-20)
+------------------
+
+* [FIXED] Small bug preventing manual grading (not quick grading)
+
+
+2.8.3 (2015-10-13)
+------------------
+
+* [FIXED] No submissions shown/counted because of filtered users lists
+
+
+2.8.2 (2015-10-06)
+------------------
+
+* [CHANGE] #2662 Refactor code to use autoloading
+* [CHANGE] Improve support for PostgreSQL
+* [FIXED] #2660 Query in updgrade script breaking in PostgreSQL
+* [FIXED] Missing additional user fields in recent_activities_block output
+* [REMOVED] Remove obsolete/unused files/code
+
+
+2.8.1
+-----
+
+* [FIXED] #2653 Move plugin settings from config to config plugins
+
+
+2.8.0 (2015-07-15)
+------------------
+
+* Moodle 2.8 compatible version
+* [FEATURE] #2268 Enhance autograding confirm message with numbers of autograded entries
+* [FEATURE] #2328 Add posibility to export "signature" column
+* [CHANGE] Some small CSS improvements
+* [FIXED] #2291 PDF export sometimes has bad layout in portrait mode
+* [FIXED] #2290 Column shown in table header even if column is hidden
+* [FIXED] #2410 Fixed some form validation error messages
+* [FIXED] #2346 Sorting of print preview and submissions table (sort by lastname by default)
+* [FIXED] #22438 Groups not shown in print preview
+* [FIXED] #2428 Removed blocking JS calls
+* [FIXED] #2415 Output (styled) notification message if there's no data to shown
+
+
+2.7 (2015-01-14)
+----------------
+
+* Moodle 2.7 compatible version
+* [FEATURE] #2089 Add PostgreSQL support
+* [FEATURE] #1810 Add information about submission time to exports
+* [CHANGE] 1977 Replace cron with scheduled task
+* [FIXED] #2061 Update JS for new grade settings
+* [FIXED] #1965 Replace add_to_log calls with triggered events
+* [FIXED] #2032 Calculation of checkmark open/closed-state
+* [FIXED] Check language files
+* [FIXED] Some minor bugs
+
+
+2.6 (2014-10-09)
+----------------
+
+* First release for Moodle 2.6
