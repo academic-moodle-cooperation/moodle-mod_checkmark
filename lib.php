@@ -1519,7 +1519,7 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
         static $scalegrades = array();
 
         if ($checkmark->grade > 0) {    // Normal number?
-            if ($feedback->grade == -1) {
+            if ($feedback->grade === null || $feedback->grade == -1) {
                 $a->grade = get_string('notgradedyet', 'checkmark');
             } else {
                 $a->grade = get_string('graded', 'checkmark').': '.(int)$feedback->grade.
