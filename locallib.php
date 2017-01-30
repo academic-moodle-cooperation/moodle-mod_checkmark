@@ -2307,7 +2307,12 @@ class checkmark {
             $mformdata->presentationgrade = ($feedback !== false) ? $feedback->presentationgrade : -1;
             $mformdata->presentationfeedback = ($feedback !== false) ? $feedback->presentationfeedback : '';
             $mformdata->presentationformat = ($feedback !== false) ? $feedback->presentationformat : FORMAT_HTML;
-            $mformdata->presentationgradedisabled = $presentationgradedisabled;
+            $mformdata->presgradedisabled = $presgradedisabled;
+            if ($mformdata->presgradedisabled) {
+                // Overwrite with gradebook value!
+                $mformdata->presentationgrade = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$userid]->str_long_grade;
+                $mformdata->presentationfeedback = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$userid]->feedback;
+            }
         }
         $mformdata->lateness = $this->display_lateness($submission->timemodified);
         $mformdata->auser = $auser;

@@ -262,7 +262,16 @@ class mod_checkmark_grading_form extends moodleform {
                 }
                 $presentationfeedback = $this->_customdata->presentationfeedback;
             }
-            if ($this->_customdata->instance_presentationgrade) {
+            if ($this->_customdata->presentationgradebook &&
+                    ($this->_customdata->presgradedisabled || !has_capability('mod/checkmark:gradepresentation', $context))) {
+                $mform->addElement('static', 'presentationgrade', get_string('presentationgrade', 'checkmark').':',
+                                   $presentationitem->grades[$this->_customdata->userid]->str_long_grade);
+                if ($presentationfeedback == '') {
+                    $presentationfeedback = '-';
+                }
+                $mform->addElement('static', 'disabledpresentationfeedback', get_string('presentationfeedback', 'checkmark').':',
+                                   $presentationfeedback);
+            } else if ($this->_customdata->instance_presentationgrade) {
                 $grademenu = array(-1 => get_string('nograde'));
                 $grademenu = $grademenu + make_grades_menu($this->_customdata->checkmark->presentationgrade);
                 if ($presentationgrade == '') {
@@ -271,17 +280,7 @@ class mod_checkmark_grading_form extends moodleform {
                 $mform->addElement('select', 'presentationgrade', get_string('presentationgrade', 'checkmark').':', $grademenu);
                 $mform->setType('presentationgrade', PARAM_INT);
                 $mform->setDefault('presentationgrade', $presentationgrade);
-            }
-            if ($this->_customdata->presentationgradedisabled || !has_capability('mod/checkmark:gradepresentation', $context)) {
-                if ($this->_customdata->instance_presentationgrade) {
-                    $mform->freeze('presentationgrade');
-                }
-                if ($presentationfeedback == '') {
-                    $presentationfeedback = '-';
-                }
-                $mform->addElement('static', 'disabledpresentationfeedback', get_string('presentationfeedback', 'checkmark').':',
-                                   $presentationfeedback);
-            } else {
+
                 $mform->addElement('editor', 'presentationfeedback_editor', get_string('presentationfeedback', 'checkmark').':',
                                    null, $this->get_editor_options($this->_customdata->cm, 'presentationfeedback') );
                 $mform->setType('presentationfeedback_editor', PARAM_RAW); // To be cleaned before display!
