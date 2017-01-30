@@ -946,107 +946,58 @@ class checkmark {
                 list($sqluserids, $userparams) = $DB->get_in_or_equal($usrlst, SQL_PARAMS_NAMED, 'user');
                 $params = array_merge_recursive($params, $userparams);
 
-                if ($attendancecoupled) {
-                    // If attendence is coupled we have to filter all out, who have no attendance-status!
-                    if (!$attendanceitem) {
-                        $attendancefilter = " AND f.attendance IS NOT NULL ";
-                        $attendancesql = "";
-                    } else {
-                        $attendancefilter = " AND (((g.locked > 0 OR g.overridden > 0) AND g.rawgrade IS NOT NULL)
-                                                    OR (f.attendance IS NOT NULL)) ";
-                        $attendancesql = "LEFT JOIN {grade_grades} g ON u.id = g.userid AND g.itemid = :itemid";
-                        $params['itemid'] = $attendanceitem->id;
-                    }
-                    $sql = "SELECT u.id FROM {user} u
-                         LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid ".
-                         $attendancesql."
-                             WHERE u.deleted = 0 AND u.id ".$sqluserids.
-                                   $attendancefilter;
-                    $params['checkmarkid'] = $this->checkmark->id;
-                } else {
-                    $sql = 'SELECT u.id FROM {user} u '.
-                            'WHERE u.deleted = 0 AND u.id '.$sqluserids;
-                }
+                $sql = "SELECT u.id, f.attendance
+                          FROM {user} u
+                     LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid
+                         WHERE u.deleted = 0 AND u.id ".$sqluserids;
+                $params['checkmarkid'] = $this->checkmark->id;
                 break;
             case self::FILTER_REQUIRE_GRADING:
                 $wherefilter = ' AND (COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0)) ';
-                if ($attendancecoupled) {
-                    if (!$attendanceitem) {
-                        $attendancefilter = " AND f.attendance IS NOT NULL ";
-                        $attendancesql = "";
-                    } else {
-                        $attendancefilter = " AND (((g.locked > 0 OR g.overridden > 0) AND g.rawgrade IS NOT NULL)
-                                                    OR (f.attendance IS NOT NULL)) ";
-                        $attendancesql = "LEFT JOIN {grade_grades} g ON u.id = g.userid AND g.itemid = :itemid";
-                        $params['itemid'] = $attendanceitem->id;
-                    }
-                } else {
-                    $attendancefilter = '';
-                    $attendancesql = "";
-                }
-                $sql = "  SELECT u.id
+                $sql = "  SELECT u.id, f.attendance
                             FROM {user} u
                        LEFT JOIN (".$esql.") eu ON eu.id=u.id
                        LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid)
-                       LEFT JOIN {checkmark_feedbacks} f ON s.userid = f.userid AND s.checkmarkid = f.checkmarkid ".
-                        $attendancesql."
+                       LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND s.checkmarkid = f.checkmarkid
                            WHERE u.deleted = 0
                                  AND s.checkmarkid = :checkmarkid".
-                       $wherefilter.$attendancefilter;
-                       $params = array_merge_recursive($params,
-                                                       array('checkmarkid' => $this->checkmark->id));
+                       $wherefilter;
+                       $params = array_merge_recursive($params, array('checkmarkid' => $this->checkmark->id));
                 break;
             case self::FILTER_ALL:
             default:
-                if ($attendancecoupled) {
-                    $attendancejoin = ' LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid2';
-                    $params['checkmarkid2'] = $this->checkmark->id;
-                    if (!$attendanceitem) {
-                        $attendancefilter = " AND f.attendance IS NOT NULL ";
-                    } else {
-                        $attendancefilter = " AND (((g.locked > 0 OR g.overridden > 0) AND g.rawgrade IS NOT NULL)
-                                                    OR (f.attendance IS NOT NULL)) ";
-                        $attendancejoin .= " LEFT JOIN {grade_grades} g ON u.id = g.userid AND g.itemid = :itemid ";
-                        $params['itemid'] = $attendanceitem->id;
-                    }
-                } else {
-                    $attendancefilter = '';
-                    $attendancejoin = '';
-                }
-                $sql = '  SELECT u.id FROM {user} u
-                       LEFT JOIN ('.$esql.') eu ON eu.id=u.id '.
-                       // Comment next line to really autograde all (even those without submissions)!
-                      'LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid) AND s.checkmarkid = :checkmarkid'.
-                      $attendancejoin.
+                // Comment out the third line to really autograde all (even those without submissions)!
+                $sql = "  SELECT u.id, f.attendance
+                            FROM {user} u
+                       LEFT JOIN (".$esql.") eu ON eu.id=u.id
+                       LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid) AND s.checkmarkid = :checkmarkid
+                       LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid
                           'WHERE u.deleted = 0
-                                 AND eu.id=u.id'.
-                       $attendancefilter;
+                                 AND eu.id=u.id";
                        $params['checkmarkid'] = $this->checkmark->id;
                 break;
         }
 
         $users = $DB->get_records_sql($sql, $params);
 
-        // Get the grades for the selected users!
-        $userids = array_keys($users);
-        if ($attendancegradebook) {
-            $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark', $this->checkmark->id, $userids);
-            $attendanceitem = $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM];
-
-            if ($attendancecoupled) {
-                foreach ($users as $user) {
-                    if (($attendanceitem->grades[$user->id]->locked || $attendanceitem->grades[$user->id]->overridden)) {
-                        if (($attendanceitem->grades[$user->id]->grade != 1)
-                                && ($attendanceitem->grades[$user->id]->grade != 0)) {
-                            // Undefined state!
-                            unset($users[$user->id]);
-                        }
+        if ($attendancecoupled) {
+            // Filter all users with undefined attendance state!
+            foreach ($users as $id => $user) {
+                if ($attendanceitem
+                        && ($attendanceitem->grades[$user->id]->locked || $attendanceitem->grades[$user->id]->overridden)) {
+                    if ($attendanceitem->grades[$user->id]->grade === null || (($attendanceitem->grades[$user->id]->grade != 1)
+                            && ($attendanceitem->grades[$user->id]->grade !== 0))) {
+                        unset($users[$user->id]);
+                    }
+                } else {
+                    if ($user->attendance === null || ($user->attendance != 1 && $user->attendance != 0)) {
+                        unset($users[$user->id]);
                     }
                 }
             }
         }
 
-        if ($users == null) {
+        if (empty($users) || count($users) == 0 || $users == null) {
             $result['status'] = GRADE_UPDATE_OK;
             if ($countonly) {
                 return 0;
@@ -1388,7 +1339,7 @@ class checkmark {
                             }
                             $SESSION->checkmark->autograde->selected = $selected;
                             $result = $this->autograde_submissions(self::FILTER_SELECTED, $selected, true);
-                            if (count($selected) == 1) {
+                            if ($result == 1) {
                                 $amount = get_string('autograde_stronesubmission', 'checkmark');
                             } else {
                                 $amount = get_string('autograde_strmultiplesubmissions', 'checkmark', $result);
