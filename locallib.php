@@ -628,20 +628,6 @@ class checkmark {
             $userid = $feedback->userid;
         }
 
-        if ($feedback == false) {
-            return;
-        }
-
-        // Check if the user can submit?
-        $cansubmit = has_capability('mod/checkmark:submit', $this->context, $userid, false);
-        // If not then check if the user still has the view cap and has a previous submission?
-        $cansubmit = $cansubmit || (($feedback !== false) && has_capability('mod/checkmark:view', $this->context, $userid, false));
-
-        if (!$cansubmit) {
-            // Can not submit checkmarks -> no feedback!
-            return;
-        }
-
         $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark',
                                         $this->checkmark->id, $userid);
         $item = $gradinginfo->items[CHECKMARK_GRADE_ITEM];
@@ -655,6 +641,59 @@ class checkmark {
         if ($this->checkmark->presentationgradebook) {
             $presentationitem = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM];
             $presentationgrade = $presentationitem->grades[$userid];
+        }
+
+        if (($feedback == false)
+                && (!$item || !$grade || (($grade->grade == null) && ($grade->feedback == null)))
+                && (!$attendanceitem || !$attendancegrade || ($attendancegrade->grade == null))
+                && (!$presentationitem || !$presentationgrade
+                    || (($presentationgrade->grade == null) && ($presentationgrade->feedback == null)))) {
+            return;
+        } else if ($feedback == false) {
+            $feedback = new stdClass();
+            $feedback->timemodified = 0;
+            if ($item && $grade) {
+                $feedback->graderid = $grade->usermodified;
+                $feedback->timemodified = $grade->dategraded;
+                $feedback->grade = $grade->grade;
+                $feedback->feedback = $grade->feedback;
+                $feedback->format = $grade->feedbackformat;
+            } else {
+                $feedback->grade = null;
+                $feedback->format = 1;
+            }
+            if (!empty($attendanceitem) && $attendancegrade) {
+                if ($attendancegrade->dategraded > $feedback->timemodified) {
+                    $feedback->graderid = $attendancegrade->usermodified;
+                    $feedback->timemodified = $attendancegrade->dategraded;
+                }
+                $feedback->attendance = $attendancegrade->grade;
+            } else {
+                $feedback->attendance = null;
+            }
+            if (!empty($presentationitem) && $presentationgrade) {
+                if ($presentationgrade->dategraded > $feedback->timemodified) {
+                    $feedback->graderid = $presentationgrade->usermodified;
+                    $feedback->timemodified = $presentationgrade->dategraded;
+                }
+                $feedback->presentationgrade = $presentationgrade->grade;
+                $feedback->presentationfeedback = $presentationgrade->feedback;
+                $feedback->presentationformat = $presentationgrade->feedbackformat;
+            } else {
+                $feedback->presentationgrade = null;
+                $feedback->presentationfeedback = null;
+                $feedback->presentationformat = 1;
+            }
+        }
+
+        // Check if the user can submit?
+        $cansubmit = has_capability('mod/checkmark:submit', $this->context, $userid, false);
+        // If not then check if the user still has the view cap and has a previous submission?
+        $cansubmit = $cansubmit || (($feedback !== false) && has_capability('mod/checkmark:view', $this->context, $userid, false));
+
+        if (!$cansubmit) {
+            // Can not submit checkmarks -> no feedback!
+            return;
         }
 
         if (($grade->hidden || $grade->grade === false)
