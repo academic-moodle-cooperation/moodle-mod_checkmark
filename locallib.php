@@ -901,7 +901,7 @@ class checkmark {
             $params['grademax']  = $this->checkmark->grade;
             $params['grademin']  = 0;
         } else {
-            $result['status'] = AUTOGRADE_SCALE_NOT_SUPPORTED;
+            $result['status'] = GRADE_UPDATE_FAILED;
             if ($countonly) {
                 return 0;
             } else {
@@ -2645,11 +2645,13 @@ class checkmark {
 
             $grp = array();
             $grp[] =& $mform->createElement( 'select', 'bulkaction', '' );
+            $enablebulk = false;
             if ($this->checkmark->trackattendance
                 && has_capability('mod/checkmark:trackattendance', $this->context)) {
                 $grp[0]->addOption(get_string('setattendant', 'checkmark'), 'setattendant');
                 $grp[0]->addOption(get_string('setabsent', 'checkmark'), 'setabsent');
                 $grp[0]->addOption('---', '', array( 'disabled' => 'disabled' ) );
+                $enablebulk = true;
             }
             if (($this->checkmark->grade <= 0)) {
                 // No autograde possible if no numeric grades are selected!
@@ -2658,6 +2660,7 @@ class checkmark {
                 $grp[0]->addOption(get_string('grade_automatically', 'checkmark'), 'grade', array('disabled' => 'disabled'));
             } else {
                 $grp[0]->addOption(get_string('grade_automatically', 'checkmark'), 'grade');
+                $enablebulk = true;
             }
 
             if ($this->checkmark->trackattendance
@@ -2665,14 +2668,27 @@ class checkmark {
                 if ($this->checkmark->attendancegradelink) {
                     $mform->addElement('html', $OUTPUT->notification(get_string('attendancegradelink_hint', 'checkmark'), 'info'));
                 }
+                if (($this->checkmark->grade <= 0)) {
+                    $attr = array('disabled' => 'disabled');
+                } else {
+                    $attr = array();
+                    $enablebulk = true;
+                }
                 $grp[0]->addOption('---', '', array( 'disabled' => 'disabled' ) );
-                $grp[0]->addOption(get_string('setattendantandgrade', 'checkmark'), 'setattendantandgrade');
-                $grp[0]->addOption(get_string('setabsentandgrade', 'checkmark'), 'setabsentandgrade');
+                $grp[0]->addOption(get_string('setattendantandgrade', 'checkmark'), 'setattendantandgrade', $attr);
+                $grp[0]->addOption(get_string('setabsentandgrade', 'checkmark'), 'setabsentandgrade', $attr);
             }
 
-            $grp[] =& $mform->createElement('submit', 'bulk', get_string('start', 'checkmark'));
-            $mform->addGroup($grp, 'actiongrp', get_string('selection', 'checkmark').'...', ' ', false);
-            $mform->addHelpButton('actiongrp', 'bulk', 'checkmark');
+            $attr = array();
+            if (!$enablebulk) {
+                $attr['disabled'] = 'disabled';
+            }
+
+            if ($enablebulk) {
+                $grp[] =& $mform->createElement('submit', 'bulk', get_string('start', 'checkmark'), $attr);
+                $mform->addGroup($grp, 'actiongrp', get_string('selection', 'checkmark').'...', ' ', false);
+                $mform->addHelpButton('actiongrp', 'bulk', 'checkmark');
+            }
         } else {
             if ($filter == self::FILTER_SUBMITTED) {
                 $mform->addElement('html',
