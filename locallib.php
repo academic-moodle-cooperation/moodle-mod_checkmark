@@ -202,7 +202,6 @@ class checkmark {
 
         if (!isset($this->checkmark->examples)) {
             $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $this->checkmark->id));
-            $flexiblenaming = $this->is_using_flexiblenaming();
 
             $exampleprefix = $this->checkmark->exampleprefix;
 
@@ -227,8 +226,6 @@ class checkmark {
      */
     public static function get_examples_static($checkmarkid) {
         global $DB;
-
-        $flexiblenaming = self::is_using_flexiblenaming_static($checkmarkid);
 
         $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmarkid));
 
@@ -2175,10 +2172,10 @@ class checkmark {
             $attendancedisabled = false;
         }
         if ($this->checkmark->presentationgradebook) {
-            $presentationgradedisabled = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$userid]->locked
+            $presgradedisabled = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$userid]->locked
                                             || $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$userid]->overridden;
         } else {
-            $presentationgradedisabled = false;
+            $presgradedisabled = false;
         }
 
         // Construct SQL, using current offset to find the data of the next student!
@@ -3039,7 +3036,7 @@ class checkmark {
      * Finaly print the submissions!
      */
     public function submissions_print() {
-        global $CFG, $DB, $DB, $OUTPUT, $PAGE;
+        global $CFG, $DB, $DB, $PAGE;
         require_once($CFG->libdir.'/gradelib.php');
 
         $filters = array(self::FILTER_ALL             => get_string('all'),
@@ -3258,13 +3255,13 @@ class checkmark {
         }
         if ($this->checkmark->presentationgradebook) {
             $presitem = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM];
-            $presentationgradedisabled = $presitem->grades[$formdata->userid]->locked
-                                            || $presitem->grades[$formdata->userid]->overridden;
+            $presgradedisabled = $presitem->grades[$formdata->userid]->locked
+                                 || $presitem->grades[$formdata->userid]->overridden;
         } else {
-            $presentationgradedisabled = false;
+            $presgradedisabled = false;
         }
         if ($this->checkmark->presentationgrading && has_capability('mod/checkmark:gradepresentation', $this->context)
-            && !$presentationgradedisabled) {
+            && !$presgradedisabled) {
             if ($this->checkmark->presentationgrade) {
                 $feedback->presentationgrade = $formdata->presentationgrade;
                 if ($formdata->presentationgrade == -1) {
