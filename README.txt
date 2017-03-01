@@ -67,6 +67,10 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2016071204
+-------------------------
+*) #4277 Fixed title and header not being set correctly on submissions and export pages
+
 v 2016071203
 -------------------------
 *) Make name and description searchable
