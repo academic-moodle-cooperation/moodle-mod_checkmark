@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+3.2.1 (2017-03-02)
+------------------
+
+* [FIXED] #4277 Fixed title and header not being set correctly on submissions and export pages
+
 
 3.2.0 (2016-12-05)
 ------------------

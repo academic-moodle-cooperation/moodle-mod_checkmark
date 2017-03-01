@@ -51,5 +51,9 @@ if ($download == 'zip') {
     $PAGE->set_pagelayout('popup'); // Remove navbars, etc!
     $checkmarkinstance->submissions_print();
 } else {
+    $pagetitle = $course->shortname.': '.get_string('modulename', 'checkmark').': '.format_string($checkmark->name, true);
+    $PAGE->set_title(strip_tags($pagetitle));
+    $PAGE->set_heading($course->fullname);
+
     $checkmarkinstance->submissions($mode);   // Display or process the submissions!
 }
