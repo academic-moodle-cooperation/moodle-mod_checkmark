@@ -5,29 +5,24 @@ Feature: Available From Date
     I need to be able to set the beginning date for the module to the December 11.
 
   @javascript
-  Scenario: Add a checkmark which starts in the future
+  Scenario: Add a checkmark starting in the future
     Given the following "courses" exist:
-        | fullname | shortname | category | group mode |
-        | Checkmark 2.9 | CM 2.9 | 0 | 0 |
+      | fullname | shortname | category | group mode |
+      | Course 1 | C1        | 0        | 0          |
     And the following "users" exist:
-        | username | firstname | lastname | email |
-        | teacher1 | Teacher | 1 | teacher1@example.com |
-        | student1 | Student | 1 | student1@example.com |
+      | username | firstname | lastname | email                |
+      | teacher1 | Teacher   | 1        | teacher1@example.com |
+      | student1 | Student   | 1        | student1@example.com |
     And the following "course enrolments" exist:
-        | user | course | role |
-        | teacher1 | CM 2.9 | editingteacher |
-        | student1 | CM 2.9 | student |
-    And I log in as "teacher1"
-    And I follow "Checkmark 2.9"
-    And I turn editing mode on
-    And I add a "Checkmark" to section "2" and I fill the form with:
-        | Checkmark name | Checkmark1 |
-        | Description | standard |
-        | timeavailable[day] | 11 |
-        | timeavailable[month] | December |
-        | timeavailable[year] | 2015 |
-    And I log out
+      | user     | course | role           |
+      | teacher1 | C1     | editingteacher |
+      | student1 | C1     | student        |
+    # We do not need to manually create the checkmark instance again,
+    # this has been testet in checkmark_adding.feature, use generators!
+    And the following "activities" exist:
+      | activity  | course | idnumber | name        | intro    | timeavailable |
+      | checkmark | C1     | CM1      | Checkmark 1 | Standard | ##tomorrow##  |
     When I log in as "student1"
-    And I follow "Checkmark 2.9"
-    And I follow "Checkmark1"
+    And I follow "Course 1"
+    And I follow "Checkmark 1"
     Then I should not see "Add submission"

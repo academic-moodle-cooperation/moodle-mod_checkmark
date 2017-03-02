@@ -7,19 +7,19 @@ Feature: In course, a teacher should be able to add a new checkmark
   @javascript
   Scenario: Add a checkmark instance
     Given the following "courses" exist:
-        | fullname | shortname | category | groupmode |
-        | Checkmark 2.9 | CM 2.9 | 0 | 0 |
+      | fullname | shortname | category | groupmode |
+      | Course 1 | C1        | 0        | 0         |
     And the following "users" exist:
-        | username | firstname | lastname | email |
-        | teacher1 | Teacher | 1 | teacher1@teacher.com |
+      | username | firstname | lastname | email                |
+      | teacher1 | Teacher   | 1        | teacher1@teacher.com |
     And the following "course enrolments" exist:
-        | user | course | role |
-        | teacher1 | CM 2.9 | editingteacher |
+      | user     | course | role           |
+      | teacher1 | C1     | editingteacher |
     And I log in as "teacher1"
-    And I follow "Checkmark 2.9"
+    And I follow "Course 1"
     And I turn editing mode on
     When I add a "Checkmark" to section "2" and I fill the form with:
-        | Checkmark name | checkmark |
-        | Description    | check |
+      | Checkmark name | checkmark |
+      | Description    | check     |
     And I follow "checkmark"
     Then I should see "check"

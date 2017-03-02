@@ -824,10 +824,12 @@ class checkmark {
             }
             if ($cnt = $this->count_real_submissions($group)) {
                 $submitted = html_writer::tag('a', get_string('viewsubmissions', 'checkmark', $cnt),
-                                              array('href' => $urlbase.'submissions.php?id='.$this->cm->id));
+                                              array('href'  => $urlbase.'submissions.php?id='.$this->cm->id,
+                                                    'id' => 'submissions'));
             } else {
                 $submitted = html_writer::tag('a', get_string('noattempts', 'checkmark'),
-                                              array('href' => $urlbase.'submissions.php?id='.$this->cm->id));
+                                              array('href'  => $urlbase.'submissions.php?id='.$this->cm->id,
+                                                    'id' => 'submissions'));
             }
         } else {
             if (isloggedin()) {

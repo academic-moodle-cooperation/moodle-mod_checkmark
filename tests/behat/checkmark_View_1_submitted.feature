@@ -8,24 +8,22 @@ Feature: In checkmark, a teacher should be able to how many students have submit
   Scenario: View 1 submitted
     Given the following "courses" exist:
       | fullname | shortname | category |
-      | Checkmark 2.9 | CM 2.9 | 0 |
+      | Course 1 | C1        | 0        |
     And the following "users" exist:
-      | username | firstname | lastname | email |
-      | teacher1 | Teacher | 1 | teacher1@example.com |
-      | student1 | Student | 1 | student1@example.com |
+      | username | firstname | lastname | email                |
+      | teacher1 | Teacher   | 1        | teacher1@example.com |
+      | student1 | Student   | 1        | student1@example.com |
     And the following "course enrolments" exist:
-      | user | course | role |
-      | teacher1 | CM 2.9 | editingteacher |
-      | student1 | CM 2.9 | student |
-    And I log in as "teacher1"
-    And I follow "Checkmark 2.9"
-    And I turn editing mode on
-    And I add a "Checkmark" to section "2" and I fill the form with:
-      | Checkmark name | Kreuzerlübung |
-      | Description | Standard-Einstellungen |
-    And I log out
-    When I log in as "student1"
-    And I follow "Checkmark 2.9"
+      | user     | course | role           |
+      | teacher1 | C1     | editingteacher |
+      | student1 | C1     | student        |
+    # We do not need to manually create the checkmark instance again,
+    # this has been testet in checkmark_adding.feature, use generators!
+    And the following "activities" exist:
+      | activity  | course | idnumber | name          | intro                  |
+      | checkmark | C1     | CM1      | Kreuzerlübung | Standard-Einstellungen |
+    And I log in as "student1"
+    And I follow "Course 1"
     And I follow "Kreuzerlübung"
     And I press "Add submission"
     And I set the following fields to these values:
@@ -37,7 +35,7 @@ Feature: In checkmark, a teacher should be able to how many students have submit
       | Example 6 | 1 |
     And I press "Save changes"
     And I log out
-    And I log in as "teacher1"
-    And I follow "Checkmark 2.9"
+    When I log in as "teacher1"
+    And I follow "Course 1"
     And I follow "Kreuzerlübung"
     Then I should see "View 1 submitted checkmarks"

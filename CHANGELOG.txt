@@ -7,6 +7,7 @@ CHANGELOG
 * [FIXED] #4310 Fixed autograding displaying warnings when attendance is in gradebook and coupled
   as well as ignoring in gradebook overwritten attendances!
 * [FIXED] Success message after auto-grading uses correct singular now, if only 1 entry was affected
+* [FIXED] Fixed behat tests after they were not working properly since the 3.2 update (or since boost was introduced)
 
 
 3.2.0 (2016-12-05)
