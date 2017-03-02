@@ -4,6 +4,8 @@ CHANGELOG
 ------------------
 
 * [FIXED] #4277 Fixed title and header not being set correctly on submissions and export pages
+* [FIXED] #4310 Fixed autograding displaying warnings when attendance is in gradebook and coupled
+  as well as ignoring in gradebook overwritten attendances!
 
 
 3.2.0 (2016-12-05)

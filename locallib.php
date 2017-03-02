@@ -908,16 +908,6 @@ class checkmark {
             }
         }
 
-        // If the attendance is linked to the grades!
-        $attendancecoupled = $this->checkmark->trackattendance && $this->checkmark->attendancegradelink;
-        $attendancegradebook = $this->checkmark->trackattendance && $this->checkmark->attendancegradebook;
-        if ($attendancegradebook) {
-            $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark', $this->checkmark->id);
-            $attendanceitem = $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM];
-        } else {
-            $attendanceitem = false;
-        }
-
         // Get all ppl that are allowed to submit checkmarks!
         $context = context_module::instance($this->cm->id);
         // Get groupmode and limit fetched users to current chosen group (or every)!
@@ -978,13 +968,24 @@ class checkmark {
 
         $users = $DB->get_records_sql($sql, $params);
 
+        // If the attendance is linked to the grades!
+        $attendancecoupled = $this->checkmark->trackattendance && $this->checkmark->attendancegradelink;
+        $attendancegradebook = $this->checkmark->trackattendance && $this->checkmark->attendancegradebook;
+
+        if ($attendancegradebook) {
+            $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark', $this->checkmark->id, array_keys($users));
+            $attendanceitem = $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM];
+        } else {
+            $attendanceitem = false;
+        }
+
         if ($attendancecoupled) {
             // Filter all users with undefined attendance state!
             foreach ($users as $id => $user) {
-                if ($attendanceitem
+                if ($attendanceitem && key_exists($user->id, $attendanceitem->grades)
                         && ($attendanceitem->grades[$user->id]->locked || $attendanceitem->grades[$user->id]->overridden)) {
                     if ($attendanceitem->grades[$user->id]->grade === null || (($attendanceitem->grades[$user->id]->grade != 1)
-                            && ($attendanceitem->grades[$user->id]->grade !== 0))) {
+                            && ($attendanceitem->grades[$user->id]->grade != 0))) {
                         unset($users[$user->id]);
                     }
                 } else {
