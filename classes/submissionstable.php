@@ -243,7 +243,7 @@ class submissionstable extends \table_sql {
      * @return submissionstable object
      */
     static public function create_submissions_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL) {
-        global $CFG, $DB, $OUTPUT;
+        global $CFG, $DB;
         // We need to have the same ID to ensure the columns are collapsed if their collapsed in the other table!
         $table = new submissionstable('mod-checkmark-submissions', $checkmarkorcmid);
 
@@ -987,7 +987,6 @@ class submissionstable extends \table_sql {
      */
     public function col_grade($values) {
         $finalgrade = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$values->id];
-        $grademax = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grademax;
         $finalgrade->formatted_grade = $this->checkmark->display_grade($finalgrade->grade, CHECKMARK_GRADE_ITEM);
         $lockedoroverridden = 'locked';
         if ($finalgrade->overridden) {
@@ -1361,10 +1360,9 @@ class submissionstable extends \table_sql {
         if (!$this->checkmark->checkmark->presentationgrading || !$this->checkmark->checkmark->presentationgrade) {
             return '';
         }
-        $presentationgradebook = $this->checkmark->checkmark->presentationgradebook;
-        if ($presentationgradebook) {
+        $presgradebook = $this->checkmark->checkmark->presentationgradebook;
+        if ($presgradebook) {
             $finalgrade = $this->gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$values->id];
-            $grademax = $this->gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grademax;
             $finalgrade->formatted_grade = $this->checkmark->display_grade($finalgrade->grade, CHECKMARK_PRESENTATION_ITEM);
             $lockedoroverridden = 'locked';
             if ($finalgrade->overridden) {
@@ -1373,7 +1371,7 @@ class submissionstable extends \table_sql {
         }
 
         // Print grade, dropdown or text!
-        if ($presentationgradebook && ($finalgrade->locked || $finalgrade->overridden)) {
+        if ($presgradebook && ($finalgrade->locked || $finalgrade->overridden)) {
             $gradeattr = array('id'    => 'pg'.$values->id,
                                'class' => $lockedoroverridden);
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
@@ -1427,13 +1425,13 @@ class submissionstable extends \table_sql {
         if (!$this->checkmark->checkmark->presentationgrading) {
             return '';
         }
-        $presentationgradebook = $this->checkmark->checkmark->presentationgradebook;
-        if ($presentationgradebook) {
+        $presgradebook = $this->checkmark->checkmark->presentationgradebook;
+        if ($presgradebook) {
             $finalgrade = $this->gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$values->id];
         }
 
         // Print Comment!
-        if ($presentationgradebook && ($finalgrade->locked || $finalgrade->overridden)) {
+        if ($presgradebook && ($finalgrade->locked || $finalgrade->overridden)) {
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return $finalgrade->str_feedback;
             } else {

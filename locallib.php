@@ -888,7 +888,7 @@ class checkmark {
      * @return int 0 if everything's ok, otherwise error code
      */
     public function autograde_submissions($filter = self::FILTER_ALL, $selected = array(), $countonly = false) {
-        global $CFG, $DB, $USER;
+        global $DB, $USER;
 
         $result = array();
         $result['status'] = false;
@@ -983,7 +983,7 @@ class checkmark {
 
         if ($attendancecoupled) {
             // Filter all users with undefined attendance state!
-            foreach ($users as $id => $user) {
+            foreach ($users as $user) {
                 if ($attendanceitem && key_exists($user->id, $attendanceitem->grades)
                         && ($attendanceitem->grades[$user->id]->locked || $attendanceitem->grades[$user->id]->overridden)) {
                     if ($attendanceitem->grades[$user->id]->grade === null || (($attendanceitem->grades[$user->id]->grade != 1)
@@ -1425,7 +1425,7 @@ class checkmark {
                 $oldpresfeedbacks = optional_param_array('oldpresentationfeedback', array(), PARAM_TEXT);
 
                 $cantrackattendances = has_capability('mod/checkmark:trackattendance',  $this->context);
-                $cangradepresentations = has_capability('mod/checkmark:gradepresentation', $this->context);
+                $cangradepres = has_capability('mod/checkmark:gradepresentation', $this->context);
 
                 $ids = array();
 
@@ -1436,13 +1436,13 @@ class checkmark {
                 }
 
                 if (!empty($presgrades) && $this->checkmark->presentationgrading && !empty($this->checkmark->presentationgrade)
-                        && $cangradepresentations) {
+                        && $cangradepres) {
                     $col = 'presentationgrade';
                     $presgrading = true;
                     $ids = array_unique(array_merge($ids, array_keys($presgrades)));
                 }
 
-                if (!empty($presfeedbacks) && $this->checkmark->presentationgrading && $cangradepresentations) {
+                if (!empty($presfeedbacks) && $this->checkmark->presentationgrading && $cangradepres) {
                     $col = 'presentationfeedback';
                     $prescommenting = true;
                     $ids = array_unique(array_merge($ids, array_keys($presfeedbacks)));
