@@ -1378,8 +1378,12 @@ class checkmark {
                                     $message .= html_writer::empty_tag('br');
                                 }
                                 if ($result['status'] == GRADE_UPDATE_OK) {
-                                    $message .= $OUTPUT->notification(get_string('autograde_success', 'checkmark',
-                                                                                 $result['updated']),
+                                    if ($result['updated'] == 1) {
+                                        $string = 'autograde_one_success';
+                                    } else {
+                                        $string = 'autograde_success';
+                                    }
+                                    $message .= $OUTPUT->notification(get_string($string, 'checkmark', $result['updated']),
                                                                       'notifysuccess');
                                 } else {
                                     $message .= $OUTPUT->notification(get_string('autograde_failed', 'checkmark'),

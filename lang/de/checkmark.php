@@ -62,6 +62,7 @@ $string['autograde_confirm'] = 'Sie sind dabei <strong>{$a}</strong> automatisch
 $string['autograde_confirm_continue'] = 'Sind Sie SICHER, dass Sie fortfahren wollen?';
 $string['autograde_error'] = 'Ein Fehler ist während der automatischen Bewertung aufgetreten!';
 $string['autograde_failed'] = 'Automatische Bewertung fehlgeschlagen!';
+$string['autograde_one_success'] = 'Automatische Bewertung erfolgreich! 1 Abgabenbewertung wurde aktualisiert.';
 $string['autograde_success'] = 'Automatische Bewertung erfolgreich! {$a} Abgabenbewertungen wurden aktualisiert.';
 $string['autograde_users_with_unknown_attendance'] = 'ACHTUNG: {$a} Abgabe konnte NICHT automatisch bewertet werden, da die Anwesenheit noch nicht erfasst wurde!';
 $string['autograde_notsupported'] = 'Diese Notenskala wird von der automatischen Bewertung nicht unterstützt.';
