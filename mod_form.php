@@ -222,7 +222,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         $mform->addElement('modgrade', 'presentationgrade', get_string('presentationgrading_grade', 'checkmark'), $gradeoptions);
         $mform->addHelpButton('presentationgrade', 'presentationgrading_grade', 'checkmark');
-        $mform->setDefault('presentationgrade[modgrade_point]', $CFG->gradepointdefault);
+        $mform->setDefault('presentationgrade', $CFG->gradepointdefault);
         $mform->disabledIf('presentationgrade[modgrade_type]', 'presentationgrading', 'eq', 0);
         $mform->disabledIf('presentationgrade[modgrade_scale]', 'presentationgrading', 'eq', 0);
         $mform->disabledIf('presentationgrade[modgrade_point]', 'presentationgrading', 'eq', 0);

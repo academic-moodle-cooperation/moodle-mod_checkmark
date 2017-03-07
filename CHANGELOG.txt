@@ -8,6 +8,7 @@ CHANGELOG
   as well as ignoring in gradebook overwritten attendances!
 * [FIXED] Success message after auto-grading uses correct singular now, if only 1 entry was affected
 * [FIXED] Fixed behat tests after they were not working properly since the 3.2 update (or since boost was introduced)
+* [FIXED] #4325 Fixed presentation grade points form field wrongly set to $CFG->gradepointdefault on every edit
 
 
 3.2.0 (2016-12-05)
