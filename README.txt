@@ -72,6 +72,7 @@ v 2016071204
 *) #4277 Fixed title and header not being set correctly on submissions and export pages
 *) #4310 Fixed autograding displaying warnings when attendance is in gradebook and coupled
    as well as ignoring in gradebook overwritten attendances!
+*) #4325 Fixed presentation grade points form field wrongly set to $CFG->gradepointdefault on every edit
 
 v 2016071203
 -------------------------
