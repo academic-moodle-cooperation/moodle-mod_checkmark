@@ -324,6 +324,7 @@ class mod_checkmark_grading_form extends moodleform {
     /**
      * Helper method to get the editor options easily.
      *
+     * @param string $editor filearea for editor to use
      * @return mixed[] Editor-options
      */
     protected function get_editor_options($editor = 'feedback') {

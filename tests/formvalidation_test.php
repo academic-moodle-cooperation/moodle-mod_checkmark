@@ -42,8 +42,6 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php'); // Include the code
 class checkmark_formvalidation_test extends basic_testcase {
     /**
      * Tests if there is an proper error for different amounts of examples and example-gradesum
-     * @group amc
-     * @group mod_checkmark
      */
     public function test_countmismatch() {
         // Setup fixture!
@@ -71,8 +69,6 @@ class checkmark_formvalidation_test extends basic_testcase {
 
     /**
      * Tests if there is an proper error for when example-gradesum differs from gradesum in instance
-     * @group amc
-     * @group mod_checkmark
      */
     public function test_summismatch() {
         // Setup fixture!
@@ -100,8 +96,6 @@ class checkmark_formvalidation_test extends basic_testcase {
 
     /**
      * Tests if both errors together will be displayed correctly
-     * @group amc
-     * @group mod_checkmark
      */
     public function test_both_errors() {
         // Setup fixture!
@@ -134,8 +128,6 @@ class checkmark_formvalidation_test extends basic_testcase {
 
     /**
      * Tests if there are no errors if flexible naming is deactivated and amount and sum mismatch
-     * @group amc
-     * @group mod_checkmark
      */
     public function test_noflexiblenaming() {
         // Setup fixture!
@@ -163,8 +155,6 @@ class checkmark_formvalidation_test extends basic_testcase {
 
     /**
      * Tests if no error will be wrongly displayed if everythings correct
-     * @group amc
-     * @group mod_checkmark
      */
     public function test_noerror() {
         // Setup fixture!
