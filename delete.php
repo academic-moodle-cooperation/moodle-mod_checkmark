@@ -24,6 +24,10 @@
  */
 
 require_once('../../config.php');
+
+// We check that in detail afterwards!
+require_login();
+
 require_once('lib.php');
 
 $id = optional_param('id', 0, PARAM_INT);  // Course module ID?

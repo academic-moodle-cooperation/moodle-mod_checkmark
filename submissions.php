@@ -24,6 +24,10 @@
  */
 
 require_once('../../config.php');
+
+// We check that in detail afterwards!
+require_login();
+
 require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 require_once($CFG->libdir.'/plagiarismlib.php');
 

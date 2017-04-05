@@ -24,7 +24,8 @@
  */
 namespace mod_checkmark;
 
-require_once('../../config.php');
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->libdir.'/gradelib.php');
 
