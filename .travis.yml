@@ -9,6 +9,9 @@ cache:
   directories:
     - $HOME/.composer/cache
 
+addons:
+  postgresql: "9.3"
+
 # Determines which versions of PHP to test our project against.  Each version listed
 # here will create a separate build and run the tests against that version of PHP.
 # WARNING, PHP7 only works in Moodle 3.0.1 or later!
@@ -24,8 +27,8 @@ env:
   - MOODLE_BRANCH=master
 # This matrix is used for testing against multiple databases.  So for each version of
 # PHP being tested, one build will be created for each database listed here.  EG: for
-# PHP 5.4, one build will be created using PHP 5.4 and pgsql.  In addition, another
-# build will be created using PHP 5.4 and mysqli.
+# PHP 5.6, one build will be created using PHP 5.6 and pgsql.  In addition, another
+# build will be created using PHP 5.6 and mysqli. The same goes for PHP 7.0 and 7.1.
  matrix:
   - DB=pgsql
   - DB=mysqli
