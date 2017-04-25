@@ -2196,4 +2196,12 @@ function mod_checkmark_core_calendar_event_action_shows_item_count(calendar_even
     // For mod_checkmark, item count should be shown if the event type is 'gradingdue' and there is one or more item count.
     return in_array($event->eventtype, $showitemcountfor) && $itemcount > 0;
 }
+
+/**
+ * Map icons for font-awesome themes.
+ */
+function mod_checkmark_get_fontawesome_icon_map() {
+    return [
+        'mod_checkmark:questionmark' => 'fa-question text-warning'
+    ];
 }
