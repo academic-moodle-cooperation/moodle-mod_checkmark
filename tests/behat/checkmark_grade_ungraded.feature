@@ -23,7 +23,7 @@ Feature: In a checkmark I want to name and grade the examples individually.
       | activity  | course | idnumber | name        | intro         |
       | checkmark | C1     | CM1      | Checkmark 1 | Description 1 |
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
     And I press "Add submission"
     And I set the following fields to these values:
@@ -36,7 +36,7 @@ Feature: In a checkmark I want to name and grade the examples individually.
     And I press "Save changes"
     And I log out
     When I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
     And I click on "submissions" "link"
     And I click on "Ungraded" "link"

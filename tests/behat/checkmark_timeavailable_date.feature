@@ -23,7 +23,7 @@ Feature: Change Allow submission from date
       | activity  | course | idnumber | name        | intro                                               | timeavailable |
       | checkmark | C1     | CM1      | Checkmark 1 | This checkmark is always available since yesterday! | ##yesterday## |
     When I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
     Then I should see "Allow submissions from"
     And I should see "##yesterday##l, j F Y##"

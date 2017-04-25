@@ -16,7 +16,7 @@ Feature: In course, a teacher should be able to add a new checkmark
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
     When I add a "Checkmark" to section "2" and I fill the form with:
       | Checkmark name | checkmark |

@@ -23,7 +23,7 @@ Feature: In checkmark, a teacher should be able to how many students have submit
       | activity  | course | idnumber | name          | intro                  |
       | checkmark | C1     | CM1      | Kreuzerlübung | Standard-Einstellungen |
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Kreuzerlübung"
     And I press "Add submission"
     And I set the following fields to these values:
@@ -36,6 +36,6 @@ Feature: In checkmark, a teacher should be able to how many students have submit
     And I press "Save changes"
     And I log out
     When I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Kreuzerlübung"
     Then I should see "View 1 submitted checkmarks"

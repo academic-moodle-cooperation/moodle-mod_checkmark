@@ -23,6 +23,6 @@ Feature: Available From Date
       | activity  | course | idnumber | name        | intro    | timeavailable |
       | checkmark | C1     | CM1      | Checkmark 1 | Standard | ##tomorrow##  |
     When I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
     Then I should not see "Add submission"

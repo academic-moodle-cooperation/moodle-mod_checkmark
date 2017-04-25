@@ -23,12 +23,12 @@ Feature: Deactivate Allow submissions from
       | activity  | course | idnumber | name        | timeavailable |
       | checkmark | C1     | CM1      | Checkmark 1 | 0             |
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
     Then I should not see "Allow submissions from"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
     Then I should not see "Allow submission from"
     And I press "Add submission"
