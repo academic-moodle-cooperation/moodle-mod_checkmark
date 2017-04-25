@@ -3502,6 +3502,15 @@ class checkmark {
     }
 
     /**
+     * Counts all ungrades submissions by ENROLLED students (not empty ones)
+     *
+     * @return int The number of submissions to be graded!
+     */
+    public function count_real_ungraded_submissions() {
+        return checkmark_count_real_ungraded_submissions();
+    }
+
+    /**
      * Alerts teachers by email of new or changed checkmarks that need grading
      *
      * First checks whether the option to email teachers is set for this checkmark.

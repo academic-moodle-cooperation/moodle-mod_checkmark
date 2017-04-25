@@ -4,3 +4,4 @@ autograde_no_users_selected,mod_checkmark
 autograde_req,mod_checkmark
 autograde_str,mod_checkmark
 autograde_str_help,mod_checkmark
+end_of_submission_for,mod_checkmark

@@ -91,7 +91,6 @@ $string['data_preview'] = 'Datenvorschau';
 $string['duedatevalidation'] = 'Das Abgabeende muss nach dem Abgabebeginn liegen.';
 $string['element_disabled'] = 'Folgendes Element ist gesperrt, da bereits Abgaben getätigt wurden.';
 $string['elements_disabled'] = 'Folgende Elemente sind gesperrt, da bereits Abgaben getätigt wurden.';
-$string['end_of_submission_for'] = 'Ende des Abgabezeitraums von {$a}';
 $string['eventgradeupdated'] = 'Note aktualisiert';
 $string['eventsubmissionsexported'] = 'Abgaben Exportiert';
 $string['eventsubmissionupdated'] = 'Abgabe aktualisiert';
@@ -116,6 +115,8 @@ $string['gradesum_mismatch'] = 'Die Summe der Beispielpunkte stimmt nicht mit de
 $string['grade_mismatch'] = 'Die Punkte müssen ein ganzzahliges Vielfaches der Beispielanzahl sein!';
 $string['grade'] = 'Bewertung';
 $string['grade_help'] = 'Bei aktivierten Individualfunktionen muss die Gesamtbewertung gleich der Summe der Einzelbewertungen der Beispiele sein (max 100).<br />Bei Standardbeispielen ist jedes ganzzahlige Vielfache der Beispielanzahl zulässig. Die Punkte pro Beispiel werden dann in der Modulinstanz automatisch angepasst.<br />Bei aktiviertem Javascript wird die Punktesumme automatisch ausgewählt bzw. nur ganzzahlige Vielfache der Beispielanzahl akzeptiert.';
+$string['gradingdue'] = 'Erinnerung zur Bewertung';
+$string['gradingdue_help'] = 'Das erwartete Datum markiert den Abschluss der Abgabe. Dieses Datum wird verwendet, um Benachrichtigungen für Trainer/innen im Dashboard zu priorisieren.';
 $string['informstudents'] = 'Sende Benachrichtigungen';
 $string['informstudents_help'] = 'Wenn aktiviert, werden Teilnehmer/in über den Status ihrer Anwesenheit informiert.';
 $string['nostudents'] = 'Es sind keine Teilnehmer/innen zur Anzeige vorhanden!';
@@ -343,3 +344,6 @@ $string['autograde_no_users_selected'] = 'Sie haben keine Teilnehmer/in zur Bewe
 $string['autograde_req'] = 'Nichtbewertete bewerten';
 $string['autograde_str'] = 'Automatische Bewertung';
 $string['autograde_str_help'] = 'Die automatische Bewertung berechnet die Noten der Abgaben anhand der Punkte der gekreuzten Beispiele.<br /><ul><li>Ausgewählte bewerten - hier werden all jene Datensätze bewertet, die links per Häckchen ausgewählt wurden. Falls noch keine Abgabe vorhanden ist, wird eine leere Abgabe hinzugefügt.</li><li>Nichtbewertete Bewerten - hier werden alle Abgaben bewertet, deren Abgabedatum aktueller als die letzte Bewertung ist</li><li>Alle Abgaben bewerten - hier werden alle bereits übermittelten Abgaben bewertet</li></ul><br />Die Punkteberechnung erfolgt aufgrund der eingestellten Beispielbewertungen sowie der angekreuzten Beispiele:<ul><li>Standard-Bewertungen: hier wird jedes Beispiel gleich gewichtet (ganzzahlige Punkteanzahl pro Beispiel). Die Bewertung ergibt sich aus der Summe der gekreuzten Beispiele multipliziert mit dem Quotienten aus Gesamtbewertung und Beispielanzahl.</li><li>individuelle Beispielgewichtungen: Für die Bewertungsberechnung wird für jedes gekreuzte Beispiel die dem Beispiel zugeordnete Punkteanzahl aufsummiert.</li></ul>';
+
+// Deprecated since Moodle 3.3!
+$string['end_of_submission_for'] = 'Ende des Abgabezeitraums von {$a}';

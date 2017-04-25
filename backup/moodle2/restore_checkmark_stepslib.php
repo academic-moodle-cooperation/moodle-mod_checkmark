@@ -94,6 +94,10 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
             $data->cutoffdate = 0;
         }
 
+        if (!isset($data->gradingdue)) {
+            $data->gradingdue = 0;
+        }
+
         if (!empty($data->preventlate)) {
             $data->cutoffdate = $data->timedue;
         } else {

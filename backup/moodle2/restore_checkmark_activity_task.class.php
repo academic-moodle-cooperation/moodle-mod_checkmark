@@ -137,36 +137,35 @@ class restore_checkmark_activity_task extends restore_activity_task {
         $courseid = $this->get_courseid();
         if ($checkmarkid = $this->get_activityid()) { // ...always set, but just to be sure to not break any course-restore!
             $checkmark = $DB->get_record('checkmark', array('id' => $checkmarkid));
+            foreach (array('course', 'due') as $type) {
+                $params = array('eventtype'  => $type,
+                                'modulename' => 'checkmark',
+                                'courseid'   => $courseid,
+                                'timestart'  => $checkmark->timedue,
+                                'name'       => '%'.$checkmark->name.'%');
+                $where = $DB->sql_like('eventtype', ':eventtype')."
+                         AND ".$DB->sql_like('modulename', ':modulename')."
+                         AND courseid = :courseid
+                         AND timestart = :timestart
+                         AND ".$DB->sql_like('name', ':name');
 
-            $params = array('eventtype'  => 'course',
-                            'modulename' => 'checkmark',
-                            'courseid'   => $courseid,
-                            'timestart'  => $checkmark->timedue,
-                            'name'       => '%'.$checkmark->name.'%');
-            $where = $DB->sql_like('eventtype', ':eventtype')."
-                     AND ".$DB->sql_like('modulename', ':modulename')."
-                     AND courseid = :courseid
-                     AND timestart = :timestart
-                     AND ".$DB->sql_like('name', ':name');
-
-            $events = $DB->get_records_select('event', $where, $params);
-            if (count($events) == 1) {
-                $event = current($events);
-                // We can fix this event!
-                $event->instance = $checkmarkid;
-                $event->eventtype = 'due';
-                $calendarevent = calendar_event::load($event->id);
-                $calendarevent->update($event);
-                $this->get_logger()->process(get_string('couldfixevent', 'checkmark', $event),
-                                             backup::LOG_INFO);
-                echo $OUTPUT->notification(get_string('couldfixevent', 'checkmark', $event),
-                                           'notifysuccess');
-            } else {
-                foreach ($events as $event) {
-                    echo $OUTPUT->notification(get_string('cantfixevent', 'checkmark', $event),
-                                   'notifyproblem');
-                    $this->get_logger()->process(get_string('cantfixevent', 'checkmark', $event),
-                                                 backup::LOG_ERROR);
+                $events = $DB->get_records_select('event', $where, $params);
+                if (count($events) == 1) {
+                    $event = current($events);
+                    // We can fix this event!
+                    $event->instance = $checkmarkid;
+                    $event->eventtype = CHECKMARK_EVENT_TYPE_DUE;
+                    $event->type = EVENT_TYPE_ACTION;
+                    $event->timesort = $checkmark->timedue;
+                    $calendarevent = calendar_event::load($event->id);
+                    $calendarevent->update($event, false);
+                    $this->get_logger()->process(get_string('couldfixevent', 'checkmark', $event), backup::LOG_INFO);
+                    echo $OUTPUT->notification(get_string('couldfixevent', 'checkmark', $event), 'notifysuccess');
+                } else {
+                    foreach ($events as $event) {
+                        echo $OUTPUT->notification(get_string('cantfixevent', 'checkmark', $event), 'notifyproblem');
+                        $this->get_logger()->process(get_string('cantfixevent', 'checkmark', $event), backup::LOG_ERROR);
+                    }
                 }
             }
         }

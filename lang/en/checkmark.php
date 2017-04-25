@@ -91,7 +91,6 @@ $string['data_preview'] = 'Data preview';
 $string['duedatevalidation'] = 'Due date must be after the available from date.';
 $string['element_disabled'] = 'The following element is disabled because of existing submissions.';
 $string['elements_disabled'] = 'The following elements are disabled because of existing submissions.';
-$string['end_of_submission_for'] = 'End of submission for {$a}';
 $string['eventgradeupdated'] = 'Grade updated';
 $string['eventsubmissionsexported'] = 'Submission exported';
 $string['eventsubmissionupdated'] = 'Submission updated';
@@ -116,6 +115,8 @@ $string['gradesum_mismatch'] = 'The sum of the individual grades won\'t match th
 $string['grade_mismatch'] = 'The grade has to be an integral multiple of the amount of examples!';
 $string['grade'] = 'Grade';
 $string['grade_help'] = 'When individual functions are activated the grade has to be the sum of all example grades (maximum 100).<br />When you\'re using standard examples the grade has to be a integral multiple of the example count. If so the points per example get automatically adjusted.<br />With activated JavaScript the grade gets selected automatically when using individual functions. In the case of usage of standard-examples with activated JavaScript only integral multiples of the example count will be accepted.';
+$string['gradingdue'] = 'Remind me to grade by';
+$string['gradingdue_help'] = 'The expected date that marking of the submissions should be completed by. This date is used to prioritise dashboard notifications for teachers.';
 $string['informstudents'] = 'Send notifications';
 $string['informstudents_help'] = 'If activated, the participant receives a notification about his/her attendance status.';
 $string['nostudents'] = 'There are no users to be displayed!';
@@ -343,3 +344,6 @@ $string['autograde_no_users_selected'] = 'You have not selected any user to grad
 $string['autograde_req'] = 'Grade ungraded';
 $string['autograde_str'] = 'Auto-grading';
 $string['autograde_str_help'] = 'Auto-grading calculates users grades according to points per example and checked examples. It adds the points for each checked example and uses this as the users grade. <ul><li>grade selected users - grades just these users, which are checked in the list. If a user hasn\'t submitted anything, a empty submission get\'s added.</li><li>grade who needs grading - grades every submission which is more up to date than the corresponding grading</li><li>grade all submissions - grades all present submissions (for this instance). Does NOT add empty submissions.</li></ul><br />The grade gets calculated based on chosen example grades and checked examples:<ul><li>standard-grading: here each example is equally weighted (integral grade per example). The grade is calculated by multiplication of the sum of checked examples with the quotient of checkmark-grade and checkmark-count.</li><li>individual example-weights: the grade is the sum of example grades for each checked example (according to instance-settings).</li></ul>';
+
+// Deprecated since Moodle 3.3!
+$string['end_of_submission_for'] = 'End of submission for {$a}';

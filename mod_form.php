@@ -92,6 +92,11 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->addHelpButton('cutoffdate', 'cutoffdate', 'checkmark');
         $mform->setDefault('cutoffdate', date('U', strtotime('+1week 23:55', time())));
 
+        $name = get_string('gradingdue', 'checkmark');
+        $mform->addElement('date_time_selector', 'gradingdue', $name, array('optional' => true));
+        $mform->addHelpButton('gradingdue', 'gradingdue', 'checkmark');
+        $mform->setDefault('gradingdue', date('U', strtotime('+5weeks 23:55', time())));
+
         $name = get_string('alwaysshowdescription', 'checkmark');
         $mform->addElement('advcheckbox', 'alwaysshowdescription', $name);
         $mform->addHelpButton('alwaysshowdescription', 'alwaysshowdescription', 'checkmark');

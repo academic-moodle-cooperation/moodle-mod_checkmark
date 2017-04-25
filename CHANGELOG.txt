@@ -1,5 +1,12 @@
 CHANGELOG
 =========
+3.3-dev (2017-04-23)
+------------------
+
+ * [FEATURE] #4415 Added separate grading-due-date to remind graders
+ * [CHANGED] #4415 Replaced checkmark_print_overview() output with action events
+
+
 3.2.1 (2017-03-02)
 ------------------
 

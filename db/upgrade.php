@@ -574,7 +574,7 @@ function xmldb_checkmark_upgrade($oldversion) {
                 $event->instance = $DB->get_field('checkmark', 'id', $cond);
                 $event->eventtype = 'due';
                 $calendarevent = calendar_event::load($event->id);
-                $calendarevent->update($event);
+                $calendarevent->update($event, false);
                 $i++;
                 echo $OUTPUT->notification(get_string('couldfixevent', 'checkmark', $event),
                                            'notifysuccess');
@@ -589,7 +589,7 @@ function xmldb_checkmark_upgrade($oldversion) {
                     $event->instance = $DB->get_field('checkmark', 'id', $cond2);
                     $event->eventtype = 'due';
                     $calendarevent = calendar_event::load($event->id);
-                    $calendarevent->update($event);
+                    $calendarevent->update($event, false);
                     $i++;
                     echo $OUTPUT->notification(get_string('couldfixevent', 'checkmark', $event),
                                                'notifysuccess');
@@ -654,7 +654,7 @@ function xmldb_checkmark_upgrade($oldversion) {
                     unset($newevent->id);
                     $newevent->instance = $checkmark->id;
                     $newevent->eventtype = 'due';
-                    if ($eventobj = calendar_event::create($newevent)) {
+                    if ($eventobj = calendar_event::create($newevent, false)) {
                         $repairedids[] = $eventobj->id;
                         echo $OUTPUT->notification(get_string('couldfixevent', 'checkmark', $event),
                                                    'notifysuccess');
@@ -671,7 +671,7 @@ function xmldb_checkmark_upgrade($oldversion) {
                     $event->instance = $checkmark->id;
                     $event->eventtype = 'due';
                     $eventobj = calendar_event::load($event->id);
-                    if ($eventobj->update($event)) {
+                    if ($eventobj->update($event, false)) {
                         $repairedids[] = $event->id;
                         echo $OUTPUT->notification(get_string('couldfixevent', 'checkmark', $event),
                                                    'notifysuccess');
@@ -696,7 +696,7 @@ function xmldb_checkmark_upgrade($oldversion) {
                 $event->timestart   = $checkmark->timedue;
                 $event->timeduration = 0;
 
-                if ($eventobj = calendar_event::create($event)) {
+                if ($eventobj = calendar_event::create($event, false)) {
                     $event->id = $eventobj->id;
                     $repairedids[] = $event->id;
                     echo $OUTPUT->notification(get_string('couldfixevent', 'checkmark', $event),
@@ -1006,6 +1006,47 @@ function xmldb_checkmark_upgrade($oldversion) {
 
     // Moodle v3.2.0 release upgrade line.
     // Put any upgrade step following this!
+
+    // Moodle v3.3.0 release upgrade line.
+    // Put any upgrade step following this!
+    if ($oldversion < 2017042300) {
+        require_once($CFG->dirroot.'/calendar/lib.php');
+
+        // Define field gradingdue to be added to checkmark.
+        $table = new xmldb_table('checkmark');
+        $field = new xmldb_field('gradingdue', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'cutoffdate');
+
+        // Conditionally launch add field gradingdue.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Set all former calendar events from CALENDAR_EVENT_TYPE_STANDARD to CALENDAR_EVENT_TYPE_ACTION!
+        $count = $DB->count_records('event', array('modulename' => 'checkmark',
+                                                   'eventtype'  => 'due'));
+        $rs = $DB->get_recordset('event', array('modulename' => 'checkmark',
+                                                'eventtype'  => 'due'));
+        $i = 0;
+        $cmnames = array();
+        $pbar = new progress_bar('UpdateEvents', 500, true);
+        $pbar->update($i, $count, 'Update events...');
+        foreach ($rs as $cur) {
+            $calendarevent = calendar_event::load($cur->id);
+            if (!array_key_exists($cur->instance, $cmnames)) {
+                $cmnames[$cur->instance] = $DB->get_field('checkmark', 'name', array('id' => $cur->instance));
+            }
+            $cur->name = $cmnames[$cur->instance];
+            $cur->type = CALENDAR_EVENT_TYPE_ACTION;
+            $cur->timesort = $cur->timestart;
+            $calendarevent->update($cur, false);
+            $i++;
+            $pbar->update($i, $count, 'Update events...');
+        }
+        $pbar->update($count, $count, 'Update events...OK!');
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2017042300, 'checkmark');
+    }
 
     return true;
 }

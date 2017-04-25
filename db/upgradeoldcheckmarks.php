@@ -119,7 +119,7 @@ foreach ($assignmentinstancesold as $instanceid) {
                 $event->instance = $newinstanceid;
 
                 $calendarevent = calendar_event::load($event->id);
-                $calendarevent->update($event);
+                $calendarevent->update($event, false);
             }
             // Gradeitem-update!
             $grades = $DB->get_records('grade_items', array('itemmodule'    => 'assignment',

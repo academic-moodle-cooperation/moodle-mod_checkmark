@@ -29,6 +29,10 @@ define('CHECKMARK_GRADE_ITEM', 0);
 define('CHECKMARK_ATTENDANCE_ITEM', 1);
 define('CHECKMARK_PRESENTATION_ITEM', 2);
 
+// Event types.
+define('CHECKMARK_EVENT_TYPE_DUE', 'due'); // Is backwards compatible to former events!
+define('CHECKMARK_EVENT_TYPE_GRADINGDUE', 'gradingdue');
+
 /**
  * Deletes a checkmark instance
  *
@@ -907,7 +911,6 @@ function checkmark_scale_used_anywhere($scaleid) {
  */
 function checkmark_refresh_events($course = 0, $checkmarkid = 0) {
     global $DB, $CFG;
-
     require_once($CFG->dirroot.'/calendar/lib.php');
 
     if ($checkmarkid == 0) {
@@ -931,70 +934,88 @@ function checkmark_refresh_events($course = 0, $checkmarkid = 0) {
     if ($checkmarks) {
         foreach ($checkmarks as $checkmark) {
             $cm = get_coursemodule_from_instance('checkmark', $checkmark->id);
+
+            // Start with creating the event.
             $event = new stdClass();
-            if ($checkmark->timedue) {
+            $event->modulename  = 'checkmark';
+            $event->courseid = $checkmark->course;
+            $event->groupid = 0;
+            $event->userid  = 0;
+            $event->instance  = $checkmark->id;
+            $event->name = $checkmark->name;
+            $event->type = CALENDAR_EVENT_TYPE_ACTION;
 
-                if ($event->id = $DB->get_field('event', 'id', array('modulename' => 'checkmark',
-                                                                     'instance'   => $checkmark->id))) {
-                    $event->name = get_string('end_of_submission_for', 'checkmark', $checkmark->name);
-                    if (!empty($checkmark->intro)) {
-                        if (!$cm) {
-                            // Convert the links to pluginfile. It is a bit hacky but at this stage the files
-                            // might not have been saved in the module area yet.
-                            $intro = $checkmark->intro;
-                            if ($draftid = file_get_submitted_draft_itemid('introeditor')) {
-                                $intro = file_rewrite_urls_to_pluginfile($intro, $draftid);
-                            }
-
-                            // We need to remove the links to files as the calendar is not ready
-                            // to support module events with file areas.
-                            $intro = strip_pluginfile_content($intro);
-                            $event->description = array('text' => $intro,
-                                                        'format' => $checkmark->introformat);
-                        } else {
-                            $event->description = format_module_intro('checkmark', $checkmark, $cm->id);
-                        }
+            if (!empty($checkmark->intro)) {
+                if (!$cm) {
+                    // Convert the links to pluginfile. It is a bit hacky but at this stage the files
+                    // might not have been saved in the module area yet.
+                    $intro = $checkmark->intro;
+                    if ($draftid = file_get_submitted_draft_itemid('introeditor')) {
+                        $intro = file_rewrite_urls_to_pluginfile($intro, $draftid);
                     }
-                    $event->timestart = $checkmark->timedue;
 
-                    $calendarevent = calendar_event::load($event->id);
-                    $calendarevent->update($event);
+                    // We need to remove the links to files as the calendar is not ready
+                    // to support module events with file areas.
+                    $intro = strip_pluginfile_content($intro);
+                    $event->description = array('text' => $intro,
+                                                'format' => $checkmark->introformat);
                 } else {
-                    $event = new stdClass();
-                    $event->name = get_string('end_of_submission_for', 'checkmark', $checkmark->name);
-                    if (!empty($checkmark->intro)) {
-                        if (!$cm) {
-                            // Convert the links to pluginfile. It is a bit hacky but at this stage the files
-                            // might not have been saved in the module area yet.
-                            $intro = $checkmark->intro;
-                            if ($draftid = file_get_submitted_draft_itemid('introeditor')) {
-                                $intro = file_rewrite_urls_to_pluginfile($intro, $draftid);
-                            }
-
-                            // We need to remove the links to files as the calendar is not ready
-                            // to support module events with file areas.
-                            $intro = strip_pluginfile_content($intro);
-                            $event->description = array('text' => $intro,
-                                                        'format' => $checkmark->introformat);
-                        } else {
-                            $event->description = format_module_intro('checkmark', $checkmark, $cm->id);
-                        }
-                    }
-                    $event->courseid    = $checkmark->course;
-                    $event->groupid     = 0;
-                    $event->userid      = 0;
-                    $event->modulename  = 'checkmark';
-                    $event->instance    = $checkmark->id;
-                    $event->eventtype   = 'due';
-                    $event->timestart   = $checkmark->timedue;
-                    $event->timeduration = 0;
-
-                    calendar_event::create($event);
+                    $event->description = format_module_intro('checkmark', $checkmark, $cm->id);
                 }
-            } else if ($event->id = $DB->get_field('event', 'id', array('modulename' => 'checkmark',
-                                                                        'instance'   => $checkmark->id))) {
-                $calendarevent = calendar_event::load($event->id);
-                $calendarevent->delete($event);
+            }
+
+            $eventtype = CHECKMARK_EVENT_TYPE_DUE;
+            if ($checkmark->timedue) {
+                $event->eventtype = $eventtype;
+                $event->name = $checkmark->name;
+
+                $event->timestart = $checkmark->timedue;
+                $event->timesort = $checkmark->timedue;
+                $select = "modulename = :modulename
+                           AND instance = :instance
+                           AND eventtype = :eventtype
+                           AND groupid = 0
+                           AND courseid <> 0";
+                $params = array('modulename' => 'checkmark', 'instance' => $checkmark->id, 'eventtype' => $eventtype);
+                $event->id = $DB->get_field_select('event', 'id', $select, $params);
+
+                // Now process the event.
+                if ($event->id) {
+                    $calendarevent = calendar_event::load($event->id);
+                    $calendarevent->update($event, false);
+                } else {
+                    calendar_event::create($event, false);
+                }
+            } else {
+                $DB->delete_records('event', array('modulename' => 'checkmark', 'instance' => $checkmark->id,
+                    'eventtype' => $eventtype));
+            }
+
+            $eventtype = CHECKMARK_EVENT_TYPE_GRADINGDUE;
+            if ($checkmark->gradingdue) {
+                $event->eventtype = $eventtype;
+                $event->name = $checkmark->name;
+
+                $event->timestart = $checkmark->gradingdue;
+                $event->timesort = $checkmark->gradingdue;
+                $select = "modulename = :modulename
+                           AND instance = :instance
+                           AND eventtype = :eventtype
+                           AND groupid = 0
+                           AND courseid <> 0";
+                $params = array('modulename' => 'checkmark', 'instance' => $checkmark->id, 'eventtype' => $eventtype);
+                $event->id = $DB->get_field_select('event', 'id', $select, $params);
+
+                // Now process the event.
+                if ($event->id) {
+                    $calendarevent = calendar_event::load($event->id);
+                    $calendarevent->update($event, false);
+                } else {
+                    calendar_event::create($event, false);
+                }
+            } else {
+                $DB->delete_records('event', array('modulename' => 'checkmark', 'instance' => $checkmark->id,
+                    'eventtype' => $eventtype));
             }
         }
     }
@@ -1374,6 +1395,22 @@ function checkmark_count_real_submissions($cm, $groupid=0) {
                                           userid '.$sqluserlist, $params);
 }
 
+/**
+ * Counts all ungrades submissions by ENROLLED students (not empty ones)
+ *
+ * @param object $cm The course module object
+ * @return int The number of submissions to be graded!
+ */
+function checkmark_count_real_ungraded_submissions($cm) {
+    global $DB;
+
+    return $DB->count_records_sql('SELECT COUNT(1)
+                                    FROM {checkmark_submissions} s
+                               LEFT JOIN {checkmark_feedbacks} f ON s.userid = f.userid AND s.checkmarkid = f.checkmarkid
+                                   WHERE graderid IS NULL
+                                     AND f.timemodified IS NULL
+                                     AND s.checkmarkid = ?', array($cm->instance));
+}
 
 /**
  * Return all checkmark submissions by ENROLLED students (even empty)
@@ -1557,11 +1594,15 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
 /**
  * prepares text for mymoodle-Page to be displayed
  *
+ * @deprecated since 3.3
+ * @todo The final deprecation of this function will take place in Moodle 3.7 - see MDL-57487.
  * @param int[] $courses Courses to print overview for
  * @param string[] $htmlarray array of html snippets to be printed
  */
 function checkmark_print_overview($courses, &$htmlarray) {
     global $USER, $CFG, $DB;
+
+    debugging('The function checkmark_print_overview() is now deprecated.', DEBUG_DEVELOPER);
 
     if (empty($courses) || !is_array($courses) || count($courses) == 0) {
         return;
@@ -2054,4 +2095,116 @@ function checkmark_page_type_list() {
         'mod-checkmark-submissions' => get_string('page-mod-checkmark-submissions', 'checkmark')
     );
     return $modulepagetype;
+}
+
+/*
+ ******************** CALENDAR API AND SIMILAR FUNCTIONS FOR checkmarks  ***********************
+ */
+
+/**
+ * Is the event visible?
+ *
+ * This is used to determine global visibility of an event in all places throughout Moodle. For example,
+ * the ASSIGN_EVENT_TYPE_GRADINGDUE event will not be shown to students on their calendar, and
+ * ASSIGN_EVENT_TYPE_DUE events will not be shown to teachers.
+ *
+ * @param calendar_event $event
+ * @return bool Returns true if the event is visible to the current user, false otherwise.
+ */
+function mod_checkmark_core_calendar_is_event_visible(calendar_event $event) {
+    global $CFG;
+
+    require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
+
+    $cm = get_fast_modinfo($event->courseid)->instances['checkmark'][$event->instance];
+    $context = context_module::instance($cm->id);
+
+    $checkmark = new checkmark($cm->id, null, $cm, null);
+
+    if ($event->eventtype == CHECKMARK_EVENT_TYPE_GRADINGDUE) {
+        return has_capability('mod/checkmark:grade', $context);
+    } else if ($event->eventtype == CHECKMARK_EVENT_TYPE_DUE) {
+        return has_capability('mod/checkmark:submit', $context) && $checkmark->isopen();
+    }
+}
+
+/**
+ * This function receives a calendar event and returns the action associated with it, or null if there is none.
+ *
+ * This is used by block_myoverview in order to display the event appropriately. If null is returned then the event
+ * is not displayed on the block.
+ *
+ * @param calendar_event $event
+ * @param \core_calendar\action_factory $factory
+ * @return \core_calendar\local\event\entities\action_interface|null
+ */
+function mod_checkmark_core_calendar_provide_event_action(calendar_event $event, \core_calendar\action_factory $factory) {
+    global $CFG, $USER;
+
+    require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
+
+    $cm = get_fast_modinfo($event->courseid)->instances['checkmark'][$event->instance];
+    $context = context_module::instance($cm->id);
+
+    $checkmark = new checkmark($cm->id, null, $cm, null);
+
+    $started = time() >= $checkmark->checkmark->timeavailable;
+    $isopen = $checkmark->isopen();
+
+    if ($event->eventtype == CHECKMARK_EVENT_TYPE_GRADINGDUE) {
+        $name = get_string('grade');
+        $url = new \moodle_url('/mod/checkmark/submissions.php', [
+            'id' => $cm->id
+        ]);
+        $itemcount = checkmark_count_real_ungraded_submissions($cm);
+        $actionable = has_capability('mod/checkmark:grade', $context) && $started;
+    } else {
+        $usersubmission = $checkmark->get_submission($USER->id, false);
+        $feedback = $checkmark->get_feedback($USER->id);
+        if (!$isopen || ($feedback && !$checkmark->checkmark->resubmit)) {
+            // The user has already been graded, nothing more to do here!
+            return null;
+        }
+
+        $url = new \moodle_url('/mod/checkmark/view.php', [
+            'id' => $cm->id,
+            'edit' => 1
+        ]);
+        $itemcount = 1;
+
+        if (!$usersubmission) {
+            // The user has not yet submitted anything. Show the addsubmission link.
+            $name = get_string('addsubmission', 'checkmark');
+            $actionable = $isopen;
+        } else {
+            // The user has not yet submitted anything. Show the editmysubmission link (if he's allowed to resubmit).
+            $name = get_string('editmysubmission', 'checkmark');
+            $actionable = $isopen && (!$feedback || $checkmark->checkmark->resubmit);
+        }
+    }
+
+    return $factory->create_instance(
+        $name,
+        $url,
+        $itemcount,
+        $actionable
+    );
+}
+
+/**
+ * Callback function that determines whether an action event should be showing its item count
+ * based on the event type and the item count.
+ *
+ * @param calendar_event $event The calendar event.
+ * @param int $itemcount The item count associated with the action event.
+ * @return bool
+ */
+function mod_checkmark_core_calendar_event_action_shows_item_count(calendar_event $event, $itemcount = 0) {
+    // List of event types where the action event's item count should be shown.
+    $showitemcountfor = [
+        CHECKMARK_EVENT_TYPE_GRADINGDUE
+    ];
+    // For mod_checkmark, item count should be shown if the event type is 'gradingdue' and there is one or more item count.
+    return in_array($event->eventtype, $showitemcountfor) && $itemcount > 0;
+}
 }
