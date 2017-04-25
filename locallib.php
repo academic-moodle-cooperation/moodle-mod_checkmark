@@ -1807,13 +1807,9 @@ class checkmark {
             if (isset($SESSION->checkmark->orderby)
                     && ($columnname == $SESSION->checkmark->orderby)) {
                 if ($SESSION->checkmark->orderdirection == 'ASC') {
-                    $columnlink .= html_writer::empty_tag('img',
-                                                          array('src' => $OUTPUT->pix_url('t/down'),
-                                                                'alt' => get_string('asc')));
+                    $columnlink .= $OUTPUT->pix_icon('t/down', get_string('asc'));
                 } else {
-                    $columnlink .= html_writer::empty_tag('img',
-                                                          array('src' => $OUTPUT->pix_url('t/up'),
-                                                                'alt' => get_string('desc')));
+                    $columnlink .= $OUTPUT->pix_icon('t/up', get_string('desc'));
                 }
             }
         } else if (!strstr($columnname, 'example') && !strstr($columnname, 'group')) {
@@ -1831,13 +1827,9 @@ class checkmark {
                     && ($SESSION->checkmark->orderby == 'firstname')) {
                 // Print order pictogramm!
                 if ($SESSION->checkmark->orderdirection == 'ASC') {
-                    $columnlink .= html_writer::empty_tag('img',
-                                                          array('src' => $OUTPUT->pix_url('t/down'),
-                                                                'alt' => get_string('asc')));
+                    $columnlink .= $OUTPUT->pix_icon('t/down', get_string('asc'));
                 } else {
-                    $columnlink .= html_writer::empty_tag('img',
-                                                          array('src' => $OUTPUT->pix_url('t/up'),
-                                                                'alt' => get_string('desc')));
+                    $columnlink .= $OUTPUT->pix_icon('t/up', get_string('desc'));
                 }
             }
             $columnlink .= ' / ';
@@ -1855,13 +1847,9 @@ class checkmark {
                     && ($SESSION->checkmark->orderby == 'lastname')) {
                 // Print order pictogramm!
                 if ($SESSION->checkmark->orderdirection == 'ASC') {
-                    $columnlink .= html_writer::empty_tag('img',
-                                                          array('src' => $OUTPUT->pix_url('t/down'),
-                                                                'alt' => get_string('asc')));
+                    $columnlink .= $OUTPUT->pix_icon('t/down', get_string('asc'));
                 } else {
-                    $columnlink .= html_writer::empty_tag('img',
-                                                          array( 'src' => $OUTPUT->pix_url('t/up'),
-                                                                 'alt' => get_string('desc')));
+                    $columnlink .= $OUTPUT->pix_icon('t/up', get_string('desc'));
                 }
             }
         } else { // Can't sort by examples because of database restrictions!
@@ -1875,26 +1863,20 @@ class checkmark {
         if (isset($SESSION->checkmark->columns[$columnname])
                 && ($SESSION->checkmark->columns[$columnname]->visibility == 0)) {
             // Show link to show column!
-            $imgattr = array('src' => $OUTPUT->pix_url('t/switch_plus'),
-                             'alt' => get_string('show'));
             $return = html_writer::link($CFG->wwwroot.'/mod/checkmark/submissions.php?id='.
                                         $this->cm->id.'&tshow='.$columnname,
-                                        html_writer::empty_tag('img', $imgattr,
-                                                               array('title' => get_string('show').' '.
-                                                                                strip_tags($columnstring))));
+                                        $OUTPUT->pix_icon('t/switch_plus', get_string('show')),
+                                        array('title' => get_string('show') . ' ' . strip_tags($columnstring)));
         } else {
             if (!isset($SESSION->checkmark->columns[$columnname])) {
                 $SESSION->checkmark->columns[$columnname] = new stdClass();
             }
             $SESSION->checkmark->columns[$columnname]->visibility = 1;
-            $imgattr = array('src' => $OUTPUT->pix_url('t/switch_minus'),
-                             'alt' => get_string('hide'));
             $return = $columnlink.' '.
                       html_writer::link($CFG->wwwroot.'/mod/checkmark/submissions.php?id='.
                                         $this->cm->id.'&thide='.$columnname,
-                                        html_writer::empty_tag('img', $imgattr),
-                                        array('title' => get_string('hide') . ' ' .
-                                                         strip_tags($columnstring)));
+                                        $OUTPUT->pix_icon('t/switch_minus', get_string('hide')),
+                                        array('title' => get_string('hide') . ' ' . strip_tags($columnstring)));
         }
         return $return;
     }

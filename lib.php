@@ -461,22 +461,13 @@ function checkmark_get_attendance_symbol($attendance = null) {
 
     if ($attendance == 1) {
         $attendantstr = strtolower(get_string('attendant', 'checkmark'));
-        $iconattr = array('src'   => $OUTPUT->pix_url('i/valid'),
-                          'alt'   => $attendantstr,
-                          'title' => $attendantstr);
-        $symbol = \html_writer::empty_tag('img', $iconattr);
+        $symbol = $OUTPUT->pix_icon('i/valid', $attendantstr, 'moodle', array('title' => $attendantstr));
     } else if (($attendance == 0) && ($attendance != null)) {
         $absentstr = strtolower(get_string('absent', 'checkmark'));
-        $iconattr = array('src'   => $OUTPUT->pix_url('i/invalid'),
-                          'alt'   => $absentstr,
-                          'title' => $absentstr);
-        $symbol = \html_writer::empty_tag('img', $iconattr);
+        $symbol = $OUTPUT->pix_icon('i/invalid', $absentstr, 'moodle', array('title' => $absentstr));
     } else {
         $unknownstr = strtolower(get_string('unknown', 'checkmark'));
-        $iconattr = array('src'   => $OUTPUT->pix_url('questionmark', 'checkmark'),
-                          'alt'   => $unknownstr,
-                          'title' => $unknownstr);
-        $symbol = \html_writer::empty_tag('img', $iconattr);
+        $symbol = $OUTPUT->pix_icon('questionmark', $unknownstr, 'checkmark', array('title' => $unknownstr));
     }
 
     return $symbol;
@@ -1309,10 +1300,8 @@ function checkmark_print_recent_mod_activity($activity, $courseid, $detail) {
     if ($detail) {
         $modname = get_string('modulename', 'checkmark');
         echo '<div class="title">';
-        echo '<img src="'.$OUTPUT->pix_url('icon', 'checkmark').'"'.
-             'class="icon" alt="'.$modname.'">';
-        echo '<a href="'.$CFG->wwwroot.'/mod/checkmark/view.php?id='.$activity->cmid.'">'.
-             $activity->name.'</a>';
+        echo $OUTPUT->image_icon('icon', $modname, 'checkmark', array('class' => 'icon'));
+        echo '<a href="'.$CFG->wwwroot.'/mod/checkmark/view.php?id='.$activity->cmid.'">'.$activity->name.'</a>';
         echo '</div>';
     }
 
