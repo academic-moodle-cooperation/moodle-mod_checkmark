@@ -33,14 +33,6 @@
     float: left;
 }
 
-.path-mod-checkmark .files img {
-    margin-right: 4px;
-}
-
-.path-mod-checkmark .files a {
-    white-space: nowrap;
-}
-
 /** Styles for submissions.php **/
 #page-mod-checkmark-submissions form#options div {
     margin-left: auto;

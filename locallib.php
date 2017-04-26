@@ -3687,19 +3687,6 @@ class checkmark {
     }
 
     /**
-     * Count the files uploaded by a given user
-     *
-     * @param int $itemid The submission's id as the file's itemid.
-     * @return int Amount of user files
-     */
-    public function count_user_files($itemid) {
-        $fs = get_file_storage();
-        $files = $fs->get_area_files($this->context->id, 'mod_checkmark', 'submission', $itemid,
-                                     'id', false);
-        return count($files);
-    }
-
-    /**
      * Returns true if the student is allowed to submit
      *
      * Checks that the checkmark has started and, cut-off-date or duedate hasn't
