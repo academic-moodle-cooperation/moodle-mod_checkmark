@@ -64,7 +64,9 @@ class submissionstable extends \table_sql {
     /** @var protected if formated cells should contain html */
     protected $format = self::FORMAT_HTML;
 
-    /** @var protected suppressinitials shows whether or not the intials bars should be printed */
+    /** @var protected suppressinitials shows whether or not the intials bars should be printed
+     * @deprecated since Moodle 3.3 TODO remove in Moodle 3.7
+     */
     protected $suppressinitials = false;
 
     /** @var protected defaultselectstate whether or not the select checkboxes should be checked or not checked by default */
@@ -473,8 +475,6 @@ class submissionstable extends \table_sql {
         // We need to have the same ID to ensure the columns are collapsed if their collapsed in the other table!
         $table = new submissionstable('mod-checkmark-submissions', $checkmarkorcmid);
 
-        $table->suppress_initials_output(true);
-
         $table->sumabs     = get_user_preferences('checkmark_sumabs', 1);
         $table->sumrel     = get_user_preferences('checkmark_sumrel', 1);
         $table->quickgrade = 0;
@@ -746,26 +746,17 @@ class submissionstable extends \table_sql {
     }
 
     /**
-     * Used to suppress initials bar if flag is set!
-     */
-    public function print_initials_bar() {
-        if (!$this->suppress_initials_output()) {
-            parent::print_initials_bar();
-        }
-    }
-
-    /**
      * Set or determine if initials bar output should be suppressed
      *
-     * @param bool $value (optional) Set flag or remove flag! Must be true or false to set/remove!
-     * @return bool current state of flag
+     * @param bool $value (optional) Remove flag!
+     * @return bool false
+     *
+     * @deprecated since Moodle 3.3 TODO remove in Moodle 3.7
      */
     public function suppress_initials_output($value = null) {
-        if ($value === true) {
-            $this->suppressinitials = true;
-        } else if ($value === false) {
-            $this->suppressinitials = false;
-        }
+        debugging('Suppression of initials output has been deprecated, due to changes in Moodle core!', DEBUG_DEVELOPER);
+
+        $this->suppressinitials = false;
 
         return $this->suppressinitials;
     }

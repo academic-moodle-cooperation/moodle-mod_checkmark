@@ -5,6 +5,7 @@ CHANGELOG
 
  * [FEATURE] #4415 Added separate grading-due-date to remind graders
  * [CHANGED] #4415 Replaced checkmark_print_overview() output with action events
+ * [CHANGED] #4423 Stopped using table_sql's non public API and display initialsbars not in other places like moodleforms
 
 
 3.2.1 (2017-03-02)

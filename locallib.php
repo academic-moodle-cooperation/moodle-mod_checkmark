@@ -2879,7 +2879,6 @@ class checkmark {
         $table = $this->get_print_data($filter);
         $tablehtml = ob_get_contents();
         ob_end_clean();
-        $mform->addElement('html', $this->print_moodleform_initials_bar($table));
 
         $summarygrp = array();
         $summarygrp[] = &$mform->createElement('advcheckbox', 'sumabs', '',
