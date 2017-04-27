@@ -486,11 +486,10 @@ class checkmark {
                 }
                 $url = new moodle_url('view.php',
                                      array('id' => $this->cm->id, 'edit' => '1'));
-                $button = $OUTPUT->single_button($url, get_string($submitbutton, 'checkmark'));
+                $button = $OUTPUT->single_button($url, get_string($submitbutton, 'checkmark'), 'post', array('primary' => true));
                 echo html_writer::tag('div', $button, array('class' => 'centered'));
                 echo "\n";
             }
-
         }
 
         $this->view_feedback();
@@ -2984,9 +2983,9 @@ class checkmark {
         if (!($continue instanceof single_button)) {
             if (is_string($continue)) {
                 $continue = new single_button(new moodle_url($continue), get_string('continue'),
-                                              'post');
+                                              'post', true);
             } else if ($continue instanceof moodle_url) {
-                $continue = new single_button($continue, get_string('continue'), 'post');
+                $continue = new single_button($continue, get_string('continue'), 'post', true);
             } else {
                 throw new coding_exception('The continue param to $OUTPUT->confirm() must be either a'.
                                            ' URL (str/moodle_url), a single_button instance or null.');
@@ -3008,9 +3007,7 @@ class checkmark {
 
         $output = $OUTPUT->box_start('generalbox', 'notice');
         $output .= html_writer::tag('p', $message);
-        $output .= html_writer::tag('div',
-                                    $OUTPUT->render($continue).
-                                    (($cancel != null) ? $OUTPUT->render($cancel) : ''),
+        $output .= html_writer::tag('div', $OUTPUT->render($continue) . (($cancel != null) ? $OUTPUT->render($cancel) : ''),
                                     array('class' => 'buttons'));
         $output .= $OUTPUT->box_end();
         return $output;

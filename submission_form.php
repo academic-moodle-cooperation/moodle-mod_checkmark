@@ -72,7 +72,8 @@ class checkmark_submission_form extends moodleform {
         $buttonarray = array();
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton',
                                                 get_string('savechanges'));
-        $buttonarray[] = &$mform->createElement('reset', 'resetbutton', get_string('revert'));
+        $buttonarray[] = &$mform->createElement('reset', 'resetbutton', get_string('revert'),
+                                                array('class' => 'btn btn-secondary'));
         $buttonarray[] = &$mform->createElement('cancel');
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');

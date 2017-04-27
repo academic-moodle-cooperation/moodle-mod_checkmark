@@ -220,7 +220,7 @@ if ($affectedrecords && empty($selectedcourses)) {
          html_writer::start_tag('div', array('class' => 'fcontainer clearfix')).
          html_writer::start_tag('div', array('class' => 'fitem fitem_actionbuttons fitem_fsubmit')).
          html_writer::start_tag('div', array('class' => 'felement fsubmit'));
-    echo html_writer::tag('button', get_string('go'), array('type' => 'submit'));
+    echo html_writer::tag('button', get_string('go'), array('type' => 'submit', 'class' => 'btn btn-primary'));
     echo html_writer::end_tag('div').
          html_writer::end_tag('div').
          html_writer::end_tag('div').
