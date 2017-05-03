@@ -104,7 +104,7 @@ class send_notifications extends \core\task\scheduled_task {
                 }
 
                 if (!$mod = \get_coursemodule_from_instance('checkmark', $feedback->checkmarkid,
-                                                           $course->id)) {
+                                                            $course->id)) {
                     echo 'Could not find course module for checkmark id '.$feedback->checkmarkid."\n";
                     continue;
                 }

@@ -106,7 +106,7 @@ function checkmark_delete_instance($id) {
     }
 
     if (!$DB->delete_records('event', array('modulename' => 'checkmark',
-                                             'instance'  => $checkmark->id))) {
+                                            'instance'  => $checkmark->id))) {
         $result = false;
     }
 
@@ -979,7 +979,7 @@ function checkmark_refresh_events($course = 0, $checkmarkid = 0) {
                 }
             } else {
                 $DB->delete_records('event', array('modulename' => 'checkmark', 'instance' => $checkmark->id,
-                    'eventtype' => $eventtype));
+                                                   'eventtype'  => $eventtype));
             }
 
             $eventtype = CHECKMARK_EVENT_TYPE_GRADINGDUE;
@@ -1006,7 +1006,7 @@ function checkmark_refresh_events($course = 0, $checkmarkid = 0) {
                 }
             } else {
                 $DB->delete_records('event', array('modulename' => 'checkmark', 'instance' => $checkmark->id,
-                    'eventtype' => $eventtype));
+                                                   'eventtype'  => $eventtype));
             }
         }
     }

@@ -26,11 +26,11 @@
 defined('MOODLE_INTERNAL') || die;
 
 $logs = array(
-array('module' => 'checkmark', 'action' => 'view',               'mtable' => 'checkmark', 'field' => 'name'),
-array('module' => 'checkmark', 'action' => 'add',                'mtable' => 'checkmark', 'field' => 'name'),
-array('module' => 'checkmark', 'action' => 'update',             'mtable' => 'checkmark', 'field' => 'name'),
-array('module' => 'checkmark', 'action' => 'view submission',    'mtable' => 'checkmark', 'field' => 'name'),
-array('module' => 'checkmark', 'action' => 'view print-preview', 'mtable' => 'checkmark', 'field' => 'name'),
-array('module' => 'checkmark', 'action' => 'export pdf',         'mtable' => 'checkmark', 'field' => 'name'),
-array('module' => 'checkmark', 'action' => 'upload',             'mtable' => 'checkmark', 'field' => 'name'),
+    array('module' => 'checkmark', 'action' => 'view', 'mtable' => 'checkmark', 'field' => 'name'),
+    array('module' => 'checkmark', 'action' => 'add', 'mtable' => 'checkmark', 'field' => 'name'),
+    array('module' => 'checkmark', 'action' => 'update', 'mtable' => 'checkmark', 'field' => 'name'),
+    array('module' => 'checkmark', 'action' => 'view submission', 'mtable' => 'checkmark', 'field' => 'name'),
+    array('module' => 'checkmark', 'action' => 'view print-preview', 'mtable' => 'checkmark', 'field' => 'name'),
+    array('module' => 'checkmark', 'action' => 'export pdf', 'mtable' => 'checkmark', 'field' => 'name'),
+    array('module' => 'checkmark', 'action' => 'upload', 'mtable' => 'checkmark', 'field' => 'name'),
 );

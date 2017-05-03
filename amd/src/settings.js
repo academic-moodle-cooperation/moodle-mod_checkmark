@@ -1,4 +1,4 @@
-// This file is part of mod_grouptool for Moodle - http://moodle.org/
+// This file is part of mod_checkmark for Moodle - http://moodle.org/
 //
 // It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,13 +23,13 @@
  */
 
  /**
-  * @module mod_grouptool/settings
+  * @module mod_checkmark/settings
   */
 define(['jquery', 'core/log'], function($, log) {
 
     /**
      * @constructor
-     * @alias module:mod_grouptool/settings
+     * @alias module:mod_checkmark/settings
      */
     var Settings = function() {
         this.dividing_symbol = ',';

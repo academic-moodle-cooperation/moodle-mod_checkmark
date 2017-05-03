@@ -2928,13 +2928,13 @@ class checkmark {
         $textsizes = array(0 => get_string('strsmall', 'checkmark'),
                            1 => get_string('strmedium', 'checkmark'),
                            2 => get_string('strlarge', 'checkmark'));
-        $mform->addElement('select', 'textsize', get_string('pdftextsize', 'checkmark'),  $textsizes);
+        $mform->addElement('select', 'textsize', get_string('pdftextsize', 'checkmark'), $textsizes);
         $mform->disabledIf('textsize', 'format', 'neq', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
         $mform->setDefault('textsize', $textsize);
 
         $pageorientations = array(\mod_checkmark\MTablePDF::LANDSCAPE => get_string('strlandscape', 'checkmark'),
                                   \mod_checkmark\MTablePDF::PORTRAIT => get_string('strportrait', 'checkmark'));
-        $mform->addElement('select', 'pageorientation', get_string('pdfpageorientation', 'checkmark'),  $pageorientations);
+        $mform->addElement('select', 'pageorientation', get_string('pdfpageorientation', 'checkmark'), $pageorientations);
         $mform->disabledIf('pageorientation', 'format', 'neq', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
         $mform->setDefault('pageorientation', $pageorientation);
 
@@ -3296,7 +3296,7 @@ class checkmark {
 
         $data = array();
         $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark',
-                                         $this->checkmark->id, $userid);
+                                        $this->checkmark->id, $userid);
 
         if (!empty($gradinginfo->outcomes)) {
             foreach ($gradinginfo->outcomes as $n => $old) {
