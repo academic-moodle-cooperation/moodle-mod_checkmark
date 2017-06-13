@@ -1,13 +1,16 @@
 CHANGELOG
 =========
-3.3-dev (2017-04-23)
+3.3.0 (2017-08-10)
 ------------------
 
- * Moodle 3.2 compatible version
+ * Moodle 3.3 compatible version
  * [FEATURE] #4415 Added separate grading-due-date to remind graders
- * [FEATURE] #4088 support for FontAwesome icons
+ * [FEATURE] #4088 Support for FontAwesome icons
+ * [FIXED] #4615 Users without submission and without feedback now get selected when selecting 'ungraded entries'
+ * [FIXED] #4644 Notifications now use the updated submission modification date
  * [CHANGED] #4415 Replaced checkmark_print_overview() output with action events
  * [CHANGED] #4423 Stopped using table_sql's non public API and display initialsbars not in other places like moodleforms
+ * [CHANGED] #4614 We now use a frozen Moodle-Form as submission preview
  * added plugin specific PHPUnit config file
  * improved coding style and code organisation and removed some unnecessary code
 
