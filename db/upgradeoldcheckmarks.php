@@ -17,6 +17,8 @@
 /**
  * Converts old Assignmenttype Checkmarks into new checkmarks (but old DB-Style)
  *
+ * TODO remove in 3.4 (this script was needed for the upgrade from mod_assignment subplugin checkmark to mod_checkmark v2.0!)
+ *
  * @package   mod_checkmark
  * @author    Philipp Hager
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
