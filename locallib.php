@@ -1897,65 +1897,6 @@ class checkmark {
     }
 
     /**
-     * Helper function, used by {@link print_initials_bar()} to output one initial bar.
-     * @param array $alpha of letters in the alphabet.
-     * @param string $current the currently selected letter.
-     * @param string $class class name to add to this initial bar.
-     * @param string $title the name to put in front of this initial bar.
-     * @param string $urlvar URL parameter name for this initial.
-     */
-    protected function print_one_moodleform_initials_bar($alpha, $current, $class, $title,
-                                                         $urlvar) {
-        global $CFG;
-        $return = '';
-        $return .= html_writer::start_tag('div', array('class' => 'fitem ' . $class)) .
-                   html_writer::start_tag('div', array('class' => 'fitemtitle')) .
-                   $title .
-                   html_writer::end_tag('div').
-                   html_writer::start_tag('div', array('class' => 'felement'));
-        if ($current) {
-            $return .= html_writer::link($CFG->wwwroot.'/mod/checkmark/submissions.php?id='.
-                                         $this->cm->id.'&'.$urlvar.'=', get_string('all'));
-        } else {
-            $return .= html_writer::tag('strong', get_string('all'));
-        }
-
-        foreach ($alpha as $letter) {
-            if ($letter === $current) {
-                $return .= html_writer::tag('strong', $letter);
-            } else {
-                $return .= html_writer::link($CFG->wwwroot.'/mod/checkmark/submissions.php?id='.
-                                             $this->cm->id.'&'.$urlvar.'='.$letter, $letter);
-            }
-        }
-
-        return $return.html_writer::end_tag('div').html_writer::end_tag('div');
-    }
-
-    /**
-     * This function is not part of the public api.
-     *
-     * @param \mod_checkmark\submissionstable $table instance of submissionstable to fetch current values of initials from!
-     */
-    protected function print_moodleform_initials_bar(\mod_checkmark\submissionstable $table) {
-        $alpha  = explode(',', get_string('alphabet', 'langconfig'));
-
-        $tmp = $table->use_initials;
-        $table->use_initials = true;
-
-        // Bar of first initials.
-        $ifirst = $table->get_initial_first();
-
-        // Bar of last initials.
-        $ilast = $table->get_initial_last();
-
-        $table->use_initials = $tmp;
-
-        return      $this->print_one_moodleform_initials_bar($alpha, $ifirst, 'firstinitial',
-                    get_string('firstname'), 'tifirst').
-                    $this->print_one_moodleform_initials_bar($alpha, $ilast, 'lastinitial',
-                    get_string('lastname'), 'tilast');
-    }
      *  Display a single submission, ready for grading on a popup window
      *
      * This default method prints the grader info and feedback box at the top and
