@@ -425,7 +425,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
      *
      * @param array $data data from the module form
      * @param array $files data about files transmitted by the module form
-     * return string[] array of error messages, to be displayed at the form fields
+     * @return string[] array of error messages, to be displayed at the form fields
      */
     public function validation($data, $files) {
         // Allow plugin checkmarks to do any extra validation after the form has been submitted!
