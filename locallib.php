@@ -1956,155 +1956,6 @@ class checkmark {
                     $this->print_one_moodleform_initials_bar($alpha, $ilast, 'lastinitial',
                     get_string('lastname'), 'tilast');
     }
-
-    /**
-     * Print group menu selector for activity.
-     *
-     * @param object $cm course module object
-     * @param bool $return return as string instead of printing
-     * @param bool $hideallparticipants If true, this prevents the 'All participants'
-     *   option from appearing in cases where it normally would. This is intended for
-     *   use only by activities that cannot display all groups together. (Note that
-     *   selecting this option does not prevent groups_get_activity_group from
-     *   returning 0; it will still do that if the user has chosen 'all participants'
-     *   in another activity, or not chosen anything.)
-     * @return mixed|void|string depending on $return param
-     */
-    public function moodleform_groups_print_activity_menu($cm, $return=false,
-                                                          $hideallparticipants=false) {
-        global $USER, $CFG;
-
-        if (!$groupmode = groups_get_activity_groupmode($cm)) {
-            if ($return) {
-                return '';
-            } else {
-                return;
-            }
-        }
-
-        $context = context_module::instance($cm->id);
-        $aag = has_capability('moodle/site:accessallgroups', $context);
-
-        if ($groupmode == VISIBLEGROUPS or $aag) {
-            // Any group in grouping!
-            $allowedgroups = groups_get_all_groups($cm->course, 0, $cm->groupingid);
-        } else {
-            // Only assigned groups!
-            $allowedgroups = groups_get_all_groups($cm->course, $USER->id, $cm->groupingid);
-        }
-
-        $activegroup = groups_get_activity_group($cm, true, $allowedgroups);
-
-        $groupsmenu = array();
-        if ((!$allowedgroups or $groupmode == VISIBLEGROUPS or $aag) and !$hideallparticipants) {
-            $groupsmenu[0] = get_string('allparticipants');
-        }
-
-        if ($allowedgroups) {
-            foreach ($allowedgroups as $group) {
-                $groupsmenu[$group->id] = format_string($group->name);
-            }
-        }
-
-        if ($groupmode == VISIBLEGROUPS) {
-            $grouplabel = get_string('groupsvisible');
-        } else {
-            $grouplabel = get_string('groupsseparate');
-        }
-
-        if ($aag and $cm->groupingid) {
-            if ($grouping = groups_get_grouping($cm->groupingid)) {
-                $grouplabel = $grouplabel . ' (' . format_string($grouping->name) . ')';
-            }
-        }
-
-        if (count($groupsmenu) == 1) {
-            $groupname = reset($groupsmenu);
-            $output = html_writer::start_tag('div', array('class' => 'fitemtitle')).
-                       html_writer::label($grouplabel, null).
-                       html_writer::end_tag('div');
-            $output .= html_writer::start_tag('div', array('class' => 'felement')).
-                       $groupname.
-                       html_writer::end_tag('div');
-        } else {
-            $url = new moodle_url($CFG->wwwroot . '/mod/checkmark/submissions.php');
-            $select = new single_select($url, 'group', $groupsmenu, $activegroup, null,
-                                        'selectgroup');
-            $select->label = $grouplabel;
-            $output = $this->render_moodleform_singleselect($select);
-        }
-
-        // Then div wrapper for xhtml strictness!
-        $output = html_writer::tag('div', $output, array('class' => 'fitem'));
-        // And another wrapper with modform-element-class!
-        $output = html_writer::tag('div', $output, array('class' => 'groupselector'));
-
-        return $output;
-
-    }
-
-    /**
-     * Internal implementation of single_select rendering
-     *
-     * @param single_select $select
-     * @return string HTML fragment
-     */
-    protected function render_moodleform_singleselect(single_select $select) {
-        $select = clone($select);
-        if (empty($select->formid)) {
-            $select->formid = html_writer::random_id('single_select_f');
-        }
-
-        $output = '';
-
-        if ($select->method === 'post') {
-            $params['sesskey'] = sesskey();
-        }
-        if (isset($params)) {
-            foreach ($params as $name => $value) {
-                $output .= html_writer::empty_tag('input', array('type'  => 'hidden',
-                                                                 'name'  => $name,
-                                                                 'value' => $value));
-            }
-        }
-
-        if (empty($select->attributes['id'])) {
-            $select->attributes['id'] = html_writer::random_id('single_select');
-        }
-
-        if ($select->disabled) {
-            $select->attributes['disabled'] = 'disabled';
-        }
-
-        if ($select->tooltip) {
-            $select->attributes['title'] = $select->tooltip;
-        }
-
-        if ($select->label) {
-            $output .= html_writer::start_tag('div', array('class' => 'fitemtitle')).
-                       html_writer::label($select->label, $select->attributes['id']).
-                       html_writer::end_tag('div');
-        }
-
-        if ($select->helpicon instanceof help_icon) {
-            $output .= $this->render($select->helpicon);
-        } else if ($select->helpicon instanceof old_help_icon) {
-            $output .= $this->render($select->helpicon);
-        }
-
-        $output .= html_writer::start_tag('div', array('class' => 'felement')).
-                   html_writer::select($select->options, $select->name, $select->selected,
-                                       $select->nothing, $select->attributes).
-                   html_writer::end_tag('div');
-
-        // Then div wrapper for xhtml strictness!
-        $output = html_writer::tag('div', $output, array('class' => 'fitem'));
-
-        // And finally one more wrapper with class!
-        return html_writer::tag('div', $output, array('class' => $select->class));
-    }
-
-    /**
      *  Display a single submission, ready for grading on a popup window
      *
      * This default method prints the grader info and feedback box at the top and
@@ -2839,15 +2690,6 @@ class checkmark {
 
         $PAGE->set_url(new moodle_url($PAGE->url, array('tab' => 'printpreview')));
 
-        $filters = array(self::FILTER_ALL             => get_string('all'),
-                         self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
-                         self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
-        if ($this->checkmark->trackattendance) {
-            $filters[self::FILTER_ATTENDANT] = get_string('all_attendant', 'checkmark');
-            $filters[self::FILTER_ABSENT] = get_string('all_absent', 'checkmark');
-            $filters[self::FILTER_UNKNOWN] = get_string('all_unknown', 'checkmark');
-        }
-
         /*
          * First we check to see if the form has just been submitted
          * to request user_preference updates!
@@ -2863,91 +2705,36 @@ class checkmark {
 
         // Form to manage print-settings!
         echo html_writer::start_tag('div', array('class' => 'usersubmissions'));
-        $formaction = new moodle_url('/mod/checkmark/submissions.php', array('id'      => $this->cm->id,
-                                                                             'sesskey' => sesskey()));
-        $mform = new MoodleQuickForm('optionspref', 'post', $formaction, '', array('class' => 'combinedprintpreviewform'));
 
-        $mform->addElement('hidden', 'updatepref');
-        $mform->setDefault('updatepref', 1);
-        $mform->addElement('header', 'data_settings_header', get_string('datasettingstitle', 'checkmark'));
-        $mform->addElement('select', 'datafilter', get_string('show'),  $filters);
-        $mform->setDefault('datafilter', $filter);
-
-        $mform->addElement('html', $this->moodleform_groups_print_activity_menu($this->cm, true));
         ob_start();
-        $table = $this->get_print_data($filter);
+        $this->get_print_data($filter);
         $tablehtml = ob_get_contents();
         ob_end_clean();
 
-        $summarygrp = array();
-        $summarygrp[] = &$mform->createElement('advcheckbox', 'sumabs', '',
-                                               get_string('summary_abs', 'checkmark'), array('group' => 3));
-        $summarygrp[] = &$mform->createElement('advcheckbox', 'sumrel', '',
-                                               get_string('summary_rel', 'checkmark'), array('group' => 3));
-        $mform->addGroup($summarygrp, 'summarygrp', get_string('checksummary', 'checkmark'), array('<br />'), false);
-        $mform->setDefault('sumabs', $sumabs);
-        $mform->setDefault('sumrel', $sumrel);
+        $customdata = [
+            'cm' => $this->cm,
+            'context' => $this->context,
+            'examplescount' => count($this->get_examples()),
+            'table' => $tablehtml,
+            'tracksattendance' => $this->checkmark->trackattendance
+        ];
+        $formaction = new moodle_url('/mod/checkmark/submissions.php', array('id'      => $this->cm->id,
+                                                                             'sesskey' => sesskey()));
+        $mform = new \mod_checkmark\exportform($formaction, $customdata, 'post', '', array('name' => 'optionspref',
+                                                                                           'class' => 'combinedprintpreviewform'));
 
-        $mform->addElement('submit', 'submitdataview', get_string('strrefreshdata', 'checkmark'));
-        $mform->addElement('header', 'print_settings_header', get_string('printsettingstitle', 'checkmark'));
-        $mform->setExpanded('print_settings_header');
-
-        $warninglvl = get_config('checkmark', 'pdfexampleswarning');
-        if (!empty($warninglvl) && (count($this->get_examples()) >= $warninglvl)) {
-            /* TODO maybe we could replace this fixed value someday with some sort of calculation
-               how much space would be needed and the info to hide some columns */
-            $mform->addElement('html', $OUTPUT->notification(get_string('manycolumnsinpdfwarning', 'checkmark'), 'notifymessage'));
-        }
-
-        // Format?
-        $formats = array(\mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF        => 'PDF',
-                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLSX       => 'XLSX',
-                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_ODS        => 'ODS',
-                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_COMMA  => 'CSV (;)',
-                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_TAB    => 'CSV (tab)');
-        $mform->addElement('select', 'format', get_string('format', 'checkmark'), $formats);
-        $mform->setDefault('format', $format);
-
-        $mform->addElement('static', 'pdf-settings', get_string('pdfsettings', 'checkmark'));
-
-        // How many submissions per page?
-        $pppgroup = array();
-        $pppgroup[] = &$mform->createElement('text', 'printperpage',
-                                             get_string('pdfpagesize', 'checkmark'), array('size' => 3));
-        $pppgroup[] = &$mform->createElement('advcheckbox', 'printoptimum', '',
-                                             get_string('optimum', 'checkmark'), array('group' => 2));
-        $mform->addGroup($pppgroup, 'printperpagegrp', get_string('pdfpagesize', 'checkmark'),
-                         ' ', false);
-        $mform->addHelpButton('printperpagegrp', 'pdfpagesize', 'checkmark');
-        $mform->setDefault('printperpage', $printperpage);
-        $mform->setDefault('printoptimum', $printoptimum);
-        $mform->disabledIf('printperpage', 'printoptimum', 'checked');
-        $mform->disabledIf('printperpage', 'format', 'neq', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
-        $mform->disabledIf('printoptimum', 'format', 'neq', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
-
-        $textsizes = array(0 => get_string('strsmall', 'checkmark'),
-                           1 => get_string('strmedium', 'checkmark'),
-                           2 => get_string('strlarge', 'checkmark'));
-        $mform->addElement('select', 'textsize', get_string('pdftextsize', 'checkmark'), $textsizes);
-        $mform->disabledIf('textsize', 'format', 'neq', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
-        $mform->setDefault('textsize', $textsize);
-
-        $pageorientations = array(\mod_checkmark\MTablePDF::LANDSCAPE => get_string('strlandscape', 'checkmark'),
-                                  \mod_checkmark\MTablePDF::PORTRAIT => get_string('strportrait', 'checkmark'));
-        $mform->addElement('select', 'pageorientation', get_string('pdfpageorientation', 'checkmark'), $pageorientations);
-        $mform->disabledIf('pageorientation', 'format', 'neq', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
-        $mform->setDefault('pageorientation', $pageorientation);
-
-        $mform->addElement('advcheckbox', 'printheader', get_string('pdfprintheader', 'checkmark'));
-        $mform->addHelpButton('printheader', 'pdfprintheader', 'checkmark');
-        $mform->setDefault('printheader', $printheader);
-        $mform->disabledIf('printheader', 'format', 'neq', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
-
-        $mform->addElement('submit', 'submittoprint', get_string('strprint', 'checkmark'));
-
-        $mform->addElement('header', 'data_preview_header', get_string('data_preview', 'checkmark'));
-        $mform->addHelpButton('data_preview_header', 'data_preview', 'checkmark');
-        $mform->setExpanded('data_preview_header');
+        $data = [
+            'filter' => $filter,
+            'sumabs' => $sumabs,
+            'sumrel' => $sumrel,
+            'format' => $format,
+            'printperpage' => $printperpage,
+            'printoptimum' => $printoptimum,
+            'textsize' => $textsize,
+            'pageorientation' => $pageorientation,
+            'printheader' => $printheader
+        ];
+        $mform->set_data($data);
 
         // Hook to allow plagiarism plugins to update status/print links.
         plagiarism_update_status($this->course, $this->cm);
@@ -2956,8 +2743,7 @@ class checkmark {
             echo $message;   // Display messages here if any!
         }
 
-        $mform->addElement('html', $tablehtml);
-
+        // TODO JS to reload table via AJAX as soon as smth in the form changes?!?
         $mform->display();
 
         echo $OUTPUT->footer();

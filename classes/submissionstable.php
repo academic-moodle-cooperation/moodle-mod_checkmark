@@ -842,7 +842,7 @@ class submissionstable extends \table_sql {
         }
 
         $params = new \stdClass();
-        $params->table = '#mform1 .submissions';
+        $params->table = '.usersubmissions table.submissions';
         $params->id = $randomid;
         $PAGE->requires->js_call_amd('mod_checkmark/checkboxcontroller', 'initializer', array($params));
 

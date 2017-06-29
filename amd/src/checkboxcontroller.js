@@ -35,7 +35,7 @@ define(['jquery', 'core/log'], function($, log) {
         // Controller ID!
         this.ID = '';
         // Table ID!
-        this.table = $('.usersubmissions #mform1');
+        this.table = $('.usersubmissions table.submissions');
     };
 
     /*
