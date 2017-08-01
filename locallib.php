@@ -242,16 +242,20 @@ class checkmark {
      * @return string example-preview
      */
     public function print_example_preview() {
-        global $USER, $OUTPUT;
+        global $USER;
         $context = context_module::instance($this->cm->id);
         require_capability('mod/checkmark:view_preview', $context, $USER);
-        echo html_writer::start_tag('div', array('class' => 'mform'));
-        echo html_writer::start_tag('div', array('class' => 'clearfix')).
-             get_string('example_preview_title', 'checkmark');
-        echo $OUTPUT->help_icon('example_preview_title', 'checkmark');
+
+        // TODO we use a form here for now, but plan to use a better template in the future! #notime
+        $mform = new MoodleQuickForm('submission', 'get', '', '');
+
+        $mform->addElement('header', 'heading', get_string('example_preview_title', 'checkmark'));
+        $mform->addHelpButton('heading', 'example_preview_title', 'checkmark');
 
         $examples = $this->get_examples();
 
+        $data = new stdClass();
+        $data->examples = [];
         foreach ($examples as $example) {
             switch ($example->grade) {
                 case '1':
@@ -262,18 +266,10 @@ class checkmark {
                     $pointsstring = get_string('strpoints', 'checkmark');
                 break;
             }
-            $symbol = self::EMPTYBOX;
-            $label = $example->name;
-            $grade = '('.$example->grade.' '.$pointsstring.')';
-            $content = html_writer::tag('div', '&nbsp;', array('class' => 'fitemtitle')).
-                       html_writer::tag('div', $symbol.'&nbsp;'.$label.'&nbsp;'.$grade,
-                                        array('class' => 'felement'));
-            echo html_writer::tag('div', $content, array('class' => 'fitem uncheckedexample'));
+            $mform->addElement('checkbox', $example->shortname, '', $example->name.' ('.$example->grade.' '.$pointsstring.')');
+            $mform->freeze($example->shortname);
         }
-
-        echo html_writer::end_tag('div');
-        echo html_writer::end_tag('div');
-
+        $mform->display();
     }
 
     /**
@@ -627,15 +623,17 @@ class checkmark {
         $item = $gradinginfo->items[CHECKMARK_GRADE_ITEM];
         $grade = $item->grades[$userid];
 
-        if ($this->checkmark->attendancegradebook) {
+        if ($this->checkmark->trackattendance && $this->checkmark->attendancegradebook) {
             $attendanceitem = $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM];
             $attendancegrade = $attendanceitem->grades[$userid];
         } else {
             $attendanceitem = false;
         }
-        if ($this->checkmark->presentationgradebook) {
+        if ($this->checkmark->presentationgrading && $this->checkmark->presentationgradebook) {
             $presentationitem = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM];
             $presentationgrade = $presentationitem->grades[$userid];
+        } else {
+            $presentationgrade = false;
         }
 
         if (($feedback == false)
@@ -3379,6 +3377,9 @@ class checkmark {
             return $output;
         }
 
+        // TODO we use a form here for now, but plan to use a better template in the future! #notime
+        $mform = new MoodleQuickForm('submission', 'get', '', '');
+
         foreach ($submission->examples as $example) {
             switch ($example->grade) {
                 case '1':
@@ -3389,21 +3390,13 @@ class checkmark {
                     $pointsstring = get_string('strpoints', 'checkmark');
                 break;
             }
+            $mform->addElement('checkbox', $example->shortname, '', $example->name.' ('.$example->grade.' '.$pointsstring.')');
             if ($example->state) { // Is it checked?
-                $symbol = self::CHECKEDBOX;
-                $class = 'checkedexample';
-            } else {
-                $symbol = self::EMPTYBOX;
-                $class = 'uncheckedexample';
+                $mform->setDefault($example->shortname, 1);
             }
-            $label = $example->name;
-            $grade = '('.$example->grade.' '.$pointsstring.')';
-            $content = html_writer::tag('div', '&nbsp;', array('class' => 'fitemtitle')).
-                       html_writer::tag('div', $symbol.'&nbsp;'.$label.'&nbsp;'.$grade,
-                                        array('class' => 'felement'));
-            $output .= html_writer::tag('div', $content,
-                                        array('class' => 'fitem '.$class));
+            $mform->freeze($example->shortname);
         }
+        $output = $mform->toHtml();
         if ($return) {
             return $output;
         }
