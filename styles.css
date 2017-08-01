@@ -105,24 +105,6 @@
     text-align: right;
 }
 
-#page-mod-checkmark-submissions .mform.optionspref .fitem .fitemtitle {
-    width: 25%;
-}
-
-#page-mod-checkmark-submissions .mform.optionspref .fitem .felement {
-    margin-left: 26%;
-    width: 15%;
-}
-
-#page-mod-checkmark-submissions.dir-rtl .mform .fitem .felement {
-    margin-left: 0;
-    margin-right: 26%;
-}
-
-#page-mod-checkmark-submissions .optionspref {
-    width: 100%;
-}
-
 #page-mod-checkmark-submissions .fastgbutton {
     text-align: center;
 }
@@ -131,10 +113,6 @@
 #page-mod-checkmark-submissions.dir-rtl .timemodified,
 #page-mod-checkmark-submissions.dir-rtl .timemarked {
     text-align: right;
-}
-
-#page-mod-checkmark-submissions.dir-rtl .mform.optionspref .fitem .fitemtitle {
-    text-align: left;
 }
 
 #page-mod-checkmark-submissions fieldset.clearfix.collapsible {
