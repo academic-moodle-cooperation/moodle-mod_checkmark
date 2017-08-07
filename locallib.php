@@ -2146,9 +2146,8 @@ class checkmark {
      * update_submission($submission) - updates the submission for the actual user
      *
      * @param object $submission Submission object to update
-     * @return object $submission
      */
-    public function update_submission($submission) {
+    public function update_submission(&$submission) {
         global $USER, $DB;
 
         $update = new stdClass();
@@ -2172,7 +2171,6 @@ class checkmark {
         $submission = $this->get_submission($USER->id);
 
         $this->update_grade($submission);
-        return $submission;
     }
 
     /**
