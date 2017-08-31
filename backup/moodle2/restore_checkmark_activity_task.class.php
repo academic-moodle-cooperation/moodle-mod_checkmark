@@ -160,10 +160,14 @@ class restore_checkmark_activity_task extends restore_activity_task {
                     $calendarevent = calendar_event::load($event->id);
                     $calendarevent->update($event, false);
                     $this->get_logger()->process(get_string('couldfixevent', 'checkmark', $event), backup::LOG_INFO);
-                    echo $OUTPUT->notification(get_string('couldfixevent', 'checkmark', $event), 'notifysuccess');
+                    if (!defined('AJAX_SCRIPT')) {
+                        echo $OUTPUT->notification(get_string('couldfixevent', 'checkmark', $event), 'notifysuccess');
+                    }
                 } else {
                     foreach ($events as $event) {
-                        echo $OUTPUT->notification(get_string('cantfixevent', 'checkmark', $event), 'notifyproblem');
+                        if (!defined('AJAX_SCRIPT')) {
+                            echo $OUTPUT->notification(get_string('cantfixevent', 'checkmark', $event), 'notifyproblem');
+                        }
                         $this->get_logger()->process(get_string('cantfixevent', 'checkmark', $event), backup::LOG_ERROR);
                     }
                 }
