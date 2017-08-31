@@ -25,12 +25,16 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+/** GRADE ITEM */
 define('CHECKMARK_GRADE_ITEM', 0);
+/** ATTENDANCE ITEM */
 define('CHECKMARK_ATTENDANCE_ITEM', 1);
+/** PRESENTATIONGRADE ITEM */
 define('CHECKMARK_PRESENTATION_ITEM', 2);
 
-// Event types.
+/** EVENT TYPE DUE - deadline for student's submissions */
 define('CHECKMARK_EVENT_TYPE_DUE', 'due'); // Is backwards compatible to former events!
+/** EVENT TYPE GRADINGDUE - reminder for teachers to grade */
 define('CHECKMARK_EVENT_TYPE_GRADINGDUE', 'gradingdue');
 
 /**
@@ -54,9 +58,6 @@ function checkmark_delete_instance($id) {
 
     if (!$cm = get_coursemodule_from_instance('checkmark', $checkmark->id)) {
         echo $OUTPUT->notification('invalidinstance(CMID='.$cm->id.' CheckmarkID='.$checkmark->id.')', 'notifyproblem');
-        $id = null;
-    } else {
-        $id = $cm->id;
     }
 
     $result = true;
@@ -199,13 +200,6 @@ function checkmark_update_instance($checkmark) {
 
     if (! $cm = get_coursemodule_from_instance('checkmark', $checkmark->id)) {
         echo $OUTPUT->notification('invalidinstance('.$checkmark->id.')', 'notifyproblem');
-        $link = '';
-        $id = null;
-        $name = $checkmark->name;
-    } else {
-        $link = $CFG->wwwroot . '/mod/checkmark/view.php?id='.$cm->id;
-        $id = $cm->id;
-        $name = $id . ' - ' . $checkmark->name;
     }
 
     return true;
@@ -1048,6 +1042,8 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
 
     $showrecentsubs = get_config('checkmark', 'showrecentsubmissions');
 
+    $owngroups = groups_get_user_groups($course->id);
+
     foreach ($submissions as $submission) {
         if (!array_key_exists($submission->cmid, $modinfo->cms)) {
             continue;
@@ -1084,20 +1080,15 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
                 continue;
             }
 
-            if (is_null($modinfo->groups)) {
-                // Load all my groups and cache it in modinfo!
-                $modinfo->groups = groups_get_user_groups($course->id);
-            }
-
             // This will be slow - show only users that share group with me in this cm!
-            if (empty($modinfo->groups[$cm->id])) {
+            if (empty($owngroups[$cm->id])) {
                 continue;
             }
             $usersgroups = groups_get_all_groups($course->id, $submission->userid,
                                                  $cm->groupingid);
             if (is_array($usersgroups)) {
                 $usersgroups = array_keys($usersgroups);
-                $intersect = array_intersect($usersgroups, $modinfo->groups[$cm->id]);
+                $intersect = array_intersect($usersgroups, $owngroups[$cm->id]);
                 if (empty($intersect)) {
                     continue;
                 }
@@ -1189,10 +1180,8 @@ function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $c
     $accessallgroups = has_capability('moodle/site:accessallgroups', $cmcontext);
     $viewfullnames   = has_capability('moodle/site:viewfullnames', $cmcontext);
 
-    if (is_null($modinfo->groups)) {
-        // Load all my groups and cache it in modinfo!
-        $modinfo->groups = groups_get_user_groups($course->id);
-    }
+    // Load all my groups!
+    $owngroups = groups_get_user_groups($course->id);
 
     $show = array();
 
@@ -1220,13 +1209,13 @@ function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $c
             }
 
             // This will be slow - show only users that share group with me in this cm!
-            if (empty($modinfo->groups[$cm->id])) {
+            if (empty($owngroups[$cm->id])) {
                 continue;
             }
             $usersgroups = groups_get_all_groups($course->id, $cm->userid, $cm->groupingid);
             if (is_array($usersgroups)) {
                 $usersgroups = array_keys($usersgroups);
-                $intersect = array_intersect($usersgroups, $modinfo->groups[$cm->id]);
+                $intersect = array_intersect($usersgroups, $owngroups[$cm->id]);
                 if (empty($intersect)) {
                     continue;
                 }
@@ -1819,6 +1808,9 @@ function checkmark_print_overview($courses, &$htmlarray) {
             $str .= '</div>';
         }
         $str .= '</div>';
+        if (!isset($htmlarray[$checkmark->course])) {
+            $htmlarray[$checkmark->course] = [];
+        }
         if (empty($htmlarray[$checkmark->course]['checkmark'])
             && (in_array($checkmark->id, $checkmarkids)
                 || in_array($checkmark->id, $overids))) {
@@ -2115,6 +2107,8 @@ function mod_checkmark_core_calendar_is_event_visible(calendar_event $event) {
     } else if ($event->eventtype == CHECKMARK_EVENT_TYPE_DUE) {
         return has_capability('mod/checkmark:submit', $context) && $checkmark->isopen();
     }
+
+    return false;
 }
 
 /**

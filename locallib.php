@@ -246,7 +246,7 @@ class checkmark {
         $context = context_module::instance($this->cm->id);
         require_capability('mod/checkmark:view_preview', $context, $USER);
 
-        // TODO we use a form here for now, but plan to use a better template in the future! #notime
+        // TODO we use a form here for now, but plan to use a better template in the future!
         $mform = new MoodleQuickForm('submission', 'get', '', '');
 
         $mform->addElement('header', 'heading', get_string('example_preview_title', 'checkmark'));
@@ -3375,7 +3375,7 @@ class checkmark {
             return $output;
         }
 
-        // TODO we use a form here for now, but plan to use a better template in the future! #notime
+        // TODO we use a form here for now, but plan to use a better template in the future!
         $mform = new MoodleQuickForm('submission', 'get', '', '');
 
         foreach ($submission->examples as $example) {

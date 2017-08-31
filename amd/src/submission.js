@@ -37,49 +37,49 @@ define(['jquery', 'core/log'], function($, log) {
     };
 
     /*
-     * update_summary() updates the displayed summary during submission edit
+     * updateSummary() updates the displayed summary during submission edit
      * @return true if everything's allright (no error handling by now)
      */
-    Submission.prototype.update_summary = function(e) {
-        var examples_new = 0;
-        var grade_new = 0;
+    Submission.prototype.updateSummary = function(e) {
+        var examplesNew = 0;
+        var gradeNew = 0;
         // Defining local variables improves readability!
         var examples = e.data.examples;
 
         // Calculate values using flexible naming (var1 = names[], var2 = grades[])!
         $.each(examples, function(key, cur) {
-            var is_checked = null;
+            var isChecked = null;
             if ($("input#example".concat(key.toString())) === null) {
                 // Compatibility to pre 2.2 and current needed ID - TODO: do we need this anymore?
-                is_checked = $("input[type=checkbox]#id_example".concat(key.toString())).prop('checked');
+                isChecked = $("input[type=checkbox]#id_example".concat(key.toString())).prop('checked');
             } else {
-                is_checked = $("input[type=checkbox]#example".concat(key.toString())).prop('checked');
+                isChecked = $("input[type=checkbox]#example".concat(key.toString())).prop('checked');
             }
-            if (is_checked) {
-                examples_new++;
-                grade_new += parseInt(cur.grade);
+            if (isChecked) {
+                examplesNew++;
+                gradeNew += parseInt(cur.grade);
             }
         });
 
-        $("span#examples").html(examples_new.toString());
-        $("span#grade").html(grade_new.toString());
+        $("span#examples").html(examplesNew.toString());
+        $("span#grade").html(gradeNew.toString());
 
         return true;
     };
 
     /*
-     * reset_submission_form(e) reset method replaces std-reset-behaviour
+     * resetSubmissionForm(e) reset method replaces std-reset-behaviour
      * first prevents default reset behaviour
      * second resets the form manually
      * third ensure to display updated data
      * @param e    event-object
      * @return true if everything's allright (no error handling by now)
      */
-    Submission.prototype.reset_submission_form = function(e) {
+    Submission.prototype.resetSubmissionForm = function(e) {
         e.preventDefault();
 
         $("#mform1")[0].reset();
-        e.data.update_summary(e);
+        e.data.updateSummary(e);
 
         return true;
     };
@@ -98,22 +98,22 @@ define(['jquery', 'core/log'], function($, log) {
 
             log.debug('Init checkmark submissions js!', 'checkmark');
 
-            var id_fieldname = null;
+            var idFieldname = null;
 
             $.each(this.examples, function(key) {
-                id_fieldname = 'input#example'.concat(key.toString());
-                log.debug('Attach click handler to ' + id_fieldname, 'checkmark');
-                $(id_fieldname).click(instance, instance.update_summary);    // Register event listener!
+                idFieldname = 'input#example'.concat(key.toString());
+                log.debug('Attach click handler to ' + idFieldname, 'checkmark');
+                $(idFieldname).click(instance, instance.updateSummary);    // Register event listener!
             });
 
             // Register event-listener on reset-button to ensure proper data to be displayed on form-reset!
-            $('#id_resetbutton').click(this, this.reset_submission_form);
+            $('#id_resetbutton').click(this, this.resetSubmissionForm);
 
             // Reset the formular after init to ensure correct checkbox-states after page-reload!
             $("#mform1")[0].reset();
 
             // Update summary to display correct data after form-reset!
-            this.update_summary({data: this});
+            this.updateSummary({data: this});
 
             return true;
     };

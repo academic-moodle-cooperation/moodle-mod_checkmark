@@ -39,10 +39,10 @@ define(['jquery', 'core/log'], function($, log) {
     };
 
     /*
-     * update_summary() updates the displayed summary during submission edit
+     * updateSummary() updates the displayed summary during submission edit
      * @return true if everything's allright (no error handling by now)
      */
-    Checkboxcontroller.prototype.update_checkboxes = function(e) {
+    Checkboxcontroller.prototype.updateCheckboxes = function(e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -90,10 +90,10 @@ define(['jquery', 'core/log'], function($, log) {
             instance.id = '';
         }
 
-        $('#' + instance.id + ' a.all').on('click', null, {inst: this, type: 'all'}, this.update_checkboxes);
-        $('#' + instance.id + ' a.none').on('click', null, {inst: this, type: 'none'}, this.update_checkboxes);
-        $('#' + instance.id + ' a.submitted').on('click', null, {inst: this, type: 'submitted'}, this.update_checkboxes);
-        $('#' + instance.id + ' a.ungraded').on('click', null, {inst: this, type: 'ungraded'}, this.update_checkboxes);
+        $('#' + instance.id + ' a.all').on('click', null, {inst: this, type: 'all'}, this.updateCheckboxes);
+        $('#' + instance.id + ' a.none').on('click', null, {inst: this, type: 'none'}, this.updateCheckboxes);
+        $('#' + instance.id + ' a.submitted').on('click', null, {inst: this, type: 'submitted'}, this.updateCheckboxes);
+        $('#' + instance.id + ' a.ungraded').on('click', null, {inst: this, type: 'ungraded'}, this.updateCheckboxes);
 
         return true;
     };

@@ -32,69 +32,69 @@ define(['jquery', 'core/log'], function($, log) {
      * @alias module:mod_checkmark/settings
      */
     var Settings = function() {
-        this.dividing_symbol = ',';
+        this.dividingSymbol = ',';
     };
 
     /*
-     * update_settings() updates the grade-selector appropriate to the given
+     * updateSettings() updates the grade-selector appropriate to the given
      * individual grades (flexiblenaming = 1) or the given amount of examples (flexiblenaming = 0)
      *
      * @return true if everything's allright (no error handling by now)
      */
-    Settings.prototype.update_settings = function(e) {
+    Settings.prototype.updateSettings = function(e) {
         var gradesum = 0;
         var i = 0;
 
         // First we strip everything we don't need!
         e.data.stripper(e);
 
-        var type_selector = '#id_grade_modgrade_type';
-        var point_selector = '#id_grade_modgrade_point';
-        var flexiblenaming_selector = '#id_flexiblenaming';
-        var examplegrades_selector = '#id_examplegrades';
-        var examplenames_selector = '#id_examplenames';
-        var examplecount_selector = '#id_examplecount';
+        var typeSelector = '#id_grade_modgrade_type';
+        var pointSelector = '#id_grade_modgrade_point';
+        var flexiblenamingSelector = '#id_flexiblenaming';
+        var examplegradesSelector = '#id_examplegrades';
+        var examplenamesSelector = '#id_examplenames';
+        var examplecountSelector = '#id_examplecount';
 
         // If non-numeric scales are used or checkmark isn't graded at all, ignore changes!
-        if ($(type_selector).val() != 'point') {
+        if ($(typeSelector).val() != 'point') {
             return true;
         }
-        if ($(flexiblenaming_selector).prop('checked')) {
+        if ($(flexiblenamingSelector).prop('checked')) {
             // Calculate gradesum using individual grades list!
             // Replace occurences of more than 1 comma in row through a single one...
-            var regex1 = new RegExp(e.data.dividing_symbol + "{2,}", "g");
-            $(examplegrades_selector).val($(examplegrades_selector).val().replace(regex1, e.data.dividing_symbol));
+            var regex1 = new RegExp(e.data.dividingSymbol + "{2,}", "g");
+            $(examplegradesSelector).val($(examplegradesSelector).val().replace(regex1, e.data.dividingSymbol));
             // Strip trailling and following commata!
             if (e.type != 'valuechange') {
-                var regex2 = new RegExp("^" + e.data.dividing_symbol + "*|" + e.data.dividing_symbol + "*$", "g");
-                $(examplegrades_selector).val($(examplegrades_selector).val().replace(regex2, ""));
-                $(examplenames_selector).val($(examplenames_selector).val().replace(regex2, ""));
+                var regex2 = new RegExp("^" + e.data.dividingSymbol + "*|" + e.data.dividingSymbol + "*$", "g");
+                $(examplegradesSelector).val($(examplegradesSelector).val().replace(regex2, ""));
+                $(examplenamesSelector).val($(examplenamesSelector).val().replace(regex2, ""));
             }
             // Get string and strip every character except "," (comma) and numerics!
-            var regex3 = new RegExp("[^0-9" + e.data.dividing_symbol + "]");
-            var temp_string = $(examplegrades_selector).val().replace(regex3, "");
-            var temp_array = temp_string.split(e.data.dividing_symbol);
+            var regex3 = new RegExp("[^0-9" + e.data.dividingSymbol + "]");
+            var temp_string = $(examplegradesSelector).val().replace(regex3, "");
+            var temp_array = temp_string.split(e.data.dividingSymbol);
             for (i = 0; i < temp_array.length; i++) {
-                if(temp_array[i].replace(/[^\d]/g, "") !== "") {
+                if (temp_array[i].replace(/[^\d]/g, "") !== "") {
                     gradesum += parseInt(temp_array[i].replace(/[^\d]/g, ""));
                 }
             }
         } else {
             // Calculate gradesum using example-amount (each example counts 1 point)!
-            gradesum = $(examplecount_selector).val();
+            gradesum = $(examplecountSelector).val();
         }
 
-        if (!$(flexiblenaming_selector).prop('checked')) {
-            if ($(point_selector).val() % gradesum === 0) {
+        if (!$(flexiblenamingSelector).prop('checked')) {
+            if ($(pointSelector).val() % gradesum === 0) {
                 // Grade is integral multiple of gradesum (= examplecount) so everything's fine!
                 return true;
             }
         }
         if ((gradesum <= 100) && (gradesum > 0)) {
-            $(type_selector).val('point');
-            $(point_selector).val(gradesum);
+            $(typeSelector).val('point');
+            $(pointSelector).val(gradesum);
         } else if (gradesum < 0) {
-            $(type_selector).val('scale');
+            $(typeSelector).val('scale');
         }
 
         return true;
@@ -109,7 +109,7 @@ define(['jquery', 'core/log'], function($, log) {
             // Compatibility to pre 2.2 and current needed ID - TODO: do we need this anymore?
             examplegrades_selector = '#id_examplegrades';
         }
-        var regex = new RegExp("[^0-9" + e.data.dividing_symbol + "]", "g");
+        var regex = new RegExp("[^0-9" + e.data.dividingSymbol + "]", "g");
         $(examplegrades_selector).val($(examplegrades_selector).val().replace(regex, ""));
         return true;
     };
@@ -120,7 +120,7 @@ define(['jquery', 'core/log'], function($, log) {
      * initializer(config) prepares settings form for JS-functionality
      */
     instance.initializer = function(config) {
-        instance.dividing_symbol = config.dividing_symbol;
+        instance.dividingSymbol = config.dividingSymbol;
 
         log.info('Initialize settings JS', 'checkmark');
 
@@ -129,18 +129,18 @@ define(['jquery', 'core/log'], function($, log) {
         var examplegrades_selector = "#id_examplegrades";
         var examplenames_selector = "#id_examplenames";
         var examplecount_selector = "#id_examplecount";
-        $(flexiblenaming_selector).click(instance, instance.update_settings);
-        $(type_selector).change(instance, instance.update_settings);
-        $(examplegrades_selector).change(instance, instance.update_settings);
-        $(examplenames_selector).change(instance, instance.update_settings);
-        $(examplecount_selector).change(instance, instance.update_settings);
-        $(examplegrades_selector).blur(instance, instance.update_settings);
-        $(examplenames_selector).blur(instance, instance.update_settings);
-        $(examplecount_selector).blur(instance, instance.update_settings);
+        $(flexiblenaming_selector).click(instance, instance.updateSettings);
+        $(type_selector).change(instance, instance.updateSettings);
+        $(examplegrades_selector).change(instance, instance.updateSettings);
+        $(examplenames_selector).change(instance, instance.updateSettings);
+        $(examplecount_selector).change(instance, instance.updateSettings);
+        $(examplegrades_selector).blur(instance, instance.updateSettings);
+        $(examplenames_selector).blur(instance, instance.updateSettings);
+        $(examplecount_selector).blur(instance, instance.updateSettings);
         $(examplegrades_selector).keyup(instance, instance.stripper);
 
-        if($("input[name=allready_submit]").val() === 'no') {
-            instance.update_settings({data: instance});
+        if ($("input[name=allready_submit]").val() === 'no') {
+            instance.updateSettings({data: instance});
         }
     };
 

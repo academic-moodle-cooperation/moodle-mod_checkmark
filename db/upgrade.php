@@ -62,7 +62,7 @@ function xmldb_checkmark_upgrade($oldversion) {
     if ($oldversion < 2011111500) {
         // Rename table in accordance to the moodle db guidlines!
         $table = new xmldb_table('checkmarkassignment_submissions');
-        if (table_exists('checkmarkassignment_submissions')) {
+        if ($dbman->table_exists('checkmarkassignment_submissions')) {
             $dbman->rename_table($table, 'checkmark_submissions');
         }
 
@@ -76,22 +76,22 @@ function xmldb_checkmark_upgrade($oldversion) {
     if ($oldversion < 2011122100) {
         $table = new xmldb_table('checkmark');
         $fieldstodrop = array('assignmenttype', 'var3', 'var4', 'var5', 'maxbytes');
-        echo '<hr />dropping fields in table: '.$table->name.'<br />';
+        echo '<hr />dropping fields in table: checkmark<br />';
         foreach ($fieldstodrop as $fieldname) {
             $field = new xmldb_field($fieldname);
             if ($dbman->field_exists($table, $field)) {
-                echo 'drop field: '.$field->name.' in table: '.$table->name;
+                echo 'drop field: '.$fieldname.' in table: checkmark';
                 $dbman->drop_field($table, $field);
                 echo '...OK<br />';
             } else {
-                echo 'field: '.$field->name.' in table: '.$table->name.' doesn\'t exists!<br />';
+                echo 'field: '.$fieldname.' in table: checkmark doesn\'t exists!<br />';
             }
         }
         $fieldstorename = array(
             'course' => 'course_id',
             'var1' => 'examplecount',
             'var2' => 'examplestart');
-        echo '<hr />renaming fields in table: '.$table->name.'<br />';
+        echo '<hr />renaming fields in table: checkmark<br />';
         foreach ($fieldstorename as $oldname => $newname) {
             switch ($oldname) {
                 case 'course':
@@ -102,17 +102,18 @@ function xmldb_checkmark_upgrade($oldversion) {
                     $field = new xmldb_field('var1', XMLDB_TYPE_INTEGER, '10', null, null, null,
                                              '0', 'emailteachers');
                     break;
+                default: // This default just soothes the IDE to not warn me about potentially undefined variable $field!
                 case 'var2':
                     $field = new xmldb_field('var2', XMLDB_TYPE_INTEGER, '10', null, null, null,
                                              '0', 'var1');
                     break;
             }
             if ($dbman->field_exists($table, $field)) {
-                echo 'rename field: '.$field->name.' in table: '.$table->name;
+                echo 'rename field: '.$oldname.' in table: checkmark';
                 $dbman->rename_field($table, $field, $newname);
                 echo ' to '.$newname.'...OK<br />';
             } else {
-                echo 'field: '.$field->name.' in table: '.$table->name.' doesn\'t exists!<br />';
+                echo 'field: '.$oldname.' in table: checkmark doesn\'t exists!<br />';
             }
         }
 
@@ -136,15 +137,15 @@ function xmldb_checkmark_upgrade($oldversion) {
         // Now take care of checkmark_submissions!
         $table = new xmldb_table('checkmark_submissions');
         $fieldstodrop = array('numfiles', 'data2');
-        echo '<hr />dropping fields in table: '.$table->name.'<br />';
+        echo '<hr />dropping fields in table: checkmark_submissions<br />';
         foreach ($fieldstodrop as $fieldname) {
             $field = new xmldb_field($fieldname);
             if ($dbman->field_exists($table, $field)) {
-                echo 'drop field: '.$field->name.' in table: '.$table->name;
+                echo 'drop field: '.$fieldname.' in table: checkmark_submissions';
                 $dbman->drop_field($table, $field);
                 echo '...OK<br />';
             } else {
-                echo 'field: '.$field->name.' in table: '.$table->name.' doesn\'t exists!<br />';
+                echo 'field: '.$fieldname.' in table: checkmark_submissions doesn\'t exists!<br />';
             }
         }
         $fieldstorename = array(
@@ -152,7 +153,7 @@ function xmldb_checkmark_upgrade($oldversion) {
             'userid' => 'user_id',
             'data1' => 'checked',
             'teacher' => 'teacher_id');
-        echo '<hr />renaming fields in table: '.$table->name.'<br />';
+        echo '<hr />renaming fields in table: checkmark_submissions<br />';
         foreach ($fieldstorename as $oldname => $newname) {
             switch ($oldname) {
                 case 'assignment':
@@ -167,17 +168,18 @@ function xmldb_checkmark_upgrade($oldversion) {
                     $field = new xmldb_field('data1', XMLDB_TYPE_TEXT, 'small', null, null, null,
                                              null, 'timemodified');
                     break;
+                default: // This default just soothes the IDE to not warn me about potentially undefined variable $field!
                 case 'teacher':
                     $field = new xmldb_field('teacher', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
                                              XMLDB_NOTNULL, null, '0', 'format');
                     break;
             }
             if ($dbman->field_exists($table, $field)) {
-                echo 'rename field: '.$field->name.' in table: '.$table->name;
+                echo 'rename field: '.$oldname.' in table: checkmark_submissions';
                 $dbman->rename_field($table, $field, $newname);
                 echo ' to '.$newname.'...OK<br />';
             } else {
-                echo 'field: '.$field->name.' in table: '.$table->name.' doesn\'t exists!<br />';
+                echo 'field: '.$oldname.' in table: checkmark_submissions doesn\'t exists!<br />';
             }
         }
 
@@ -220,11 +222,11 @@ function xmldb_checkmark_upgrade($oldversion) {
                                  XMLDB_NOTNULL, null, '0', 'id');
 
         if ($dbman->field_exists($table, $field)) {
-            echo 'rename field: '.$field->name.' in table: '.$table->name;
+            echo 'rename field: course_id in table: checkmark';
             $dbman->rename_field($table, $field, $newname);
             echo ' to '.$newname.'...OK<br />';
         } else {
-            echo 'field: '.$field->name.' in table: '.$table->name.' doesn\'t exists!<br />';
+            echo 'field: course_id in table: checkmark doesn\'t exists!<br />';
         }
 
         // Define index course_id (not unique) to be dropped form checkmark!
@@ -373,7 +375,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         foreach ($checkmarks as $checkmarkid => $checkmark) {
             // Create entries for checkmark examples!
             $ids[$checkmarkid] = array();
-            @$pbar->update($instancecount, $countinstances, 'migrate instance '.$checkmark->name);
+            $pbar->update($instancecount, $countinstances, 'migrate instance '.$checkmark->name);
             $present = $DB->get_fieldset_select('checkmark_examples', 'name',
                                                 'checkmarkid = :checkmarkid',
                                                 array('checkmarkid' => $checkmark->id));
@@ -400,7 +402,6 @@ function xmldb_checkmark_upgrade($oldversion) {
                 }
             } else {
                 // Standard naming?
-                $examplecount = $checkmark->examplecount;
                 if ($checkmark->grade <= 100 && $checkmark->grade >= 0) {
                     $grade = $checkmark->grade / $checkmark->examplecount;
                 } else {
@@ -440,10 +441,10 @@ function xmldb_checkmark_upgrade($oldversion) {
             $submissions = $DB->get_records('checkmark_submissions', array('checkmarkid' => $checkmark->id));
             $subcounter = 1;
             $submissionscount = count($submissions);
-            @$pbar2->update(0, $submissionscount, "migrate submissions for instance ".$checkmark->name);
+            $pbar2->update(0, $submissionscount, "migrate submissions for instance ".$checkmark->name);
             foreach ($submissions as $key => $submission) {
-                @$pbar2->update($subcounter, $submissionscount,
-                                "migrate submission ".$subcounter." for instance ".$checkmark->name);
+                $pbar2->update($subcounter, $submissionscount,
+                        "migrate submission ".$subcounter." for instance ".$checkmark->name);
                 $subcounter++;
                 $checkedexamples = explode(',', $submission->checked);
                 $present = $DB->get_fieldset_select('checkmark_checks', 'exampleid', 'submissionid = ?', array($submission->id));
@@ -477,8 +478,8 @@ function xmldb_checkmark_upgrade($oldversion) {
             }
         }
 
-        $pbar->update($intancecount, $instancecount, "migration complete!");
-        $pbar2->update($intancecount, $instancecount, "migration complete!");
+        $pbar->update($instancecount, $instancecount, "migration complete!");
+        $pbar2->update($instancecount, $instancecount, "migration complete!");
 
         // Checkmark savepoint reached!
         upgrade_mod_savepoint(true, 2013061000, 'checkmark');

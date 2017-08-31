@@ -52,25 +52,30 @@ class submissionstable extends \table_sql {
     /** select submissions which require grading */
     const SEL_REQ_GRADING = 3;
 
-    /** @var protected checkmark instance */
+    /** @var \checkmark protected checkmark instance */
     protected $checkmark;
 
-    /** @var protected context instance */
+    /** @var \context_module protected context instance */
     protected $context;
 
-    /** @var protected if submission should be shown in timesubmitted column */
+    /** @var \bool protected if submission should be shown in timesubmitted column */
     protected $showsubmission = false;
 
-    /** @var protected if formated cells should contain html */
+    /** @var \int protected if formated cells should contain html */
     protected $format = self::FORMAT_HTML;
 
-    /** @var protected suppressinitials shows whether or not the intials bars should be printed
+    /** @var \bool protected suppressinitials shows whether or not the intials bars should be printed
      * @deprecated since Moodle 3.3 TODO remove in Moodle 3.7
      */
     protected $suppressinitials = false;
 
-    /** @var protected defaultselectstate whether or not the select checkboxes should be checked or not checked by default */
+    /** @var \bool protected defaultselectstate whether or not the select checkboxes should be checked or not checked by default */
     protected $defaultselectstate = false;
+
+    /**
+     * @var \array private For storing user-customised table properties in the user_preferences db table.
+     */
+    private $prefs = array();
 
     /**
      * constructor
@@ -1230,25 +1235,26 @@ class submissionstable extends \table_sql {
      * This function is called for each data row to allow processing of the
      * user's outcomes.
      *
+     * @param object $values Contains object with all the values of record.
      * @return $string Return user's outcomes.
      */
-    public function col_outcome() {
+    public function col_outcome($values) {
         $outcomes = '';
         foreach ($this->gradinginfo->outcomes as $n => $outcome) {
             $options = make_grades_menu(-$outcome->scaleid);
+            $index = $outcome->grades[$values->id]->grade;
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 $outcomes .= $outcome->name.': '.$options[$index]."\n";
             } else {
                 $outcomes .= \html_writer::start_tag('div', array('class' => 'outcome'));
                 $outcomes .= \html_writer::tag('label', $outcome->name);
-                if ($outcome->grades[$auser->id]->locked or !$this->quickgrade) {
+                if ($outcome->grades[$values->id]->locked or !$this->quickgrade) {
                     $options[0] = get_string('nooutcome', 'grades');
-                    $index = $outcome->grades[$auser->id]->grade;
-                    $outcomes .= ': '.\html_writer::tag('span', $options[$index], array('id' => 'outcome_'.$n.'_'. $auser->id));
+                    $outcomes .= ': '.\html_writer::tag('span', $options[$index], array('id' => 'outcome_'.$n.'_'. $values->id));
                 } else {
                     $attributes = array();
-                    $attributes['id'] = 'outcome_'.$n.'_'.$auser->id;
-                    $usr = $auser->id;
+                    $attributes['id'] = 'outcome_'.$n.'_'.$values->id;
+                    $usr = $values->id;
                     $outcomes .= ' '.\html_writer::select($options, 'outcome_'.$n.'['.$usr.']', $outcome->grades[$usr]->grade,
                                                           array(get_string('nooutcome', 'grades')), $attributes);
                 }
