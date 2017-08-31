@@ -1,18 +1,28 @@
 CHANGELOG
 =========
+3.3.1 (2017-09-14)
+------------------
+
+* [FIXED] #4668 supress HTML output during AJAX call of restore methods, so AJAX-Call for duplication wont return corrupt JSON!
+* [FIXED] #4671 fixed some formatting causing Moodle's prechecker to give warnings
+* [FIXED] #4678 fixed submission displaying via moodleform breaking grading form (HTML doesn't like nested form elements!)
+* [FIXED] #4683 fixed two of mod_checkmark's behat features using the same feature name
+* [CHANGED] #4682 updated travis.yml to use moodle-plugin-ci version 2 and run behat tests in firefox and chrome
+
+
 3.3.0 (2017-08-10)
 ------------------
 
- * Moodle 3.3 compatible version
- * [FEATURE] #4415 Added separate grading-due-date to remind graders
- * [FEATURE] #4088 Support for FontAwesome icons
- * [FIXED] #4615 Users without submission and without feedback now get selected when selecting 'ungraded entries'
- * [FIXED] #4644 Notifications now use the updated submission modification date
- * [CHANGED] #4415 Replaced checkmark_print_overview() output with action events
- * [CHANGED] #4423 Stopped using table_sql's non public API and display initialsbars not in other places like moodleforms
- * [CHANGED] #4614 We now use a frozen Moodle-Form as submission preview
- * added plugin specific PHPUnit config file
- * improved coding style and code organisation and removed some unnecessary code
+* Moodle 3.3 compatible version
+* [FEATURE] #4415 Added separate grading-due-date to remind graders
+* [FEATURE] #4088 Support for FontAwesome icons
+* [FIXED] #4615 Users without submission and without feedback now get selected when selecting 'ungraded entries'
+* [FIXED] #4644 Notifications now use the updated submission modification date
+* [CHANGED] #4415 Replaced checkmark_print_overview() output with action events
+* [CHANGED] #4423 Stopped using table_sql's non public API and display initialsbars not in other places like moodleforms
+* [CHANGED] #4614 We now use a frozen Moodle-Form as submission preview
+* added plugin specific PHPUnit config file
+* improved coding style and code organisation and removed some unnecessary code
 
 
 3.2.1 (2017-03-02)
