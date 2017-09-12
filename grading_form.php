@@ -91,6 +91,15 @@ class mod_checkmark_grading_form extends moodleform {
     }
 
     /**
+     * Returns the MoodleQuickForm element to have the submission elements added!
+     * @return MoodleQuickForm
+     */
+    public function get_moodleform() {
+        $mform = &$this->_form;
+        return $mform;
+    }
+
+    /**
      * Add the feedback section to the form.
      */
     public function add_feedback_section() {
@@ -318,7 +327,7 @@ class mod_checkmark_grading_form extends moodleform {
     public function add_submission_content() {
         $mform =& $this->_form;
         $mform->addElement('header', 'Submission', get_string('submission', 'checkmark'));
-        $mform->addElement('html', $this->_customdata->submission_content);
+        \checkmark::add_submission_elements($mform, $this->_customdata->submission);
     }
 
     /**

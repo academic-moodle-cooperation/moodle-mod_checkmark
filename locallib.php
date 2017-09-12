@@ -239,6 +239,8 @@ class checkmark {
     /**
      * print_example_preview() returns a preview of the set examples
      *
+     * TODO use a function to get a empty submission and checkmark::add_submission_elements() instead!
+     *
      * @return string example-preview
      */
     public function print_example_preview() {
@@ -2107,7 +2109,7 @@ class checkmark {
         $mformdata->attendancedisabled = $attendancedisabled;
         $mformdata->nextid = $nextid;
         $mformdata->previousid = $previousid;
-        $mformdata->submission_content = $this->print_user_submission($user->id, true);
+        $mformdata->instance = $this;
         $mformdata->filter = $filter;
         $mformdata->mailinfo = get_user_preferences('checkmark_mailinfo', 0);
 
@@ -3356,7 +3358,7 @@ class checkmark {
      *
      * @param int $userid (optional) id of the user. If 0 then $USER->id is used.
      * @param bool $return (optional) defaults to false. If true the html snippet is returned
-     * @return string|void HTML snippet if $return is true
+     * @return string|bool HTML snippet if $return is true or true if $return is anything else
      */
     public function print_user_submission($userid=0, $return=false) {
         global $USER;
@@ -3378,15 +3380,39 @@ class checkmark {
         // TODO we use a form here for now, but plan to use a better template in the future!
         $mform = new MoodleQuickForm('submission', 'get', '', '');
 
+        self::add_submission_elements($mform, $submission);
+
+        if ($return === true) {
+            $output = $mform->toHtml();
+            return $output;
+        }
+
+        echo $output;
+
+        return true;
+    }
+
+    /**
+     * Adds the elements representing the submission to the MoodleQuickForm!
+     *
+     * @param \MoodleQuickForm $mform
+     * @param \stdClass $submission
+     */
+    public static function add_submission_elements(\MoodleQuickForm &$mform, \stdClass $submission) {
+        if (empty($submission) || !object_property_exists($submission, 'examples') || empty($submission->examples)) {
+            // If there's no submission, we have nothing to do here!
+            return;
+        }
+
         foreach ($submission->examples as $example) {
             switch ($example->grade) {
                 case '1':
                     $pointsstring = get_string('strpoint', 'checkmark');
-                break;
+                    break;
                 case '2':
                 default:
                     $pointsstring = get_string('strpoints', 'checkmark');
-                break;
+                    break;
             }
             $mform->addElement('checkbox', $example->shortname, '', $example->name.' ('.$example->grade.' '.$pointsstring.')');
             if ($example->state) { // Is it checked?
@@ -3394,11 +3420,6 @@ class checkmark {
             }
             $mform->freeze($example->shortname);
         }
-        $output = $mform->toHtml();
-        if ($return) {
-            return $output;
-        }
-        echo $output;
     }
 
     /**
