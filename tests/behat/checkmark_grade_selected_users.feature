@@ -1,5 +1,5 @@
 @mod @mod_checkmark @amc
-Feature: In a checkmark I want to name and grade the examples individually.
+Feature: In a checkmark I want to grade selected submissions.
     In order to grad a specific user
     As a teacher
     I need to able to grade a selected user

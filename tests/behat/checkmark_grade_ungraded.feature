@@ -1,5 +1,5 @@
 @mod @mod_checkmark @amc
-Feature: In a checkmark I want to name and grade the examples individually.
+Feature: In a checkmark I want to grade ungraded submissions.
     In order to name/grade the examples individually
     As a teacher
     In need to be able to make the changes in the editing mode.
