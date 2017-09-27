@@ -1,10 +1,16 @@
 CHANGELOG
 =========
+3.3.2 (2017-09-27)
+------------------
+
+* [FIXED] #4732 fixed a regression due to #4672 causing erronous cleaning of checkmark individual grades setting
+
+
 3.3.1 (2017-09-14)
 ------------------
 
 * [FIXED] #4668 supress HTML output during AJAX call of restore methods, so AJAX-Call for duplication wont return corrupt JSON!
-* [FIXED] #4671 fixed some formatting causing Moodle's prechecker to give warnings
+* [FIXED] #4672 fixed some formatting causing Moodle's prechecker to give warnings
 * [FIXED] #4678 fixed submission displaying via moodleform breaking grading form (HTML doesn't like nested form elements!)
 * [FIXED] #4683 fixed two of mod_checkmark's behat features using the same feature name
 * [CHANGED] #4682 updated travis.yml to use moodle-plugin-ci version 2 and run behat tests in firefox and chrome
