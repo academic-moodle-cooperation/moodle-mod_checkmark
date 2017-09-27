@@ -42,7 +42,7 @@ define(['jquery', 'core/log'], function($, log) {
      * @return true if everything's allright (no error handling by now)
      */
     Settings.prototype.updateSettings = function(e) {
-        var gradesum = 0;
+        var gradeSum = 0;
         var i = 0;
 
         // First we strip everything we don't need!
@@ -50,50 +50,50 @@ define(['jquery', 'core/log'], function($, log) {
 
         var typeSelector = '#id_grade_modgrade_type';
         var pointSelector = '#id_grade_modgrade_point';
-        var flexiblenamingSelector = '#id_flexiblenaming';
-        var examplegradesSelector = '#id_examplegrades';
-        var examplenamesSelector = '#id_examplenames';
-        var examplecountSelector = '#id_examplecount';
+        var flexibleNamingSelector = '#id_flexiblenaming';
+        var exampleGradesSelector = '#id_examplegrades';
+        var exampleNamesSelector = '#id_examplenames';
+        var exampleCountSelector = '#id_examplecount';
 
         // If non-numeric scales are used or checkmark isn't graded at all, ignore changes!
-        if ($(typeSelector).val() != 'point') {
+        if ($(typeSelector).val() !== 'point') {
             return true;
         }
-        if ($(flexiblenamingSelector).prop('checked')) {
+        if ($(flexibleNamingSelector).prop('checked')) {
             // Calculate gradesum using individual grades list!
             // Replace occurences of more than 1 comma in row through a single one...
             var regex1 = new RegExp(e.data.dividingSymbol + "{2,}", "g");
-            $(examplegradesSelector).val($(examplegradesSelector).val().replace(regex1, e.data.dividingSymbol));
+            $(exampleGradesSelector).val($(exampleGradesSelector).val().replace(regex1, e.data.dividingSymbol));
             // Strip trailling and following commata!
-            if (e.type != 'valuechange') {
+            if (e.type !== 'valuechange') {
                 var regex2 = new RegExp("^" + e.data.dividingSymbol + "*|" + e.data.dividingSymbol + "*$", "g");
-                $(examplegradesSelector).val($(examplegradesSelector).val().replace(regex2, ""));
-                $(examplenamesSelector).val($(examplenamesSelector).val().replace(regex2, ""));
+                $(exampleGradesSelector).val($(exampleGradesSelector).val().replace(regex2, ""));
+                $(exampleNamesSelector).val($(exampleNamesSelector).val().replace(regex2, ""));
             }
             // Get string and strip every character except "," (comma) and numerics!
             var regex3 = new RegExp("[^0-9" + e.data.dividingSymbol + "]");
-            var temp_string = $(examplegradesSelector).val().replace(regex3, "");
-            var temp_array = temp_string.split(e.data.dividingSymbol);
-            for (i = 0; i < temp_array.length; i++) {
-                if (temp_array[i].replace(/[^\d]/g, "") !== "") {
-                    gradesum += parseInt(temp_array[i].replace(/[^\d]/g, ""));
+            var tempString = $(exampleGradesSelector).val().replace(regex3, "");
+            var tempArray = tempString.split(e.data.dividingSymbol);
+            for (i = 0; i < tempArray.length; i++) {
+                if (tempArray[i].replace(/[^\d]/g, "") !== "") {
+                    gradeSum += parseInt(tempArray[i].replace(/[^\d]/g, ""));
                 }
             }
         } else {
             // Calculate gradesum using example-amount (each example counts 1 point)!
-            gradesum = $(examplecountSelector).val();
+            gradeSum = $(exampleCountSelector).val();
         }
 
-        if (!$(flexiblenamingSelector).prop('checked')) {
-            if ($(pointSelector).val() % gradesum === 0) {
+        if (!$(flexibleNamingSelector).prop('checked')) {
+            if ($(pointSelector).val() % gradeSum === 0) {
                 // Grade is integral multiple of gradesum (= examplecount) so everything's fine!
                 return true;
             }
         }
-        if ((gradesum <= 100) && (gradesum > 0)) {
+        if ((gradeSum <= 100) && (gradeSum > 0)) {
             $(typeSelector).val('point');
-            $(pointSelector).val(gradesum);
-        } else if (gradesum < 0) {
+            $(pointSelector).val(gradeSum);
+        } else if (gradeSum < 0) {
             $(typeSelector).val('scale');
         }
 
@@ -104,13 +104,14 @@ define(['jquery', 'core/log'], function($, log) {
         if ((e !== null) && (e.which <= 46)) { // That means: no written character!
             return true;
         }
-        var examplegrades_selector = '#examplegrades';
-        if (!$(examplegrades_selector).length) {
+        var exampleGradesSelector = '#examplegrades';
+        if (!$(exampleGradesSelector).length) {
             // Compatibility to pre 2.2 and current needed ID - TODO: do we need this anymore?
-            examplegrades_selector = '#id_examplegrades';
+            exampleGradesSelector = '#id_examplegrades';
         }
+
         var regex = new RegExp("[^0-9" + e.data.dividingSymbol + "]", "g");
-        $(examplegrades_selector).val($(examplegrades_selector).val().replace(regex, ""));
+        $(exampleGradesSelector).val($(exampleGradesSelector).val().replace(regex, ""));
         return true;
     };
 
@@ -124,20 +125,20 @@ define(['jquery', 'core/log'], function($, log) {
 
         log.info('Initialize settings JS', 'checkmark');
 
-        var type_selector = '#id_grade_modgrade_type';
-        var flexiblenaming_selector = "#id_flexiblenaming";
-        var examplegrades_selector = "#id_examplegrades";
-        var examplenames_selector = "#id_examplenames";
-        var examplecount_selector = "#id_examplecount";
-        $(flexiblenaming_selector).click(instance, instance.updateSettings);
-        $(type_selector).change(instance, instance.updateSettings);
-        $(examplegrades_selector).change(instance, instance.updateSettings);
-        $(examplenames_selector).change(instance, instance.updateSettings);
-        $(examplecount_selector).change(instance, instance.updateSettings);
-        $(examplegrades_selector).blur(instance, instance.updateSettings);
-        $(examplenames_selector).blur(instance, instance.updateSettings);
-        $(examplecount_selector).blur(instance, instance.updateSettings);
-        $(examplegrades_selector).keyup(instance, instance.stripper);
+        var typeSelector = '#id_grade_modgrade_type';
+        var flexibleNamingSelector = "#id_flexiblenaming";
+        var exampleGradesSelector = "#id_examplegrades";
+        var exampleNamesSelector = "#id_examplenames";
+        var exampleCountSelector = "#id_examplecount";
+        $(flexibleNamingSelector).click(instance, instance.updateSettings);
+        $(typeSelector).change(instance, instance.updateSettings);
+        $(exampleGradesSelector).change(instance, instance.updateSettings);
+        $(exampleNamesSelector).change(instance, instance.updateSettings);
+        $(exampleCountSelector).change(instance, instance.updateSettings);
+        $(exampleGradesSelector).blur(instance, instance.updateSettings);
+        $(exampleNamesSelector).blur(instance, instance.updateSettings);
+        $(exampleCountSelector).blur(instance, instance.updateSettings);
+        $(exampleGradesSelector).keyup(instance, instance.stripper);
 
         if ($("input[name=allready_submit]").val() === 'no') {
             instance.updateSettings({data: instance});

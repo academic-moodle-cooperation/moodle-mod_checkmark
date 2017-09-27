@@ -256,7 +256,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->addElement('hidden', 'course', optional_param('course', 0, PARAM_INT));
 
         $params = new stdClass();
-        $params->dividing_symbol = checkmark::DELIMITER;
+        $params->dividingSymbol = checkmark::DELIMITER;
         $PAGE->requires->js_call_amd('mod_checkmark/settings', 'initializer', array($params));
 
         $mform->addElement('select', 'resubmit', get_string('allowresubmit', 'checkmark'), $ynoptions);
