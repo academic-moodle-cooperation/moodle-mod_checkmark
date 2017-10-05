@@ -432,6 +432,9 @@ class submissionstable extends \table_sql {
         }
         $where .= "u.id ".$sqluserids;
         $groupby = " u.id, s.id, f.id, ".$ufields." ".$useridentityfields;
+        if ($table->groupmode != NOGROUPS) {
+            $groupby .= ", grpq.groups";
+        }
 
         $table->set_sql($fields, $from, $where, $params, $groupby);
         $table->set_count_sql("SELECT COUNT(u.id) FROM ".$from." WHERE ".$where, $params);

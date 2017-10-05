@@ -13,15 +13,31 @@ Feature: In a checkmark I want to grade selected submissions.
       | username | firstname | lastname | email                |
       | teacher1 | Teacher   | 1        | teacher1@example.com |
       | student1 | Student   | 1        | student1@example.com |
+      | student2 | Student   | 2        | student2@example.com |
+      | student3 | Student   | 3        | student3@example.com |
+      | student4 | Student   | 4        | student4@example.com |
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
+      | student2 | C1     | student        |
+      | student3 | C1     | student        |
+      | student4 | C1     | student        |
+    And the following "groups" exist:
+      | name    | course | idnumber |
+      | Group 1 | C1     | G1       |
+      | Group 2 | C1     | G2       |
+    And the following "group members" exist:
+      | user     | group |
+      | student1 | G1    |
+      | student2 | G1    |
+      | student3 | G2    |
+      | student4 | G2    |
     # We do not need to manually create the checkmark instance again,
     # this has been testet in checkmark_adding.feature, use generators!
     And the following "activities" exist:
-      | activity  | course | idnumber | name        | intro         |
-      | checkmark | C1     | CM1      | Checkmark 1 | Description 1 |
+      | activity  | course | idnumber | name        | intro         | groupmode |
+      | checkmark | C1     | CM1      | Checkmark 1 | Description 1 | 1         |
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
