@@ -165,7 +165,7 @@ function checkmark_update_instance($checkmark) {
          */
         checkmark_update_examples($checkmark);
     }
-    checkmark_refresh_events($checkmark->course, $checkmark->id);
+    checkmark_refresh_events($checkmark->course, $checkmark);
 
     if ($checkmark->allready_submit != 'yes') {
         /* We won't change the grades after someone submitted already - otherwise he/she would
@@ -890,35 +890,44 @@ function checkmark_scale_used_anywhere($scaleid) {
  * only checkmark events belonging to the course specified are checked.
  * This function is used, in its new format, by restore_refresh_events()
  *
- * @param int $course (optional) If zero then all checkmarks for all courses are covered
- * @param int $checkmarkid (optional) If zero then only course filter is active!
- * @return bool Always returns true
+ * TODO this callback changed in 3.3.2 and we quick fixed it but should take a look at at for 3.4!
+ *
+ * @param int $courseid
+ * @param int|stdClass $instance Assign module instance or ID.
+ * @param int|stdClass $cm Course module object or ID (not used in this module).
+ * @return bool
  */
-function checkmark_refresh_events($course = 0, $checkmarkid = 0) {
+function checkmark_refresh_events($courseid = 0, $instance = null, $cm = null) {
     global $DB, $CFG;
     require_once($CFG->dirroot.'/calendar/lib.php');
 
-    if ($checkmarkid == 0) {
-        if ($course == 0) {
-            $cond = array();
-        } else {
-            $cond = array('course' => $course);
+    // If we have instance information then we can just update the one event instead of updating all events.
+    if (isset($instance)) {
+        if (!is_object($instance)) {
+            $instance = $DB->get_record('checkmark', array('id' => $instance), '*', MUST_EXIST);
         }
+        $checkmarks = [$instance->id => $instance];
     } else {
-        if ($course == 0) {
-            $cond = array('id' => $checkmarkid);
-        } else {
-            $cond = array('id' => $checkmarkid, 'course' => $course);
-        }
-    }
+        $cond = [];
 
-    if (!$checkmarks = $DB->get_records('checkmark', $cond)) {
-        return true;
+        if ($courseid) {
+            // Make sure that the course id is numeric.
+            if (!is_numeric($courseid)) {
+                return false;
+            }
+            $cond['course'] = $courseid;
+        }
+
+        if (!$checkmarks = $DB->get_records('checkmark', $cond)) {
+            return true;
+        }
     }
 
     if ($checkmarks) {
         foreach ($checkmarks as $checkmark) {
-            $cm = get_coursemodule_from_instance('checkmark', $checkmark->id);
+            if (count($checkmarks) > 1 || !isset($cm) || !is_object($cm)) {
+                $cm = get_coursemodule_from_instance('checkmark', $checkmark->id);
+            }
 
             // Start with creating the event.
             $event = new stdClass();

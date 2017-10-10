@@ -155,7 +155,7 @@ class restore_checkmark_activity_task extends restore_activity_task {
                     // We can fix this event!
                     $event->instance = $checkmarkid;
                     $event->eventtype = CHECKMARK_EVENT_TYPE_DUE;
-                    $event->type = EVENT_TYPE_ACTION;
+                    $event->type = CALENDAR_EVENT_TYPE_ACTION;
                     $event->timesort = $checkmark->timedue;
                     $calendarevent = calendar_event::load($event->id);
                     $calendarevent->update($event, false);
