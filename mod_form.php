@@ -390,28 +390,37 @@ class mod_checkmark_mod_form extends moodleform_mod {
             $grades = '';
             $examplestart = '';
             $examplecount = count($examples);
+
             foreach ($examples as $example) {
-                if (($oldname == null) && ($oldgrade == null)) {
-                    $oldname = $example->shortname;
-                    $oldgrade = $example->grade;
-                    $names = $example->shortname;
-                    $grades = $example->grade;
-                    $examplestart = $example->shortname;
+                $names .= checkmark::DELIMITER . $example->shortname;
+                $grades .= checkmark::DELIMITER . $example->grade;
+                // First we check the obvious...
+                if ($flexiblenaming || preg_match('*[^0-9]*', $example->shortname)) {
+                    $flexiblenaming = true;
                 } else {
-                    if ((intval($oldname) + 1 != intval($example->shortname))
-                        || (intval($oldgrade) != intval($example->grade))) {
+                    if (($oldname == null) && ($oldgrade == null)) {
+                        $oldname = $example->shortname;
+                        $oldgrade = $example->grade;
+                        $names = $example->shortname;
+                        $grades = $example->grade;
+                        $examplestart = $example->shortname;
+                    } else {
+                        if ((intval($oldname) + 1 != intval($example->shortname))
+                            || (intval($oldgrade) != intval($example->grade))) {
                             $flexiblenaming = true;
+                        }
                     }
-                    $names .= checkmark::DELIMITER.$example->shortname;
-                    $grades .= checkmark::DELIMITER.$example->grade;
+                    $oldgrade = $example->grade;
+                    $oldname = $example->shortname;
                 }
-                $oldgrade = $example->grade;
-                $oldname = $example->shortname;
             }
+
             if ($flexiblenaming) {
                 $defaultvalues['examplegrades'] = $grades;
                 $defaultvalues['examplenames'] = $names;
                 $defaultvalues['flexiblenaming'] = true;
+                $defaultvalues['examplestart'] = get_config('checkmark', 'stdexamplestart');;
+                $defaultvalues['examplecount'] = get_config('checkmark', 'stdexamplecount');;
             } else {
                 $defaultvalues['flexiblenaming'] = false;
                 $defaultvalues['examplestart'] = $examplestart;
