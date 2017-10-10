@@ -1,5 +1,18 @@
 CHANGELOG
 =========
+3.3.3 (2017-10-10)
+------------------
+
+* [FIXED] #4750 missing field in GROUP BY causing PostgreSQL to raise error when groupmode is either VISIBLE or SEPARATE
+                see https://github.com/academic-moodle-cooperation/moodle-mod_checkmark/issues/18
+* [FIXED] #4752 fix algorithm used to recognise standard naming schemes to wrongly recognise "2/3 and 1/2", "3" as "2", "3"
+                see https://github.com/academic-moodle-cooperation/moodle-mod_checkmark/issues/19
+* [FIXED] #4753 fixed problems with checkmark_refresh_events() callback due to paramters having been changed
+                between Moodle 3.3.1 and 3.3.2
+* [CHANGED] #4767 Admins now have the ability to see the example preview even if thei're not enroled in the course
+* added some JSDoc comments
+
+
 3.3.2 (2017-09-27)
 ------------------
 
