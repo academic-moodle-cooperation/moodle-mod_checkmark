@@ -38,9 +38,11 @@ define(['jquery', 'core/log'], function($, log) {
         this.table = $('.usersubmissions table.submissions');
     };
 
-    /*
+    /**
      * updateSummary() updates the displayed summary during submission edit
-     * @return true if everything's allright (no error handling by now)
+     *
+     * @param e
+     * @return true if everything's alright (no error handling by now)
      */
     Checkboxcontroller.prototype.updateCheckboxes = function(e) {
         e.preventDefault();
@@ -71,12 +73,12 @@ define(['jquery', 'core/log'], function($, log) {
 
     var instance = new Checkboxcontroller();
 
-    /*
+    /**
      * initializer(config) prepares checkmark-data
      * and registers event-listeners for each checkbox
      *
-     * @param config contains object with all examples
-     * @return    true if everything's ok (no error-handling implemented)
+     * @param params contains table and ID selectors
+     * @return true if everything's ok (no error-handling implemented)
      */
     instance.initializer = function(params) {
         log.debug("Init checkboxcontroller (" + params.id + ")!\nfor table " + params.table, 'checkmark');
