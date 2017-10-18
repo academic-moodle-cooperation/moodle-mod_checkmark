@@ -312,7 +312,7 @@ function checkmark_update_examples($checkmark) {
         foreach (array_keys($names) as $key) {
             if ($next = current($examples)) {
                 // If there's an old example to update, we reuse them!
-                $next->name = $names[$key];
+                $next->name = html_entity_decode($names[$key]);
                 $next->grade = $grades[$key];
                 $DB->update_record('checkmark_examples', $next);
                 next($examples);
@@ -320,7 +320,7 @@ function checkmark_update_examples($checkmark) {
                 // Or we create new ones if there aren't any old ones left!
                 $example = new stdClass();
                 $example->checkmarkid = $checkmark->instance;
-                $example->name = $names[$key];
+                $example->name = html_entity_decode($names[$key]);
                 $example->grade = $grades[$key];
                 $DB->insert_record('checkmark_examples', $example);
                 next($examples);
