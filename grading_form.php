@@ -126,7 +126,6 @@ class mod_checkmark_grading_form extends moodleform {
             // Visible elements!
             $mform->addElement('editor', 'feedback_editor', get_string('feedback', 'checkmark').':', null,
                                $this->get_editor_options() );
-            $mform->setType('feedback_editor', PARAM_RAW); // To be cleaned before display!
             $mform->setDefault('feedback_editor', $this->_customdata->feedback);
         }
 
@@ -288,7 +287,6 @@ class mod_checkmark_grading_form extends moodleform {
 
                 $mform->addElement('editor', 'presentationfeedback_editor', get_string('presentationfeedback', 'checkmark').':',
                                    null, $this->get_editor_options($this->_customdata->cm, 'presentationfeedback') );
-                $mform->setType('presentationfeedback_editor', PARAM_RAW); // To be cleaned before display!
                 $mform->setDefault('presentationfeedback_editor', $presentationfeedback);
             }
         }
@@ -318,7 +316,6 @@ class mod_checkmark_grading_form extends moodleform {
             $mform->addGroup($buttonarray2, 'grading_buttonar2', '', array(' '), false);
         }
         $mform->closeHeaderBefore('grading_buttonar');
-        $mform->setType('grading_buttonar', PARAM_RAW);
     }
 
     /**

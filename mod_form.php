@@ -273,7 +273,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         }
         $mform->addElement('text', 'examplecount', get_string('numberofexamples', 'checkmark'), array('id' => 'id_examplecount'));
         // We're going to clean them by ourselves...
-        $mform->setType('examplecount', PARAM_RAW);
+        $mform->setType('examplecount', PARAM_INT);
         $mform->addHelpButton('examplecount', 'numberofexamples', 'checkmark');
         $mform->disabledIf('examplecount', 'flexiblenaming', 'checked');
         $stdexamplecount = get_config('checkmark', 'stdexamplecount');
@@ -281,7 +281,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         $mform->addElement('text', 'examplestart', get_string('firstexamplenumber', 'checkmark'));
         // We're going to clean them by ourselves...
-        $mform->setType('examplestart', PARAM_RAW);
+        $mform->setType('examplestart', PARAM_INT);
         $mform->addHelpButton('examplestart', 'firstexamplenumber', 'checkmark');
         $mform->disabledIf('examplestart', 'flexiblenaming', 'checked');
         $stdexamplestart = get_config('checkmark', 'stdexamplestart');
@@ -302,7 +302,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         $mform->addElement('text', 'examplenames', get_string('examplenames', 'checkmark').' ('.checkmark::DELIMITER.')');
         // We clean these by ourselves!
-        $mform->setType('examplenames', PARAM_RAW);
+        $mform->setType('examplenames', PARAM_TEXT);
         $mform->addHelpButton('examplenames', 'examplenames', 'checkmark');
         $stdnames = get_config('checkmark', 'stdnames');
         $mform->setDefault('examplenames', $stdnames);
@@ -313,7 +313,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->addElement('text', 'examplegrades', get_string('examplegrades', 'checkmark').' ('.checkmark::DELIMITER.')',
                            array('id' => 'id_examplegrades'));
         // We clean these by ourselves!
-        $mform->setType('examplegrades', PARAM_RAW);
+        $mform->setType('examplegrades', PARAM_SEQUENCE);
         $mform->addHelpButton('examplegrades', 'examplegrades', 'checkmark');
         $stdgrades = get_config('checkmark', 'stdgrades');
         $mform->setDefault('examplegrades', $stdgrades);
