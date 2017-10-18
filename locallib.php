@@ -1167,8 +1167,7 @@ class checkmark {
                 $a = new stdClass();
                 $a->gradecount = count($grades);
                 $a->namecount  = count($names);
-                $errors['examplegrades'] = get_string('count_individuals_mismatch', 'checkmark',
-                                                      $a);
+                $errors['examplegrades'] = get_string('count_individuals_mismatch', 'checkmark', $a);
                 $errors['examplenames'] = get_string('count_individuals_mismatch', 'checkmark', $a);
             }
             /*
