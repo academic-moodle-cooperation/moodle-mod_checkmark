@@ -2367,7 +2367,7 @@ class checkmark {
 
         $coursecontext = context_course::instance($course->id);
         if (has_capability('gradereport/grader:view', $coursecontext)
-            && has_capability('moodle/grade:viewall', $coursecontext)) {
+                && has_capability('moodle/grade:viewall', $coursecontext)) {
             $linkhref = $CFG->wwwroot.'/grade/report/grader/index.php?id='.$course->id;
             $link = html_writer::tag('a', get_string('seeallcoursegrades', 'grades'),
                                      array('href' => $linkhref));
@@ -2738,7 +2738,7 @@ class checkmark {
      * Finaly print the submissions!
      */
     public function submissions_print() {
-        global $CFG, $DB, $DB, $PAGE;
+        global $CFG, $PAGE;
         require_once($CFG->libdir.'/gradelib.php');
 
         $filters = array(self::FILTER_ALL             => get_string('all'),
