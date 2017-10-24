@@ -64,6 +64,17 @@ class MTablePDF extends \pdf {
     /** Output as tab separated CSV */
     const OUTPUT_FORMAT_CSV_TAB = 5;
 
+    /** Disable font-stretching */
+    const STRETCH_DISABLED = 0;
+    /** Horizontal scaling if text is larger than cell */
+    const STRETCH_SCALING = 1;
+    /** Horizontal scaling is always applied */
+    const STRETCH_FORCED_SCALING = 2;
+    /** Horizontal spacing if text is larger than cell */
+    const STRETCH_SPACING = 3;
+    /** Horizontal spacing is always applied */
+    const STRETCH_FORCED_SPACING = 4;
+
     /** @var $outputformat which format to export into */
     private $outputformat = self::OUTPUT_FORMAT_PDF;
 
@@ -108,8 +119,8 @@ class MTablePDF extends \pdf {
         $this->columnformat = array();
         for ($i = 0; $i < count($columnwidths); $i++) {
             $this->columnformat[] = array();
-            $this->columnformat[$i][] = array("fill" => 0, "align" => "L");
-            $this->columnformat[$i][] = array("fill" => 1, "align" => "L");
+            $this->columnformat[$i][] = array("fill" => 0, "align" => "L", "stretch" => self::STRETCH_DISABLED);
+            $this->columnformat[$i][] = array("fill" => 1, "align" => "L", "stretch" => self::STRETCH_DISABLED);
         }
     }
 
@@ -124,7 +135,12 @@ class MTablePDF extends \pdf {
                 "column count (" . count($this->columnwidths) . ")");
         }
 
-        $this->columnformat = array_merge($this->columnformat, $columnformat);
+        $columnformat = array_values($columnformat);
+
+        foreach ($this->columnformat as $id => &$cur) {
+            $cur[0] = array_merge($cur[0], $columnformat[$id]);
+            $cur[1] = array_merge($cur[1], $columnformat[$id]);
+        }
     }
 
     /**
@@ -510,8 +526,14 @@ class MTablePDF extends \pdf {
             $maxnumlines = 1;
 
             foreach ($row as $key => $value) {
+                $cf = $this->columnformat[$key];
+                $cf = $cf[$rownum % count($cf)];
                 if ($value['rowspan'] == 0 && !is_null($value['data'])) {
-                    $this->data[$rownum][$key]['numlines'] = $this->getNumLines($value['data'], $w[$key]);
+                    if ($cf['stretch'] != self::STRETCH_DISABLED) {
+                        $this->data[$rownum][$key]['numlines'] = 1;
+                    } else {
+                        $this->data[$rownum][$key]['numlines'] = $this->getNumLines($value['data'], $w[$key]);
+                    }
                     $maxnumlines = max($maxnumlines, $this->data[$rownum][$key]['numlines']);
                 }
             }
@@ -522,8 +544,14 @@ class MTablePDF extends \pdf {
         // Add heights to rows for fields wich are rowspanned but still need more space.
         foreach ($this->data as $rownum => $row) {
             foreach ($row as $key => $value) {
+                $cf = $this->columnformat[$key];
+                $cf = $cf[$rownum % count($cf)];
                 if ($value['rowspan'] != 0 && !is_null($value['data'])) {
-                    $lineheight = $this->getNumLines($value['data'], $w[$key]);
+                    if ($cf['stretch'] != self::STRETCH_DISABLED) {
+                        $lineheight = 1;
+                    } else {
+                        $lineheight = $this->getNumLines($value['data'], $w[$key]);
+                    }
 
                     $lines = 0;
                     for ($i = $rownum; $i <= $rownum + $value['rowspan']; $i++) {
@@ -676,8 +704,14 @@ class MTablePDF extends \pdf {
                         $value['data'] = $debuginfo . substr($value['data'], 0, strlen($value['data']) - (strlen($debuginfo)));
                     }
 
-                    $pdf->MultiCell($w[$key], $numlines * $cellsize, $value['data'], 'LR'.$bottomborder,
-                            $cf['align'], $cf['fill'], 0, '', '', true, '0');
+                    if ($cf['stretch'] != self::STRETCH_DISABLED) {
+                        $pdf->Cell($w[$key], $numlines * $cellsize, $value['data'], 'LR'.$bottomborder, 0, $cf['align'],
+                                $cf['fill'], '', $cf['stretch'], false, 'T', 'M');
+                    } else {
+                        $pdf->MultiCell($w[$key], $numlines * $cellsize, $value['data'], 'LR'.$bottomborder,
+                                $cf['align'], $cf['fill'], 0);
+                    }
+
 
                 } else if ($rowspans[$key] > 0) {
                     if ($debug) {

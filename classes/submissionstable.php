@@ -487,6 +487,7 @@ class submissionstable extends \table_sql {
 
         $table->sumabs     = get_user_preferences('checkmark_sumabs', 1);
         $table->sumrel     = get_user_preferences('checkmark_sumrel', 1);
+        $forcesinglelinenames = get_user_preferences('checkmark_forcesinglelinenames', 0);
         $table->quickgrade = 0;
         $table->filter = $table;
         $table->defaultselectstate = true; // Select all checkboxes by default!
@@ -496,6 +497,9 @@ class submissionstable extends \table_sql {
         $tablecolumns = array('selection', 'fullname');
         $table->cellwidth = array(array('mode' => 'Fixed', 'value' => '25'));
         $table->columnformat = array('fullname' => array('align' => 'L'));
+        if ($forcesinglelinenames) {
+            $table->columnformat['fullname']['stretch'] = MTablePDF::STRETCH_SCALING;
+        }
         $helpicons = array(null, null);
         $table->add_colgroup(1, 'sel');
 

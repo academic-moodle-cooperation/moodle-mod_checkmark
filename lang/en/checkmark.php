@@ -267,6 +267,9 @@ $string['failedupdatefeedback'] = 'Failed to update submission feedback for user
 $string['feedback'] = 'Feedback';
 $string['feedbackfromteacher'] = 'Feedback from the {$a}';
 $string['feedbackupdated'] = 'Submissions feedback updated for {$a} people';
+$string['forcesinglelinenames'] = 'Force single-line names';
+$string['forcesinglelinenames_help'] = '<p>Enforces the name to be written to the PDF in a single line.</p>
+<p><i>Beware:</i> if there are too many columns or the name is too long it will be distorted and can become unreadable. Hide some unimportant columns to have more room for the name if this happens.</p>';
 $string['graded'] = 'Graded';
 $string['guestnosubmit'] = 'Sorry, guests are not allowed to submit a checkmark. You have to log in/ register before you can submit your answer.';
 $string['guestnoupload'] = 'Sorry, guests are not allowed to upload';

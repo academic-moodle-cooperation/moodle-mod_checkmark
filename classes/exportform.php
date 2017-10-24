@@ -142,6 +142,10 @@ class exportform extends \moodleform {
         $mform->addHelpButton('printheader', 'pdfprintheader', 'checkmark');
         $mform->disabledIf('printheader', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
 
+        $mform->addElement('checkbox', 'forcesinglelinenames', get_string('forcesinglelinenames', 'checkmark'));
+        $mform->addHelpButton('forcesinglelinenames', 'forcesinglelinenames', 'checkmark');
+        $mform->disabledIf('forcesinglelinenames', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
+
         $mform->addElement('submit', 'submittoprint', get_string('strprint', 'checkmark'));
 
         $mform->addElement('header', 'data_preview_header', get_string('data_preview', 'checkmark'));

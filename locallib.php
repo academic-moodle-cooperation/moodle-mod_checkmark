@@ -2570,7 +2570,7 @@ class checkmark {
      * Handles all print preference setting (if submitted) and returns the current values!
      *
      * @return array print preferences ($filter, $sumabs, $sumrel, $format, $printperpage, $printoptimum, $textsize,
-     *                                  $pageorientation, $printheader)
+     *                                  $pageorientation, $printheader, $forcesinglelinenames)
      */
     public function print_preferences() {
         $updatepref = optional_param('updatepref', 0, PARAM_INT);
@@ -2594,6 +2594,8 @@ class checkmark {
                 set_user_preference('checkmark_pageorientation', $pageorientation);
                 $printheader = optional_param('printheader', 0, PARAM_INT);
                 set_user_preference('checkmark_printheader', $printheader);
+                $forcesinglelinenames = optional_param('forcesinglelinenames', 0, PARAM_INT);
+                set_user_preference('checkmark_forcesinglelinenames', $forcesinglelinenames);
             }
         } else {
             $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
@@ -2613,6 +2615,7 @@ class checkmark {
             $textsize = get_user_preferences('checkmark_textsize', 0);
             $pageorientation = get_user_preferences('checkmark_pageorientation', \mod_checkmark\MTablePDF::LANDSCAPE);
             $printheader = get_user_preferences('checkmark_printheader', 1);
+            $forcesinglelinenames = get_user_preferences('checkmark_forcesinglelinenames', 0);
         }
 
         // Keep compatibility to old user preferences!
@@ -2622,7 +2625,8 @@ class checkmark {
             $pageorientation = \mod_checkmark\MTablePDF::LANDSCAPE;
         }
 
-        return array($filter, $sumabs, $sumrel, $format, $printperpage, $printoptimum, $textsize, $pageorientation, $printheader);
+        return array($filter, $sumabs, $sumrel, $format, $printperpage, $printoptimum, $textsize, $pageorientation, $printheader,
+            $forcesinglelinenames);
     }
 
     /**
@@ -2641,7 +2645,7 @@ class checkmark {
          * to request user_preference updates!
          */
         list($filter, $sumabs, $sumrel, $format, $printperpage, $printoptimum, $textsize, $pageorientation,
-                $printheader) = $this->print_preferences();
+                $printheader, $forcesinglelinenames) = $this->print_preferences();
 
         // Trigger the event!
         \mod_checkmark\event\printpreview_viewed::printpreview($this->cm)->trigger();
@@ -2678,7 +2682,8 @@ class checkmark {
             'printoptimum' => $printoptimum,
             'textsize' => $textsize,
             'pageorientation' => $pageorientation,
-            'printheader' => $printheader
+            'printheader' => $printheader,
+            'forcesinglelinenames' => $forcesinglelinenames
         ];
         $mform->set_data($data);
 
@@ -2772,7 +2777,7 @@ class checkmark {
          * to request user_preference updates! We don't use $printoptimum here, it's implicit in $printperpage!
          */
         list($filter, $sumabs, $sumrel, $format, $printperpage, , $textsize, $orientation,
-                $printheader) = $this->print_preferences();
+                $printheader, $forcesinglelinenames) = $this->print_preferences();
 
         $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark',
                                         $this->checkmark->id);
@@ -2885,6 +2890,7 @@ class checkmark {
             $data['printheader']  = $printheader;
             $data['textsize']     = $textsize;
             $data['printperpage'] = $printperpage;
+            $data['forcesinglelinenames'] = $forcesinglelinenames;
         }
         \mod_checkmark\event\submissions_exported::exported($this->cm, $data)->trigger();
 

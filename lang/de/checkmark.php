@@ -267,6 +267,9 @@ $string['failedupdatefeedback'] = 'Aktualisierung der Rückmeldung für Teilnehm
 $string['feedback'] = 'Rückmeldung';
 $string['feedbackfromteacher'] = 'Rückmeldung von {$a}';
 $string['feedbackupdated'] = 'Abgaberückmeldung für {$a} Personen aktualisiert';
+$string['forcesinglelinenames'] = 'Erzwinge einzeilige Namen';
+$string['forcesinglelinenames_help'] = '<p>Erzwingt die Darstellung der Namen in einer Zeile im PDF.</p>
+<p><i>Achtung:</i> bei zu vielen Spalten oder wenn der Name zu lang ist, wird dieser gestaucht und kann unleserlich werden. Blenden Sie nicht benötigte Spalten aus um mehr Platz zu haben, falls dies passiert.</p>';
 $string['graded'] = 'Benotet';
 $string['guestnosubmit'] = 'Gästen ist es nicht erlaubt Kreuzerlübungen abzugeben. Sie müssen sich zuerst registrieren/einloggen, bevor Sie abgeben können.';
 $string['guestnoupload'] = 'Gästen ist es nicht erlaubt hochzuladen';
