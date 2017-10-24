@@ -211,6 +211,8 @@ class exportform extends \moodleform {
     /**
      * Validates current checkmark settings
      *
+     * TODO use this form correctly to enable usage of validation etc, currently we use only submitted values via optional_param()!
+     *
      * @param array $data data from the module form
      * @param array $files data about files transmitted by the module form
      * @return string[] array of error messages, to be displayed at the form fields
