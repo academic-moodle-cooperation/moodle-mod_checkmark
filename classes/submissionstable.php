@@ -147,7 +147,9 @@ class submissionstable extends \table_sql {
             } else {
                 $total = $grandtotal;
             }
-            $this->pagesize($pagesize, $total);
+            if ($pagesize) {
+                $this->pagesize($pagesize, $total);
+            }
         }
 
         // Fetch the attempts!

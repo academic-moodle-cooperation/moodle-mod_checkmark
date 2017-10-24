@@ -2331,11 +2331,11 @@ class checkmark {
 
         if (!empty($updatepref)) {
             $perpage = optional_param('perpage', 10, PARAM_INT);
-            $perpage = ($perpage <= 0) ? 10 : $perpage;
+            if ($perpage >= 0 && $perpage <= 100) {
+                set_user_preference('checkmark_perpage', $perpage);
+            }
             $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
-            set_user_preference('checkmark_perpage', $perpage);
-            set_user_preference('checkmark_quickgrade', optional_param('quickgrade', 0,
-                                                                       PARAM_BOOL));
+            set_user_preference('checkmark_quickgrade', optional_param('quickgrade', 0, PARAM_BOOL));
             set_user_preference('checkmark_filter', $filter);
         }
 
@@ -2344,6 +2344,11 @@ class checkmark {
          * from database!
          */
         $perpage    = get_user_preferences('checkmark_perpage', 10);
+        // Replace invalid values with our standard value!
+        if ($perpage < 0 || $perpage > 100) {
+            $perpage = 10;
+            set_user_preference('checkmark_perpage', $perpage);
+        }
         $quickgrade = get_user_preferences('checkmark_quickgrade', 0);
         $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
 
@@ -2393,9 +2398,9 @@ class checkmark {
         $mform->setDefault('page', $page);
 
         $table = \mod_checkmark\submissionstable::create_submissions_table($this->cm->id, $filter);
-        if ($DB->count_records_sql($table->countsql, $table->countparams)) {
+        if ($total = $DB->count_records_sql($table->countsql, $table->countparams)) {
             ob_start();
-            $table->out($perpage, true);
+            $table->out($total < $perpage ? $total : $perpage, true);
             $tablehtml = ob_get_contents();
             ob_end_clean();
             $mform->addElement('html', $tablehtml);
@@ -2498,7 +2503,13 @@ class checkmark {
 
         $mform->setDefault('filter', $filter);
 
-        $mform->addElement('text', 'perpage', get_string('pagesize', 'checkmark'), array('size' => 1));
+        $mform->addElement('select', 'perpage', get_string('pagesize', 'checkmark'), [
+            0 => get_string('all'),
+            10 => 10,
+            20 => 20,
+            50 => 50,
+            100 => 100
+        ]);
         $mform->setDefault('perpage', $perpage);
 
         $mform->addElement('checkbox', 'quickgrade', get_string('quickgrade', 'checkmark'));
