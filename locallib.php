@@ -2527,6 +2527,144 @@ class checkmark {
         return $output;
     }
 
+    public function quick_export($template = false) {
+        global $DB, $PAGE;
+
+        $classname = '\\mod_checkmark\\local\\exporttemplates\\'.$template;
+        if (!class_exists($classname)) {
+            return [[], [], [], [], []];
+        }
+
+        $filters = array(self::FILTER_ALL             => get_string('all'),
+            self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
+            self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
+        if ($this->checkmark->trackattendance) {
+            $filters[self::FILTER_ATTENDANT] = get_string('all_attendant', 'checkmark');
+            $filters[self::FILTER_ABSENT] = get_string('all_absent', 'checkmark');
+            $filters[self::FILTER_UNKNOWN] = get_string('all_unknown', 'checkmark');
+        }
+
+        $formats = array(\mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF        => 'PDF',
+            \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLSX       => 'XLSX',
+            \mod_checkmark\MTablePDF::OUTPUT_FORMAT_ODS        => 'ODS',
+            \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_COMMA  => 'CSV (;)',
+            \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_TAB    => 'CSV (tab)');
+
+        /*
+         * First we check to see if the form has just been submitted
+         * to request user_preference updates! We don't use $printoptimum here, it's implicit in $printperpage!
+         */
+        list($filter, , , $format, $printperpage, , , , , ) = $this->print_preferences();
+
+        $groupmode = optional_param('groupmode', false, PARAM_INT);
+        if ($groupmode === false) {
+            $groupmode = groups_get_activity_groupmode($this->cm);
+            $currentgroup = groups_get_activity_group($this->cm, true);
+        } else {
+            $currentgroup = optional_param('groupid', 0, PARAM_INT);
+        }
+
+        $usrlst = optional_param_array('selected', array(), PARAM_INT);
+
+        if (empty($usrlst)) {
+            redirect($PAGE->url, get_string('nousers', 'checkmark'), null, 'notifyproblem');
+            return;
+        }
+
+        $table = $classname::create_export_table($this->cm->id, $filter, $usrlst);
+
+        list($sumabs, $sumrel, $orientation, $textsize, $printheader, $forcesinglelinenames) = $classname::get_export_settings();
+
+        if ($DB->count_records_sql($table->countsql, $table->countparams)) {
+            list(, $tableheaders, $data, $columnformat, $cellwidth) = $table->get_data();
+        } else {
+            $tableheaders = [];
+            $data = [];
+            $columnformat = [];
+            $cellwidth = [];
+        }
+
+        $coursename = $this->course->fullname;
+        $timeavailable = $this->checkmark->timeavailable;
+        $checkmarkname = $this->checkmark->name;
+        $timedue = $this->checkmark->timedue;
+        $notactivestr = get_string('notactive', 'checkmark');
+        $viewname = $filters[$filter];
+
+        if ($groupmode != NOGROUPS) {
+            if ($currentgroup == "") {
+                $grpname = get_string('all', 'checkmark');
+            } else {
+                $grpname = groups_get_group_name($currentgroup);
+            }
+        } else {
+            $grpname = '-';
+        }
+
+        $pdf = new \mod_checkmark\MTablePDF($orientation, $cellwidth);
+
+        $timeavailablestr = !empty($timeavailable) ? userdate($timeavailable) : $notactivestr;
+        $pdf->setHeaderText(get_string('course').':', $coursename,
+            get_string('availabledate', 'checkmark').':', $timeavailablestr,
+            '', $viewname,
+            // Second header row!
+            get_string('strassignment', 'checkmark').':', $checkmarkname,
+            get_string('duedate', 'checkmark').':', !empty($timedue) ? userdate($timedue) : $notactivestr,
+            get_string('groups').':', $grpname);
+
+        $pdf->ShowHeaderFooter($printheader);
+        $pdf->SetFontSize($textsize);
+
+        if (is_number($printperpage) && $printperpage != 0) {
+            $pdf->setRowsperPage($printperpage);
+        }
+
+        // Data present?
+        if (count($data)) {
+            $pdf->setColumnFormat($columnformat);
+            $pdf->setTitles($tableheaders);
+            foreach ($data as $row) {
+                $pdf->addRow($row);
+            }
+        } else {
+            if ($filter == self::FILTER_REQUIRE_GRADING) {
+                $pdf->addRow(array('', get_string('norequiregrading', 'checkmark'), ''));
+                $pdf->setTitles(array(' ', ' ', ' '));
+            } else {
+                $pdf->addRow(array('', get_string('nosubmisson', 'checkmark'), ''));
+                $pdf->setTitles(array(' ', ' ', ' '));
+            }
+        }
+
+        $pdf->setOutputFormat($format);
+
+        $data = array(
+            'template'        => $template,
+            'groupmode'       => $groupmode,
+            'groupid'         => $currentgroup,
+            'selected'        => $usrlst,
+            'filter'          => $filter,
+            'filter_readable' => $filters[$filter],
+            'format'          => $format,
+            'format_readable' => $formats[$format],
+            'sumabs'          => $sumabs,
+            'sumrel'          => $sumrel,
+        );
+
+        if ($data['format'] == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
+            $data['orientation']  = $orientation;
+            $data['printheader']  = $printheader;
+            $data['textsize']     = $textsize;
+            $data['printperpage'] = $printperpage;
+            $data['forcesinglelinenames'] = $forcesinglelinenames;
+        }
+        \mod_checkmark\event\submissions_exported::exported($this->cm, $data)->trigger();
+
+        $pdf->generate($this->course->shortname.'-'.$this->checkmark->name.'-'.
+                get_string('exporttemplate_'.$template, 'checkmark'));
+        die();
+    }
+
     /**
      * Finaly print the submissions!
      */

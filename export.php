@@ -47,9 +47,13 @@ $checkmarkinstance = new checkmark($cm->id, $checkmark, $cm, $course);
 $mform = $checkmarkinstance->get_export_form();
 
 if ($fromform = $mform->get_data()) {
-    // See if we're going to export based on custom settings!
-    if (!empty($fromform->submittoprint)) {
-        $PAGE->set_pagelayout('popup'); // Remove navbars, etc!
+    // See if we're going to export based on a template!
+    if (!empty($fromform->template)) {
+        $templates = \mod_checkmark\exportform::get_templates();
+        if (in_array($fromform->template, $templates)) {
+            $checkmarkinstance->quick_export($fromform->template);
+        }
+    } else if (!empty($fromform->export)) {
         $checkmarkinstance->submissions_print();
     }
 }

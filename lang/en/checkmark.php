@@ -233,6 +233,7 @@ $string['comment'] = 'Comment';
 $string['configshowrecentsubmissions'] = 'Everyone can see notifications of submissions in recent activity reports.';
 $string['coursemisconf'] = 'Course is miss-configured';
 $string['currentgrade'] = 'Current grade in grade book';
+$string['custom_settings'] = 'custom settings';
 $string['cutoffdate'] = 'Cut-off date';
 $string['cutoffdate_help'] = 'If activated this marks the end of the submission period. After this date, no student will be able to submit. If disabled students are allowed to submit even after the due date.';
 $string['deleteallsubmissions'] = 'Delete all submissions';
@@ -263,6 +264,29 @@ $string['emptysubmission'] = 'You have not submitted anything yet';
 $string['enablenotification'] = 'Send notifications';
 $string['enablenotification_help'] = 'If enabled, students will be notified once their checkmark submissions (or corresponding presentations) are graded or their attendancy is marked.';
 $string['errornosubmissions'] = 'There are no submissions available to download';
+$string['export'] = 'export';
+$string['exporttemplates'] = 'Template';
+$string['exporttemplates_help'] = 'Quick export with predefined templates<br />
+<ul>
+    <li><strong>custom settings</strong><br />
+        no template is used, all settings have to be made manually</li>
+    <li><strong>Gradinglist simple:</strong><br />
+        portrait, small font, with header/footer, names printed in one line<br />
+        containing following columns: [fullname, examples, grade]</li>
+    <li><strong>Gradinglist extended:</strong><br />
+        landscape, small font, with header/footer, names printed in one line<br />
+        containing following columns: [fullname, idnumber, examples, checked, grade]</li>
+    <li><strong>Signaturelist simple:</strong><br />
+        portrait, small font, with header/footer, names printed in one line<br />
+        containing following columns: [fullname, examples, signature]</li>
+    <li><strong>Signaturelist extended:</strong><br />
+        landscape, small font, with header/footer, names printed in one line<br />
+        containing following columns: [fullname, idnumber, examples, checked, grade, signature]</li>
+</ul>';
+$string['exporttemplate_grades'] = 'Gradinglist simple';
+$string['exporttemplate_grades_extended'] = 'Gradinglist extended';
+$string['exporttemplate_signature'] = 'Signaturelist simple';
+$string['exporttemplate_signature_extended'] = 'Signaturelist extended';
 $string['failedupdatefeedback'] = 'Failed to update submission feedback for user {$a}';
 $string['feedback'] = 'Feedback';
 $string['feedbackfromteacher'] = 'Feedback from the {$a}';

@@ -233,6 +233,7 @@ $string['comment'] = 'Kommentar';
 $string['configshowrecentsubmissions'] = 'Jeder kann Benachrichtigungen über Abgaben in den letzen Aktivitäten sehen.';
 $string['coursemisconf'] = 'Kurs ist falsch konfiguriert';
 $string['currentgrade'] = 'Aktuelle Note im Gradebook';
+$string['custom_settings'] = 'benutzerdefinierte Einstellungen';
 $string['cutoffdate'] = 'Letzter Abgabetermin';
 $string['cutoffdate_help'] = 'Wenn aktiviert markiert dieses Datum das Ende der Abgabeperiode. Nach diesem Datum können Teilnehmer/innen nichts mehr abgeben. Wenn deaktivert können Teilnehmer/innen auch nach dem Abgabeende weiter Abgaben tätigen, welche als zu spät gekennzeichnet werden.';
 $string['deleteallsubmissions'] = 'Alle Abgaben löschen';
@@ -263,6 +264,29 @@ $string['emptysubmission'] = 'Sie haben noch nichts abgegeben.';
 $string['enablenotification'] = 'Sende Benachrichtigungen';
 $string['enablenotification_help'] = 'Wenn aktiviert, werden Teilnehmer/innen benachrichtigt, sobald ihre Abgaben (oder zugehörige Tafelleistungen) bewertet oder ihre Anwesenheit gesetzt wurde.';
 $string['errornosubmissions'] = 'Es sind keine Abgaben zum Download vorhanden';
+$string['export'] = 'exportieren';
+$string['exporttemplates'] = 'Vorlage';
+$string['exporttemplates_help'] = 'Schneller Export mit Vorlagen<br />
+<ul>
+    <li><strong>benutzerdefinierte Einstellungen</strong><br />
+        es wird kein Template verwendet, alle Einstellungen müssen manuell vorgenommen werden</li>
+    <li><strong>Bewertungsliste einfach</strong><br />
+        Hochformat, kleine Schrift, mit Kopf/Fußzeile, Namen einzeilig<br />
+        enthält folgende Spalten: [Nachname, Vorname, Beispiele, Bewertung]</li>
+    <li><strong>Bewertungsliste erweitert</strong><br />
+        Querformat, kleine Schrift, mit Kopf/Fußzeile, Namen einzeilig<br />
+        enthält folgende Spalten: [Nachname, Vorname, Matrikelnummer, Beispiele, Kreuzerl, Bewertung]</li>
+    <li><strong>Unterschriftenliste einfach</strong><br />
+        Hochformat, kleine Schrift, mit Kopf/Fußzeile, Namen einzeilig<br />
+        enthält folgende Spalten: [Nachname, Vorname, Beispiele, Unterschrift]</li>
+    <li><strong>Unterschriftenliste erweitert</strong><br />
+        Querformat, kleine Schrift, mit Kopf/Fußzeile, Namen einzeilig<br />
+        enthält folgende Spalten: [Nachname, Vorname, Matrikelnummer, Beispiele, Kreuzerl, Bewertung, Unterschrift]</li>
+</ul>';
+$string['exporttemplate_grades'] = 'Bewertungsliste einfach';
+$string['exporttemplate_grades_extended'] = 'Bewertungsliste erweitert';
+$string['exporttemplate_signature'] = 'Unterschriftenliste einfach';
+$string['exporttemplate_signature_extended'] = 'Unterschriftenliste erweitert';
 $string['failedupdatefeedback'] = 'Aktualisierung der Rückmeldung für Teilnehmer/in {$a} gescheitert';
 $string['feedback'] = 'Rückmeldung';
 $string['feedbackfromteacher'] = 'Rückmeldung von {$a}';

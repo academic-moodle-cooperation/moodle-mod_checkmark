@@ -51,6 +51,7 @@ class submissions_exported extends \core\event\base {
      * Create event object and return it.
      *
      * Data array needs this elements:
+     * -- template = (optional, only when used) template name that has been used
      * -- groupmode = groups_get_activity_groupmode($this->cm);
      * -- groupid = currentgroup = groups_get_activity_group($this->cm, true);
      * -- selected = optional_param_array('selected', array(), PARAM_INT);
@@ -88,13 +89,21 @@ class submissions_exported extends \core\event\base {
      */
     public function get_description() {
         if ($this->data['other']['groupmode'] != NOGROUPS) {
-                $group = ' for group with id \''.$this->data['other']['groupid'].'\'';
+            $group = ' for group with id \''.$this->data['other']['groupid'].'\'';
         } else {
             $group = '';
         }
 
-        return "The user with id '$this->userid' exported the submissions for '{$this->objecttable}' with the " .
-            "course module id '$this->contextinstanceid'".$group." as '".$this->data['other']['format_readable']."'.";
+        if (key_exists('template', $this->data['other'])) {
+            $templatestr = " using template '".
+                get_string('exporttemplate_'.$this->data['other']['template'], 'checkmark')."'";
+        } else {
+            $templatestr = '';
+        }
+
+        return "The user with id '$this->userid' exported the submissions for '{$this->objecttable}' with the ".
+            "course module id '$this->contextinstanceid'".$group.$templatestr." as '".
+            $this->data['other']['format_readable']."'.";
     }
 
     /**
@@ -113,14 +122,10 @@ class submissions_exported extends \core\event\base {
      */
     public function get_url() {
         $params = array('id' => $this->contextinstanceid,
-                        'tab' => 'printpreview',
                         'format' => $this->data['other']['format'],
                         'groupmode' => $this->data['other']['groupmode'],
                         'groupid' => $this->data['other']['groupid'],
-                        'datafilter' => $this->data['other']['filter'],
-                        'sumabs' => $this->data['other']['sumabs'],
-                        'sumrel' => $this->data['other']['sumrel'],
-                        'submittoprint' => true);
+                        'datafilter' => $this->data['other']['filter']);
         foreach ($this->data['other']['selected'] as $cur) {
             $params['selected['.$cur.']'] = $cur;
         }
@@ -130,7 +135,7 @@ class submissions_exported extends \core\event\base {
             $params['printperpage'] = $this->data['other']['printperpage'];
             $params['textsize'] = $this->data['other']['textsize'];
         }
-        return new \moodle_url("/mod/$this->objecttable/submissions.php", $params);
+        return new \moodle_url("/mod/$this->objecttable/export.php", $params);
     }
 
     /**
@@ -140,7 +145,7 @@ class submissions_exported extends \core\event\base {
      */
     protected function get_legacy_logdata() {
         return array($this->courseid, $this->objecttable, 'export '.$this->data['other']['format_readable'],
-                     "submissions.php?id=".$this->contextinstanceid."&groupid=".$this->data['other']['groupid'].
+                     "export.php?id=".$this->contextinstanceid."&groupid=".$this->data['other']['groupid'].
                      "&format=".$this->data['other']['format'], '', $this->contextinstanceid);
     }
 
@@ -207,10 +212,6 @@ class submissions_exported extends \core\event\base {
 
         if (!key_exists('sumabs', $this->data['other'])) {
             throw new \coding_exception('Summary (absolute) key is missing!');
-        }
-
-        if (!key_exists('sumrel', $this->data['other'])) {
-            throw new \coding_exception('Summary (relative) key is missing!');
         }
     }
 }

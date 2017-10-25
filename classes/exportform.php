@@ -96,6 +96,7 @@ class exportform extends \moodleform {
         $mform->addGroup($summarygrp, 'summarygrp', get_string('checksummary', 'checkmark'), ['<br />'], false);
 
         $mform->addElement('submit', 'submitdataview', get_string('strrefreshdata', 'checkmark'));
+
         $mform->addElement('header', 'print_settings_header', get_string('printsettingstitle', 'checkmark'));
         $mform->setExpanded('print_settings_header');
 
@@ -109,7 +110,13 @@ class exportform extends \moodleform {
         // Format?
         $mform->addElement('select', 'format', get_string('format', 'checkmark'), self::FORMATS);
 
-        $mform->addElement('static', 'pdf-settings', get_string('pdfsettings', 'checkmark'));
+        $templatenames = self::get_templates();
+        $templates = ['' => get_string('custom_settings', 'checkmark')];
+        foreach ($templatenames as $cur) {
+            $templates[$cur] = get_string('exporttemplate_'.$cur, 'checkmark');
+        }
+        $mform->addElement('select', 'template', get_string('exporttemplates', 'checkmark'), $templates);
+        $mform->addHelpButton('template', 'exporttemplates', 'checkmark');
 
         // How many submissions per page?
         $pppgroup = [
@@ -130,6 +137,7 @@ class exportform extends \moodleform {
         ];
         $mform->addElement('select', 'textsize', get_string('pdftextsize', 'checkmark'), $textsizes);
         $mform->disabledIf('textsize', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->disabledIf('textsize', 'template', 'neq', '');
 
         $pageorientations = [
             MTablePDF::LANDSCAPE => get_string('strlandscape', 'checkmark'),
@@ -137,16 +145,19 @@ class exportform extends \moodleform {
         ];
         $mform->addElement('select', 'pageorientation', get_string('pdfpageorientation', 'checkmark'), $pageorientations);
         $mform->disabledIf('pageorientation', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->disabledIf('pageorientation', 'template', 'neq', '');
 
         $mform->addElement('checkbox', 'printheader', get_string('pdfprintheader', 'checkmark'));
         $mform->addHelpButton('printheader', 'pdfprintheader', 'checkmark');
         $mform->disabledIf('printheader', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->disabledIf('printheader', 'template', 'neq', '');
 
         $mform->addElement('checkbox', 'forcesinglelinenames', get_string('forcesinglelinenames', 'checkmark'));
         $mform->addHelpButton('forcesinglelinenames', 'forcesinglelinenames', 'checkmark');
         $mform->disabledIf('forcesinglelinenames', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->disabledIf('forcesinglelinenames', 'template', 'neq', '');
 
-        $mform->addElement('submit', 'submittoprint', get_string('strprint', 'checkmark'));
+        $mform->addElement('submit', 'export', get_string('export', 'checkmark'));
 
         $mform->addElement('header', 'data_preview_header', get_string('data_preview', 'checkmark'));
         $mform->addHelpButton('data_preview_header', 'data_preview', 'checkmark');
@@ -205,12 +216,37 @@ class exportform extends \moodleform {
 
         if (count($groupsmenu) == 1) {
             $groupname = reset($groupsmenu);
-            $mform->addElement('static', 'selectgroup', $grouplabel, $groupname);
+            $mform->addElement('static', 'group', $grouplabel, $groupname);
         } else {
-            $mform->addElement('select', 'selectgroup', $grouplabel, $groupsmenu);
-            $mform->setDefault('selectgroup', $activegroup);
+            $mform->addElement('select', 'group', $grouplabel, $groupsmenu);
+            $mform->setDefault('group', $activegroup);
         }
     }
+
+    /**
+     * Returns the available export templates
+     *
+     * @return string[] available template-names
+     */
+    public static function get_templates() {
+        global $CFG;
+
+        $dir = scandir($CFG->dirroot.'/mod/checkmark/classes/local/exporttemplates');
+        $templates = [];
+        foreach ($dir as $cur) {
+            if (in_array($cur, ['.', '..'])) {
+                continue;
+            }
+            $cur = str_replace('.php', '', $cur);
+            $classname = '\\mod_checkmark\\local\\exporttemplates\\'.$cur;
+            if (class_exists($classname)) {
+                $templates[] = $cur;
+            }
+        }
+
+        return $templates;
+    }
+
 
     /**
      * Validates current checkmark settings
