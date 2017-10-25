@@ -77,6 +77,24 @@ class submissionstable extends \table_sql {
      */
     private $prefs = array();
 
+    /** @var array */
+    protected $cellwidth = [];
+
+    /** @var array */
+    protected $columnformat = [];
+
+    /** @var int */
+    protected $groupmode = null;
+
+    /** @var int */
+    protected $currentgroup = null;
+
+    /** @var \stdClass */
+    protected $gradinginfo = null;
+
+    /** @var bool */
+    protected $usesoutcomes = null;
+
     /**
      * constructor
      * @param string $uniqueid a string identifying this table.Used as a key in
@@ -185,7 +203,9 @@ class submissionstable extends \table_sql {
     public function get_data() {
         global $SESSION;
 
-        $this->setup();
+        if (!$this->setup) {
+            $this->setup();
+        }
 
         // We need to access (read only) the collapsed columns!
         if ($this->is_persistent()) {
@@ -450,8 +470,6 @@ class submissionstable extends \table_sql {
             $table->presentationgrademenu = make_grades_menu($table->checkmark->checkmark->presentationgrade);
         }
 
-        $table->setup();
-
         return $table;
     }
 
@@ -489,7 +507,7 @@ class submissionstable extends \table_sql {
         $table->sumrel     = get_user_preferences('checkmark_sumrel', 1);
         $forcesinglelinenames = get_user_preferences('checkmark_forcesinglelinenames', 0);
         $table->quickgrade = 0;
-        $table->filter = $table;
+        $table->filter = $filter;
         $table->defaultselectstate = true; // Select all checkboxes by default!
 
         // Adapt table for export view (columns, etc.)!
@@ -507,7 +525,7 @@ class submissionstable extends \table_sql {
         foreach ($useridentity as $cur) {
             $tableheaders[] = ($cur == 'phone1') ? get_string('phone') : get_string($cur);
             $tablecolumns[] = $cur;
-            $table->cellwidth[] = array('mode' => 'Relativ', 'value' => '20');
+            $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
             $table->columnformat[$cur] = array('align' => 'L');
             $helpicons[] = null;
         }
@@ -515,7 +533,7 @@ class submissionstable extends \table_sql {
         if ($table->groupmode != NOGROUPS) {
             $tableheaders[] = get_string('group');
             $tablecolumns[] = 'groups';
-            $table->cellwidth[] = array('mode' => 'Relativ', 'value' => '20');
+            $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
             $table->columnformat['groups'] = array('align' => 'L');
             $helpicons[] = null;
             $table->add_colgroup(1, 'group');
@@ -558,14 +576,14 @@ class submissionstable extends \table_sql {
 
         $tableheaders[] = get_string('comment', 'checkmark');
         $tablecolumns[] = 'feedback';
-        $table->cellwidth[] = array('mode' => 'Relativ', 'value' => '50');
+        $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '50');
         $table->columnformat['feedback'] = array('align' => 'L');
         $helpicons[] = null;
 
         if ($table->usesoutcomes) {
             $tableheaders[] = get_string('outcome', 'grades');
             $tablecolumns[] = 'outcome';
-            $table->cellwidth[] = array('mode' => 'Relativ', 'value' => '50');
+            $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '50');
             $table->columnformat['outcome'] = array('align' => 'L');
             $helpicons[] = null;
             $table->add_colgroup(3, 'feedback outcomes');
@@ -722,8 +740,6 @@ class submissionstable extends \table_sql {
 
         $table->gradinginfo = grade_get_grades($table->checkmark->course->id, 'mod', 'checkmark', $table->checkmark->checkmark->id,
                                                $users);
-
-        $table->setup();
 
         return $table;
     }
@@ -1133,13 +1149,18 @@ class submissionstable extends \table_sql {
      */
     public function col_timesubmitted($values) {
         $late = 0;
+        if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+            $timeformat = get_string('strftimedatetimeshort');
+        } else {
+            $timeformat = get_string('strftimedatetime');
+        }
         // Prints student answer and student modified date!
         if ($values->timesubmitted > 0) {
             if ($this->showsubmission) {
                 $content = $this->checkmark->print_student_answer($values->id).userdate($values->timesubmitted,
-                                                                                        get_string('strftimedatetime'));
+                                                                                        $timeformat);
             } else {
-                $content = userdate($values->timesubmitted, get_string('strftimedatetime'));
+                $content = userdate($values->timesubmitted, $timeformat);
             }
             if ($values->timesubmitted >= $this->checkmark->checkmark->timedue) {
                 $content .= $this->checkmark->display_lateness($values->timesubmitted);
@@ -1170,16 +1191,21 @@ class submissionstable extends \table_sql {
      * @return $string Return user's time of grading.
      */
     public function col_timemarked($values) {
+        if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+            $timeformat = get_string('strftimedatetimeshort');
+        } else {
+            $timeformat = get_string('strftimedatetime');
+        }
         $finalgrade = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$values->id];
         if ($finalgrade->locked || $finalgrade->overridden) {
-            $date = userdate($finalgrade->dategraded, get_string('strftimedatetime'));
+            $date = userdate($finalgrade->dategraded, $timeformat);
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return $date;
             } else {
                 return \html_writer::tag('div', $date, array('id' => 'tt'.$values->id));
             }
         } else if ($values->feedbackid && $values->timemarked > 0) {
-            $date = userdate($values->timemarked, get_string('strftimedatetime'));
+            $date = userdate($values->timemarked, $timeformat);
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return $date;
             } else {

@@ -138,7 +138,7 @@ class exportform extends \moodleform {
         $mform->addElement('select', 'pageorientation', get_string('pdfpageorientation', 'checkmark'), $pageorientations);
         $mform->disabledIf('pageorientation', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
 
-        $mform->addElement('advcheckbox', 'printheader', get_string('pdfprintheader', 'checkmark'));
+        $mform->addElement('checkbox', 'printheader', get_string('pdfprintheader', 'checkmark'));
         $mform->addHelpButton('printheader', 'pdfprintheader', 'checkmark');
         $mform->disabledIf('printheader', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
 

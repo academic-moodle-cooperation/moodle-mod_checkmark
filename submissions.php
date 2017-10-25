@@ -34,7 +34,6 @@ require_once($CFG->libdir.'/plagiarismlib.php');
 $id   = optional_param('id', 0, PARAM_INT);          // Course module ID
 $c    = optional_param('c', 0, PARAM_INT);           // checkmark ID
 $mode = optional_param('mode', 'all', PARAM_ALPHANUM);  // What mode are we in?
-$download = optional_param('download' , 'none', PARAM_ALPHA); // ZIP download asked for?
 
 // Sets url with params and performs require_login!
 $url = new moodle_url('/mod/checkmark/submissions.php');
