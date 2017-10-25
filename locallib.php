@@ -94,7 +94,7 @@ class checkmark {
      * If the checkmark is hidden and the user is not a teacher then
      * this prints a page header and notice.
      *
-     * @param int $cmid the current course module id - not set for new checkmarks
+     * @param string|int $cmid the current course module id - not set for new checkmarks
      * @param object $checkmark usually null, but if we have it we pass it to save db access
      * @param object $cm usually null, but if we have it we pass it to save db access
      * @param object $course usually null, but if we have it we pass it to save db access
@@ -237,11 +237,9 @@ class checkmark {
     }
 
     /**
-     * print_example_preview() returns a preview of the set examples
+     * print_example_preview() prints a preview of the set examples
      *
      * TODO use a function to get a empty submission and checkmark::add_submission_elements() instead!
-     *
-     * @return string example-preview
      */
     public function print_example_preview() {
         global $USER;
@@ -385,10 +383,10 @@ class checkmark {
                 $data->$name = empty($example->state) ? 0 : 1;
             }
         }
+        $mform = new checkmark_submission_form(null, $data);
 
         if ($editmode) {
             // Prepare form and process submitted data!
-            $mform = new checkmark_submission_form(null, $data);
 
             if ($mform->is_cancelled()) {
                 redirect(new moodle_url($PAGE->url, array('id' => $this->cm->id)));
@@ -440,7 +438,7 @@ class checkmark {
         $this->view_attendancehint();
         echo "\n";
 
-        if ($editmode) {
+        if ($editmode && !empty($mform)) {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'checkmarkform');
             echo $this->print_summary();
             $mform->display();
@@ -460,9 +458,9 @@ class checkmark {
             } else if (has_capability('mod/checkmark:submit', $context, $USER, false)) {
                 // No submission present!
                 echo html_writer::tag('div', get_string('nosubmission', 'checkmark'));
-                echo $this->print_example_preview();
+                $this->print_example_preview();
             } else if (has_capability('mod/checkmark:view_preview', $context)) {
-                echo $this->print_example_preview();
+                $this->print_example_preview();
             } else {
                 /*
                  * If he isn't allowed to view the preview and has no submission
@@ -612,7 +610,7 @@ class checkmark {
 
         if (!$feedback) { // Get feedback for this checkmark!
             $userid = $USER->id;
-            $feedback = $this->get_feedback($USER->id, true, true);
+            $feedback = $this->get_feedback($USER->id);
         } else {
             $userid = $feedback->userid;
         }
@@ -622,17 +620,17 @@ class checkmark {
         $item = $gradinginfo->items[CHECKMARK_GRADE_ITEM];
         $grade = $item->grades[$userid];
 
+        $attendanceitem = false;
+        $attendancegrade = false;
         if ($this->checkmark->trackattendance && $this->checkmark->attendancegradebook) {
             $attendanceitem = $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM];
             $attendancegrade = $attendanceitem->grades[$userid];
-        } else {
-            $attendanceitem = false;
         }
+        $presentationitem = false;
+        $presentationgrade = false;
         if ($this->checkmark->presentationgrading && $this->checkmark->presentationgradebook) {
             $presentationitem = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM];
             $presentationgrade = $presentationitem->grades[$userid];
-        } else {
-            $presentationgrade = false;
         }
 
         if (($feedback == false)
@@ -769,7 +767,6 @@ class checkmark {
         }
 
         if ($this->checkmark->presentationgrading) {
-            $content = "";
             if ($this->checkmark->presentationgrade && $this->checkmark->presentationgradebook) {
                 $presgrade = $presentationgrade->str_long_grade;
             } else if (!empty($this->checkmark->presentationgrade)) {
@@ -881,7 +878,7 @@ class checkmark {
      * @param int $filter (optional) which entrys to filter (self::FILTER_ALL, self::FILTER_REQUIRE_GRADING)
      * @param int[] $selected (optional) selected users, used if filter equals self::FILTER_SELECTED
      * @param bool $countonly (optional) defaults to false, should we only count the submissions or grade them?
-     * @return int 0 if everything's ok, otherwise error code
+     * @return int|array 0 if everything's ok, otherwise error code
      */
     public function autograde_submissions($filter = self::FILTER_ALL, $selected = array(), $countonly = false) {
         global $DB, $USER;
@@ -952,13 +949,12 @@ class checkmark {
                 break;
             case self::FILTER_ALL:
             default:
-                // Comment out the third line to really autograde all (even those without submissions)!
                 $sql = "  SELECT u.id, f.attendance
                             FROM {user} u
                        LEFT JOIN (".$esql.") eu ON eu.id=u.id
                        LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid) AND s.checkmarkid = :checkmarkid
                        LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid
-                          'WHERE u.deleted = 0
+                           WHERE u.deleted = 0
                                  AND eu.id=u.id";
                        $params['checkmarkid'] = $this->checkmark->id;
                 break;
@@ -1012,7 +1008,7 @@ class checkmark {
                 }
                 $timemarked = time();
                 foreach ($users as $currentuser) {
-                    $feedback = $this->get_feedback($currentuser->id, false); // Get feedback!
+                    $feedback = $this->get_feedback($currentuser->id); // Get feedback!
                     if ($feedback === false) { // Or make a new feedback!
                         $feedback = $this->prepare_new_feedback($currentuser->id);
                         $feedback->timecreated = $timemarked;
@@ -1078,14 +1074,12 @@ class checkmark {
     /**
      * Any preprocessing needed for the settings form
      *
-     * @param array $defaultvalues - array to fill in with the default values
-     *      in the form 'formelement' => 'value'
+     * @param array $defaultvalues - array to fill in with the default values in the form 'formelement' => 'value'
      * @param object $form - the form that is to be displayed
-     * @return none
      */
     public function form_data_preprocessing(&$defaultvalues, $form) {
         if (isset($this->checkmark)) {
-            if (count_real_submissions() != 0) {
+            if (checkmark_count_real_submissions($this->cm->id) != 0) {
                 $form->addElement('hidden', 'allready_submit', 'yes');
                 $defaultvalues['allready_submit'] = 'yes';
             } else {
@@ -1238,16 +1232,13 @@ class checkmark {
      * @param string $mode Specifies the kind of teacher interaction taking place
      */
     public function submissions($mode) {
-        global $SESSION;
+        global $SESSION, $USER, $OUTPUT, $DB, $PAGE;
         /*
          * The main switch is changed to facilitate
          *     1) Batch fast grading
          *     2) Skip to the next one on the popup
          *     3) Save and Skip to the next one on the popup
          */
-
-        // Make user global so we can use the id!
-        global $USER, $OUTPUT, $DB, $PAGE;
 
         $mailinfo = optional_param('mailinfo', null, PARAM_BOOL);
 
@@ -1261,8 +1252,6 @@ class checkmark {
             $mode = 'saveandprevious';
         } else if (optional_param('bulk', null, PARAM_BOOL)) {
             $mode = 'bulk';
-        } else {
-            $mode = optional_param('mode', 'all', PARAM_ALPHANUM);
         }
 
         // This is no security check, this just tells us if there is posted data!
@@ -1300,9 +1289,6 @@ class checkmark {
                 }
                 if ($bulkaction && ($selected || ($confirm && !empty($SESSION->checkmark->autograde->selected)))) {
                     // Process bulk action!
-                    list($select, $params) = $DB->get_in_or_equal($selected);
-                    $select = 'userid '.$select.' AND checkmarkid = ?';
-                    $params[] = $this->checkmark->id;
                     // Check if some of the selected users don't have a feedback entry and create on if so!
                     foreach ($selected as $sel) {
                         $this->prepare_new_feedback($sel); // Make one if missing!
@@ -1773,13 +1759,13 @@ class checkmark {
      * provide a 'Next submission' button.
      * to process submissions before they are graded
      * This method gets its arguments from the page parameters userid and offset
-     * TODO look through this method - it's pretty old and I want to update it in 3.2! It uses it's own code to get
-     *      the next/previous entries from the table (if there are any)!
-     *      We should rewrite that to a better alternative considering submissionstable class!
+     * TODO look through this method - this method's buggy, due to submission-table saving it's settings elsewhere now!
+     * TODO 3.4 --> rewrite to use submissionstable-class!
      *
      * @param int $offset (optional)
      * @param int $userid (optional)
      * @param bool $display (optional) defaults to true. Wether to echo the content or return it
+     * @return stdClass|true
      */
     public function display_submission($offset=-1, $userid =-1, $display=true) {
         global $CFG, $DB, $PAGE, $OUTPUT, $SESSION;
@@ -1829,7 +1815,7 @@ class checkmark {
         $groupmode = groups_get_activity_groupmode($this->cm);
         $currentgroup = groups_get_activity_group($this->cm);
         $users = get_enrolled_users($context, 'mod/checkmark:submit', $currentgroup, 'u.id');
-
+        $previousid = 0;
         $nextid = 0;
         $where = '';
         if ($filter == self::FILTER_SUBMITTED) {
@@ -1888,10 +1874,9 @@ class checkmark {
                    'WHERE '.$where.'u.id '.$sqluserids;
             // Construct sort!
             if (empty($SESSION->flextable['mod-checkmark-submission'])
-                || !is_array($SESSION->flextable['mod-checkmark-submissions']->sortby)) {
+                    || !is_array($SESSION->flextable['mod-checkmark-submissions']->sortby)) {
                 $sort = '';
             } else {
-
                 $bits = array();
                 $sortby = $SESSION->flextable['mod-checkmark-submissions']->sortby;
                 foreach ($sortby as $column => $order) {
@@ -1916,7 +1901,6 @@ class checkmark {
             } else {
                 $auser = $DB->get_records_sql($select.$sql.$sort, $params, $offset, 2);
                 $moreexistent = is_array($auser) && (count($auser) > 1);
-                $previousid = 0;
             }
             if ($moreexistent) {
                 $nextuser = next($auser);
@@ -2010,6 +1994,8 @@ class checkmark {
         $submitform->display();
 
         echo $OUTPUT->footer();
+
+        return true;
     }
 
     /**
@@ -2029,9 +2015,9 @@ class checkmark {
             $stateupdate->exampleid = $key;
             if (!$id = $DB->get_field('checkmark_checks', 'id', array('submissionid' => $submission->id,
                                                                       'exampleid'    => $key), IGNORE_MISSING)) {
-                $DB->insert_record('checkmark_checks', array('submissionid' => $submission->id,
-                                                             'exampleid'    => $key,
-                                                             'state'        => $example->state));
+                $stateupdate->submissionid = $submission->id;
+                $stateupdate->state = $example->state;
+                $DB->insert_record('checkmark_checks', $stateupdate);
             } else {
                 $stateupdate->id = $id;
                 $stateupdate->state = $example->state;
@@ -2050,7 +2036,7 @@ class checkmark {
      * @return bool|void
      */
     public function display_submissions($message='') {
-        global $SESSION, $OUTPUT;
+        global $SESSION, $OUTPUT, $CFG, $DB, $OUTPUT, $PAGE;
 
         if (!isset($SESSION->checkmark)) {
             $SESSION->checkmark = new stdClass();
@@ -2058,11 +2044,7 @@ class checkmark {
 
         echo $OUTPUT->header();
 
-        echo $this->print_submission_tabs('submissions');
-
-
-        global $CFG, $DB, $OUTPUT, $PAGE;
-        require_once($CFG->libdir.'/gradelib.php');
+        $this->print_submission_tabs('submissions');
 
         /*
          * First we check to see if the form has just been submitted
@@ -2275,6 +2257,11 @@ class checkmark {
         echo $OUTPUT->footer();
     }
 
+    /**
+     * Prints the submission and export tabs
+     *
+     * @param string $tab currently active tab
+     */
     public function print_submission_tabs($tab) {
         global $CFG;
 
@@ -2294,7 +2281,7 @@ class checkmark {
      * @param int $filter Filter to apply (checkmark::FILTER_ALL, checkmark::FILTER_REQUIRE_GRADING, ...)
      * @param int[] $ids (optional) User-IDs to filter for
      * @param bool $dataonly (optional) return raw data-object or HTML table
-     * @return \mod_checkmark\submissionstable|object data object or table object
+     * @return array|\mod_checkmark\submissionstable
      */
     public function get_print_data($filter, $ids=array(), $dataonly=false) {
         global $DB, $OUTPUT;
@@ -2333,6 +2320,8 @@ class checkmark {
 
     /**
      * Handles all print preference setting (if submitted) and returns the current values!
+     *
+     * TODO do we really need this method (for writing preferences) when we have the form used properly now?
      *
      * @return array print preferences ($filter, $sumabs, $sumrel, $format, $printperpage, $printoptimum, $textsize,
      *                                  $pageorientation, $printheader, $forcesinglelinenames)
@@ -2394,6 +2383,11 @@ class checkmark {
             $forcesinglelinenames);
     }
 
+    /**
+     * Returns export form
+     *
+     * @return bool|\mod_checkmark\exportform
+     */
     public function get_export_form() {
         static $mform = false;
 
@@ -2527,42 +2521,61 @@ class checkmark {
         return $output;
     }
 
-    public function quick_export($template = false) {
-        global $DB, $PAGE;
-
-        $classname = '\\mod_checkmark\\local\\exporttemplates\\'.$template;
-        if (!class_exists($classname)) {
-            return [[], [], [], [], []];
-        }
-
-        $filters = array(self::FILTER_ALL             => get_string('all'),
+    /**
+     * Returns applicable filters
+     *
+     * @return array applicable filters
+     */
+    protected function get_filters() {
+        $filters = [
+            self::FILTER_ALL             => get_string('all'),
             self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
-            self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
+            self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark')
+        ];
+
         if ($this->checkmark->trackattendance) {
             $filters[self::FILTER_ATTENDANT] = get_string('all_attendant', 'checkmark');
             $filters[self::FILTER_ABSENT] = get_string('all_absent', 'checkmark');
             $filters[self::FILTER_UNKNOWN] = get_string('all_unknown', 'checkmark');
         }
 
-        $formats = array(\mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF        => 'PDF',
+        return $filters;
+    }
+
+    /**
+     * Returns export formats
+     *
+     * @return array export formats
+     */
+    static protected function get_formats() {
+        return [
+            \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF        => 'PDF',
             \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLSX       => 'XLSX',
             \mod_checkmark\MTablePDF::OUTPUT_FORMAT_ODS        => 'ODS',
             \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_COMMA  => 'CSV (;)',
-            \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_TAB    => 'CSV (tab)');
+            \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_TAB    => 'CSV (tab)'
+        ];
+    }
+
+    /**
+     * Exports table with chosen template
+     *
+     * @param bool|string $template The templates name
+     * @return array|void
+     */
+    public function quick_export($template = false) {
+        global $PAGE;
+
+        $classname = '\\mod_checkmark\\local\\exporttemplates\\'.$template;
+        if (!class_exists($classname)) {
+            return;
+        }
 
         /*
          * First we check to see if the form has just been submitted
          * to request user_preference updates! We don't use $printoptimum here, it's implicit in $printperpage!
          */
-        list($filter, , , $format, $printperpage, , , , , ) = $this->print_preferences();
-
-        $groupmode = optional_param('groupmode', false, PARAM_INT);
-        if ($groupmode === false) {
-            $groupmode = groups_get_activity_groupmode($this->cm);
-            $currentgroup = groups_get_activity_group($this->cm, true);
-        } else {
-            $currentgroup = optional_param('groupid', 0, PARAM_INT);
-        }
+        list($filter, , , , , , , , , ) = $this->print_preferences();
 
         $usrlst = optional_param_array('selected', array(), PARAM_INT);
 
@@ -2573,26 +2586,40 @@ class checkmark {
 
         $table = $classname::create_export_table($this->cm->id, $filter, $usrlst);
 
-        list($sumabs, $sumrel, $orientation, $textsize, $printheader, $forcesinglelinenames) = $classname::get_export_settings();
+        $this->exportpdf($table->get_data(), $template);
+    }
 
-        if ($DB->count_records_sql($table->countsql, $table->countparams)) {
-            list(, $tableheaders, $data, $columnformat, $cellwidth) = $table->get_data();
-        } else {
-            $tableheaders = [];
-            $data = [];
-            $columnformat = [];
-            $cellwidth = [];
+    /**
+     * Creates and outputs PDF (then dies).
+     *
+     * @param mixed[] $exportdata Returned by table object's get_data()
+     * @param string $template (optional) Template name if used
+     */
+    protected function exportpdf($exportdata, $template = '') {
+        global $PAGE;
+
+        $filters = $this->get_filters();
+        $formats = self::get_formats();
+
+        list(, $tableheaders, $data, $columnformat, $cellwidth) = $exportdata;
+
+        /*
+         * Get all settings preferences, some will be overwritten if a template is used!
+         */
+        list($filter, $sumabs, $sumrel, $format, $printperpage, ,
+             $textsize, $orientation, $printheader, $forcesinglelinenames) = $this->print_preferences();
+
+        if (!empty($template)) {
+            $classname = '\\mod_checkmark\\local\\exporttemplates\\'.$template;
+            list($sumabs, $sumrel, $orientation, $textsize, $printheader,
+                    $forcesinglelinenames) = $classname::get_export_settings();
         }
 
-        $coursename = $this->course->fullname;
-        $timeavailable = $this->checkmark->timeavailable;
-        $checkmarkname = $this->checkmark->name;
-        $timedue = $this->checkmark->timedue;
-        $notactivestr = get_string('notactive', 'checkmark');
-        $viewname = $filters[$filter];
-
+        $groupmode = groups_get_activity_groupmode($this->cm);
+        $currentgroup = 0;
         if ($groupmode != NOGROUPS) {
-            if ($currentgroup == "") {
+            $currentgroup = groups_get_activity_group($this->cm, true);
+            if (empty($currentgroup)) {
                 $grpname = get_string('all', 'checkmark');
             } else {
                 $grpname = groups_get_group_name($currentgroup);
@@ -2601,15 +2628,24 @@ class checkmark {
             $grpname = '-';
         }
 
+        $usrlst = optional_param_array('selected', array(), PARAM_INT);
+
+        if (empty($usrlst)) {
+            redirect($PAGE->url, get_string('nousers', 'checkmark'), null, 'notifyproblem');
+            return;
+        }
+
         $pdf = new \mod_checkmark\MTablePDF($orientation, $cellwidth);
 
-        $timeavailablestr = !empty($timeavailable) ? userdate($timeavailable) : $notactivestr;
-        $pdf->setHeaderText(get_string('course').':', $coursename,
+        $notactivestr = get_string('notactive', 'checkmark');
+        $timeavailablestr = !empty($this->checkmark->timeavailable) ? userdate($this->checkmark->timeavailable) : $notactivestr;
+        $timeduestr = !empty($this->checkmark->timedue) ? userdate($this->checkmark->timedue) : $notactivestr;
+        $pdf->setHeaderText(get_string('course').':', $this->course->fullname,
             get_string('availabledate', 'checkmark').':', $timeavailablestr,
-            '', $viewname,
+            !$template ? get_string('strprintpreview', 'checkmark') : '', $filters[$filter],
             // Second header row!
-            get_string('strassignment', 'checkmark').':', $checkmarkname,
-            get_string('duedate', 'checkmark').':', !empty($timedue) ? userdate($timedue) : $notactivestr,
+            get_string('strassignment', 'checkmark').':', $this->checkmark->name,
+            get_string('duedate', 'checkmark').':', $timeduestr,
             get_string('groups').':', $grpname);
 
         $pdf->ShowHeaderFooter($printheader);
@@ -2639,7 +2675,6 @@ class checkmark {
         $pdf->setOutputFormat($format);
 
         $data = array(
-            'template'        => $template,
             'groupmode'       => $groupmode,
             'groupid'         => $currentgroup,
             'selected'        => $usrlst,
@@ -2658,10 +2693,16 @@ class checkmark {
             $data['printperpage'] = $printperpage;
             $data['forcesinglelinenames'] = $forcesinglelinenames;
         }
+        if ($template) {
+            $data['template'] = $template;
+        }
         \mod_checkmark\event\submissions_exported::exported($this->cm, $data)->trigger();
 
-        $pdf->generate($this->course->shortname.'-'.$this->checkmark->name.'-'.
-                get_string('exporttemplate_'.$template, 'checkmark'));
+        $filename = $this->course->shortname.'-'.$this->checkmark->name;
+        if ($template) {
+            $filename .= '-' . get_string('exporttemplate_' . $template, 'checkmark');
+        }
+        $pdf->generate($filename);
         die();
     }
 
@@ -2669,49 +2710,15 @@ class checkmark {
      * Finaly print the submissions!
      */
     public function submissions_print() {
-        global $CFG, $PAGE;
-        require_once($CFG->libdir.'/gradelib.php');
-
-        $filters = array(self::FILTER_ALL             => get_string('all'),
-                         self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
-                         self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
-        if ($this->checkmark->trackattendance) {
-            $filters[self::FILTER_ATTENDANT] = get_string('all_attendant', 'checkmark');
-            $filters[self::FILTER_ABSENT] = get_string('all_absent', 'checkmark');
-            $filters[self::FILTER_UNKNOWN] = get_string('all_unknown', 'checkmark');
-        }
-
-        $formats = array(\mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF        => 'PDF',
-                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLSX       => 'XLSX',
-                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_ODS        => 'ODS',
-                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_COMMA  => 'CSV (;)',
-                         \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_TAB    => 'CSV (tab)');
+        global $PAGE;
 
         /*
          * First we check to see if the form has just been submitted
          * to request user_preference updates! We don't use $printoptimum here, it's implicit in $printperpage!
          */
-        list($filter, $sumabs, $sumrel, $format, $printperpage, , $textsize, $orientation,
-                $printheader, $forcesinglelinenames) = $this->print_preferences();
-
-        $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark',
-                                        $this->checkmark->id);
-
-        $groupmode = optional_param('groupmode', false, PARAM_INT);
-        if ($groupmode === false) {
-            $groupmode = groups_get_activity_groupmode($this->cm);
-            $currentgroup = groups_get_activity_group($this->cm, true);
-        } else {
-            $currentgroup = optional_param('groupid', 0, PARAM_INT);
-        }
+        list($filter, , , , , , , , , ) = $this->print_preferences();
 
         $usrlst = optional_param_array('selected', array(), PARAM_INT);
-
-        if (!empty($CFG->enableoutcomes) && !empty($gradinginfo->outcomes)) {
-            $usesoutcomes = true;
-        } else {
-            $usesoutcomes = false;
-        }
 
         if (empty($usrlst)) {
             redirect($PAGE->url, get_string('nousers', 'checkmark'), null, 'notifyproblem');
@@ -2720,97 +2727,8 @@ class checkmark {
 
         // Get data!
         $printdata = $this->get_print_data($filter, $usrlst, true);
-        // First is empty because we don't use 'columns' here!
-        list(, $tableheaders, $data, $columnformat, $cellwidth) = $printdata;
 
-        $coursename = $this->course->fullname;
-        $timeavailable = $this->checkmark->timeavailable;
-        $checkmarkname = $this->checkmark->name;
-        $timedue = $this->checkmark->timedue;
-        $notactivestr = get_string('notactive', 'checkmark');
-        $viewname = $filters[$filter];
-
-        if ($groupmode != NOGROUPS) {
-            if ($currentgroup == "") {
-                $grpname = get_string('all', 'checkmark');
-            } else {
-                $grpname = groups_get_group_name($currentgroup);
-            }
-        } else {
-            $grpname = '-';
-        }
-
-        $pdf = new \mod_checkmark\MTablePDF($orientation, $cellwidth);
-
-        $timeavailablestr = !empty($timeavailable) ? userdate($timeavailable) : $notactivestr;
-        $pdf->setHeaderText(get_string('course').':', $coursename,
-                            get_string('availabledate', 'checkmark').':', $timeavailablestr,
-                            get_string('strprintpreview', 'checkmark'), $viewname,
-                            // Second header row!
-                            get_string('strassignment', 'checkmark').':', $checkmarkname,
-                            get_string('duedate', 'checkmark').':', !empty($timedue) ? userdate($timedue) : $notactivestr,
-                            get_string('groups') . ':', $grpname);
-
-        $pdf->ShowHeaderFooter($printheader);
-
-        switch ($textsize) {
-            case '0':
-                $pdf->SetFontSize(\mod_checkmark\MTablePDF::FONTSIZE_SMALL);
-                break;
-            case '1':
-                $pdf->SetFontSize(\mod_checkmark\MTablePDF::FONTSIZE_MEDIUM);
-                break;
-            case '2':
-                $pdf->SetFontSize(\mod_checkmark\MTablePDF::FONTSIZE_LARGE);
-                break;
-        }
-
-        if (is_number($printperpage) && $printperpage != 0) {
-            $pdf->setRowsperPage($printperpage);
-        }
-
-        // Data present?
-        if (count($data)) {
-            $pdf->setColumnFormat($columnformat);
-            $pdf->setTitles($tableheaders);
-            foreach ($data as $row) {
-                $pdf->addRow($row);
-            }
-        } else {
-            if ($filter == self::FILTER_REQUIRE_GRADING) {
-                $pdf->addRow(array('', get_string('norequiregrading', 'checkmark'), ''));
-                $pdf->setTitles(array(' ', ' ', ' '));
-            } else {
-                $pdf->addRow(array('', get_string('nosubmisson', 'checkmark'), ''));
-                $pdf->setTitles(array(' ', ' ', ' '));
-            }
-        }
-
-        $pdf->setOutputFormat($format);
-
-        $data = array(
-            'groupmode'       => $groupmode,
-            'groupid'         => $currentgroup,
-            'selected'        => $usrlst,
-            'filter'          => $filter,
-            'filter_readable' => $filters[$filter],
-            'format'          => $format,
-            'format_readable' => $formats[$format],
-            'sumabs'          => $sumabs,
-            'sumrel'          => $sumrel,
-        );
-
-        if ($data['format'] == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
-            $data['orientation']  = $orientation;
-            $data['printheader']  = $printheader;
-            $data['textsize']     = $textsize;
-            $data['printperpage'] = $printperpage;
-            $data['forcesinglelinenames'] = $forcesinglelinenames;
-        }
-        \mod_checkmark\event\submissions_exported::exported($this->cm, $data)->trigger();
-
-        $pdf->generate($this->course->shortname . '-' . $this->checkmark->name);
-        die();
+        $this->exportpdf($printdata);
     }
 
     /**
@@ -2998,9 +2916,9 @@ class checkmark {
                         $submission->examples[$key]->shortname = $examples[$key]->shortname;
                         $submission->examples[$key]->grade = $examples[$key]->grade;
                         $submission->examples[$key]->state = null;
-                        $DB->insert_record('checkmark_checks', array('exampleid'    => $key,
-                                                                     'submissionid' => $submission->id,
-                                                                     'state'        => null));
+                        $DB->insert_record('checkmark_checks', (object)['exampleid'    => $key,
+                                                                        'submissionid' => $submission->id,
+                                                                        'state'        => null]);
                     }
                 } else {
                     foreach ($submission->examples as $key => $ex) {
@@ -3018,9 +2936,9 @@ class checkmark {
         $sid = $DB->insert_record('checkmark_submissions', $newsubmission);
 
         foreach ($examples as $key => $example) {
-            $DB->insert_record('checkmark_checks', array('exampleid'    => $key,
-                                                         'submissionid' => $sid,
-                                                         'state'        => null));
+            $DB->insert_record('checkmark_checks', (object)['exampleid'    => $key,
+                                                            'submissionid' => $sid,
+                                                            'state'        => null]);
         }
 
         $submission = $DB->get_record('checkmark_submissions', array('checkmarkid' => $this->checkmark->id,
@@ -3138,7 +3056,7 @@ class checkmark {
      * @return int The number of submissions to be graded!
      */
     public function count_real_ungraded_submissions() {
-        return checkmark_count_real_ungraded_submissions();
+        return checkmark_count_real_ungraded_submissions($this->cm);
     }
 
     /**
@@ -3263,6 +3181,8 @@ class checkmark {
     /**
      * Creates the html content for emails to teachers
      *
+     * TODO replace with template in 3.4
+     *
      * @param object $info The info used by the 'emailteachermailhtml' language string
      * @return string HTML snippet to use in messages
      */
@@ -3376,20 +3296,6 @@ class checkmark {
     }
 
     /**
-     * Return true if is set description is hidden till available date
-     *
-     * This is needed by calendar so that hidden descriptions do not
-     * come up in upcoming events.
-     * Check that description is hidden till available date
-     * TODO: check if we can delete this by now?!?
-     *
-     * @return bool false (always!)
-     */
-    public function description_is_hidden() {
-        return false;
-    }
-
-    /**
      * Return an outline of the user's interaction with the checkmark
      *
      * The default method returns the grade and timemodified
@@ -3432,7 +3338,8 @@ class checkmark {
 
         echo html_writer::empty_tag('br');
 
-        if ($feedback = $this->get_feedback($user->id) && !empty($feedback->grader)) {
+        $feedback = $this->get_feedback($user->id);
+        if ($feedback && !empty($feedback->grader)) {
             $this->view_feedback($feedback);
         }
 

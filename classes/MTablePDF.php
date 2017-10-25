@@ -253,7 +253,7 @@ class MTablePDF extends \pdf {
     /**
      * Sets the titles for the columns in the pdf
      *
-     * @param String $titles
+     * @param string[] $titles
      */
     public function settitles($titles) {
         if (count($titles) != count($this->columnwidths)) {
@@ -266,8 +266,8 @@ class MTablePDF extends \pdf {
     /**
      * Sets the PDFs page orientation ('P' = Portrait, 'L' = Landscape)
      *
-     * @param char $orientation
-     * @return true if ok
+     * @param string $orientation
+     * @return bool true if ok
      */
     public function setorientation($orientation) {
         if ($orientation == 'P' || $orientation == 'L') {
@@ -711,7 +711,6 @@ class MTablePDF extends \pdf {
                         $pdf->MultiCell($w[$key], $numlines * $cellsize, $value['data'], 'LR'.$bottomborder,
                                 $cf['align'], $cf['fill'], 0);
                     }
-
 
                 } else if ($rowspans[$key] > 0) {
                     if ($debug) {
