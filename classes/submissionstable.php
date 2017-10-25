@@ -627,7 +627,7 @@ class submissionstable extends \table_sql {
         $table->define_columns($tablecolumns);
         $table->define_headers($tableheaders);
         $table->define_help_for_headers($helpicons);
-        $table->define_baseurl($CFG->wwwroot.'/mod/checkmark/submissions.php?id='.$table->checkmark->cm->id.
+        $table->define_baseurl($CFG->wwwroot.'/mod/checkmark/export.php?id='.$table->checkmark->cm->id.
                                '&amp;currentgroup='.$table->currentgroup);
 
         $table->sortable(true, 'lastname'); // Sorted by lastname by default!

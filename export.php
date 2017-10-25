@@ -36,26 +36,34 @@ $c    = optional_param('c', 0, PARAM_INT);           // checkmark ID
 $mode = optional_param('mode', 'all', PARAM_ALPHANUM);  // What mode are we in?
 
 // Sets url with params and performs require_login!
-$url = new moodle_url('/mod/checkmark/submissions.php');
+$url = new moodle_url('/mod/checkmark/export.php');
 list($cm, $checkmark, $course) = \checkmark::init_checks($id, $c, $url);
-
-if (optional_param('tab', false, PARAM_ALPHANUM) == 'printpreview') {
-    // Legacy link redirect!
-    redirect(new moodle_url('/mod/checkmark/export.php', array('id' => $cm->id)));
-}
 
 require_capability('mod/checkmark:grade', context_module::instance($cm->id));
 
 // Load up the required checkmark code!
 $checkmarkinstance = new checkmark($cm->id, $checkmark, $cm, $course);
 
-if ($mode !== 'all') {
-    $url->param('mode', $mode);
+$mform = $checkmarkinstance->get_export_form();
+
+if ($fromform = $mform->get_data()) {
+    // See if we're going to export based on custom settings!
+    if (!empty($fromform->submittoprint)) {
+        $PAGE->set_pagelayout('popup'); // Remove navbars, etc!
+        $checkmarkinstance->submissions_print();
+    }
 }
 
 $pagetitle = $course->shortname.': '.get_string('modulename', 'checkmark').': '.format_string($checkmark->name, true);
 $PAGE->set_title(strip_tags($pagetitle));
 $PAGE->set_heading($course->fullname);
-$PAGE->force_settings_menu(true);
 
-$checkmarkinstance->submissions($mode);   // Display or process the submissions!
+if (!isset($SESSION->checkmark)) {
+    $SESSION->checkmark = new stdClass();
+}
+
+echo $OUTPUT->header();
+
+echo $checkmarkinstance->print_submission_tabs('export');
+
+$checkmarkinstance->view_export();   // Display or process the submissions!

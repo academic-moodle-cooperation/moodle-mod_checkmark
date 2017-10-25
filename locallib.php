@@ -2050,139 +2050,19 @@ class checkmark {
      * @return bool|void
      */
     public function display_submissions($message='') {
-        global $SESSION, $CFG, $DB, $DB, $OUTPUT;
-
-        $id = required_param('id', PARAM_INT);
-
-        $inactive = null;
-        $activetwo = null;
-        $tabs = array();
-        $row = array();
-
-        $row[] = new tabobject('submissions',
-                               $CFG->wwwroot.'/mod/checkmark/submissions.php?id='.$id.
-                               '&amp;tab=submissions', get_string('strsubmissions', 'checkmark'),
-                               get_string('strsubmissionstabalt', 'checkmark'), false);
-        $row[] = new tabobject('printpreview',
-                               $CFG->wwwroot.'/mod/checkmark/submissions.php?id='.$id.
-                               '&amp;tab=printpreview', get_string('strprintpreview', 'checkmark'),
-                               get_string('strprintpreviewtabalt', 'checkmark'), false);
+        global $SESSION, $OUTPUT;
 
         if (!isset($SESSION->checkmark)) {
             $SESSION->checkmark = new stdClass();
         }
 
-        $tab = optional_param('tab', null, PARAM_ALPHAEXT);
-        if ($tab) {
-            $SESSION->checkmark->currenttab = $tab;
-        }
-
-        if (isset($SESSION->checkmark->currenttab)) {
-            $currenttab = $SESSION->checkmark->currenttab;
-        } else {
-            $SESSION->checkmark->currenttab = 'submissions';
-            $currenttab = 'submissions';
-        }
-
-        $ifirst = optional_param('ifirst', null, PARAM_RAW);
-
-        if (!is_null($ifirst)
-             && ($ifirst === '' || strstr(get_string('alphabet', 'langconfig'), $ifirst))) {
-            // Filter first names!
-            $SESSION->checkmark->ifirst = $ifirst;
-        }
-
-        $ilast = optional_param('ilast', null, PARAM_RAW);
-        if (!is_null($ilast)
-             && ($ilast === '' || strpos(get_string('alphabet', 'langconfig'), $ilast) !== false)) {
-            // Filter last names!
-            $SESSION->checkmark->ilast = $ilast;
-        }
-
-        $thide = optional_param('thide', null, PARAM_ALPHANUMEXT);
-        if ($thide) { // Hide table-column!
-            if (!isset($SESSION->checkmark->columns)) {
-                $SESSION->checkmark->columns = array();
-            }
-            if (!isset($SESSION->checkmark->columns[$thide])) {
-                $SESSION->checkmark->columns[$thide] = new stdClass();
-            }
-            $SESSION->checkmark->columns[$thide]->visibility = 0;
-        }
-
-        $tshow = optional_param('tshow', null, PARAM_ALPHANUMEXT);
-        if ($tshow) { // Show table-column!
-            if (!isset($SESSION->checkmark->columns)) {
-                $SESSION->checkmark->columns = array();
-            }
-            if (!isset($SESSION->checkmark->columns[$tshow])) {
-                $SESSION->checkmark->columns[$tshow] = new stdClass();
-            }
-            $SESSION->checkmark->columns[$tshow]->visibility = 1;
-        }
-
-        $tsort = optional_param('tsort', null, PARAM_ALPHANUMEXT);
-        if ($tsort) { // Sort table by column!
-            if (!isset($SESSION->checkmark->columns)) {
-                $SESSION->checkmark->columns = array();
-            }
-            if (!isset($SESSION->checkmark->columns[$tsort]->sortable)
-                || ($SESSION->checkmark->columns[$tsort]->sortable != false)) {
-                if (isset($SESSION->checkmark->orderby)
-                    && ($SESSION->checkmark->orderby == $tsort)) {
-                    // Change direction!
-                    if ($SESSION->checkmark->orderdirection == 'ASC') {
-                        $SESSION->checkmark->orderdirection = 'DESC';
-                    } else {
-                        $SESSION->checkmark->orderdirection = 'ASC';
-                    }
-                } else {
-                    // Set new column for ordering!
-                    $SESSION->checkmark->orderby = $tsort;
-                    $SESSION->checkmark->orderdirection = 'ASC';
-                }
-            }
-        }
-
-        switch ($SESSION->checkmark->currenttab) {
-            case 'submissions':
-                $inactive = array();
-                $inactive[] = 'submissions';
-                break;
-            case 'printpreview':
-                $inactive = array();
-                $inactive[] = 'printpreview';
-                break;
-        }
-
-        $tabs[] = $row;
-
         echo $OUTPUT->header();
 
-        echo print_tabs($tabs, $currenttab, $inactive, $activetwo, true);
+        echo $this->print_submission_tabs('submissions');
 
-        switch ($currenttab) {
-            case 'printpreview':
-                $this->print_preview_tab($message);
-                break;
-            case 'submissions':
-            default:
-                $this->submissions_tab($message);
-                break;
-        }
 
-    }
-
-    /**
-     * Content of the tab for normal submissions-view
-     *
-     * @param string $message (optional) a message (plain text or HTML snippet) to display on the page
-     */
-    public function submissions_tab($message='') {
-        global $CFG, $DB, $DB, $OUTPUT, $PAGE;
+        global $CFG, $DB, $OUTPUT, $PAGE;
         require_once($CFG->libdir.'/gradelib.php');
-
-        $PAGE->set_url(new moodle_url($PAGE->url, array('tab' => 'submissions')));
 
         /*
          * First we check to see if the form has just been submitted
@@ -2190,8 +2070,8 @@ class checkmark {
          */
 
         $filters = array(self::FILTER_ALL             => get_string('all'),
-                         self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
-                         self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
+            self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
+            self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
 
         if ($this->checkmark->trackattendance) {
             $filters[self::FILTER_ATTENDANT] = get_string('all_attendant', 'checkmark');
@@ -2395,6 +2275,19 @@ class checkmark {
         echo $OUTPUT->footer();
     }
 
+    public function print_submission_tabs($tab) {
+        global $CFG;
+
+        $tabs = [[
+            new tabobject('submissions', $CFG->wwwroot.'/mod/checkmark/submissions.php?id='.$this->cm->id,
+                    get_string('strsubmissions', 'checkmark'), get_string('strsubmissionstabalt', 'checkmark'), false),
+            new tabobject('export', $CFG->wwwroot.'/mod/checkmark/export.php?id='.$this->cm->id,
+                    get_string('strprintpreview', 'checkmark'), get_string('strprintpreviewtabalt', 'checkmark'), false)
+        ]];
+
+        print_tabs($tabs, $tab, [$tab], []);
+    }
+
     /**
      * Either returns raw data for pdf/xls/ods/etc export or prints and returns table.
      *
@@ -2501,23 +2394,64 @@ class checkmark {
             $forcesinglelinenames);
     }
 
+    public function get_export_form() {
+        static $mform = false;
+
+        if (!$mform) {
+            /*
+             * First we check to see if the form has just been submitted
+             * to request user_preference updates!
+             */
+            list($filter, $sumabs, $sumrel, $format, $printperpage, $printoptimum, $textsize, $pageorientation,
+                $printheader, $forcesinglelinenames) = $this->print_preferences();
+
+            ob_start();
+            $this->get_print_data($filter);
+            $tablehtml = ob_get_contents();
+            ob_end_clean();
+
+            $customdata = [
+                'cm' => $this->cm,
+                'context' => $this->context,
+                'examplescount' => count($this->get_examples()),
+                'table' => $tablehtml,
+                'tracksattendance' => $this->checkmark->trackattendance
+            ];
+            $formaction = new moodle_url('/mod/checkmark/export.php', [
+                'id'      => $this->cm->id,
+                'sesskey' => sesskey()
+            ]);
+            $mform = new \mod_checkmark\exportform($formaction, $customdata, 'post', '', [
+                'name' => 'optionspref',
+                'class' => 'combinedprintpreviewform'
+            ]);
+
+            $data = [
+                'filter' => $filter,
+                'sumabs' => $sumabs,
+                'sumrel' => $sumrel,
+                'format' => $format,
+                'printperpage' => $printperpage,
+                'printoptimum' => $printoptimum,
+                'textsize' => $textsize,
+                'pageorientation' => $pageorientation,
+                'printheader' => $printheader,
+                'forcesinglelinenames' => $forcesinglelinenames
+            ];
+            $mform->set_data($data);
+        }
+
+        return $mform;
+    }
+
     /**
      * Echo the print preview tab including a optional message!
      *
      * @param string $message The message to display in the tab!
      */
-    public function print_preview_tab($message='') {
+    public function view_export($message='') {
         global $CFG, $OUTPUT, $PAGE;
         require_once($CFG->libdir.'/gradelib.php');
-
-        $PAGE->set_url(new moodle_url($PAGE->url, array('tab' => 'printpreview')));
-
-        /*
-         * First we check to see if the form has just been submitted
-         * to request user_preference updates!
-         */
-        list($filter, $sumabs, $sumrel, $format, $printperpage, $printoptimum, $textsize, $pageorientation,
-                $printheader, $forcesinglelinenames) = $this->print_preferences();
 
         // Trigger the event!
         \mod_checkmark\event\printpreview_viewed::printpreview($this->cm)->trigger();
@@ -2528,36 +2462,7 @@ class checkmark {
         // Form to manage print-settings!
         echo html_writer::start_tag('div', array('class' => 'usersubmissions'));
 
-        ob_start();
-        $this->get_print_data($filter);
-        $tablehtml = ob_get_contents();
-        ob_end_clean();
-
-        $customdata = [
-            'cm' => $this->cm,
-            'context' => $this->context,
-            'examplescount' => count($this->get_examples()),
-            'table' => $tablehtml,
-            'tracksattendance' => $this->checkmark->trackattendance
-        ];
-        $formaction = new moodle_url('/mod/checkmark/submissions.php', array('id'      => $this->cm->id,
-                                                                             'sesskey' => sesskey()));
-        $mform = new \mod_checkmark\exportform($formaction, $customdata, 'post', '', array('name' => 'optionspref',
-                                                                                           'class' => 'combinedprintpreviewform'));
-
-        $data = [
-            'filter' => $filter,
-            'sumabs' => $sumabs,
-            'sumrel' => $sumrel,
-            'format' => $format,
-            'printperpage' => $printperpage,
-            'printoptimum' => $printoptimum,
-            'textsize' => $textsize,
-            'pageorientation' => $pageorientation,
-            'printheader' => $printheader,
-            'forcesinglelinenames' => $forcesinglelinenames
-        ];
-        $mform->set_data($data);
+        $mform = $this->get_export_form();
 
         // Hook to allow plagiarism plugins to update status/print links.
         plagiarism_update_status($this->course, $this->cm);
