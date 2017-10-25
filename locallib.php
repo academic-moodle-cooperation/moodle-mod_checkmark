@@ -1272,7 +1272,8 @@ class checkmark {
                 if ($this->process_feedback()) {
                     $this->display_submissions(get_string('changessaved'));
                 } else {
-                    $this->display_submission();
+                    $userid = required_param('userid', PARAM_INT);
+                    $this->display_submission($userid);
                 }
                 break;
 
@@ -1587,13 +1588,10 @@ class checkmark {
                  * This turns out to be similar to a single case!
                  * The URL used is for the next submission.
                  */
-                $offset = required_param('offset', PARAM_INT);
                 $nextid = required_param('nextid', PARAM_INT);
                 $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
                 $id = required_param('id', PARAM_INT);
-                $offset = (int)$offset + 1;
-                redirect('submissions.php?id='.$id.'&userid='. $nextid . '&filter='.$filter.
-                         '&mode=single&offset='.$offset);
+                redirect('submissions.php?id='.$id.'&userid='.$nextid.'&filter='.$filter.'&mode=single');
                 break;
 
             case 'saveandprevious':
@@ -1609,21 +1607,20 @@ class checkmark {
                  * This turns out to be similar to a single case!
                  * The URL used is for the next submission.
                  */
-                $offset = required_param('offset', PARAM_INT);
                 $previousid = required_param('previousid', PARAM_INT);
                 $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
                 $id = required_param('id', PARAM_INT);
-                $offset = (int)$offset - 1;
-                redirect('submissions.php?id='.$id.'&userid='. $previousid . '&filter='.$filter.
-                         '&mode=single&offset='.$offset);
+                redirect('submissions.php?id='.$id.'&userid='. $previousid . '&filter='.$filter.'&mode=single');
                 break;
 
             case 'singlenosave':
-                $this->display_submission();
+                $userid = required_param('userid', PARAM_INT);
+                $this->display_submission($userid);
                 break;
 
             case 'print':
-                $this->display_submission();
+                $userid = required_param('userid', PARAM_INT);
+                $this->display_submission($userid);
                 break;
 
             default:
@@ -1762,24 +1759,14 @@ class checkmark {
      * TODO look through this method - this method's buggy, due to submission-table saving it's settings elsewhere now!
      * TODO 3.4 --> rewrite to use submissionstable-class!
      *
-     * @param int $offset (optional)
-     * @param int $userid (optional)
-     * @param bool $display (optional) defaults to true. Wether to echo the content or return it
+     * @param int $userid
      * @return stdClass|true
      */
-    public function display_submission($offset=-1, $userid =-1, $display=true) {
+    public function display_submission($userid) {
         global $CFG, $DB, $PAGE, $OUTPUT, $SESSION;
-        require_once($CFG->libdir.'/gradelib.php');
-        require_once($CFG->libdir.'/tablelib.php');
-        require_once($CFG->dirroot.'/repository/lib.php');
-        if ($userid == -1) {
-            $userid = required_param('userid', PARAM_INT);
-        }
-        if ($offset == -1) {
-            // Offset for where to start looking for student.
-            $offset = required_param('offset', PARAM_INT);
-        }
-        $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
+
+        $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
+        $table = \mod_checkmark\submissionstable::create_submissions_table($this->cm->id, $filter);
 
         if (!$user = $DB->get_record('user', array('id' => $userid))) {
             print_error('nousers');
@@ -1811,104 +1798,11 @@ class checkmark {
         // Construct SQL, using current offset to find the data of the next student!
         $context = context_module::instance($this->cm->id);
 
-        // Get all ppl that can submit checkmarks!
-        $groupmode = groups_get_activity_groupmode($this->cm);
-        $currentgroup = groups_get_activity_group($this->cm);
-        $users = get_enrolled_users($context, 'mod/checkmark:submit', $currentgroup, 'u.id');
         $previousid = 0;
         $nextid = 0;
-        $where = '';
-        if ($filter == self::FILTER_SUBMITTED) {
-            $where .= 's.timemodified > 0 AND ';
-        } else if ($filter == self::FILTER_REQUIRE_GRADING) {
-            $where .= 'COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0) AND ';
-        }
-        $params = array();
-        if ($users) {
-            $userfields = user_picture::fields('u', array('lastaccess', 'idnumber'));
 
-            list($sqluserids, $userparams) = $DB->get_in_or_equal(array_keys($users), SQL_PARAMS_NAMED, 'user');
-            $params = array_merge_recursive($params, $userparams);
-
-            $params['checkmarkid'] = $this->checkmark->id;
-            $params['checkmarkid2'] = $this->checkmark->id;
-
-            if ($groupmode != NOGROUPS) {
-                if (isset($SESSION->checkmark->orderby) && ($SESSION->checkmark->orderby == 'groups')) {
-                    if (isset($SESSION->checkmark->orderdirection)
-                        && $SESSION->checkmark->orderdirection == 'DESC') {
-                        $groupselect = 'MAX(grps.name)';
-                        $grouporder = ' ORDER BY grps.name '.$SESSION->checkmark->orderdirection;
-                    } else {
-                        $groupselect = 'MIN(grps.name)';
-                        $grouporder = ' ORDER BY grps.name ASC';
-                    }
-                } else {
-                    $groupselect = 'MIN(grps.name)';
-                    $grouporder = ' ORDER BY grps.name ASC';
-                }
-                $getgroupsql = 'SELECT grps.courseid, '.$groupselect;
-                $params['courseid'] = $this->course->id;
-                $getgroupsql .= ' AS groups, grpm.userid AS userid
-                             FROM {groups_members} grpm
-                             LEFT JOIN {groups} grps
-                             ON grps.id = grpm.groupid
-                             WHERE grps.courseid = :courseid
-                             GROUP BY grpm.userid'.
-                             $grouporder;
-                $groupssql = ' LEFT JOIN ('.$getgroupsql.') grpq ON u.id = grpq.userid ';
-            } else {
-                $groupssql = '';
-            }
-
-            $select = 'SELECT '.$userfields.',
-                              s.id AS submissionid, f.grade, f.feedback,
-                              s.timemodified, f.timemodified AS timemarked ';
-            if ($groupmode != NOGROUPS) {
-                $select .= ', groups ';
-            }
-            $sql = 'FROM {user} u '.
-                   'LEFT JOIN {checkmark_submissions} s ON u.id = s.userid AND s.checkmarkid = :checkmarkid
-                    LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid2'.
-                   $groupssql.
-                   'WHERE '.$where.'u.id '.$sqluserids;
-            // Construct sort!
-            if (empty($SESSION->flextable['mod-checkmark-submission'])
-                    || !is_array($SESSION->flextable['mod-checkmark-submissions']->sortby)) {
-                $sort = '';
-            } else {
-                $bits = array();
-                $sortby = $SESSION->flextable['mod-checkmark-submissions']->sortby;
-                foreach ($sortby as $column => $order) {
-                    if ($order == SORT_ASC) {
-                        $bits[] = $column . ' ASC';
-                    } else {
-                        $bits[] = $column . ' DESC';
-                    }
-                }
-
-                $sort = implode(', ', $bits);
-            }
-            if (!empty($sort)) {
-                $sort = 'ORDER BY '.$sort;
-            }
-            if ($offset >= 1) {
-                $auser = $DB->get_records_sql($select.$sql.$sort, $params, $offset - 1, 3);
-                $previoususer = current($auser);
-                $previousid = $previoususer->id;
-                $moreexistent = is_array($auser) && (count($auser) > 2);
-                next($auser);   // Reset array to last position!
-            } else {
-                $auser = $DB->get_records_sql($select.$sql.$sort, $params, $offset, 2);
-                $moreexistent = is_array($auser) && (count($auser) > 1);
-            }
-            if ($moreexistent) {
-                $nextuser = next($auser);
-                // Calculate user status!
-                $nextuser->status = ($nextuser->timemarked > 0)
-                                     && ($nextuser->timemarked >= $nextuser->timemodified);
-                $nextid = $nextuser->id;
-            }
+        if (false !== ($triple = $table->get_triple($userid))) {
+            list($previousid, $userid, $nextid) = $triple;
         }
 
         if (($feedback !== false) && isset($feedback->graderid) && $feedback->graderid) {
@@ -1949,9 +1843,7 @@ class checkmark {
             }
         }
         $mformdata->lateness = $this->display_lateness($submission->timemodified);
-        $mformdata->auser = $auser;
         $mformdata->user = $user;
-        $mformdata->offset = $offset;
         $mformdata->userid = $userid;
         $mformdata->cm = $this->cm;
         $mformdata->grading_info = $gradinginfo;
@@ -1966,13 +1858,6 @@ class checkmark {
         $mformdata->mailinfo = get_user_preferences('checkmark_mailinfo', 0);
 
         $submitform = new mod_checkmark_grading_form( null, $mformdata );
-
-        if (!$display) {
-            $return = new stdClass();
-            $return->mform = $submitform;
-            $return->fileui_options = $mformdata->fileui_options;
-            return $return;
-        }
 
         if ($submitform->is_cancelled()) {
             redirect('submissions.php?id='.$this->cm->id);

@@ -474,6 +474,41 @@ class submissionstable extends \table_sql {
     }
 
     /**
+     * Returns the previous, current and next userid (to navigate the list) as array
+     *
+     * @param int $userid User to get surrounding entries for
+     * @return array|bool false if userid is not found, else triple previous userid, userid and next userid (or false if some of
+     *                    those don't exist)
+     */
+    public function get_triple($userid) {
+        if (!$this->setup) {
+            $this->setup();
+        }
+        if (!$this->rawdata) {
+            $this->query_db(0);
+        }
+
+        if (!key_exists($userid, $this->rawdata)) {
+            return false;
+        }
+
+        $userids = array_keys($this->rawdata);
+        $pos = array_search($userid, $userids);
+
+        if (count($userids) == 1) {
+            return [false, $userids[$pos], false];
+        } else if ($pos > 0 && $pos < count($userids) - 1) {
+            return [$userids[$pos - 1], $userids[$pos], $userids[$pos + 1]];
+        } else if ($pos == 0) {
+            return [false, $userids[$pos], $userids[$pos + 1]];
+        } else if ($pos == count($userids) - 1) {
+            return [$userids[$pos - 1], $userids[$pos], false];
+        }
+
+        return false;
+    }
+
+    /**
      * Set the sql to query the db. Query will be :
      *      SELECT $fields FROM $from WHERE $where
      * Of course you can use sub-queries, JOINS etc. by putting them in the
@@ -1229,9 +1264,7 @@ class submissionstable extends \table_sql {
      */
     public function col_status($values) {
         global $OUTPUT;
-        if (!isset($this->offset)) {
-            $this->offset = optional_param('page', 0, PARAM_INT) * $this->pagesize;
-        }
+
         // TODO: enhance with AJAX grading!
         $status = ($values->timemarked > 0) && ($values->timemarked >= $values->timesubmitted);
         $text = $status ? $this->strupdate : $this->strgrade;
@@ -1241,7 +1274,7 @@ class submissionstable extends \table_sql {
             // No more buttons, we use popups!
             $popupurl = '/mod/checkmark/submissions.php?id='.$this->checkmark->cm->id.
                         '&amp;userid='.$values->id.'&amp;mode=single'.
-                        '&amp;filter='.$this->filter.'&amp;offset='.$this->offset++;
+                        '&amp;filter='.$this->filter;
 
             $button = $OUTPUT->action_link($popupurl, $text);
 

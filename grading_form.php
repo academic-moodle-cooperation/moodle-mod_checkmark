@@ -46,8 +46,6 @@ class mod_checkmark_grading_form extends moodleform {
         $formattr['id'] = 'submitform';
         $mform->setAttributes($formattr);
         // Here come the hidden params!
-        $mform->addElement('hidden', 'offset', ($this->_customdata->offset + 1));
-        $mform->setType('offset', PARAM_INT);
         $mform->addElement('hidden', 'userid', $this->_customdata->userid);
         $mform->setType('userid', PARAM_INT);
         $mform->addElement('hidden', 'nextid', $this->_customdata->nextid);
