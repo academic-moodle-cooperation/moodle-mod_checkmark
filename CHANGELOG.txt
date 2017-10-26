@@ -1,5 +1,19 @@
 CHANGELOG
 =========
+3.3.4 (2017-10-26)
+------------------
+
+* [FEATURE] #4399 quick-export templates to enable a reliable setting for exporting PDFs
+* [FEATURE] #4331 setting to force name column to be written in one line in PDF exports
+* [FIXED] #4330 UTF-8 symbols in examples' names wont get saved HTML-encoded
+* [FIXED] #4860 replaced free text field for page size in submission view with select dropdown, due to huge page size values for
+                submissions table caused core's tablelib to allocate huge amounts of memory
+* [FIXED] #4867 fixed wrong order when grading single submissions via "next"/"previous"/"save and next"-buttons due to accessing
+                settings in old unused memory places (possible regression of #3226)
+* [CHANGED] separated submissions tab and export tab (URLs for export tab changed and no tab-parameter needed!)
+* removal of unused code, small improvements, etc.
+
+
 3.3.3 (2017-10-10)
 ------------------
 
