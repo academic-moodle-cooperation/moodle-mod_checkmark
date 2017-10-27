@@ -62,8 +62,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        $mform->addElement('text', 'name', get_string('checkmarkname', 'checkmark'),
-                           array('size' => '64'));
+        $mform->addElement('text', 'name', get_string('checkmarkname', 'checkmark'), array('size' => '64'));
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
@@ -101,7 +100,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->addElement('advcheckbox', 'alwaysshowdescription', $name);
         $mform->addHelpButton('alwaysshowdescription', 'alwaysshowdescription', 'checkmark');
         $mform->setDefault('alwaysshowdescription', 1);
-        $mform->disabledIf('alwaysshowdescription', 'timeavailable[enabled]', 'notchecked');
+        $mform->hideIf('alwaysshowdescription', 'timeavailable[enabled]', 'notchecked');
 
         $this->add_checkmark_elements();
 
@@ -228,14 +227,12 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->addElement('modgrade', 'presentationgrade', get_string('presentationgrading_grade', 'checkmark'), $gradeoptions);
         $mform->addHelpButton('presentationgrade', 'presentationgrading_grade', 'checkmark');
         $mform->setDefault('presentationgrade', $CFG->gradepointdefault);
-        $mform->disabledIf('presentationgrade[modgrade_type]', 'presentationgrading', 'eq', 0);
-        $mform->disabledIf('presentationgrade[modgrade_scale]', 'presentationgrading', 'eq', 0);
-        $mform->disabledIf('presentationgrade[modgrade_point]', 'presentationgrading', 'eq', 0);
+        $mform->hideIf('presentationgrade', 'presentationgrading', 'eq', 0);
 
         $mform->addElement('selectyesno', 'presentationgradebook', get_string('presentationgradebook', 'checkmark'));
         $mform->addHelpButton('presentationgradebook', 'presentationgradebook', 'checkmark');
         $mform->setDefault('presentationgradebook', $ingradebook);
-        $mform->disabledIf('presentationgradebook', 'presentationgrading', 'eq', 0);
+        $mform->hideIf('presentationgradebook', 'presentationgrading', 'eq', 0);
     }
 
     /**
@@ -275,7 +272,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         // We're going to clean them by ourselves...
         $mform->setType('examplecount', PARAM_INT);
         $mform->addHelpButton('examplecount', 'numberofexamples', 'checkmark');
-        $mform->disabledIf('examplecount', 'flexiblenaming', 'checked');
+        $mform->hideIf('examplecount', 'flexiblenaming', 'checked');
         $stdexamplecount = get_config('checkmark', 'stdexamplecount');
         $mform->setDefault('examplecount', $stdexamplecount);
 
@@ -283,7 +280,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         // We're going to clean them by ourselves...
         $mform->setType('examplestart', PARAM_INT);
         $mform->addHelpButton('examplestart', 'firstexamplenumber', 'checkmark');
-        $mform->disabledIf('examplestart', 'flexiblenaming', 'checked');
+        $mform->hideIf('examplestart', 'flexiblenaming', 'checked');
         $stdexamplestart = get_config('checkmark', 'stdexamplestart');
         $mform->setDefault('examplestart', $stdexamplestart);
 
@@ -307,7 +304,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $stdnames = get_config('checkmark', 'stdnames');
         $mform->setDefault('examplenames', $stdnames);
 
-        $mform->disabledIf('examplenames', 'flexiblenaming', 'notchecked');
+        $mform->hideIf('examplenames', 'flexiblenaming', 'notchecked');
         $mform->setAdvanced('examplenames');
 
         $mform->addElement('text', 'examplegrades', get_string('examplegrades', 'checkmark').' ('.checkmark::DELIMITER.')',
@@ -317,7 +314,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->addHelpButton('examplegrades', 'examplegrades', 'checkmark');
         $stdgrades = get_config('checkmark', 'stdgrades');
         $mform->setDefault('examplegrades', $stdgrades);
-        $mform->disabledIf('examplegrades', 'flexiblenaming', 'notchecked');
+        $mform->hideIf('examplegrades', 'flexiblenaming', 'notchecked');
         $mform->setAdvanced('examplegrades');
     }
 
@@ -335,12 +332,12 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         // Add select: attendance influences grade yes/no?
         $mform->addElement('selectyesno', 'attendancegradelink', get_string('attendancegradelink', 'checkmark'));
-        $mform->disabledIf('attendancegradelink', 'trackattendance', 'eq', 0);
+        $mform->hideIf('attendancegradelink', 'trackattendance', 'eq', 0);
         $mform->addHelpButton('attendancegradelink', 'attendancegradelink', 'checkmark');
 
         // Add select: save attendance in gradebook yes/no?
         $mform->addElement('selectyesno', 'attendancegradebook', get_string('attendancegradebook', 'checkmark'));
-        $mform->disabledIf('attendancegradebook', 'trackattendance', 'eq', 0);
+        $mform->hideIf('attendancegradebook', 'trackattendance', 'eq', 0);
         $mform->addHelpButton('attendancegradebook', 'attendancegradebook', 'checkmark');
     }
 
