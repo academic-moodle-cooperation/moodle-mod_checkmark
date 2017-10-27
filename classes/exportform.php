@@ -127,8 +127,7 @@ class exportform extends \moodleform {
         $mform->addHelpButton('printperpagegrp', 'pdfpagesize', 'checkmark');
         $mform->setType('printperpage', PARAM_INT);
         $mform->disabledIf('printperpage', 'printoptimum', 'checked');
-        $mform->disabledIf('printperpage', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
-        $mform->disabledIf('printoptimum', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->hideIf('printperpagegrp', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
 
         $textsizes = [
             0 => get_string('strsmall', 'checkmark'),
@@ -136,26 +135,26 @@ class exportform extends \moodleform {
             2 => get_string('strlarge', 'checkmark')
         ];
         $mform->addElement('select', 'textsize', get_string('pdftextsize', 'checkmark'), $textsizes);
-        $mform->disabledIf('textsize', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
-        $mform->disabledIf('textsize', 'template', 'neq', '');
+        $mform->hideIf('textsize', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->hideIf('textsize', 'template', 'neq', '');
 
         $pageorientations = [
             MTablePDF::LANDSCAPE => get_string('strlandscape', 'checkmark'),
             MTablePDF::PORTRAIT => get_string('strportrait', 'checkmark')
         ];
         $mform->addElement('select', 'pageorientation', get_string('pdfpageorientation', 'checkmark'), $pageorientations);
-        $mform->disabledIf('pageorientation', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
-        $mform->disabledIf('pageorientation', 'template', 'neq', '');
+        $mform->hideIf('pageorientation', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->hideIf('pageorientation', 'template', 'neq', '');
 
         $mform->addElement('checkbox', 'printheader', get_string('pdfprintheader', 'checkmark'));
         $mform->addHelpButton('printheader', 'pdfprintheader', 'checkmark');
-        $mform->disabledIf('printheader', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
-        $mform->disabledIf('printheader', 'template', 'neq', '');
+        $mform->hideIf('printheader', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->hideIf('printheader', 'template', 'neq', '');
 
         $mform->addElement('checkbox', 'forcesinglelinenames', get_string('forcesinglelinenames', 'checkmark'));
         $mform->addHelpButton('forcesinglelinenames', 'forcesinglelinenames', 'checkmark');
-        $mform->disabledIf('forcesinglelinenames', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
-        $mform->disabledIf('forcesinglelinenames', 'template', 'neq', '');
+        $mform->hideIf('forcesinglelinenames', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->hideIf('forcesinglelinenames', 'template', 'neq', '');
 
         $mform->addElement('submit', 'export', get_string('export', 'checkmark'));
 
