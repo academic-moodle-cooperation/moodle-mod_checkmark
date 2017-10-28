@@ -36,9 +36,11 @@ define(['jquery', 'core/log'], function($, log) {
         this.examples = [];
     };
 
-    /*
-     * updateSummary() updates the displayed summary during submission edit
-     * @return true if everything's allright (no error handling by now)
+    /**
+     * UpdateSummary updates the displayed summary during submission edit
+     *
+     * @param {Event} e event object
+     * @return {bool} true if everything's allright (no error handling by now)
      */
     Submission.prototype.updateSummary = function(e) {
         var examplesNew = 0;
@@ -67,13 +69,13 @@ define(['jquery', 'core/log'], function($, log) {
         return true;
     };
 
-    /*
-     * resetSubmissionForm(e) reset method replaces std-reset-behaviour
-     * first prevents default reset behaviour
-     * second resets the form manually
-     * third ensure to display updated data
-     * @param e    event-object
-     * @return true if everything's allright (no error handling by now)
+    /**
+     * ResetSubmissionForm reset method replaces std-reset-behaviour
+     *   I) prevents default reset behaviour
+     *  II) resets the form manually
+     * III) ensure to display updated data
+     * @param {Event} e event-object
+     * @return {bool} true if everything's allright (no error handling by now)
      */
     Submission.prototype.resetSubmissionForm = function(e) {
         e.preventDefault();
@@ -86,12 +88,11 @@ define(['jquery', 'core/log'], function($, log) {
 
     var instance = new Submission();
 
-    /*
-     * initializer(config) prepares checkmark-data
-     * and registers event-listeners for each checkbox
+    /**
+     * Initializer prepares checkmark-data and registers event-listeners for each checkbox
      *
-     * @param config contains object with all examples
-     * @return    true if everything's ok (no error-handling implemented)
+     * @param {Array} params contains object with all examples
+     * @return {bool} true if everything's ok (no error-handling implemented)
      */
     instance.initializer = function(params) {
             instance.examples = params.examples;

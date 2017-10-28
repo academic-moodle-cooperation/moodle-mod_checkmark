@@ -35,11 +35,12 @@ define(['jquery', 'core/log'], function($, log) {
         this.dividingSymbol = ',';
     };
 
-    /*
-     * updateSettings() updates the grade-selector appropriate to the given
+    /**
+     * UpdateSettings updates the grade-selector appropriate to the given
      * individual grades (flexiblenaming = 1) or the given amount of examples (flexiblenaming = 0)
      *
-     * @return true if everything's allright (no error handling by now)
+     * @param {Event} e event object
+     * @return {bool} true if everything's allright (no error handling by now)
      */
     Settings.prototype.updateSettings = function(e) {
         var gradeSum = 0;
@@ -100,6 +101,12 @@ define(['jquery', 'core/log'], function($, log) {
         return true;
     };
 
+    /**
+     * Strips unwanted characters from examplegrades field!
+     *
+     * @param {Event} e event object
+     * @returns {boolean} true if everything's OK
+     */
     Settings.prototype.stripper = function(e) {
         if ((e !== null) && (e.which <= 46)) { // That means: no written character!
             return true;
@@ -117,8 +124,11 @@ define(['jquery', 'core/log'], function($, log) {
 
     var instance = new Settings();
 
-    /*
-     * initializer(config) prepares settings form for JS-functionality
+    /**
+     * Initializer prepares settings form for JS-functionality
+     *
+     * @param {Array} config contains object with all examples
+     * @return {bool} true if everything's ok (no error-handling implemented)
      */
     instance.initializer = function(config) {
         instance.dividingSymbol = config.dividingSymbol;
@@ -143,6 +153,8 @@ define(['jquery', 'core/log'], function($, log) {
         if ($("input[name=allready_submit]").val() === 'no') {
             instance.updateSettings({data: instance});
         }
+
+        return true;
     };
 
     return instance;
