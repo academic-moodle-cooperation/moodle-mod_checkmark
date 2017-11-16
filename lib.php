@@ -261,7 +261,7 @@ function checkmark_update_examples($checkmark) {
                                    ' object containing data from the mod_form.');
     }
 
-    $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmark->instance));
+    $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmark->instance), 'id ASC');
 
     if (!empty($examples)) {
         list($esql, $eparams) = $DB->get_in_or_equal(array_keys($examples));
@@ -1690,14 +1690,16 @@ function checkmark_print_overview($courses, &$htmlarray) {
              LEFT JOIN {checkmark_checks} chks ON chks.exampleid = ex.id
              LEFT JOIN {checkmark_submissions} sub ON chks.submissionid = sub.id
                  WHERE ex.checkmarkid = :checkmarkid
-                       AND (sub.userid = :userid OR sub.userid IS NULL)';
+                       AND (sub.userid = :userid OR sub.userid IS NULL)
+              ORDER BY ex.id';
             $mysubmissions[$key]->examples = $DB->get_records_sql($sql, array('userid'      => $USER->id,
                                                                               'checkmarkid' => $key));
         } else {
             // Gotty say, nothing is checked, 'cause there's no submission now!
             $sql = "SELECT ex.id AS id, name, grade, 0 AS state
                       FROM {checkmark_examples} ex
-                     WHERE ex.checkmarkid = :checkmarkid";
+                     WHERE ex.checkmarkid = :checkmarkid
+                  ORDER BY ex.id";
             $mysubmissions[$key]->examples = $DB->get_records_sql($sql, array('checkmarkid' => $key));
         }
     }
