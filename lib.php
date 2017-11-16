@@ -315,7 +315,6 @@ function checkmark_update_examples($checkmark) {
                 $next->name = html_entity_decode($names[$key]);
                 $next->grade = $grades[$key];
                 $DB->update_record('checkmark_examples', $next);
-                next($examples);
             } else {
                 // Or we create new ones if there aren't any old ones left!
                 $example = new stdClass();
@@ -323,8 +322,8 @@ function checkmark_update_examples($checkmark) {
                 $example->name = html_entity_decode($names[$key]);
                 $example->grade = $grades[$key];
                 $DB->insert_record('checkmark_examples', $example);
-                next($examples);
             }
+            next($examples);
         }
         while ($next = current($examples)) { // We delete the rest if there are any old left!
             $DB->delete_records('checkmark_examples', array('id' => $next->id));
