@@ -198,7 +198,7 @@ class checkmark {
         global $DB;
 
         if (!isset($this->checkmark->examples)) {
-            $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $this->checkmark->id));
+            $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $this->checkmark->id), 'id ASC');
 
             $exampleprefix = $this->checkmark->exampleprefix;
 
@@ -224,7 +224,7 @@ class checkmark {
     public static function get_examples_static($checkmarkid) {
         global $DB;
 
-        $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmarkid));
+        $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmarkid), 'id ASC');
 
         $exampleprefix = $DB->get_field('checkmark', 'exampleprefix', array('id' => $checkmarkid));
 
@@ -1118,7 +1118,7 @@ class checkmark {
             return false;
         }
 
-        $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $instanceid));
+        $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $instanceid), 'id ASC');
 
         $oldname = null;
         $oldgrade = null;
