@@ -2227,7 +2227,7 @@ class checkmark {
                 $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
                 $printperpage = (($printperpage <= 0) || $printoptimum) ? 0 : $printperpage;
                 set_user_preference('checkmark_pdfprintperpage', $printperpage);
-                $textsize = optional_param('textsize', 0, PARAM_INT);
+                $textsize = optional_param('textsize', \mod_checkmark\MTablePDF::FONTSIZE_SMALL, PARAM_INT);
                 set_user_preference('checkmark_textsize', $textsize);
                 $pageorientation = optional_param('pageorientation', \mod_checkmark\MTablePDF::LANDSCAPE, PARAM_ALPHA);
                 set_user_preference('checkmark_pageorientation', $pageorientation);
@@ -2251,7 +2251,7 @@ class checkmark {
             } else {
                 $printoptimum = 0;
             }
-            $textsize = get_user_preferences('checkmark_textsize', 0);
+            $textsize = get_user_preferences('checkmark_textsize', \mod_checkmark\MTablePDF::FONTSIZE_SMALL);
             $pageorientation = get_user_preferences('checkmark_pageorientation', \mod_checkmark\MTablePDF::LANDSCAPE);
             $printheader = get_user_preferences('checkmark_printheader', 1);
             $forcesinglelinenames = get_user_preferences('checkmark_forcesinglelinenames', 0);

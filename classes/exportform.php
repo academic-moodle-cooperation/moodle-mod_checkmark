@@ -130,9 +130,9 @@ class exportform extends \moodleform {
         $mform->hideIf('printperpagegrp', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
 
         $textsizes = [
-            0 => get_string('strsmall', 'checkmark'),
-            1 => get_string('strmedium', 'checkmark'),
-            2 => get_string('strlarge', 'checkmark')
+            MTablePDF::FONTSIZE_SMALL => get_string('strsmall', 'checkmark'),
+            MTablePDF::FONTSIZE_MEDIUM => get_string('strmedium', 'checkmark'),
+            MTablePDF::FONTSIZE_LARGE => get_string('strlarge', 'checkmark')
         ];
         $mform->addElement('select', 'textsize', get_string('pdftextsize', 'checkmark'), $textsizes);
         $mform->hideIf('textsize', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
