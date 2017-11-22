@@ -1,5 +1,15 @@
 CHANGELOG
 =========
+3.3.5 (2017-11-22)
+------------------
+
+* [FIXED] #4915 order examples fetched from DB by ID where it's significant
+* [FIXED] #4952 fixed text-size setting having no effect in PDF exports
+* [FIXED] #4954 fixed UI/UX regression causing only the current page to be exported by disabling pagination for exports
+* [CHANGED] #4954 show initialbars for submission- and export-table if pagination is disabled
+* [CHANGED] pin node version to 8.9
+
+
 3.3.4 (2017-10-26)
 ------------------
 
