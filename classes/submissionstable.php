@@ -150,7 +150,7 @@ class submissionstable extends \table_sql {
             }
             $grandtotal = $DB->count_records_sql($this->countsql, $this->countparams);
             if ($useinitialsbar && !$this->is_downloading()) {
-                $this->initialbars($grandtotal > $pagesize);
+                $this->initialbars(($grandtotal > $pagesize) || empty($pagesize));
             }
 
             list($wsql, $wparams) = $this->get_sql_where();
