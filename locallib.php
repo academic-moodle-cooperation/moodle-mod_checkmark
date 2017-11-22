@@ -2176,11 +2176,10 @@ class checkmark {
             if ($dataonly) {
                 return $table->get_data();
             } else {
-                $perpage = get_user_preferences('checkmark_perpage', 10);
                 echo html_writer::start_tag('div', array('class' => 'fcontainer scroll_forced',
                                                          'id'    => 'table_begin'));
                 echo html_writer::tag('div', $table->checkbox_controller(), array('class' => 'checkboxcontroller'));
-                $table->out($perpage, true);
+                $table->out(0, true);
                 echo html_writer::end_tag('div');
                 return $table;
             }
