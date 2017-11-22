@@ -276,7 +276,7 @@ function checkmark_update_examples($checkmark) {
     if (empty($checkmark->flexiblenaming)) {
         // Standard-naming.
         $i = $checkmark->examplestart;
-        if ($checkmark->grade >= 0) {
+        if ($checkmark->grade >= 0 && !empty($checkmark->examplecount)) {
             $grade = $checkmark->grade / $checkmark->examplecount;
         } else {
             $grade = 0;
