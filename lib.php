@@ -326,7 +326,7 @@ function checkmark_update_examples($checkmark) {
             next($examples);
         }
         while ($next = current($examples)) { // We delete the rest if there are any old left!
-            $DB->delete_records('checkmark_examples', array('id' => $next->id));
+            $DB->delete_records('checkmark_examples', ['id' => $next->id]);
             next($examples);
         }
     }
