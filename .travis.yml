@@ -2,7 +2,10 @@
 language: php
 
 # This tells Travis CI to use its new architecture.  Everything is better!
-sudo: false
+#sudo: false
+# We have to use the fully virtualized environment to work around problems with behat tests using selenium and firefox
+# @see also https://github.com/moodlerooms/moodle-plugin-ci/issues/70
+sudo: required
 
 addons:
   firefox: "47.0.1"
