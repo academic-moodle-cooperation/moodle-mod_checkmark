@@ -19,17 +19,18 @@
  *
  * @package   mod_checkmark
  * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @copyright 2017 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$handlers = array();
-
-/* List of events thrown from checkmark module
-
-checkmark_finalize_sent - object course, object user, object cm, object checkmark, fileareaname
-checkmark_file_sent     - object course, object user, object cm, object checkmark, object file
-
-*/
+$observers = [
+        [
+                'eventname'    => '\core\event\course_module_updated',
+                'callback'     => '\mod_checkmark\observer::course_module_updated',
+                'includefile'  => '/mod/checkmark/classes/observer.php',
+                'priority'     => 0,
+                'internal'     => true,
+        ],
+];
