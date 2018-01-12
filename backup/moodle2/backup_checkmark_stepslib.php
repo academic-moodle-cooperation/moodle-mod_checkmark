@@ -49,6 +49,11 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
             'gradingdue', 'emailteachers', 'exampleprefix', 'grade', 'trackattendance', 'attendancegradelink',
             'presentationgrading', 'presentationgrade', 'presentationgradebook', 'timemodified'));
 
+        $overrides = new backup_nested_element('overrides');
+
+        $override = new backup_nested_element('override', ['id'], ['checkmarkid', 'userid', 'timeavailable', 'timedue',
+            'cutoffdate', 'timecreated', 'modifierid']);
+
         $submissions = new backup_nested_element('submissions');
 
         $submission = new backup_nested_element('submission', array('id'), array(
@@ -71,6 +76,8 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         // Now build the tree!
         $checkmark->add_child($examples);
         $examples->add_child($example);
+        $checkmark->add_child($overrides);
+        $overrides->add_child($override);
         $checkmark->add_child($submissions);
         $submissions->add_child($submission);
         $checkmark->add_child($feedbacks);
@@ -87,6 +94,7 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
 
         // All the rest of elements only happen if we are including user info!
         if ($userinfo) {
+            $override->set_source_table('checkmark_overrides', ['checkmarkid' => backup::VAR_PARENTID]);
             $submission->set_source_table('checkmark_submissions',
                                           array('checkmarkid' => backup::VAR_PARENTID));
             $feedback->set_source_table('checkmark_feedbacks',
@@ -98,6 +106,8 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         // Define id annotations!
         $checkmark->annotate_ids('scale', 'grade');
         $checkmark->annotate_ids('scale', 'presentationgrade');
+        $override->annotate_ids('user', 'userid');
+        $override->annotate_ids('user', 'modifierid');
         $submission->annotate_ids('user', 'userid');
         $feedback->annotate_ids('user', 'userid');
         $feedback->annotate_ids('user', 'graderid');

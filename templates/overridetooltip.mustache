@@ -1,0 +1,52 @@
+{{!
+    This file is part of mod_publication for Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_grouptool/checkboxcontroller
+
+    Grouptool's checkboxcontroller template.
+
+    The purpose of this template is to display control-elements for the sortlist's checkboxes.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * helpicon helpicon displayed besides title
+    * options Array with groupingids & grouping names
+
+    Example context (json):
+    {
+        "timeavailable": { "title": "Help Text Title", "linktext": "Help Text Content" },
+        "timedue": "2018-01-31 12:45"
+    }
+
+}}
+<div class="mod_checkmark_overridetooltip text-left p-a-0">
+    <a class="btn btn-link p-a-0 m-a-0" role="button"
+       data-container="body" data-toggle="popover"
+       data-placement="{{#ltr}}right{{/ltr}}{{^ltr}}left{{/ltr}}" data-content="{{!
+            }}<div><strong>{{#str}}dates_overwritten, mod_checkmark{{/str}}</strong></div>{{!
+            }}{{#timeavailable}}<div class='nowrap'>{{#str}}availabledate, mod_checkmark{{/str}}:&nbsp;{{.}}</div>{{/timeavailable}}{{!
+            }}{{#timedue}}<div class='nowrap'>{{#str}}duedate, mod_checkmark{{/str}}:&nbsp;{{.}}</div>{{/timedue}}{{!
+            }}{{#cutoffdate}}<div class='nowrap'>{{#str}}cutoffdate, mod_checkmark{{/str}}:&nbsp;{{.}}</div>{{/cutoffdate}}"{{!
+       }} data-html="true" tabindex="0" data-trigger="focus">
+       {{#pix}} overwrittendates, mod_checkmark,  {{#str}}dates_overwritten, mod_checkmark{{/str}} {{/pix}}
+    </a>
+</div>

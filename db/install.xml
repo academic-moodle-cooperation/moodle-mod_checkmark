@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/checkmark/db" VERSION="20170423" COMMENT="XMLDB file for Moodle mod/checkmark"
+<XMLDB PATH="mod/checkmark/db" VERSION="20171220" COMMENT="XMLDB file for Moodle mod/checkmark"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -102,6 +102,26 @@
         <KEY NAME="exampleid" TYPE="foreign" FIELDS="exampleid" REFTABLE="checkmark_examples" REFFIELDS="id"/>
         <KEY NAME="submissionid" TYPE="foreign" FIELDS="submissionid" REFTABLE="checkmark_submissions" REFFIELDS="id"/>
       </KEYS>
+    </TABLE>
+    <TABLE NAME="checkmark_overrides" COMMENT="Table containing user specific overrides for available-, due- and cutoff-dates for users.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="checkmarkid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timeavailable" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timedue" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="cutoffdate" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="checkmarkid" TYPE="foreign" FIELDS="checkmarkid" REFTABLE="checkmark" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="checkmarkid-userid" UNIQUE="false" FIELDS="checkmarkid, userid"/>
+        <INDEX NAME="timecreated" UNIQUE="false" FIELDS="timecreated"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

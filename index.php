@@ -117,8 +117,13 @@ foreach ($modinfo->instances['checkmark'] as $cm) {
         $grade = '-';
     }
 
-
     $due = !empty($cms[$cm->id]) && !empty($cms[$cm->id]->timedue) ? userdate($cms[$cm->id]->timedue) : '-';
+    $overridden = checkmark_get_overridden_dates($cm->instance, $USER->id);
+    if (!empty($overridden) && !empty($overridden->timedue)) {
+        $due .= html_writer::div(get_string('extended_until', 'checkmark', userdate($overridden->timedue)),
+                'small alert-info');
+    }
+
 
     if ($usesections) {
         $table->data[] = array ($printsection, $link, $due, $submitted, $grade);

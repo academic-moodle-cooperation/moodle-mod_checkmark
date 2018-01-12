@@ -38,10 +38,19 @@ $mode = optional_param('mode', 'all', PARAM_ALPHANUM);  // What mode are we in?
 // Sets url with params and performs require_login!
 $url = new moodle_url('/mod/checkmark/submissions.php');
 list($cm, $checkmark, $course) = \checkmark::init_checks($id, $c, $url);
+$context = context_module::instance($cm->id);
 
 if (optional_param('tab', false, PARAM_ALPHANUM) == 'printpreview') {
     // Legacy link redirect!
     redirect(new moodle_url('/mod/checkmark/export.php', array('id' => $cm->id)));
+} else if (optional_param('bulk', false, PARAM_BOOL) && optional_param('bulkaction', null, PARAM_ALPHA) === 'extend'
+        && has_capability('mod/checkmark:manageoverrides', $context)) {
+    $url = new moodle_url('/mod/checkmark/extend.php', [
+            'id' => $cm->id,
+            'type' => \mod_checkmark\overrideform::USER,
+            'users' => json_encode(optional_param_array('selected', [], PARAM_INT)),
+            'return' => urlencode($PAGE->url->out())]);
+    redirect($url);
 }
 
 require_capability('mod/checkmark:grade', context_module::instance($cm->id));

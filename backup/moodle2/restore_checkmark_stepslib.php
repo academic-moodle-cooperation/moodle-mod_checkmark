@@ -54,6 +54,8 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
         $paths[] = $example;
 
         if ($userinfo) {
+            $override = new restore_path_element('checkmark_override', '/activity/checkmark/overrides/override');
+            $paths[] = $override;
             $submission = new restore_path_element('checkmark_submission',
                                                    '/activity/checkmark/submissions/submission');
             $paths[] = $submission;
@@ -154,6 +156,27 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
                                                                'grade'       => $examplegrades[$key]));
             }
         }
+    }
+
+    /**
+     * Handles restoration of 1 checkmark submission
+     *
+     * @param object $data Submission data to restore
+     */
+    protected function process_checkmark_override($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $data->checkmarkid = $this->get_new_parentid('checkmark');
+        $data->timecreated = $this->apply_date_offset($data->timecreated);
+
+        $data->userid = $this->get_mappingid('user', $data->userid);
+        $data->modifierid = $this->get_mappingid('user', $data->modifierid);
+
+        $newitemid = $DB->insert_record('checkmark_overrides', $data);
+        $this->set_mapping('checkmark_overrides', $oldid, $newitemid, true);
     }
 
     /**

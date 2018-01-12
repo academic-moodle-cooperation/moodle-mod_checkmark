@@ -143,5 +143,15 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         )
     ),
+
+    // Edit the date overrides.
+    'mod/checkmark:manageoverrides' => array(
+            'captype' => 'write',
+            'contextlevel' => CONTEXT_MODULE,
+            'archetypes' => array(
+                    'editingteacher' => CAP_ALLOW,
+                    'manager' => CAP_ALLOW
+            )
+    ),
 );
 

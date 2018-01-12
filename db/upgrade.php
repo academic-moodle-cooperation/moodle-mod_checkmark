@@ -1049,5 +1049,37 @@ function xmldb_checkmark_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2017042300, 'checkmark');
     }
 
+    if ($oldversion < 2017081300) {
+        // Define table checkmark_overrides to be created.
+        $table = new xmldb_table('checkmark_overrides');
+
+        // Adding fields to table checkmark_overrides.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('checkmarkid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('timeavailable', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('timedue', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('cutoffdate', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('modifierid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table checkmark_overrides.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('checkmarkid', XMLDB_KEY_FOREIGN, array('checkmarkid'), 'checkmark', array('id'));
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+        $table->add_key('modifierid', XMLDB_KEY_FOREIGN, array('modifierid'), 'user', array('id'));
+
+        // Adding indexes to table checkmark_overrides.
+        $table->add_index('checkmarkid-userid-timecreated', XMLDB_INDEX_NOTUNIQUE, array('checkmarkid', 'userid', 'timecreated'));
+
+        // Conditionally launch create table for checkmark_overrides.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2017081300, 'checkmark');
+    }
+
     return true;
 }

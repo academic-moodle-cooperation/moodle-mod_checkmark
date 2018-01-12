@@ -100,9 +100,10 @@
     text-align: center;
 }
 
-#page-mod-checkmark-view #dates .c0 {
+#page-mod-checkmark-view #dates .title {
     font-weight: bold;
     text-align: right;
+    vertical-align: top;
 }
 
 #page-mod-checkmark-submissions .fastgbutton {

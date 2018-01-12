@@ -76,8 +76,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->setExpanded('availability', true);
 
         $name = get_string('availabledate', 'checkmark');
-        $options = array('optional' => true);
-        $mform->addElement('date_time_selector', 'timeavailable', $name, $options);
+        $mform->addElement('date_time_selector', 'timeavailable', $name, array('optional' => true));
         $mform->addHelpButton('timeavailable', 'availabledate', 'checkmark');
         $mform->setDefault('timeavailable', time());
 

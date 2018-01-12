@@ -394,12 +394,18 @@ function checkmark_user_complete($course, $user, $mod, $checkmark) {
  *                        will know about (most noticeably, an icon).
  */
 function checkmark_get_coursemodule_info($coursemodule) {
-    global $DB;
+    global $DB, $USER;
 
     $dbparams = array('id' => $coursemodule->instance);
     $fields = 'id, name, alwaysshowdescription, timeavailable, intro, introformat';
     if (!$checkmark = $DB->get_record('checkmark', $dbparams, $fields)) {
         return false;
+    }
+
+    if ($overridden = checkmark_get_overridden_dates($checkmark->id, $USER->id)) {
+        if ($overridden->timeavailable) {
+            $checkmark->timeavailable = $overridden->timeavailable;
+        }
     }
 
     $result = new cached_cm_info();
@@ -412,12 +418,50 @@ function checkmark_get_coursemodule_info($coursemodule) {
             unset($result->content);
         }
     }
+
     return $result;
 }
 
 /**
+ * This function returns the overridden values for timeavailable, timedue and cutoffdate or false!
+ *
+ * It uses a static variable to cache the results and possibly lessen DB queries! TODO: examine if we need some other cache for it!
+ *
+ * @param $checkmarkid
+ * @param int $userid
+ * @return bool
+ */
+function checkmark_get_overridden_dates($checkmarkid, $userid=0) {
+    global $USER, $DB;
+
+    static $cached = [];
+
+    if ($userid === 0) {
+        $userid = $USER->id;
+    }
+
+    if (key_exists($userid, $cached) && key_exists($checkmarkid, $cached[$userid])) {
+        return $cached[$userid][$checkmarkid];
+    }
+
+    $records = $DB->get_records("checkmark_overrides", ['checkmarkid' => $checkmarkid, 'userid' => $userid], "timecreated DESC",
+            "id, timeavailable, timedue, cutoffdate", 0, 1);
+
+    if (!key_exists($userid, $cached)) {
+        $cached[$userid] = [];
+    }
+
+    if (count($records)) {
+        $cached[$userid][$checkmarkid] = reset($records);
+    } else {
+        $cached[$userid][$checkmarkid] = false;
+    }
+
+    return $cached[$userid][$checkmarkid];
+}
+
+/**
  * Return grade for given user or all users.
- * @todo 2.5 use primarily grades from gradebook!
  *
  * @param object $checkmark checkmark object
  * @param int $userid optional user id, 0 means all users
@@ -888,8 +932,6 @@ function checkmark_scale_used_anywhere($scaleid) {
  * If course = 0, then every checkmark event in the site is checked, else
  * only checkmark events belonging to the course specified are checked.
  * This function is used, in its new format, by restore_refresh_events()
- *
- * TODO this callback changed in 3.3.2 and we quick fixed it but should take a look at at for 3.4!
  *
  * @param int $courseid
  * @param int|stdClass $instance Assign module instance or ID.
@@ -1976,8 +2018,8 @@ function checkmark_reset_userdata($data) {
  */
 function checkmark_reset_course_form_definition(&$mform) {
     $mform->addElement('header', 'checkmarkheader', get_string('modulenameplural', 'checkmark'));
-    $mform->addElement('advcheckbox', 'reset_checkmark_submissions',
-                       get_string('deleteallsubmissions', 'checkmark'));
+    $mform->addElement('advcheckbox', 'reset_checkmark_submissions', get_string('deleteallsubmissions', 'checkmark'));
+    $mform->addElement('advcheckbox', 'reset_checkmark_overrides', get_string('deletealloverrides', 'checkmark'));
 }
 
 /**
@@ -1987,7 +2029,10 @@ function checkmark_reset_course_form_definition(&$mform) {
  * @return array Associative array defining defaults for the form
  */
 function checkmark_reset_course_form_defaults() {
-    return array('reset_checkmark_submissions' => 1);
+    return [
+        'reset_checkmark_submissions' => 1,
+        'reset_checkmark_overrides' => 1
+    ];
 }
 
 /**
@@ -2046,6 +2091,32 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
     $checkmarkinstance = new checkmark($PAGE->cm->id, $checkmarkrow, $PAGE->cm, $PAGE->course);
 
     $allgroups = false;
+
+    // Add nodes to override dates for users/groups!
+    if (has_capability('mod/checkmark:manageoverrides', $PAGE->cm->context)) {
+        $keys = $checkmarknode->get_children_key_list();
+        // Insert nodes on position 2 and 3 in the list!
+        $url = new moodle_url('/mod/checkmark/extend.php', [
+                'id' => $PAGE->cm->id,
+                'return' => urlencode($PAGE->url->out())
+        ]);
+        $type = \navigation_node::TYPE_CUSTOM;
+        $shorttext = get_string('override_groups_dates', 'checkmark');
+        $key = 'extendgroups';
+        $icon = null;
+        $groupnode = \navigation_node::create(get_string('override_groups_dates', 'checkmark'),
+                new moodle_url($url, ['type' => \mod_checkmark\overrideform::GROUP]),
+                $type, $shorttext, $key, $icon);
+        $checkmarknode->add_node($groupnode, $keys[1]);
+
+        $shorttext = get_string('override_users_dates', 'checkmark');
+        $key = 'extendusers';
+        $icon = null;
+        $usernode = \navigation_node::create(get_string('override_users_dates', 'checkmark'),
+                new moodle_url($url, ['type' => \mod_checkmark\overrideform::USER]),
+                $type, $shorttext, $key, $icon);
+        $checkmarknode->add_node($usernode, 'extendgroups');
+    }
 
     // Add checkmark submission information!
     if (has_capability('mod/checkmark:grade', $PAGE->cm->context)) {
@@ -2141,7 +2212,9 @@ function mod_checkmark_core_calendar_provide_event_action(calendar_event $event,
 
     $checkmark = new checkmark($cm->id, null, $cm, null);
 
-    $started = time() >= $checkmark->checkmark->timeavailable;
+    $notoverridden = (!$checkmark->overrides || $checkmark->overrides->timeavailable === null);
+    $cmptime = $notoverridden ? $checkmark->checkmark->timeavailable : $checkmark->overrides->timeavailable;
+    $started = time() >= $cmptime;
     $isopen = $checkmark->isopen();
 
     if ($event->eventtype == CHECKMARK_EVENT_TYPE_GRADINGDUE) {
@@ -2206,6 +2279,7 @@ function mod_checkmark_core_calendar_event_action_shows_item_count(calendar_even
  */
 function mod_checkmark_get_fontawesome_icon_map() {
     return [
-        'mod_checkmark:questionmark' => 'fa-question text-warning'
+        'mod_checkmark:questionmark' => 'fa-question text-warning',
+        'mod_checkmark:overwrittendates' => 'fa-clock-o text-info'
     ];
 }

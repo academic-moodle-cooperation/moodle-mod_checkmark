@@ -23,8 +23,17 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_checkmark;
+use dml_exception;
+use checkmark;
+use coding_exception;
+use moodle_exception;
+use moodle_recordset;
+use core\dml\recordset_walk;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
 
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->libdir.'/gradelib.php');
@@ -75,7 +84,7 @@ class submissionstable extends \table_sql {
     /**
      * @var \array private For storing user-customised table properties in the user_preferences db table.
      */
-    private $prefs = array();
+    private $prefs = [];
 
     /** @var array */
     protected $cellwidth = [];
@@ -95,6 +104,9 @@ class submissionstable extends \table_sql {
     /** @var bool */
     protected $usesoutcomes = null;
 
+    /** @var bool */
+    protected $hasoverrides = false;
+
     /**
      * constructor
      * @param string $uniqueid a string identifying this table.Used as a key in
@@ -102,9 +114,11 @@ class submissionstable extends \table_sql {
      * @param checkmark|int $checkmarkorcmid checkmark object or course module id of checkmark instance
      */
     public function __construct($uniqueid, $checkmarkorcmid = null) {
-        global $CFG;
+        global $CFG, $DB;
 
         parent::__construct($uniqueid);
+
+        $this->attributes['id'] = $uniqueid;
 
         if ($checkmarkorcmid instanceof \checkmark) {
             $this->checkmark = $checkmarkorcmid;
@@ -132,6 +146,10 @@ class submissionstable extends \table_sql {
 
         // Save status of table(s) persistent as user preference!
         $this->is_persistent(true);
+
+        if ($DB->record_exists('checkmark_overrides', ['checkmarkid' => $this->checkmark->checkmark->id])) {
+            $this->hasoverrides = true;
+        }
     }
 
     /**
@@ -797,6 +815,14 @@ class submissionstable extends \table_sql {
      * Here we extend the moodle sql_table with the ability to output colgroups!
      */
     public function start_html() {
+        global $PAGE;
+
+        if ($this->hasoverrides) {
+            $params = new \stdClass();
+            $params->id = $this->attributes['id'];
+            $PAGE->requires->js_call_amd('mod_checkmark/overrides', 'initializer', [$params]);
+        }
+
         parent::start_html();
         if (!empty($this->colgroups)) {
             foreach ($this->colgroups as $colgrp) {
@@ -1197,12 +1223,14 @@ class submissionstable extends \table_sql {
             } else {
                 $content = userdate($values->timesubmitted, $timeformat);
             }
-            if ($values->timesubmitted >= $this->checkmark->checkmark->timedue) {
-                $content .= $this->checkmark->display_lateness($values->timesubmitted);
+            $overrides = checkmark_get_overridden_dates($this->checkmark->checkmark->id, $values->id);
+            if ($overrides && $overrides->timedue) {
+                $timedue = $overrides->timedue;
+            } else {
+                $timedue = $this->checkmark->checkmark->timedue;
             }
-            $time = $this->checkmark->checkmark->timedue - $values->timesubmitted;
-            if (!empty($this->checkmark->checkmark->timedue) && $time < 0) {
-                $late = 1;
+            if ($values->timesubmitted >= $timedue) {
+                $content .= $this->checkmark->display_lateness($values->timesubmitted, $values->id);
             }
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return strip_tags($content);
@@ -1278,8 +1306,29 @@ class submissionstable extends \table_sql {
 
             $button = $OUTPUT->action_link($popupurl, $text);
 
-            return \html_writer::tag('div', $button, array('id'    => 'up'.$values->id,
-                                                           'class' => 's'.$status));
+            // If overridden dates are present for this user, we display an icon with popup!
+            if ($this->hasoverrides && $overrides = checkmark_get_overridden_dates($this->checkmark->cm->instance, $values->id)) {
+                $context = new stdClass();
+                if ($overrides->timeavailable) {
+                    $context->timeavailable = userdate($overrides->timeavailable, get_string('strftimerecentfull'));
+                } else {
+                    $context->timeavailable = false;
+                }
+                if ($overrides->timedue) {
+                    $context->timedue = userdate($overrides->timedue, get_string('strftimerecentfull'));
+                } else {
+                    $context->timedue = false;
+                }
+                if ($overrides->cutoffdate) {
+                    $context->cutoffdate = userdate($overrides->cutoffdate, get_string('strftimerecentfull'));
+                } else {
+                    $context->cutoffdate = false;
+                }
+                $button .= $OUTPUT->render_from_template('mod_checkmark/overridetooltip', $context);
+            }
+
+            return \html_writer::tag('div', $button, ['id'    => 'up'.$values->id,
+                                                      'class' => 's'.$status]);
         }
     }
 

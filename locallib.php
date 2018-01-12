@@ -85,6 +85,8 @@ class checkmark {
     public $context;
     /** @var object[] cached examples for this instance */
     public $examples;
+    /** @var object contains overridden dates (for current user only!) */
+    public $overrides = false;
 
     /**
      * Constructor for the checkmark class
@@ -100,7 +102,7 @@ class checkmark {
      * @param object $course usually null, but if we have it we pass it to save db access
      */
     public function __construct($cmid='staticonly', $checkmark=null, $cm=null, $course=null) {
-        global $COURSE, $DB;
+        global $COURSE, $DB, $USER;
 
         if ($cmid == 'staticonly') {
             // Use static functions only!
@@ -128,6 +130,11 @@ class checkmark {
         } else if (! $this->checkmark = $DB->get_record('checkmark',
                                                         array('id' => $this->cm->instance))) {
             print_error('invalidid', 'checkmark');
+        }
+
+        // Check for overridden dates!
+        if ($overridden = checkmark_get_overridden_dates($this->checkmark->id, $USER->id)) {
+            $this->overrides = $overridden;
         }
 
         // Ensure compatibility with modedit checkmark obj!
@@ -358,8 +365,7 @@ class checkmark {
         if (!is_enrolled($this->context, $USER, 'mod/checkmark:submit')) {
             $editable = false;
         } else {
-            $editable = $this->isopen()
-                        && (!$submission || $this->checkmark->resubmit || ($feedback === false) );
+            $editable = $this->isopen() && (!$submission || $this->checkmark->resubmit || ($feedback === false) );
             if (groups_get_activity_groupmode($this->cm, $this->course) != NOGROUPS) {
                 $editable = $editable && groups_has_membership($this->cm);
             }
@@ -528,7 +534,9 @@ class checkmark {
      */
     public function view_intro() {
         global $OUTPUT;
-        if ($this->checkmark->alwaysshowdescription || time() > $this->checkmark->timeavailable) {
+        $notoverridden = (!$this->overrides || $this->overrides->timeavailable === null);
+        $cmptime = $notoverridden ? $this->checkmark->timeavailable : $this->overrides->timeavailable;
+        if ($this->checkmark->alwaysshowdescription || (time() > $cmptime)) {
             if (!empty($this->checkmark->intro)) {
                 echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
                 echo format_module_intro('checkmark', $this->checkmark, $this->cm->id);
@@ -545,27 +553,62 @@ class checkmark {
      */
     public function view_dates() {
         global $OUTPUT;
-        if (!$this->checkmark->timeavailable && !$this->checkmark->timedue) {
+        if (!$this->checkmark->timeavailable && !$this->checkmark->timedue && !$this->overrides &&
+                !$this->overrides->timeavailable && !$this->overrides->timedue) {
             return;
         }
 
         echo $OUTPUT->box_start('generalbox boxaligncenter', 'dates');
-        echo html_writer::start_tag('table');
-        if ($this->checkmark->timeavailable) {
-            $row = html_writer::tag('td', get_string('availabledate', 'checkmark').':',
-                                    array('class' => 'c0')).
-                   html_writer::tag('td', userdate($this->checkmark->timeavailable),
-                                    array('class' => 'c1'));
-            echo html_writer::tag('tr', $row);
+        $table = new html_table();
+        $table->attributes['class'] = 'table-condensed';
+        $rows = [];
+        if ($this->checkmark->timeavailable
+                || ($this->overrides && $this->overrides->timeavailable &&
+                        ($this->overrides->timeavailable !== $this->checkmark->timeavailable))) {
+            $row = [new html_table_cell(get_string('availabledate', 'checkmark').':')];
+            $row[0]->attributes['class'] = 'title';
+            if ($this->checkmark->timeavailable) {
+                $timeavailable = userdate($this->checkmark->timeavailable);
+                if ($this->overrides && $this->overrides->timeavailable) {
+                    $row[0]->rowspan = 2;
+                    $timeavailable = html_writer::tag('del', $timeavailable);
+                }
+                $row[1] = new html_table_cell($timeavailable);
+            } else {
+                $row[1] = new html_table_cell(userdate($this->overrides->timeavailable));
+                $row[1]->attributes['class'] = 'alert-info';
+            }
+            $rows[] = new html_table_row($row);
+            if ($this->checkmark->timeavailable && $this->overrides && $this->overrides->timeavailable) {
+                $row = [new html_table_cell(userdate($this->overrides->timeavailable))];
+                $row[0]->attributes['class'] = 'alert-info';
+                $rows[] = new html_table_row($row);
+            }
         }
-        if ($this->checkmark->timedue) {
-            $row = html_writer::tag('td', get_string('duedate', 'checkmark').':',
-                                    array('class' => 'c0')).
-                   html_writer::tag('td', userdate($this->checkmark->timedue),
-                                    array('class' => 'c1'));
-            echo html_writer::tag('tr', $row);
+        if ($this->checkmark->timedue
+                || ($this->overrides && $this->overrides->timedue && ($this->overrides->timedue !== $this->checkmark->timedue))) {
+            $row = [new html_table_cell(get_string('duedate', 'checkmark').':')];
+            $row[0]->attributes['class'] = 'title';
+            if ($this->checkmark->timedue) {
+                $due = userdate($this->checkmark->timedue);
+                if ($this->overrides && $this->overrides->timedue) {
+                    $row[0]->rowspan = 2;
+                    $due = html_writer::tag('del', $due);
+                }
+                $row[1] = new html_table_cell($due);
+            } else {
+                $row[1] = new html_table_cell(userdate($this->overrides->timedue));
+                $row[1]->attributes['class'] = 'alert-info align-left';
+            }
+            $rows[] = new html_table_row($row);
+            if ($this->checkmark->timedue && $this->overrides && $this->overrides->timedue) {
+                $row = [new html_table_cell(userdate($this->overrides->timedue))];
+                $row[0]->attributes['class'] = 'alert-info align-left';
+                $rows[] = new html_table_row($row);
+            }
         }
-        echo html_writer::end_tag('table');
+        $table->data = $rows;
+        echo html_writer::table($table);
         echo $OUTPUT->box_end();
     }
 
@@ -829,8 +872,12 @@ class checkmark {
                 if ($submission = $this->get_submission($USER->id)) {
                     if ($submission->timemodified) {
                         $date = userdate($submission->timemodified);
-                        if ($submission->timemodified <= $this->checkmark->timedue
-                            || empty($this->checkmark->timedue)) {
+                        if ($this->overrides && $this->overrides->timedue) {
+                            $timedue = $this->overrides->timedue;
+                        } else {
+                            $timedue = $this->checkmark->timedue;
+                        }
+                        if ($submission->timemodified <= $timedue || empty($timedue)) {
                             $submitted = html_writer::tag('span', $date, array('class' => 'text-success'));
                         } else {
                             $submitted = html_writer::tag('span', $date, array('class' => 'text-error'));
@@ -841,6 +888,43 @@ class checkmark {
         }
 
         return $submitted;
+    }
+
+    /**
+     * Override available from date, due date or cut off date for certain users!
+     *
+     * @param int[] $users
+     * @param int $timeavailable
+     * @param int $timedue
+     * @param int $cutoffdate
+     * @throws dml_exception
+     */
+    public function override_dates(array $users, int $timeavailable, int $timedue, int $cutoffdate) {
+        global $DB, $USER;
+
+        if (empty($users) || !is_array($users)) {
+            return;
+        }
+
+        $users = array_unique($users);
+
+        $record = new stdClass();
+        if (!empty($timeavailable)) {
+            $record->timeavailable = $timeavailable;
+        }
+        if (!empty($timedue)) {
+            $record->timedue = $timedue;
+        }
+        if (!empty($cutoffdate)) {
+            $record->cutoffdate = $cutoffdate;
+        }
+        $record->timecreated = time();
+        $record->modifierid = $USER->id;
+        $record->checkmarkid = $this->cm->instance;
+        foreach ($users as $cur) {
+            $record->userid = $cur;
+            $DB->insert_record('checkmark_overrides', $record);
+        }
     }
 
     /**
@@ -1842,7 +1926,7 @@ class checkmark {
                 $mformdata->presentationfeedback = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$userid]->feedback;
             }
         }
-        $mformdata->lateness = $this->display_lateness($submission->timemodified);
+        $mformdata->lateness = $this->display_lateness($submission->timemodified, $user->id);
         $mformdata->user = $user;
         $mformdata->userid = $userid;
         $mformdata->cm = $this->cm;
@@ -2048,6 +2132,11 @@ class checkmark {
                 $grp[0]->addOption(get_string('setattendant', 'checkmark'), 'setattendant');
                 $grp[0]->addOption(get_string('setabsent', 'checkmark'), 'setabsent');
                 $grp[0]->addOption('---', '', array( 'disabled' => 'disabled' ) );
+                $enablebulk = true;
+            }
+            if (has_capability('mod/checkmark:manageoverrides', $this->context)) {
+                $grp[0]->addOption(get_string('grant_extension', 'checkmark'), 'extend');
+                $grp[0]->addOption('---', '', ['disabled' => 'disabled']);
                 $enablebulk = true;
             }
             if (($this->checkmark->grade <= 0)) {
@@ -3164,17 +3253,28 @@ class checkmark {
     public function isopen() {
         $time = time();
 
-        if (empty($this->checkmark->timeavailable)) {
-            if (empty($this->checkmark->cutoffdate)) {
+        $timeavailable = $this->checkmark->timeavailable;
+        $cutoffdate = $this->checkmark->cutoffdate;
+        if ($this->overrides) {
+            if ($this->overrides->timeavailable) {
+                $timeavailable = $this->overrides->timeavailable;
+            }
+            if ($this->overrides->cutoffdate) {
+                $cutoffdate = $this->overrides->cutoffdate;
+            }
+        }
+
+        if (empty($timeavailable)) {
+            if (empty($cutoffdate)) {
                 return true;
             } else {
-                return ($time <= $this->checkmark->cutoffdate);
+                return ($time <= $cutoffdate);
             }
         } else {
-            if (empty($this->checkmark->cutoffdate)) {
-                return ($this->checkmark->timeavailable <= $time);
+            if (empty($cutoffdate)) {
+                return ($timeavailable <= $time);
             } else {
-                return (($this->checkmark->timeavailable <= $time) && ($time <= $this->checkmark->cutoffdate));
+                return (($timeavailable <= $time) && ($time <= $cutoffdate));
             }
         }
     }
@@ -3215,7 +3315,7 @@ class checkmark {
         if ($submission = $this->get_submission($user->id)) {
             echo get_string('lastmodified').': ';
             echo userdate($submission->timemodified);
-            echo $this->display_lateness($submission->timemodified);
+            echo $this->display_lateness($submission->timemodified, $user->id);
         } else {
             print_string('notsubmittedyet', 'checkmark');
         }
@@ -3234,9 +3334,20 @@ class checkmark {
      * Return a string indicating how late a submission is
      *
      * @param int $timesubmitted Submissions timestamp to compare
+     * @param int $userid (optional) if lateness should be displayed for another user!
      * @return string HTML snippet containing info about submission time
      */
-    public function display_lateness($timesubmitted) {
+    public function display_lateness($timesubmitted, $userid = 0) {
+        if (!empty($userid)) {
+            $overrides = checkmark_get_overridden_dates($this->checkmark->id, $userid);
+        } else {
+            $overrides = $this->overrides;
+        }
+
+        if ($overrides && $overrides->timedue) {
+            return checkmark_display_lateness($timesubmitted, $overrides->timedue);
+        }
+
         return checkmark_display_lateness($timesubmitted, $this->checkmark->timedue);
     }
 
@@ -3298,10 +3409,19 @@ class checkmark {
             }
         }
 
+        if ($data->reset_checkmark_overrides) {
+            $checkmarks = $DB->get_fieldset('checkmark', 'id', array('course' => $data->courseid));
+            if (!empty($checkmarks) && is_array($checkmarks)) {
+                list($checkmarksql, $params) = $DB->get_in_or_equal($checkmarks);
+                $DB->delete_records_select('checkmark_overrides', 'checkmarkid ' . $checkmarksql, $params);
+            }
+        }
+
         // Updating dates - shift may be negative too!
         if ($data->timeshift) {
             shift_course_mod_dates('checkmark', array('timedue', 'timeavailable', 'cutoffdate'),
                                    $data->timeshift, $data->course);
+
             $status[] = array('component' => $componentstr,
                               'item'      => get_string('datechanged'),
                               'error'     => false);
