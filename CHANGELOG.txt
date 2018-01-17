@@ -1,9 +1,16 @@
 CHANGELOG
 =========
-3.4-dev
+3.4.0 (2018-01-27)
 ------------------
 
-*
+* Moodle 3.4 compatible version
+* [FEATURE] #4894 added the ability to override time available, time due and cutoff-date for certain users or groups!
+* [FIXED] #5048 added an event observer to update calendar events, if instance name is changed via inplace-editing on course page
+* [FIXED] #4954 UI/UX regression causing only the current page to be exportable
+* [FIXED] #4915 order examples fetched from DB by ID, this will hopefully resolve some strange ORDER issues on certain databases
+* [CHANGED] #4954 show initial-bars even if all submissions are displayed on one page
+* [UPDATE] #4830 use hideIf in moodleforms to enhance UX by hiding everything not really relevant
+* various code improvements, removal of unused code, etc.
 
 3.3.4 (2017-10-26)
 ------------------
