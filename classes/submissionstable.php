@@ -104,6 +104,29 @@ class submissionstable extends \table_sql {
     /** @var bool */
     protected $usesoutcomes = null;
 
+    /** @var int  */
+    protected $examplecount = 0;
+    /** @var int  */
+    protected $sumabs = 0;
+    /** @var int  */
+    protected $sumrel = 0;
+    /** @var null  */
+    protected $filter = null;
+    /** @var bool  */
+    protected $quickgrade = false;
+    /** @var int  */
+    protected $tabindex = 0;
+    /** @var array  */
+    protected $colgroups = [];
+    /** @var array  */
+    protected $grademenu = [];
+    /** @var array  */
+    protected $presentationgrademenu = [];
+    /** @var string  */
+    protected $strupdate = '';
+    /** @var string  */
+    protected $strgrade = '';
+
     /** @var bool */
     protected $hasoverrides = false;
 
@@ -112,6 +135,8 @@ class submissionstable extends \table_sql {
      * @param string $uniqueid a string identifying this table.Used as a key in
      *                          session  vars. It gets set automatically with the helper methods!
      * @param checkmark|int $checkmarkorcmid checkmark object or course module id of checkmark instance
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function __construct($uniqueid, $checkmarkorcmid = null) {
         global $CFG, $DB;
@@ -158,6 +183,7 @@ class submissionstable extends \table_sql {
      * @param int $pagesize size of page for paginated displayed table.
      * @param bool $useinitialsbar do you want to use the initials bar. Bar
      * will only be used if there is a fullname column defined for the table.
+     * @throws dml_exception
      */
     public function query_db($pagesize, $useinitialsbar=true) {
         global $DB;
@@ -217,6 +243,8 @@ class submissionstable extends \table_sql {
      * table data. TODO: replace array-using methods with streaming download (like dataformat).
      *
      * @return array[] array of arrays containing data in legacy format (compatible with mtablepdf class)
+     * @throws coding_exception;
+     * @throws dml_exception
      */
     public function get_data() {
         global $SESSION;
@@ -261,13 +289,13 @@ class submissionstable extends \table_sql {
         $this->download = '';
 
         if ($this->rawdata instanceof \Traversable && !$this->rawdata->valid()) {
-            return array(array(), array(), array(), array(), array());
+            return [[], [], [], [], []];
         }
         if (!$this->rawdata) {
-            return array(array(), array(), array(), array(), array());
+            return [[], [], [], [], []];
         }
 
-        $returndata = array();
+        $returndata = [];
         $this->format = self::FORMAT_DOWNLOAD;
         foreach ($this->rawdata as $key => $row) {
             $returndata[$key] = $this->format_row($row);
@@ -275,12 +303,12 @@ class submissionstable extends \table_sql {
 
         $this->format = self::FORMAT_HTML;
 
-        if ($this->rawdata instanceof \core\dml\recordset_walk ||
+        if ($this->rawdata instanceof recordset_walk ||
                 $this->rawdata instanceof moodle_recordset) {
             $this->rawdata->close();
         }
 
-        return array($this->columns, $this->headers, $returndata, $this->columnformat, $this->cellwidth);
+        return [$this->columns, $this->headers, $returndata, $this->columnformat, $this->cellwidth];
     }
 
     /**
@@ -289,6 +317,9 @@ class submissionstable extends \table_sql {
      * @param checkmark|int $checkmarkorcmid checkmark object or course module id of checkmark instance
      * @param int $filter Which filter to use (FILTER_ALL, FILTER_REQUIRE_GRADING, FILTER_SUBMITTED, ...)
      * @return submissionstable object
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     static public function create_submissions_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL) {
         global $CFG, $DB;
@@ -302,9 +333,9 @@ class submissionstable extends \table_sql {
         $table->defaultselectstate = false;
 
         // Adapt table for submissions view (columns, etc.)!
-        $tablecolumns = array('selection', 'picture', 'fullname');
-        $tableheaders = array('', '', get_string('fullnameuser'));
-        $helpicons = array(null, null, null);
+        $tablecolumns = ['selection', 'picture', 'fullname'];
+        $tableheaders = ['', '', get_string('fullnameuser')];
+        $helpicons = [null, null, null];
         $table->add_colgroup(1, 'sel');
 
         $useridentity = get_extra_user_fields($table->context);
@@ -411,7 +442,7 @@ class submissionstable extends \table_sql {
         $table->no_sorting('status');
 
         // Create and set the SQL!
-        $params = array();
+        $params = [];
         $useridentityfields = get_extra_user_fields_sql($table->context, 'u');
         $ufields = \user_picture::fields('u');
         $examplecount = count($table->checkmark->checkmark->examples);
@@ -497,6 +528,7 @@ class submissionstable extends \table_sql {
      * @param int $userid User to get surrounding entries for
      * @return array|bool false if userid is not found, else triple previous userid, userid and next userid (or false if some of
      *                    those don't exist)
+     * @throws dml_exception
      */
     public function get_triple($userid) {
         if (!$this->setup) {
@@ -550,8 +582,11 @@ class submissionstable extends \table_sql {
      * @param int $filter which filter to use
      * @param int[] $ids for which user ids to filter
      * @return submissionstable object
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
-    static public function create_export_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL, $ids = array()) {
+    static public function create_export_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL, $ids = []) {
         global $CFG, $DB;
         // We need to have the same ID to ensure the columns are collapsed if their collapsed in the other table!
         $table = new submissionstable('mod-checkmark-submissions', $checkmarkorcmid);
@@ -564,38 +599,38 @@ class submissionstable extends \table_sql {
         $table->defaultselectstate = true; // Select all checkboxes by default!
 
         // Adapt table for export view (columns, etc.)!
-        $tableheaders = array('', get_string('name'));
-        $tablecolumns = array('selection', 'fullname');
-        $table->cellwidth = array(array('mode' => 'Fixed', 'value' => '25'));
-        $table->columnformat = array('fullname' => array('align' => 'L'));
+        $tableheaders = ['', get_string('name')];
+        $tablecolumns = ['selection', 'fullname'];
+        $table->cellwidth = [['mode' => 'Fixed', 'value' => '25']];
+        $table->columnformat = ['fullname' => ['align' => 'L']];
         if ($forcesinglelinenames) {
             $table->columnformat['fullname']['stretch'] = MTablePDF::STRETCH_SCALING;
         }
-        $helpicons = array(null, null);
+        $helpicons = [null, null];
         $table->add_colgroup(1, 'sel');
 
         $useridentity = get_extra_user_fields($table->context);
         foreach ($useridentity as $cur) {
             $tableheaders[] = ($cur == 'phone1') ? get_string('phone') : get_string($cur);
             $tablecolumns[] = $cur;
-            $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
-            $table->columnformat[$cur] = array('align' => 'L');
+            $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '20'];
+            $table->columnformat[$cur] = ['align' => 'L'];
             $helpicons[] = null;
         }
         $table->add_colgroup(count($useridentity) + 1, 'user');
         if ($table->groupmode != NOGROUPS) {
             $tableheaders[] = get_string('group');
             $tablecolumns[] = 'groups';
-            $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
-            $table->columnformat['groups'] = array('align' => 'L');
+            $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '20'];
+            $table->columnformat['groups'] = ['align' => 'L'];
             $helpicons[] = null;
             $table->add_colgroup(1, 'group');
         }
 
         $tablecolumns[] = 'timesubmitted';
         $tableheaders[] = get_string('lastmodified').' ('.get_string('submission', 'checkmark').')';
-        $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '30');
-        $table->columnformat['timesubmitted'] = array('align' => 'L');
+        $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '30'];
+        $table->columnformat['timesubmitted'] = ['align' => 'L'];
         $helpicons[] = null;
         $table->add_colgroup(1, 'timesubmitted');
 
@@ -604,8 +639,8 @@ class submissionstable extends \table_sql {
             $width = strlen($example->shortname) + strlen($example->grade) + 4;
             $tableheaders[] = $example->shortname." (".$example->grade.'P)';
             $tablecolumns[] = 'example'.$key;
-            $table->cellwidth[] = array('mode' => 'Fixed', 'value' => $width);
-            $table->columnformat['example'.$key] = array('align' => 'C');
+            $table->cellwidth[] = ['mode' => 'Fixed', 'value' => $width];
+            $table->columnformat['example'.$key] = ['align' => 'C'];
             $helpicons[] = null;
         }
         $table->add_colgroup(count($table->checkmark->checkmark->examples), 'examples');
@@ -613,8 +648,8 @@ class submissionstable extends \table_sql {
         if ((!empty($table->sumabs) || !empty($table->sumrel))) {
             $tableheaders[] = get_string('checkmarks', 'checkmark');
             $tablecolumns[] = 'summary';
-            $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
-            $table->columnformat['summary'] = array('align' => 'L');
+            $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '20'];
+            $table->columnformat['summary'] = ['align' => 'L'];
             $helpicons[] = null;
             $table->add_colgroup(1, 'summary');
         }
@@ -622,22 +657,22 @@ class submissionstable extends \table_sql {
         if ($table->checkmark->checkmark->grade != 0) {
             $tableheaders[] = get_string('grade');
             $tablecolumns[] = 'grade';
-            $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '15');
-            $table->columnformat['grade'] = array('align' => 'R');
+            $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '15'];
+            $table->columnformat['grade'] = ['align' => 'R'];
             $helpicons[] = null;
         }
 
         $tableheaders[] = get_string('comment', 'checkmark');
         $tablecolumns[] = 'feedback';
-        $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '50');
-        $table->columnformat['feedback'] = array('align' => 'L');
+        $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '50'];
+        $table->columnformat['feedback'] = ['align' => 'L'];
         $helpicons[] = null;
 
         if ($table->usesoutcomes) {
             $tableheaders[] = get_string('outcome', 'grades');
             $tablecolumns[] = 'outcome';
-            $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '50');
-            $table->columnformat['outcome'] = array('align' => 'L');
+            $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '50'];
+            $table->columnformat['outcome'] = ['align' => 'L'];
             $helpicons[] = null;
             $table->add_colgroup(3, 'feedback outcomes');
         } else {
@@ -648,8 +683,8 @@ class submissionstable extends \table_sql {
             $tableheaders[] = get_string('attendance', 'checkmark');
             $helpicons[] = new \help_icon('attendance', 'checkmark');
             $tablecolumns[] = 'attendance';
-            $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
-            $table->columnformat['attendance'] = array('align' => 'R');
+            $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '20'];
+            $table->columnformat['attendance'] = ['align' => 'R'];
             $table->add_colgroup(1, 'attendance');
         }
         if ($table->checkmark->checkmark->presentationgrading) {
@@ -658,22 +693,22 @@ class submissionstable extends \table_sql {
                 $tableheaders[] = get_string('presentationgrade_table', 'checkmark');
                 $helpicons[] = null;
                 $tablecolumns[] = 'presentationgrade';
-                $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '20');
-                $table->columnformat['presentationgrade'] = array('align' => 'R');
+                $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '20'];
+                $table->columnformat['presentationgrade'] = ['align' => 'R'];
                 $span++;
             }
             $tableheaders[] = get_string('presentationfeedback_table', 'checkmark');
             $helpicons[] = null;
             $tablecolumns[] = 'presentationfeedback';
-            $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '50');
-            $table->columnformat['presentationfeedback'] = array('align' => 'L');
+            $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '50'];
+            $table->columnformat['presentationfeedback'] = ['align' => 'L'];
             $table->add_colgroup($span, 'presentationgrade');
         }
 
         $tableheaders[] = get_string('signature', 'checkmark');
         $tablecolumns[] = 'signature';
-        $table->cellwidth[] = array('mode' => 'Fixed', 'value' => '30');
-        $table->columnformat['signature'] = array('align' => 'L');
+        $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '30'];
+        $table->columnformat['signature'] = ['align' => 'L'];
         $helpicons[] = null;
         $table->add_colgroup(1, 'signature');
 
@@ -724,7 +759,7 @@ class submissionstable extends \table_sql {
         $table->no_sorting('signature');
 
         // Create and set the SQL!
-        $params = array();
+        $params = [];
         $useridentityfields = get_extra_user_fields_sql($table->checkmark->context, 'u');
         $ufields = \user_picture::fields('u');
         $table->examplecount = count($table->checkmark->checkmark->examples);
@@ -826,8 +861,8 @@ class submissionstable extends \table_sql {
         parent::start_html();
         if (!empty($this->colgroups)) {
             foreach ($this->colgroups as $colgrp) {
-                echo \html_writer::start_tag('colgroup', array('class' => $colgrp->class,
-                                                               'span'  => $colgrp->span));
+                echo \html_writer::start_tag('colgroup', ['class' => $colgrp->class,
+                                                          'span'  => $colgrp->span]);
                 for ($i = 0; $i < $colgrp->span; $i++) {
                     echo \html_writer::empty_tag('col');
                 }
@@ -839,17 +874,14 @@ class submissionstable extends \table_sql {
     /**
      * Set or determine if initials bar output should be suppressed
      *
-     * @param bool $value (optional) Remove flag!
      * @return bool false
      *
      * @deprecated since Moodle 3.3 TODO remove in Moodle 3.7
      */
-    public function suppress_initials_output($value = null) {
+    public function suppress_initials_output() {
         debugging('Suppression of initials output has been deprecated, due to changes in Moodle core!', DEBUG_DEVELOPER);
 
-        $this->suppressinitials = false;
-
-        return $this->suppressinitials;
+        return false;
     }
 
     /**
@@ -857,9 +889,11 @@ class submissionstable extends \table_sql {
      *
      * @param int $filter Currently active filter (FILTER_ALL, FILTER_REQUIRE_GRADING, FILTER_SUBMITTED...)
      * @param int[] $ids (optional) Array of userids to filter for
-     * @return $string Return user's outcomes.
+     * @return int[] the filtered userids!
+     * @throws dml_exception
+     * @throws coding_exception
      */
-    public function get_userids($filter, $ids = array()) {
+    public function get_userids($filter, $ids = []) {
         global $DB;
 
         // Get all ppl that are allowed to submit checkmarks!
@@ -904,7 +938,7 @@ class submissionstable extends \table_sql {
         }
 
         if (empty($users)) {
-            return array(-1);
+            return [-1];
         }
 
         return $users;
@@ -914,16 +948,18 @@ class submissionstable extends \table_sql {
      * Renders links to select all/ungraded/submitted/none entries
      *
      * @param bool $returnonlylinks if true only the links will be returned without title!
+     * @return string HTML snippet to output in page
+     * @throws moodle_exception
      */
     public function checkbox_controller($returnonlylinks = true) {
         global $PAGE;
 
         $baseurl = $PAGE->url;
 
-        $allurl = new \moodle_url($baseurl, array('select' => self::SEL_ALL));
-        $noneurl = new \moodle_url($baseurl, array('select' => self::SEL_NONE));
-        $reqgradingurl = new \moodle_url($baseurl, array('select' => self::SEL_REQ_GRADING));
-        $submittedurl = new \moodle_url($baseurl, array('select' => self::SEL_SUBMITTED));
+        $allurl = new \moodle_url($baseurl, ['select' => self::SEL_ALL]);
+        $noneurl = new \moodle_url($baseurl, ['select' => self::SEL_NONE]);
+        $reqgradingurl = new \moodle_url($baseurl, ['select' => self::SEL_REQ_GRADING]);
+        $submittedurl = new \moodle_url($baseurl, ['select' => self::SEL_SUBMITTED]);
 
         $randomid = \html_writer::random_id('checkboxcontroller');
         if (!$returnonlylinks) {
@@ -935,16 +971,16 @@ class submissionstable extends \table_sql {
         $params = new \stdClass();
         $params->table = '.usersubmissions table.submissions';
         $params->id = $randomid;
-        $PAGE->requires->js_call_amd('mod_checkmark/checkboxcontroller', 'initializer', array($params));
+        $PAGE->requires->js_call_amd('mod_checkmark/checkboxcontroller', 'initializer', [$params]);
 
         return \html_writer::tag('div', $title.
-                                        \html_writer::link($allurl, get_string('all'), array('class' => 'all')).' / '.
-                                        \html_writer::link($noneurl, get_string('none'), array('class' => 'none')).' / '.
+                                        \html_writer::link($allurl, get_string('all'), ['class' => 'all']).' / '.
+                                        \html_writer::link($noneurl, get_string('none'), ['class' => 'none']).' / '.
                                         \html_writer::link($reqgradingurl, get_string('ungraded', 'checkmark'),
-                                                           array('class' => 'ungraded')).' / '.
+                                                           ['class' => 'ungraded']).' / '.
                                         \html_writer::link($submittedurl, get_string('submitted', 'checkmark'),
-                                                           array('class' => 'submitted')),
-                                 array('id' => $randomid));
+                                                           ['class' => 'submitted']),
+                                 ['id' => $randomid]);
     }
 
     /***************************************************************
@@ -956,7 +992,8 @@ class submissionstable extends \table_sql {
      * XXX value.
      *
      * @param object $values Contains object with all the values of record.
-     * @return $string Return XXX.
+     * @return string Return XXX.
+     * @throws coding_exception
      */
     public function col_selection($values) {
         // If the data is being downloaded than we don't want to show HTML.
@@ -967,7 +1004,7 @@ class submissionstable extends \table_sql {
             // All get selected by default in export table, not selected in submissions table!
             $selectstate = $this->defaultselectstate;
 
-            $attr = array('class' => 'checkboxgroup1');
+            $attr = ['class' => 'checkboxgroup1'];
             if ($select == self::SEL_ALL) {
                 $selectstate = true;
             } else if ($select === self::SEL_NONE) {
@@ -1005,7 +1042,7 @@ class submissionstable extends \table_sql {
      * user picture.
      *
      * @param object $values Contains object with all the values of record.
-     * @return $string Return user fullname.
+     * @return string Return user fullname.
      */
     public function col_fullname($values) {
         if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
@@ -1020,7 +1057,7 @@ class submissionstable extends \table_sql {
      * user picture.
      *
      * @param object $values Contains object with all the values of record.
-     * @return $string Return user picture markup.
+     * @return string Return user picture markup.
      */
     public function col_picture($values) {
         global $OUTPUT;
@@ -1037,7 +1074,7 @@ class submissionstable extends \table_sql {
      * user's groups.
      *
      * @param object $values Contains object with all the values of record.
-     * @return $string Return user groups.
+     * @return string Return user groups.
      */
     public function col_groups($values) {
         if (isset($values->groups)) {
@@ -1052,12 +1089,12 @@ class submissionstable extends \table_sql {
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return $values->groups;
             } else {
-                return \html_writer::tag('div', $values->groups, array('id' => 'gr'.$values->id));
+                return \html_writer::tag('div', $values->groups, ['id' => 'gr'.$values->id]);
             }
         } else if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
             return '';
         } else {
-            return \html_writer::tag('div', '-', array('id' => 'gr'.$values->id));
+            return \html_writer::tag('div', '-', ['id' => 'gr'.$values->id]);
         }
     }
 
@@ -1066,7 +1103,8 @@ class submissionstable extends \table_sql {
      * user's grade.
      *
      * @param object $values Contains object with all the values of record.
-     * @return $string Return user's grade.
+     * @return string Return user's grade.
+     * @throws coding_exception
      */
     public function col_grade($values) {
         $finalgrade = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$values->id];
@@ -1078,32 +1116,32 @@ class submissionstable extends \table_sql {
         if ($values->feedbackid) {
             // Print grade, dropdown or text!
             if ($finalgrade->locked || $finalgrade->overridden) {
-                $gradeattr = array('id'    => 'g'.$values->id,
-                                   'class' => $lockedoroverridden);
+                $gradeattr = ['id'    => 'g'.$values->id,
+                              'class' => $lockedoroverridden];
                 if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                     return $finalgrade->formatted_grade;
                 } else {
                     return \html_writer::tag('div', $finalgrade->formatted_grade, $gradeattr);
                 }
             } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
-                $attributes = array();
+                $attributes = [];
                 $attributes['tabindex'] = $this->tabindex++;
                 $menu = \html_writer::select($this->grademenu,
                                             'menu['.$values->id.']',
                                             (int)$values->grade,
-                                            array(-1 => get_string('nograde')),
+                                            [-1 => get_string('nograde')],
                                             $attributes);
-                $oldgradeattr = array('type'  => 'hidden',
-                                      'name'  => 'oldgrade['.$values->id.']',
-                                      'value' => $values->grade);
+                $oldgradeattr = ['type'  => 'hidden',
+                                 'name'  => 'oldgrade['.$values->id.']',
+                                 'value' => $values->grade];
                 $oldgrade = \html_writer::empty_tag('input', $oldgradeattr);
-                return \html_writer::tag('div', $menu.$oldgrade, array('id' => 'g'.$values->id));
+                return \html_writer::tag('div', $menu.$oldgrade, ['id' => 'g'.$values->id]);
             } else {
                 if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                     return $this->checkmark->display_grade($values->grade);
                 } else {
                     return \html_writer::tag('div', $this->checkmark->display_grade($values->grade),
-                                             array('id' => 'g'.$values->id));
+                                             ['id' => 'g'.$values->id]);
                 }
             }
         } else {
@@ -1111,27 +1149,27 @@ class submissionstable extends \table_sql {
                 if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                     return $finalgrade->formatted_grade;
                 } else {
-                    return \html_writer::tag('div', $finalgrade->formatted_grade, array('id' => 'g'.$values->id));
+                    return \html_writer::tag('div', $finalgrade->formatted_grade, ['id' => 'g'.$values->id]);
                 }
             } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
                 // Allow editing!
-                $attributes = array();
+                $attributes = [];
                 $attributes['tabindex'] = $this->tabindex++;
                 $menu = \html_writer::select($this->grademenu,
                                             'menu['.$values->id.']',
                                             $values->grade,
-                                            array(-1 => get_string('nograde')),
+                                            [-1 => get_string('nograde')],
                                             $attributes);
-                $oldgradearr = array('type'  => 'hidden',
-                                     'name'  => 'oldgrade'.$values->id,
-                                     'value' => $values->grade);
+                $oldgradearr = ['type'  => 'hidden',
+                                'name'  => 'oldgrade'.$values->id,
+                                'value' => $values->grade];
                 $oldgrade = \html_writer::empty_tag('input', $oldgradearr);
-                return \html_writer::tag('div', $menu.$oldgrade, array('id' => 'g'.$values->id));
+                return \html_writer::tag('div', $menu.$oldgrade, ['id' => 'g'.$values->id]);
             } else {
                 if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                     return '-';
                 } else {
-                    return \html_writer::tag('div', '-', array('id' => 'g'.$values->id));
+                    return \html_writer::tag('div', '-', ['id' => 'g'.$values->id]);
                 }
             }
         }
@@ -1142,7 +1180,7 @@ class submissionstable extends \table_sql {
      * user's feedback.
      *
      * @param object $values Contains object with all the values of record.
-     * @return $string Return user's feedback.
+     * @return string Return user's feedback.
      */
     public function col_feedback($values) {
         $finalgrade = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$values->id];
@@ -1152,24 +1190,24 @@ class submissionstable extends \table_sql {
                 if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                     return $finalgrade->str_feedback;
                 } else {
-                    return \html_writer::tag('div', $finalgrade->str_feedback, array('id' => 'com'.$values->id));
+                    return \html_writer::tag('div', $finalgrade->str_feedback, ['id' => 'com'.$values->id]);
                 }
             } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
-                $inputarr = array('type'  => 'hidden',
-                                  'name'  => 'oldfeedback['.$values->id.']',
-                                  'value' => trim($values->feedback));
+                $inputarr = ['type'  => 'hidden',
+                             'name'  => 'oldfeedback['.$values->id.']',
+                             'value' => trim($values->feedback)];
                 $oldfeedback = \html_writer::empty_tag('input', $inputarr);
-                $content = \html_writer::tag('textarea', $values->feedback, array('tabindex' => $this->tabindex++,
-                                                                                  'name'     => 'feedback['.$values->id.']',
-                                                                                  'id'       => 'feedback'.$values->id,
-                                                                                  'rows'     => 2,
-                                                                                  'cols'     => 20));
-                return \html_writer::tag('div', $content.$oldfeedback, array('id' => 'com'.$values->id));
+                $content = \html_writer::tag('textarea', $values->feedback, ['tabindex' => $this->tabindex++,
+                                                                             'name'     => 'feedback['.$values->id.']',
+                                                                             'id'       => 'feedback'.$values->id,
+                                                                             'rows'     => 2,
+                                                                             'cols'     => 20]);
+                return \html_writer::tag('div', $content.$oldfeedback, ['id' => 'com'.$values->id]);
             } else {
                 if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                     return $values->feedback;
                 } else {
-                    return \html_writer::tag('div', $values->feedback, array('id' => 'com'.$values->id));
+                    return \html_writer::tag('div', $values->feedback, ['id' => 'com'.$values->id]);
                 }
             }
         } else {
@@ -1177,25 +1215,25 @@ class submissionstable extends \table_sql {
                 if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                     return $finalgrade->str_feedback;
                 } else {
-                    return \html_writer::tag('div', $finalgrade->str_feedback, array('id' => 'com'.$values->id));
+                    return \html_writer::tag('div', $finalgrade->str_feedback, ['id' => 'com'.$values->id]);
                 }
             } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
-                $inputarr = array('type'  => 'hidden',
-                                  'name'  => 'oldfeedback'.$values->id,
-                                  'value' => trim($values->feedback));
+                $inputarr = ['type'  => 'hidden',
+                             'name'  => 'oldfeedback'.$values->id,
+                             'value' => trim($values->feedback)];
                 $oldfeedback = \html_writer::empty_tag('input', $inputarr);
 
-                $content = \html_writer::tag('textarea', $values->feedback, array('tabindex'  => $this->tabindex++,
-                                                                                  'name'      => 'feedback['.$values->id.']',
-                                                                                  'id'        => 'feedback'.$values->id,
-                                                                                  'rows'      => '2',
-                                                                                  'cols'      => '20'));
-                return \html_writer::tag('div', $content.$oldfeedback, array('id' => 'com'.$values->id));
+                $content = \html_writer::tag('textarea', $values->feedback, ['tabindex'  => $this->tabindex++,
+                                                                             'name'      => 'feedback['.$values->id.']',
+                                                                             'id'        => 'feedback'.$values->id,
+                                                                             'rows'      => '2',
+                                                                             'cols'      => '20']);
+                return \html_writer::tag('div', $content.$oldfeedback, ['id' => 'com'.$values->id]);
             } else {
                 if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                     return '';
                 } else {
-                    return \html_writer::tag('div', '&nbsp;', array('id' => 'com'.$values->id));
+                    return \html_writer::tag('div', '&nbsp;', ['id' => 'com'.$values->id]);
                 }
             }
         }
@@ -1206,10 +1244,10 @@ class submissionstable extends \table_sql {
      * user's submission time.
      *
      * @param object $values Contains object with all the values of record.
-     * @return $string Return user time of submission.
+     * @return string Return user time of submission.
+     * @throws coding_exception
      */
     public function col_timesubmitted($values) {
-        $late = 0;
         if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
             $timeformat = get_string('strftimedatetimeshort');
         } else {
@@ -1235,13 +1273,13 @@ class submissionstable extends \table_sql {
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return strip_tags($content);
             } else {
-                return \html_writer::tag('div', $content, array('id' => 'ts'.$values->id));
+                return \html_writer::tag('div', $content, ['id' => 'ts'.$values->id]);
             }
         } else {
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return '-';
             } else {
-                return \html_writer::tag('div', '-', array('id' => 'ts'.$values->id));
+                return \html_writer::tag('div', '-', ['id' => 'ts'.$values->id]);
             }
         }
     }
@@ -1251,7 +1289,8 @@ class submissionstable extends \table_sql {
      * user's time of grading.
      *
      * @param object $values Contains object with all the values of record.
-     * @return $string Return user's time of grading.
+     * @return string Return user's time of grading.
+     * @throws coding_exception
      */
     public function col_timemarked($values) {
         if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
@@ -1265,18 +1304,18 @@ class submissionstable extends \table_sql {
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return $date;
             } else {
-                return \html_writer::tag('div', $date, array('id' => 'tt'.$values->id));
+                return \html_writer::tag('div', $date, ['id' => 'tt'.$values->id]);
             }
         } else if ($values->feedbackid && $values->timemarked > 0) {
             $date = userdate($values->timemarked, $timeformat);
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return $date;
             } else {
-                return \html_writer::tag('div', $date, array('id' => 'tt'.$values->id));
+                return \html_writer::tag('div', $date, ['id' => 'tt'.$values->id]);
             }
         } else {
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
-                return \html_writer::tag('div', '-', array('id' => 'tt'.$values->id));
+                return \html_writer::tag('div', '-', ['id' => 'tt'.$values->id]);
             } else {
                 return '-';
             }
@@ -1288,7 +1327,8 @@ class submissionstable extends \table_sql {
      * user's grading button.
      *
      * @param object $values Contains object with all the values of record.
-     * @return $string Return user's grading button.
+     * @return string Return user's grading button.
+     * @throws coding_exception
      */
     public function col_status($values) {
         global $OUTPUT;
@@ -1300,9 +1340,9 @@ class submissionstable extends \table_sql {
             return $text;
         } else {
             // No more buttons, we use popups!
-            $popupurl = '/mod/checkmark/submissions.php?id='.$this->checkmark->cm->id.
-                        '&amp;userid='.$values->id.'&amp;mode=single'.
-                        '&amp;filter='.$this->filter;
+            $popupurl = '/mod/checkmark/submissions.php?id=' . $this->checkmark->cm->id .
+                    '&amp;userid=' . $values->id . '&amp;mode=single' .
+                    '&amp;filter=' . $this->filter;
 
             $button = $OUTPUT->action_link($popupurl, $text);
 
@@ -1337,14 +1377,14 @@ class submissionstable extends \table_sql {
      * user's final grade.
      *
      * @param object $values Contains object with all the values of record.
-     * @return $string Return user's final grade.
+     * @return string Return user's final grade.
      */
     public function col_finalgrade($values) {
         $finalgrade = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$values->id];
         if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
             return $finalgrade->str_grade;
         } else {
-            return \html_writer::tag('span', $finalgrade->str_grade, array('id' => 'finalgrade_'.$values->id));
+            return \html_writer::tag('span', $finalgrade->str_grade, ['id' => 'finalgrade_'.$values->id]);
         }
     }
 
@@ -1353,7 +1393,8 @@ class submissionstable extends \table_sql {
      * user's outcomes.
      *
      * @param object $values Contains object with all the values of record.
-     * @return $string Return user's outcomes.
+     * @return string Return user's outcomes.
+     * @throws coding_exception
      */
     public function col_outcome($values) {
         $outcomes = '';
@@ -1363,17 +1404,17 @@ class submissionstable extends \table_sql {
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 $outcomes .= $outcome->name.': '.$options[$index]."\n";
             } else {
-                $outcomes .= \html_writer::start_tag('div', array('class' => 'outcome'));
+                $outcomes .= \html_writer::start_tag('div', ['class' => 'outcome']);
                 $outcomes .= \html_writer::tag('label', $outcome->name);
                 if ($outcome->grades[$values->id]->locked or !$this->quickgrade) {
                     $options[0] = get_string('nooutcome', 'grades');
-                    $outcomes .= ': '.\html_writer::tag('span', $options[$index], array('id' => 'outcome_'.$n.'_'. $values->id));
+                    $outcomes .= ': '.\html_writer::tag('span', $options[$index], ['id' => 'outcome_'.$n.'_'. $values->id]);
                 } else {
-                    $attributes = array();
+                    $attributes = [];
                     $attributes['id'] = 'outcome_'.$n.'_'.$values->id;
                     $usr = $values->id;
                     $outcomes .= ' '.\html_writer::select($options, 'outcome_'.$n.'['.$usr.']', $outcome->grades[$usr]->grade,
-                                                          array(get_string('nooutcome', 'grades')), $attributes);
+                                                          [get_string('nooutcome', 'grades')], $attributes);
                 }
                 $outcomes .= \html_writer::end_tag('div');
             }
@@ -1386,7 +1427,7 @@ class submissionstable extends \table_sql {
      * user's summary.
      *
      * @param object $values Contains object with all the values of record.
-     * @return $string Return user's summary.
+     * @return string Return user's summary.
      */
     public function col_summary($values) {
         if (!empty($this->sumabs) && !empty($this->sumrel)) {
@@ -1402,7 +1443,7 @@ class submissionstable extends \table_sql {
         if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
             return $summary;
         } else {
-            return \html_writer::tag('div', $summary, array('id' => 'sum'.$values->id));
+            return \html_writer::tag('div', $summary, ['id' => 'sum'.$values->id]);
         }
     }
 
@@ -1411,7 +1452,8 @@ class submissionstable extends \table_sql {
      * user's attendance column.
      *
      * @param object $values Contains object with all the values of record.
-     * @return $string Return user's signature column (empty).
+     * @return string Return user's signature column (empty).
+     * @throws coding_exception
      */
     public function col_attendance($values) {
         // Print attendance symbol or quickgrading checkboxes!
@@ -1428,29 +1470,29 @@ class submissionstable extends \table_sql {
                 return $finalgrade->grade;
             } else {
                 $symbol = checkmark_get_attendance_symbol($finalgrade->grade);
-                return \html_writer::tag('div', $symbol, array('id' => 'com'.$values->id));
+                return \html_writer::tag('div', $symbol, ['id' => 'com'.$values->id]);
             }
         } else if (has_capability('mod/checkmark:trackattendance', $this->context)
                     && $this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
             if ($values->attendance === null) {
                 $values->attendance = -1;
             }
-            $inputarr = array('type'  => 'hidden',
-                              'name'  => 'oldattendance['.$values->id.']',
-                              'value' => $values->attendance);
+            $inputarr = ['type'  => 'hidden',
+                         'name'  => 'oldattendance['.$values->id.']',
+                         'value' => $values->attendance];
             $oldattendance = \html_writer::empty_tag('input', $inputarr);
-            $attr = array('tabindex' => $this->tabindex++,
-                          'id'       => 'attendance'.$values->id);
-            $options = array(-1 => '? '.strtolower(get_string('unknown', 'checkmark')),
-                             1  => '✓ '.strtolower(get_string('attendant', 'checkmark')),
-                             0  => '✗ '.strtolower(get_string('absent', 'checkmark')));
+            $attr = ['tabindex' => $this->tabindex++,
+                     'id'       => 'attendance'.$values->id];
+            $options = [-1 => '? '.strtolower(get_string('unknown', 'checkmark')),
+                        1  => '✓ '.strtolower(get_string('attendant', 'checkmark')),
+                        0  => '✗ '.strtolower(get_string('absent', 'checkmark'))];
             if ($values->attendance === null) {
                 $content = \html_writer::select($options, 'attendance['.$values->id.']', -1, false, $attr);
             } else {
                 $content = \html_writer::select($options, 'attendance['.$values->id.']', $values->attendance, false, $attr);
             }
 
-            return \html_writer::tag('div', $content.$oldattendance, array('id' => 'att'.$values->id));
+            return \html_writer::tag('div', $content.$oldattendance, ['id' => 'att'.$values->id]);
         } else {
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 if ($values->attendance == null) {
@@ -1459,7 +1501,7 @@ class submissionstable extends \table_sql {
                 return $values->attendance;
             } else {
                 $symbol = checkmark_get_attendance_symbol($values->attendance);
-                return \html_writer::tag('div', $symbol, array('id' => 'com'.$values->id));
+                return \html_writer::tag('div', $symbol, ['id' => 'com'.$values->id]);
             }
         }
     }
@@ -1469,13 +1511,15 @@ class submissionstable extends \table_sql {
      * user's presentationgrade.
      *
      * @param object $values Contains object with all the values of record.
-     * @return $string Return user's grade.
+     * @return string Return user's grade.
+     * @throws coding_exception
      */
     public function col_presentationgrade($values) {
         if (!$this->checkmark->checkmark->presentationgrading || !$this->checkmark->checkmark->presentationgrade) {
             return '';
         }
         $presgradebook = $this->checkmark->checkmark->presentationgradebook;
+        $lockedoroverridden = '';
         if ($presgradebook) {
             $finalgrade = $this->gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$values->id];
             $finalgrade->formatted_grade = $this->checkmark->display_grade($finalgrade->grade, CHECKMARK_PRESENTATION_ITEM);
@@ -1483,12 +1527,14 @@ class submissionstable extends \table_sql {
             if ($finalgrade->overridden) {
                 $lockedoroverridden = 'overridden';
             }
+        } else {
+            $finalgrade = false;
         }
 
         // Print grade, dropdown or text!
         if ($presgradebook && ($finalgrade->locked || $finalgrade->overridden)) {
-            $gradeattr = array('id'    => 'pg'.$values->id,
-                               'class' => $lockedoroverridden);
+            $gradeattr = ['id'    => 'pg'.$values->id,
+                          'class' => $lockedoroverridden];
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return $finalgrade->formatted_grade;
             } else {
@@ -1498,18 +1544,18 @@ class submissionstable extends \table_sql {
             if ($values->presentationgrade === null) {
                 $values->presentationgrade = -1;
             }
-            $attributes = array();
+            $attributes = [];
             $attributes['tabindex'] = $this->tabindex++;
             $menu = \html_writer::select($this->presentationgrademenu,
                                         'presentationgrade['.$values->id.']',
                                         (int)$values->presentationgrade,
-                                        array(-1 => get_string('nograde')),
+                                        [-1 => get_string('nograde')],
                                         $attributes);
-            $oldgradeattr = array('type'  => 'hidden',
-                                  'name'  => 'oldpresentationgrade['.$values->id.']',
-                                  'value' => (int)$values->presentationgrade);
+            $oldgradeattr = ['type'  => 'hidden',
+                             'name'  => 'oldpresentationgrade['.$values->id.']',
+                             'value' => (int)$values->presentationgrade];
             $oldgrade = \html_writer::empty_tag('input', $oldgradeattr);
-            return \html_writer::tag('div', $menu.$oldgrade, array('id' => 'pg'.$values->id));
+            return \html_writer::tag('div', $menu.$oldgrade, ['id' => 'pg'.$values->id]);
         } else {
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 if ($values->feedbackid) {
@@ -1521,9 +1567,9 @@ class submissionstable extends \table_sql {
                 if ($values->feedbackid) {
                     return \html_writer::tag('div', $this->checkmark->display_grade($values->presentationgrade,
                                                                                     CHECKMARK_PRESENTATION_ITEM),
-                                             array('id' => 'pg'.$values->id));
+                                             ['id' => 'pg'.$values->id]);
                 } else {
-                    return \html_writer::tag('div', '-', array('id' => 'pg'.$values->id));
+                    return \html_writer::tag('div', '-', ['id' => 'pg'.$values->id]);
                 }
             }
         }
@@ -1534,7 +1580,7 @@ class submissionstable extends \table_sql {
      * user's presentation feedback.
      *
      * @param object $values Contains object with all the values of record.
-     * @return $string Return user's feedback.
+     * @return string Return user's feedback.
      */
     public function col_presentationfeedback($values) {
         if (!$this->checkmark->checkmark->presentationgrading) {
@@ -1543,6 +1589,8 @@ class submissionstable extends \table_sql {
         $presgradebook = $this->checkmark->checkmark->presentationgradebook;
         if ($presgradebook) {
             $finalgrade = $this->gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$values->id];
+        } else {
+            $finalgrade = false;
         }
 
         // Print Comment!
@@ -1550,32 +1598,32 @@ class submissionstable extends \table_sql {
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return $finalgrade->str_feedback;
             } else {
-                return \html_writer::tag('div', $finalgrade->str_feedback, array('id' => 'pcom'.$values->id));
+                return \html_writer::tag('div', $finalgrade->str_feedback, ['id' => 'pcom'.$values->id]);
             }
         } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
-            $inputarr = array('type'  => 'hidden',
-                              'name'  => 'oldpresentationfeedback['.$values->id.']',
-                              'value' => trim(str_replace('<br />', '<br />\n', $values->presentationfeedback)));
+            $inputarr = ['type'  => 'hidden',
+                         'name'  => 'oldpresentationfeedback['.$values->id.']',
+                         'value' => trim(str_replace('<br />', '<br />\n', $values->presentationfeedback))];
             $oldfeedback = \html_writer::empty_tag('input', $inputarr);
-            $attr = array('tabindex' => $this->tabindex++,
-                          'name'     => 'presentationfeedback['.$values->id.']',
-                          'id'       => 'presentationfeedback'.$values->id,
-                          'rows'     => 2,
-                          'cols'     => 20);
+            $attr = ['tabindex' => $this->tabindex++,
+                     'name'     => 'presentationfeedback['.$values->id.']',
+                     'id'       => 'presentationfeedback'.$values->id,
+                     'rows'     => 2,
+                     'cols'     => 20];
             $content = \html_writer::tag('textarea', trim(str_replace('<br />', '<br />\n', $values->presentationfeedback)), $attr);
-            return \html_writer::tag('div', $content.$oldfeedback, array('id' => 'pcom'.$values->id));
+            return \html_writer::tag('div', $content.$oldfeedback, ['id' => 'pcom'.$values->id]);
         } else {
             if ($values->feedbackid) {
                 if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                     return ($values->presentationfeedback === null) ? '' : $values->presentationfeedback;
                 } else {
-                    return \html_writer::tag('div', $values->presentationfeedback, array('id' => 'pcom'.$values->id));
+                    return \html_writer::tag('div', $values->presentationfeedback, ['id' => 'pcom'.$values->id]);
                 }
             } else {
                 if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                     return '';
                 } else {
-                    return \html_writer::tag('div', '&nbsp;', array('id' => 'com'.$values->id));
+                    return \html_writer::tag('div', '&nbsp;', ['id' => 'com'.$values->id]);
                 }
             }
         }
@@ -1585,7 +1633,7 @@ class submissionstable extends \table_sql {
      * This function is called for each data row to allow processing of the
      * user's signature column.
      *
-     * @return $string Return user's signature column (empty).
+     * @return string Return user's signature column (empty).
      */
     public function col_signature() {
         // Print empty signature-cell!
@@ -1597,9 +1645,8 @@ class submissionstable extends \table_sql {
      * columns which do not have a *_cols function.
      *
      * @param string $colname Name of current column
-     * @param mixed[] $values Values of the current row
-     * @return string return processed value. Return NULL if no change has
-     *     been made.
+     * @param stdClass $values Values of the current row
+     * @return string return processed value. Return NULL if no change has been made.
      */
     public function other_cols($colname, $values) {
         // Process examples!
@@ -1620,7 +1667,7 @@ class submissionstable extends \table_sql {
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return $state;
             } else {
-                return \html_writer::tag('div', $state, array('id' => 'ex'.$values->id.'_'.$match[1]));
+                return \html_writer::tag('div', $state, ['id' => 'ex'.$values->id.'_'.$match[1]]);
             }
         }
 
@@ -1634,15 +1681,17 @@ class submissionstable extends \table_sql {
                 if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                     return $values->$colname;
                 } else {
-                    return \html_writer::tag('div', $values->$colname, array('id' => 'u'.$colname.$values->id));
+                    return \html_writer::tag('div', $values->$colname, ['id' => 'u'.$colname.$values->id]);
                 }
             } else {
                 if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                     return '-';
                 } else {
-                    return \html_writer::tag('div', '-', array('id' => 'u'.$colname.$values->id));
+                    return \html_writer::tag('div', '-', ['id' => 'u'.$colname.$values->id]);
                 }
             }
         }
+
+        return '';
     }
 }
