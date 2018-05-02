@@ -3356,6 +3356,8 @@ class checkmark {
      *
      * @param object $data info for which instance to reset the userdata
      * @return array status array
+     * @throws dml_exception
+     * @throws coding_exception
      */
     public function reset_userdata($data) {
         global $DB;
@@ -3368,7 +3370,7 @@ class checkmark {
         $status = array();
 
         if (!empty($data->reset_checkmark_submissions)) {
-            $checkmarks = $DB->get_fieldset('checkmark', 'id', array('course' => $data->courseid));
+            $checkmarks = $DB->get_fieldset_select('checkmark', 'id', 'course = :course', ['course' => $data->courseid]);
             if (!empty($checkmarks) && is_array($checkmarks)) {
                 list($checkmarksql, $params) = $DB->get_in_or_equal($checkmarks);
 
@@ -3381,7 +3383,7 @@ class checkmark {
                 $DB->delete_records_select('checkmark_submissions',
                                            'checkmarkid '.$checkmarksql, $params);
                 $DB->delete_records_select('checkmark_feedbacks',
-                                           'checkmarkid IN ('.$checkmarksql.')', $params);
+                                           'checkmarkid '.$checkmarksql, $params);
                 if (!count($submissions)) {
                     $ssql = ' = NULL';
                     $sparams = array();
@@ -3410,10 +3412,14 @@ class checkmark {
         }
 
         if ($data->reset_checkmark_overrides) {
-            $checkmarks = $DB->get_fieldset('checkmark', 'id', array('course' => $data->courseid));
+            $checkmarks = $DB->get_fieldset_select('checkmark', 'id', 'course = :course', ['course' => $data->courseid]);
             if (!empty($checkmarks) && is_array($checkmarks)) {
                 list($checkmarksql, $params) = $DB->get_in_or_equal($checkmarks);
                 $DB->delete_records_select('checkmark_overrides', 'checkmarkid ' . $checkmarksql, $params);
+
+                $status[] = array('component' => $componentstr,
+                                  'item'      => get_string('deletealloverrides', 'checkmark'),
+                                  'error'     => false);
             }
         }
 
