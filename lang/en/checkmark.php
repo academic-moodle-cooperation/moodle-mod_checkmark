@@ -27,9 +27,10 @@ defined('MOODLE_INTERNAL') || die;
 
 $string['checkmark:addinstance'] = 'Add checkmark instance';
 $string['checkmark:grade'] = 'Grade checkmark';
-$string['checkmark:trackattendance'] = 'Track student\'s attendance';
 $string['checkmark:gradepresentation'] = 'Grade presentation';
+$string['checkmark:manageoverrides'] = 'Manage checkmark overrides';
 $string['checkmark:submit'] = 'Submit checkmark';
+$string['checkmark:trackattendance'] = 'Track student\'s attendance';
 $string['checkmark:view'] = 'View checkmark';
 $string['checkmark:view_preview'] = 'Preview';
 
