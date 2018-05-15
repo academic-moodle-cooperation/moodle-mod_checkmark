@@ -29,7 +29,6 @@ require_once('../../config.php');
 require_login();
 
 require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
-require_once($CFG->libdir.'/plagiarismlib.php');
 
 $id   = optional_param('id', 0, PARAM_INT);          // Course module ID
 $c    = optional_param('c', 0, PARAM_INT);           // checkmark ID

@@ -543,7 +543,6 @@ class checkmark {
                 echo $OUTPUT->box_end();
             }
         }
-        plagiarism_print_disclosure($this->cm->id);
     }
 
     /**
@@ -2070,9 +2069,6 @@ class checkmark {
 
         echo html_writer::start_tag('div', array('class' => 'usersubmissions'));
 
-        // Hook to allow plagiarism plugins to update status/print links.
-        plagiarism_update_status($this->course, $this->cm);
-
         $coursecontext = context_course::instance($course->id);
         if (has_capability('gradereport/grader:view', $coursecontext)
                 && has_capability('moodle/grade:viewall', $coursecontext)) {
@@ -2430,9 +2426,6 @@ class checkmark {
         echo html_writer::start_tag('div', array('class' => 'usersubmissions'));
 
         $mform = $this->get_export_form();
-
-        // Hook to allow plagiarism plugins to update status/print links.
-        plagiarism_update_status($this->course, $this->cm);
 
         if (!empty($message)) {
             echo $message;   // Display messages here if any!

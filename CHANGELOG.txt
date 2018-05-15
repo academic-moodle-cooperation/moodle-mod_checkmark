@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+3.4.2 (2018-05-15)
+------------------
+
+* [CHANGED] #5436 removed unsupported/unused plagiarism libs and calls
+
+
 3.4.1 (2018-05-02)
 ------------------
 
