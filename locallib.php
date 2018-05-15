@@ -2581,6 +2581,8 @@ class checkmark {
                     $forcesinglelinenames) = $classname::get_export_settings();
         }
 
+        $usrlst = optional_param_array('selected', array(), PARAM_INT);
+
         $groupmode = groups_get_activity_groupmode($this->cm);
         $currentgroup = 0;
         if ($groupmode != NOGROUPS) {
@@ -2589,18 +2591,27 @@ class checkmark {
                 $grpname = get_string('all', 'checkmark');
             } else {
                 $grpname = groups_get_group_name($currentgroup);
+                // Remove everyone from the usrlst who's not in the currently selected group!
+                $grpmembers = groups_get_members($currentgroup);
+                $usrlst = array_intersect($usrlst, array_keys($grpmembers));
             }
         } else {
             $grpname = '-';
         }
-
-        $usrlst = optional_param_array('selected', array(), PARAM_INT);
 
         if (empty($usrlst)) {
             redirect($PAGE->url, get_string('nousers', 'checkmark'), null, 'notifyproblem');
             return;
         }
 
+        if (!count($data)) {
+            $cellwidth = [
+                ['mode' => 'Fixed', 'value' => '15'],
+                ['mode' => 'Fixed', 'value' => '50'],
+                ['mode' => 'Fixed', 'value' => '15']
+            ];
+            $printheader = true;
+        }
         $pdf = new \mod_checkmark\MTablePDF($orientation, $cellwidth);
 
         $notactivestr = get_string('notactive', 'checkmark');
@@ -2630,12 +2641,12 @@ class checkmark {
             }
         } else {
             if ($filter == self::FILTER_REQUIRE_GRADING) {
-                $pdf->addRow(array('', get_string('norequiregrading', 'checkmark'), ''));
-                $pdf->setTitles(array(' ', ' ', ' '));
+                $text = get_string('norequiregrading', 'checkmark');
             } else {
-                $pdf->addRow(array('', get_string('nosubmisson', 'checkmark'), ''));
-                $pdf->setTitles(array(' ', ' ', ' '));
+                $text = get_string('nosubmisson', 'checkmark');
             }
+            $pdf->setTitles(array(' ', ' ', ' '));
+            $pdf->addRow(array('', $text, ''));
         }
 
         $pdf->setOutputFormat($format);

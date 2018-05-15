@@ -3,6 +3,7 @@ CHANGELOG
 3.4.2 (2018-05-15)
 ------------------
 
+* [FIXED] #5426 fix non groups members staying selected for export if selected group is changed before pressing export
 * [CHANGED] #5436 removed unsupported/unused plagiarism libs and calls
 
 
