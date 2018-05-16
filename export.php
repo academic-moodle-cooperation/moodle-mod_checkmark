@@ -47,7 +47,7 @@ $mform = $checkmarkinstance->get_export_form();
 
 if ($fromform = $mform->get_data()) {
     // See if we're going to export based on a template!
-    if (!empty($fromform->template)) {
+    if (!empty($fromform->export) && !empty($fromform->template)) {
         $templates = \mod_checkmark\exportform::get_templates();
         if (in_array($fromform->template, $templates)) {
             $checkmarkinstance->quick_export($fromform->template);

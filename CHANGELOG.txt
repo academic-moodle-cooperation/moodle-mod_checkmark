@@ -4,6 +4,7 @@ CHANGELOG
 ------------------
 
 * [FIXED] #5426 fix non groups members staying selected for export if selected group is changed before pressing export
+* [FIXED] #5442 don't download the PDF immediatly when clicking on update data preview if a template has been selected
 * [CHANGED] #5436 removed unsupported/unused plagiarism libs and calls
 
 
