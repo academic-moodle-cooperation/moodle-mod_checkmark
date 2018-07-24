@@ -333,9 +333,9 @@ class submissionstable extends \table_sql {
         $table->defaultselectstate = false;
 
         // Adapt table for submissions view (columns, etc.)!
-        $tablecolumns = ['selection', 'picture', 'fullname'];
-        $tableheaders = ['', '', get_string('fullnameuser')];
-        $helpicons = [null, null, null];
+        $tablecolumns = ['selection', 'fullname'];
+        $tableheaders = ['', get_string('fullnameuser')];
+        $helpicons = [null, null];
         $table->add_colgroup(1, 'sel');
 
         $useridentity = get_extra_user_fields($table->context);
@@ -344,35 +344,52 @@ class submissionstable extends \table_sql {
             $tableheaders[] = ($cur == 'phone1') ? get_string('phone') : get_string($cur);
             $helpicons[] = null;
         }
-        $table->add_colgroup(count($useridentity) + 2, 'user');
+        $table->add_colgroup(count($useridentity) + 1, 'user');
         if ($table->groupmode != NOGROUPS) {
             $tableheaders[] = get_string('group');
             $tablecolumns[] = 'groups';
             $helpicons[] = null;
             $table->add_colgroup(1, 'group');
         }
+
+        $tableheaders[] = get_string('lastmodified').' ('.get_string('submission', 'checkmark').')';
+        $tablecolumns[] = 'timesubmitted';
+        $helpicons[] = null;
+        $table->add_colgroup(1, 'timesubmitted');
+        // Dynamically add examples!
+        foreach ($table->checkmark->checkmark->examples as $key => $example) {
+            $width = strlen($example->shortname) + strlen($example->grade) + 4;
+            $tableheaders[] = $example->shortname." (".$example->grade.'P)';
+            $tablecolumns[] = 'example'.$key;
+            $table->cellwidth[] = ['mode' => 'Fixed', 'value' => $width];
+            $table->columnformat['example'.$key] = ['align' => 'C'];
+            $helpicons[] = null;
+        }
+        $table->add_colgroup(count($table->checkmark->checkmark->examples), 'examples');
+
         if ($table->checkmark->checkmark->grade != 0) {
             $tableheaders[] = get_string('grade');
             $tablecolumns[] = 'grade';
             $helpicons[] = null;
+            $feedbackcols = 3;
+        } else {
+            $feedbackcols = 2;
         }
         $tableheaders[] = get_string('comment', 'checkmark');
         $tablecolumns[] = 'feedback';
         $helpicons[] = null;
-        $table->add_colgroup(2, 'feedback');
-        $tableheaders[] = get_string('lastmodified').' ('.get_string('submission', 'checkmark').')';
-        $tablecolumns[] = 'timesubmitted';
-        $helpicons[] = null;
         $tableheaders[] = get_string('lastmodified').' ('.get_string('grade').')';
         $tablecolumns[] = 'timemarked';
         $helpicons[] = null;
-        $table->add_colgroup(2, 'changedates');
+        $table->add_colgroup($feedbackcols, 'feedback');
+
         if ($table->checkmark->checkmark->trackattendance) {
             $tableheaders[] = get_string('attendance', 'checkmark');
             $tablecolumns[] = 'attendance';
             $helpicons[] = new \help_icon('attendance', 'checkmark');
             $table->add_colgroup(1, 'attendance');
         }
+
         $tableheaders[] = get_string('status');
         $tablecolumns[] = 'status';
         $helpicons[] = null;
@@ -411,10 +428,8 @@ class submissionstable extends \table_sql {
         $table->collapsible(true);
         $table->initialbars(true);
 
-        $table->column_suppress('picture');
         $table->column_suppress('fullname');
 
-        $table->column_class('picture', 'picture');
         $table->column_class('fullname', 'fullname');
         $table->column_class('idnumber', 'idnumber');
         if ($table->groupmode != NOGROUPS) {
@@ -424,6 +439,12 @@ class submissionstable extends \table_sql {
         $table->column_class('grade', 'grade');
         $table->column_class('feedback', 'feedback');
         $table->column_class('timesubmitted', 'timesubmitted');
+
+        foreach ($table->checkmark->checkmark->examples as $key => $example) {
+            $table->column_class('example'.$key, 'example'.$key);
+            $table->no_sorting('example'.$key);
+        }
+
         $table->column_class('timemarked', 'timemarked');
         $table->column_class('status', 'status');
         $table->column_class('finalgrade', 'finalgrade');
@@ -1255,12 +1276,8 @@ class submissionstable extends \table_sql {
         }
         // Prints student answer and student modified date!
         if ($values->timesubmitted > 0) {
-            if ($this->showsubmission) {
-                $content = $this->checkmark->print_student_answer($values->id).userdate($values->timesubmitted,
-                                                                                        $timeformat);
-            } else {
-                $content = userdate($values->timesubmitted, $timeformat);
-            }
+            $content = userdate($values->timesubmitted, $timeformat);
+
             $overrides = checkmark_get_overridden_dates($this->checkmark->checkmark->id, $values->id);
             if ($overrides && $overrides->timedue) {
                 $timedue = $overrides->timedue;
