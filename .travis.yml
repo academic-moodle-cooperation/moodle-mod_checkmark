@@ -5,16 +5,11 @@ language: php
 #sudo: false
 # We have to use the fully virtualized environment to work around problems with behat tests using selenium and firefox
 # @see also https://github.com/moodlerooms/moodle-plugin-ci/issues/70
-sudo: required
+sudo: false
 
 addons:
   firefox: "47.0.1"
   postgresql: "9.3"
-  apt:
-    packages:
-      - oracle-java8-installer
-      - oracle-java8-set-default
-      - chromium-chromedriver
 
 # This tells Travis CI to cache Composer's cache.  Speeds up build times.
 cache:
@@ -34,7 +29,7 @@ php:
 env:
  global:
 # This line determines which version of Moodle to test against.
-  - MOODLE_BRANCH=MOODLE_34_STABLE
+  - MOODLE_BRANCH=MOODLE_35_STABLE
 
 # This matrix is used for testing against multiple databases.  So for each version of
 # PHP being tested, one build will be created for each database listed here.  EG: for
@@ -43,6 +38,7 @@ env:
  matrix:
   - DB=pgsql
   - DB=mysqli
+  - DB=mariadb
 
 # This section defines who's going to receive the notifications!
 notifications:
