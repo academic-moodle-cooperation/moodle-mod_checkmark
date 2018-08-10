@@ -53,14 +53,14 @@ class submissions_exported extends \core\event\base {
      *
      * @param \stdClass $cm course module object
      * @param \mod_checkmark\export $exportsettings Export settings object
-     * @return \mod_checkmark\event\submissions_exported
+     * @return \core\event\base
      */
     public static function exported(\stdClass $cm, \mod_checkmark\export $exportsettings) {
-        $event = self::create(array(
+        $event = static::create([
             'objectid' => $cm->instance,
             'context'  => \context_module::instance($cm->id),
             'other'    => $exportsettings->get_event_data(),
-        ));
+        ]);
 
         return $event;
     }
@@ -104,11 +104,13 @@ class submissions_exported extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        $params = array('id' => $this->contextinstanceid,
-                        'format' => $this->data['other']['format'],
-                        'groupmode' => $this->data['other']['groupmode'],
-                        'groupid' => $this->data['other']['groupid'],
-                        'datafilter' => $this->data['other']['filter']);
+        $params = [
+            'id' => $this->contextinstanceid,
+            'format' => $this->data['other']['format'],
+            'groupmode' => $this->data['other']['groupmode'],
+            'groupid' => $this->data['other']['groupid'],
+            'datafilter' => $this->data['other']['filter']
+        ];
         foreach ($this->data['other']['selected'] as $cur) {
             $params['selected['.$cur.']'] = $cur;
         }
@@ -127,9 +129,18 @@ class submissions_exported extends \core\event\base {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, $this->objecttable, 'export '.$this->data['other']['format_readable'],
-                     "export.php?id=".$this->contextinstanceid."&groupid=".$this->data['other']['groupid'].
-                     "&format=".$this->data['other']['format'], '', $this->contextinstanceid);
+        return [
+            $this->courseid,
+            $this->objecttable,
+            'export '.$this->data['other']['format_readable'],
+            (new \moodle_url("/mod/checkmark/export.php", [
+                'id' => $this->contextinstanceid,
+                'groupid' => $this->data['other']['groupid'],
+                'format' => $this->data['other']['format']
+            ]))->out(),
+            '',
+            $this->contextinstanceid
+        ];
     }
 
     /**
