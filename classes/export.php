@@ -78,12 +78,12 @@ class export {
     private $usrlst = null;
     /** @var $filter int which filter used for the export */
     private $filter = null;
-    /** @var $filter_readable string Human readable filter name */
-    private $filter_readable = null;
+    /** @var $filterreadable string Human readable filter name */
+    private $filterreadable = null;
     /** @var $outputformat int which format to export into */
     private $format = null;
-    /** @var $format_readable string Human readable output format */
-    private $format_readable = null;
+    /** @var $formatreadable string Human readable output format */
+    private $formatreadable = null;
     /** @var $sumabs bool whether to export absolute values */
     private $sumabs = null;
     /** @var $sumrel bool whether to export relative values */
@@ -129,9 +129,9 @@ class export {
         $this->groupid = $groupid;
         $this->usrlst = $selected;
         $this->filter = $filter;
-        $this->filter_readable = $this->filters[$filter];
+        $this->filterreadable = $this->filters[$filter];
         $this->format = $format;
-        $this->format_readable = $this->formats[$format];
+        $this->formatreadable = $this->formats[$format];
         $this->sumabs = $sumabs;
         $this->sumrel = $sumrel;
     }
@@ -158,15 +158,18 @@ class export {
         $this->template = $template;
     }
 
+    /**
+     * @return mixed[] The settings ready to be used for an export event!
+     */
     public function get_event_data() {
         $data = [
             'groupmode' => $this->groupmode,
             'groupid' => $this->groupid,
             'selected' => $this->usrlst,
             'filter' => $this->filter,
-            'filter_readable' => $this->filter_readable,
+            'filter_readable' => $this->filterreadable,
             'format' => $this->format,
-            'format_readable' => $this->format_readable,
+            'format_readable' => $this->formatreadable,
             'sumabs' => $this->sumabs,
             'sumrel' => $this->sumrel,
         ];
