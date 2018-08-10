@@ -2797,7 +2797,8 @@ class checkmark {
             }
 
             $curexport = new \mod_checkmark\export();
-            $curexport->set_general_data($groupmode, $currentgroup ? $currentgroup->id : 0, $usrlst, $filter, $format, $sumabs, $sumrel);
+            $groupid = $currentgroup ? $currentgroup->id : 0;
+            $curexport->set_general_data($groupmode, $groupid, $usrlst, $filter, $format, $sumabs, $sumrel);
             if ($format === \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
                 $curexport->set_pdf_data($orientation, $printheader, $textsize, $printperpage, $forcesinglelinenames);
             }
