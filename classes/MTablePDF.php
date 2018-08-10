@@ -401,9 +401,6 @@ class MTablePDF extends \pdf {
         $filename = clean_filename($filename);
 
         switch($this->outputformat) {
-            case self::OUTPUT_FORMAT_XLS:
-                $this->get_xls($filename);
-                break;
             case self::OUTPUT_FORMAT_XLSX:
                 $this->get_xlsx($filename);
                 break;
@@ -847,25 +844,6 @@ class MTablePDF extends \pdf {
     public function set_headerformat($headertitleformat, $headerdescformat) {
              $this->headerformat['title'] = $headertitleformat;
              $this->headerformat['desc'] = $headerdescformat;
-    }
-
-    /**
-     * Generate XLS
-     *
-     * @deprecated since 2.8
-     * @param string $filename Name of the exported file
-     */
-    public function get_xls($filename) {
-        global $CFG;
-
-        require_once($CFG->libdir . "/excellib.class.php");
-
-        $workbook = new \MoodleExcelWorkbook("-", 'excel5');
-
-        $this->fill_workbook($workbook);
-
-        $workbook->send($filename.'.xls');
-        $workbook->close();
     }
 
     /**
