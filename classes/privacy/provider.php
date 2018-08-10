@@ -102,6 +102,7 @@ class provider implements metadataprovider, pluginprovider, preference_provider 
         $collection->add_user_preference('checkmark_sumabs', 'privacy:metadata:pref:sumabs');
         $collection->add_user_preference('checkmark_sumrel', 'privacy:metadata:pref:sumrel');
         $collection->add_user_preference('checkmark_textsize', 'privacy:metadata:pref:textsize');
+        $collection->add_user_preference('checkmark_zipped', 'privacy:metadata:pref:zipped');
 
         // Link to subplugins.
         $collection->add_subsystem_link('core_message', [], 'privacy:metadata:subsys:message');

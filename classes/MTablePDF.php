@@ -68,6 +68,11 @@ class MTablePDF extends \pdf {
     /** Output as tab separated CSV */
     const OUTPUT_FORMAT_CSV_TAB = 5;
 
+    /** Output as per-group-PDFs zipped in an archive */
+    const ZIPPED = 'zipped';
+    /** Output as single uncompressed file */
+    const UNCOMPRESSED = 'uncompressed';
+
     /** Disable font-stretching */
     const STRETCH_DISABLED = 0;
     /** Horizontal scaling if text is larger than cell */
@@ -419,11 +424,9 @@ class MTablePDF extends \pdf {
     }
 
     /**
-     * Generate pdf
-     *
-     * @param string $filename Name of the exported file
+     * Prepares the PDF in a standardized way to be filled with data!
      */
-    private function get_pdf($filename) {
+    private function prepare_pdf() {
         $pdf = $this;
 
         // Add a page.
@@ -513,8 +516,14 @@ class MTablePDF extends \pdf {
         $pdf->SetFillColor(0xe8, 0xe8, 0xe8);
         $pdf->SetTextColor(0);
         $pdf->SetFont('');
+    }
 
-        // Data.
+    /**
+     * Writes the table-data to the PDF-file.
+     */
+    private function write_data() {
+        $pdf = $this;
+
         $fill = 0;
 
         $rowheights = [];
@@ -706,17 +715,63 @@ class MTablePDF extends \pdf {
             $pdf->Ln();
             $fill = !$fill;
         }
+    }
+    /**
+     * Generate pdf
+     *
+     * @param string $filename Name of the exported file
+     */
+    private function get_pdf($filename) {
+        $this->prepare_pdf();
 
+        // Data.
+        $this->write_data();
+
+        // Output the PDF!
         if ($filename != '') {
             if (substr($filename, strlen($filename) - 4) != ".pdf") {
                 $filename .= '.pdf';
             }
 
             $filename = clean_filename($filename);
-            $pdf->Output($filename, 'D');
+            $this->Output($filename, 'D');
         } else {
-            $pdf->Output();
+            $this->Output();
         }
+    }
+
+    /**
+     * Generate temporary pdf saved in server filespace to be pocessed further
+     *
+     * @param string|bool $filename Filename to use. If omitted a random name is used.
+     * @return bool|string Full filepath + filename or false if something happened
+     */
+    public function get_temp_pdf($filename = false) {
+        static $tmpdir = false;
+
+        $this->prepare_pdf();
+
+        // Data.
+        $this->write_data();
+
+        if (!$tmpdir) {
+            $tmpdir = make_request_directory();
+        }
+        if (!$filename) {
+            $filename = microtime();
+        }
+
+        // Output the PDF!
+        try {
+            $this->Output($tmpdir.$filename, 'F');
+            return $tmpdir . $filename;
+        } catch (\Exception $e) {
+            // TODO proper error handling and error localized strings!
+            \core\notification::add('Problem during PDF-export.<br/>\n'.$e->getMessage().'<br/>\n'.$e->getTraceAsString(),
+                    'error');
+        }
+
+        return false;
     }
 
     /**

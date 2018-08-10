@@ -57,6 +57,7 @@ $string['privacy:metadata:pref:quickgrade'] = 'Should quickgrading be activated 
 $string['privacy:metadata:pref:sumabs'] = 'Should absolute sums be shown by default for this user?';
 $string['privacy:metadata:pref:sumrel'] = 'Should relative sums be shown by default for this user?';
 $string['privacy:metadata:pref:textsize'] = 'Default text-size to use for this user\'s exports.';
+$string['privacy:metadata:pref:zipped'] = 'Default setting if separate PDFs per group as ZIP-archive are prefered.';
 $string['privacy:metadata:presentationgrade'] = 'Grade given for the user\'s presentation.';
 $string['privacy:metadata:presentationfeedback'] = 'Textual feedback given to the user\'s presentation.';
 $string['privacy:metadata:presentationformat'] = 'Format for the textual feedback given to the user\'s presentation.';
@@ -405,6 +406,7 @@ $string['summary_rel'] = '% examples checked';
 $string['viewmysubmission'] = 'View my submission';
 $string['viewsubmissions'] = 'View {$a} submitted checkmarks';
 $string['yoursubmission'] = 'Your submission';
+$string['zippedgrouppdfs'] = 'Groups as separate PDFs';
 /*
  * End of block with standard-strings
  */

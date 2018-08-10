@@ -110,6 +110,13 @@ class exportform extends \moodleform {
         // Format?
         $mform->addElement('select', 'format', get_string('format', 'checkmark'), self::FORMATS);
 
+        $mform->addElement('advcheckbox', 'zipped', '', get_string('zippedgrouppdfs', 'checkmark'), null, [
+                MTablePDF::UNCOMPRESSED,
+                MTablePDF::ZIPPED
+        ]);
+        $mform->hideIf('zipped', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->hideIf('zipped', 'group', 'neq', 0);
+
         $templatenames = self::get_templates();
         $templates = ['' => get_string('custom_settings', 'checkmark')];
         foreach ($templatenames as $cur) {

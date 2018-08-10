@@ -2293,7 +2293,7 @@ class checkmark {
      * TODO do we really need this method (for writing preferences) when we have the form used properly now?
      *
      * @return array print preferences ($filter, $sumabs, $sumrel, $format, $printperpage, $printoptimum, $textsize,
-     *                                  $pageorientation, $printheader, $forcesinglelinenames)
+     *                                  $pageorientation, $printheader, $forcesinglelinenames, $zipped)
      */
     public function print_preferences() {
         $updatepref = optional_param('updatepref', 0, PARAM_INT);
@@ -2319,6 +2319,10 @@ class checkmark {
                 set_user_preference('checkmark_printheader', $printheader);
                 $forcesinglelinenames = optional_param('forcesinglelinenames', 0, PARAM_INT);
                 set_user_preference('checkmark_forcesinglelinenames', $forcesinglelinenames);
+                $zipped = optional_param('zipped', \mod_checkmark\MTablePDF::UNCOMPRESSED, PARAM_ALPHA);
+                set_user_preference('checkmark_zipped', $zipped);
+            } else {
+                set_user_preference('checkmark_zipped', \mod_checkmark\MTablePDF::UNCOMPRESSED);
             }
         } else {
             $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
@@ -2339,6 +2343,7 @@ class checkmark {
             $pageorientation = get_user_preferences('checkmark_pageorientation', \mod_checkmark\MTablePDF::LANDSCAPE);
             $printheader = get_user_preferences('checkmark_printheader', 1);
             $forcesinglelinenames = get_user_preferences('checkmark_forcesinglelinenames', 0);
+            $zipped = get_user_preferences('checkmark_zipped', \mod_checkmark\MTablePDF::UNCOMPRESSED);
         }
 
         // Keep compatibility to old user preferences!
@@ -2348,8 +2353,19 @@ class checkmark {
             $pageorientation = \mod_checkmark\MTablePDF::LANDSCAPE;
         }
 
-        return array($filter, $sumabs, $sumrel, $format, $printperpage, $printoptimum, $textsize, $pageorientation, $printheader,
-            $forcesinglelinenames);
+        return [
+            $filter,
+            $sumabs,
+            $sumrel,
+            $format,
+            $printperpage,
+            $printoptimum,
+            $textsize,
+            $pageorientation,
+            $printheader,
+            $forcesinglelinenames,
+            $zipped
+        ];
     }
 
     /**
@@ -2366,7 +2382,7 @@ class checkmark {
              * to request user_preference updates!
              */
             list($filter, $sumabs, $sumrel, $format, $printperpage, $printoptimum, $textsize, $pageorientation,
-                $printheader, $forcesinglelinenames) = $this->print_preferences();
+                $printheader, $forcesinglelinenames, $zipped) = $this->print_preferences();
 
             ob_start();
             $this->get_print_data($filter);
@@ -2399,7 +2415,8 @@ class checkmark {
                 'textsize' => $textsize,
                 'pageorientation' => $pageorientation,
                 'printheader' => $printheader,
-                'forcesinglelinenames' => $forcesinglelinenames
+                'forcesinglelinenames' => $forcesinglelinenames,
+                'zipped' => $zipped,
             ];
             $mform->set_data($data);
         }
@@ -2541,7 +2558,7 @@ class checkmark {
          * First we check to see if the form has just been submitted
          * to request user_preference updates! We don't use $printoptimum here, it's implicit in $printperpage!
          */
-        list($filter, , , , , , , , , ) = $this->print_preferences();
+        list($filter, , , $format, , , , , , , $zipped) = $this->print_preferences();
 
         $usrlst = optional_param_array('selected', [], PARAM_INT);
 
@@ -2552,7 +2569,11 @@ class checkmark {
 
         $table = $classname::create_export_table($this->cm->id, $filter, $usrlst);
 
-        $this->exportpdf($table->get_data(), $template);
+        if ($zipped === \mod_checkmark\MTablePDF::ZIPPED) {
+            $this->export_zipped_group_pdfs($template);
+        } else {
+            $this->exportpdf($table->get_data(), $template);
+        }
     }
 
     /**
@@ -2684,6 +2705,150 @@ class checkmark {
     }
 
     /**
+     * Exports a separate PDF for each group collected in a ZIP file
+     *
+     * @param string|false $template The template name to use or false
+     */
+    protected function export_zipped_group_pdfs($template = false) {
+        global $USER;
+
+        $groupmode = groups_get_activity_groupmode($this->cm);
+        $aag = has_capability('moodle/site:accessallgroups', $this->context);
+        if ($groupmode === NOGROUPS) {
+            // TODO proper exception text!
+            throw new coding_exception('wrong groupmode!');
+        } else if ($groupmode == VISIBLEGROUPS or $aag) {
+            $groups = groups_get_all_groups($this->course->id, 0, $this->course->defaultgroupingid);
+        } else {
+            $groups = groups_get_all_groups($this->course->id, $USER->id, $this->course->defaultgroupingid);
+        }
+
+        $filters = $this->get_filters();
+        $formats = self::get_formats();
+
+        /*
+         * Get all settings preferences, some will be overwritten if a template is used!
+         */
+        list($filter, $sumabs, $sumrel, $format, $printperpage, ,
+                $textsize, $orientation, $printheader, $forcesinglelinenames) = $this->print_preferences();
+
+        if (!empty($template)) {
+            $classname = '\\mod_checkmark\\local\\exporttemplates\\'.$template;
+            list($sumabs, $sumrel, $orientation, $textsize, $printheader,
+                    $forcesinglelinenames) = $classname::get_export_settings();
+        }
+
+        $notactivestr = get_string('notactive', 'checkmark');
+        $timeavailablestr = !empty($this->checkmark->timeavailable) ? userdate($this->checkmark->timeavailable) : $notactivestr;
+        $timeduestr = !empty($this->checkmark->timedue) ? userdate($this->checkmark->timedue) : $notactivestr;
+
+        $filesforzipping = [];
+
+        foreach ($groups as $currentgroup) {
+            $grpname = $currentgroup->name;
+            $usrlst = array_keys(groups_get_members($currentgroup->id, 'u.id'));
+
+            if (empty($usrlst)) {
+                // We don't export empty groups here!
+                continue;
+            }
+
+            // Get data!
+            $printdata = $this->get_print_data($filter, $usrlst, true);
+            list(, $tableheaders, $data, $columnformat, $cellwidth) = $printdata;
+
+            if (!count($data)) {
+                $cellwidth = [
+                        ['mode' => 'Fixed', 'value' => '15'],
+                        ['mode' => 'Fixed', 'value' => '50'],
+                        ['mode' => 'Fixed', 'value' => '15']
+                ];
+                $printheader = true;
+            }
+            $pdf = new \mod_checkmark\MTablePDF($orientation, $cellwidth);
+
+            $pdf->setoutputformat(\mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
+            $pdf->showheaderfooter($printheader);
+            $pdf->setfontsize($textsize);
+
+            if (is_number($printperpage) && $printperpage != 0) {
+                $pdf->setrowsperpage($printperpage);
+            }
+
+            $pdf->setheadertext(get_string('course') . ':', $this->course->fullname,
+                    get_string('availabledate', 'checkmark') . ':', $timeavailablestr,
+                    !$template ? get_string('strprintpreview', 'checkmark') : '', $filters[$filter],
+                    // Second header row!
+                    get_string('strassignment', 'checkmark') . ':', $this->checkmark->name,
+                    get_string('duedate', 'checkmark') . ':', $timeduestr,
+                    get_string('groups') . ':', $grpname);
+
+            // Data present?
+            if (count($data)) {
+                $pdf->setcolumnformat($columnformat);
+                $pdf->settitles($tableheaders);
+                foreach ($data as $row) {
+                    $pdf->addrow($row);
+                }
+            } else {
+                if ($filter == self::FILTER_REQUIRE_GRADING) {
+                    $text = get_string('norequiregrading', 'checkmark');
+                } else {
+                    $text = get_string('nosubmisson', 'checkmark');
+                }
+                $pdf->settitles([' ', ' ', ' ']);
+                $pdf->addrow(['', $text, '']);
+            }
+
+            $data = [
+                    'groupmode' => $groupmode,
+                    'groupid' => $currentgroup->id,
+                    'selected' => $usrlst,
+                    'filter' => $filter,
+                    'filter_readable' => $filters[$filter],
+                    'format' => $format,
+                    'format_readable' => $formats[$format],
+                    'sumabs' => $sumabs,
+                    'sumrel' => $sumrel,
+            ];
+
+            if ($data['format'] == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
+                $data['orientation'] = $orientation;
+                $data['printheader'] = $printheader;
+                $data['textsize'] = $textsize;
+                $data['printperpage'] = $printperpage;
+                $data['forcesinglelinenames'] = $forcesinglelinenames;
+            }
+            if ($template) {
+                $data['template'] = $template;
+            }
+            \mod_checkmark\event\submissions_exported::exported($this->cm, $data)->trigger();
+
+            $filename = $this->course->shortname . '-' . $this->checkmark->name . '-' . $currentgroup->name;
+            if ($template) {
+                $filename .= '-' . get_string('exporttemplate_' . $template, 'checkmark');
+            }
+            if (!preg_match('/.pdf$/', $filename)) {
+                $filename .= '.pdf';
+            }
+            $filesforzipping[$filename] = $pdf->get_temp_pdf();
+        }
+
+        $zipper = new zip_packer();
+        $tmpdir = make_temp_directory('checkmark');
+        $zipfile = tempnam($tmpdir, 'checkmark_');
+        $zipname = $this->course->shortname . '-' . $this->checkmark->name;
+        if (!preg_match('/.zip$/', $zipname)) {
+            $zipname .= '.zip';
+        }
+        if ($zipper->archive_to_pathname($filesforzipping, $zipfile)) {
+            send_temp_file($zipfile, $zipname); // Send file and delete after sending.
+        } else {
+            throw new coding_exception('Something bad happened during creating the ZIP file!');
+        }
+    }
+
+    /**
      * Finaly print the submissions!
      */
     public function submissions_print() {
@@ -2693,19 +2858,23 @@ class checkmark {
          * First we check to see if the form has just been submitted
          * to request user_preference updates! We don't use $printoptimum here, it's implicit in $printperpage!
          */
-        list($filter, , , , , , , , , ) = $this->print_preferences();
+        list($filter, , , $format, , , , , , , $zipped) = $this->print_preferences();
 
-        $usrlst = optional_param_array('selected', array(), PARAM_INT);
+        if ($zipped === \mod_checkmark\MTablePDF::ZIPPED) {
+            $this->export_zipped_group_pdfs();
+        } else {
+            $usrlst = optional_param_array('selected', [], PARAM_INT);
 
-        if (empty($usrlst)) {
-            redirect($PAGE->url, get_string('nousers', 'checkmark'), null, 'notifyproblem');
-            return;
+            if (empty($usrlst)) {
+                    redirect($PAGE->url, get_string('nousers', 'checkmark'), null, 'notifyproblem');
+                    return;
+            }
+
+            // Get data!
+            $printdata = $this->get_print_data($filter, $usrlst, true);
+
+            $this->exportpdf($printdata);
         }
-
-        // Get data!
-        $printdata = $this->get_print_data($filter, $usrlst, true);
-
-        $this->exportpdf($printdata);
     }
 
     /**
