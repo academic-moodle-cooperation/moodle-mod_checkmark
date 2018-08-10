@@ -427,14 +427,14 @@ class MTablePDF extends \pdf {
         $pdf = $this;
 
         // Add a page.
-        $pdf->setDrawColor(0);
+        $pdf->SetDrawColor(0);
         $pdf->AddPage();
 
         // Calcuate column widths.
         $sumfix = 0;
         $sumrelativ = 0;
 
-        $rowspans = array();
+        $rowspans = [];
         $allfixed = true;
         $sum = 0;
 
@@ -454,16 +454,14 @@ class MTablePDF extends \pdf {
             }
         }
 
-        $w = array();
+        $this->cw = [];
         foreach ($this->columnwidths as $idx => $width) {
             if ($allfixed) {
-                $w[$idx] = round(
-                        ($pdf->getPageWidth() - 20) / $sum * $width['value']);
+                $this->cw[$idx] = round(($pdf->getPageWidth() - 20) / $sum * $width['value']);
             } else if ($width["mode"] == "Fixed") {
-                $w[$idx] = $width['value'];
+                $this->cw[$idx] = $width['value'];
             } else {
-                $w[$idx] = round(
-                        ($pdf->getPageWidth() - 20 - $sumfix) / $sumrelativ * $width['value']);
+                $this->cw[$idx] = round(($pdf->getPageWidth() - 20 - $sumfix) / $sumrelativ * $width['value']);
             }
         }
 
@@ -485,7 +483,7 @@ class MTablePDF extends \pdf {
             // Colors, line width and bold font.
             $this->SetFillColor(0xc0, 0xc0, 0xc0);
             $this->SetTextColor(0);
-            $this->setDrawColor(0);
+            $this->SetDrawColor(0);
             $this->SetLineWidth(0.3);
             $this->SetFont('', 'B');
 
@@ -494,7 +492,7 @@ class MTablePDF extends \pdf {
                 if (!isset($this->align[$key])) {
                     $this->align[$key] = 'C';
                 }
-                $this->Cell($w[$key], 7, $value, 1, 0, $this->align[$key], 1, null, '1', 0);
+                $this->Cell($this->cw[$key], 7, $value, 1, 0, $this->align[$key], 1, null, '1', 0);
             }
             $this->Ln();
         }
@@ -519,7 +517,7 @@ class MTablePDF extends \pdf {
         // Data.
         $fill = 0;
 
-        $rowheights = array();
+        $rowheights = [];
 
         // Calculate line heights for not rowspanned fields.
         foreach ($this->data as $rownum => $row) {
@@ -532,7 +530,7 @@ class MTablePDF extends \pdf {
                     if ($cf['stretch'] != self::STRETCH_DISABLED) {
                         $this->data[$rownum][$key]['numlines'] = 1;
                     } else {
-                        $this->data[$rownum][$key]['numlines'] = $this->getNumLines($value['data'], $w[$key]);
+                        $this->data[$rownum][$key]['numlines'] = $this->getNumLines($value['data'], $this->cw[$key]);
                     }
                     $maxnumlines = max($maxnumlines, $this->data[$rownum][$key]['numlines']);
                 }
@@ -550,7 +548,7 @@ class MTablePDF extends \pdf {
                     if ($cf['stretch'] != self::STRETCH_DISABLED) {
                         $lineheight = 1;
                     } else {
-                        $lineheight = $this->getNumLines($value['data'], $w[$key]);
+                        $lineheight = $this->getNumLines($value['data'], $this->cw[$key]);
                     }
 
                     $lines = 0;
@@ -569,17 +567,7 @@ class MTablePDF extends \pdf {
         $fullrows = 0;
 
         // Calculate space on pages.
-        $fsize = ceil($this->getFontSize());
-        if ($fsize == 3) {
-            $fsize = self::FONTSIZE_SMALL;
-        } else if ($fsize == 4) {
-            $fsize = self::FONTSIZE_MEDIUM;
-        } else if ($fsize == 5) {
-            $fsize = self::FONTSIZE_LARGE;
-        }
-
-        $spaceonpage = array();
-
+        $spaceonpage = [];
         if ($this->fontsize == self::FONTSIZE_SMALL) {
             if ($this->orientation == self::PORTRAIT) {
                 $spaceonpage[0] = 62;
@@ -588,7 +576,6 @@ class MTablePDF extends \pdf {
                 $spaceonpage[0] = 40;
                 $spaceonpage[1] = 42;
             }
-
         } else if ($this->fontsize == self::FONTSIZE_MEDIUM) {
             if ($this->orientation == self::PORTRAIT) {
                 $spaceonpage[0] = 49;
@@ -597,7 +584,6 @@ class MTablePDF extends \pdf {
                 $spaceonpage[0] = 32;
                 $spaceonpage[1] = 33;
             }
-
         } else if ($this->fontsize == self::FONTSIZE_LARGE) {
             if ($this->orientation == self::PORTRAIT) {
                 $spaceonpage[0] = 41;
@@ -643,7 +629,7 @@ class MTablePDF extends \pdf {
             if ($forcebreakonnextpage) {
                 // Break because there had to be allready a break but we couldnt.
                 if (!$dontbreak) {
-                    $pdf->addPage();
+                    $pdf->AddPage();
                     $fullrows = $rowheights[$rownum];
                     $forcebreakonnextpage = false;
 
@@ -651,7 +637,7 @@ class MTablePDF extends \pdf {
                 // Break because of fixed rows per page.
             } else if ($this->rowsperpage && $this->rowsperpage > 0 && $rownum != 0 && $rownum % $this->rowsperpage == 0) {
                 if (!$dontbreak) {
-                    $pdf->addPage();
+                    $pdf->AddPage();
                     $fullrows = $rowheights[$rownum];
                 } else {
                     $forcebreakonnextpage = true;
@@ -659,7 +645,7 @@ class MTablePDF extends \pdf {
                 // Break because there is no more space on current page.
             } else if ($this->rowsperpage && $this->rowsperpage > 0 && $fullrows + $spannedheight > $spaceleft) {
                 if (!$dontbreak) {
-                    $pdf->addPage();
+                    $pdf->AddPage();
                     $fullrows = $rowheights[$rownum];
                 } else {
                     $forcebreakonnextpage = true;
@@ -668,7 +654,7 @@ class MTablePDF extends \pdf {
             } else {
                 if ($fullrows + $spannedheight > $spaceleft) {
                     if (!$dontbreak) {
-                        $pdf->addPage();
+                        $pdf->AddPage();
                         $fullrows = $rowheights[$rownum];
                     } else {
                         $forcebreakonnextpage = true;
@@ -676,24 +662,18 @@ class MTablePDF extends \pdf {
                 }
             }
 
-            if ($rownum == count($this->data) - 1) {
-                $bottomborder = 'B';
-            } else {
-                $bottomborder = '';
-            }
-
             $debug = false;
 
             foreach ($row as $key => $value) {
                 $cf = $this->columnformat[$key];
                 $cf = $cf[$rownum % count($cf)];
+                if ($value['rowspan'] > 0) {
+                    $rowspans[$key] = $value['rowspan'];
+                } else {
+                    $rowspans[$key] = 0;
+                }
 
                 if (!is_null($value['data'])) {
-                    $bottomborder = 'TB';
-                    if ($value['rowspan'] > 0) {
-                        $rowspans[$key] = $value['rowspan'];
-                    }
-
                     $numlines = 0;
                     for ($i = $rownum; $i <= $rownum + $value['rowspan']; $i++) {
                         $numlines += $rowheights[$i];
@@ -705,10 +685,10 @@ class MTablePDF extends \pdf {
                     }
 
                     if ($cf['stretch'] != self::STRETCH_DISABLED) {
-                        $pdf->Cell($w[$key], $numlines * $cellsize, $value['data'], 'LR'.$bottomborder, 0, $cf['align'],
+                        $pdf->Cell($this->cw[$key], $numlines * $cellsize, $value['data'], 'LRTB', 0, $cf['align'],
                                 $cf['fill'], '', $cf['stretch'], false, 'T', 'M');
                     } else {
-                        $pdf->MultiCell($w[$key], $numlines * $cellsize, $value['data'], 'LR'.$bottomborder,
+                        $pdf->MultiCell($this->cw[$key], $numlines * $cellsize, $value['data'], 'LRTB',
                                 $cf['align'], $cf['fill'], 0);
                     }
 
@@ -719,7 +699,7 @@ class MTablePDF extends \pdf {
 
                     $numlines = $rowheights[$rownum];
 
-                    $pdf->Cell($w[$key], $numlines * $cellsize, $value['data'], 'LR', 0, false, 0, '', '', true, '0');
+                    $pdf->Cell($this->cw[$key], $numlines * $cellsize, $value['data'], 'LR', 0, false, 0, '', '', true, '0');
                     $rowspans[$key] = $rowspans[$key] - 1;
                 }
             }
