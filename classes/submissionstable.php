@@ -312,6 +312,27 @@ class submissionstable extends \table_sql {
     }
 
     /**
+     * Dynamically adds the example's columns to the arrays!
+     *
+     * @param string[] $tablecolumns Table's columns identifieres
+     * @param string[] $tableheaders Table's header texts as strings
+     * @param mixed[] $helpicons array of help icons and nulls
+     */
+    private function addexamplecolumns(&$tablecolumns, &$tableheaders, &$helpicons) {
+        // Dynamically add examples!
+        foreach ($this->checkmark->checkmark->examples as $key => $example) {
+            $width = strlen($example->shortname) + strlen($example->grade) + 4;
+            $tableheaders[] = $example->shortname." (".$example->grade.'P)';
+            $tablecolumns[] = 'example'.$key;
+            $this->cellwidth[] = ['mode' => 'Fixed', 'value' => $width];
+            $this->columnformat['example'.$key] = ['align' => 'C'];
+            $helpicons[] = null;
+        }
+        $this->add_colgroup(count($this->checkmark->checkmark->examples), 'examples');
+
+    }
+
+    /**
      * Helper method to create the table for submissions view!
      *
      * @param checkmark|int $checkmarkorcmid checkmark object or course module id of checkmark instance
@@ -356,16 +377,8 @@ class submissionstable extends \table_sql {
         $tablecolumns[] = 'timesubmitted';
         $helpicons[] = null;
         $table->add_colgroup(1, 'timesubmitted');
-        // Dynamically add examples!
-        foreach ($table->checkmark->checkmark->examples as $key => $example) {
-            $width = strlen($example->shortname) + strlen($example->grade) + 4;
-            $tableheaders[] = $example->shortname." (".$example->grade.'P)';
-            $tablecolumns[] = 'example'.$key;
-            $table->cellwidth[] = ['mode' => 'Fixed', 'value' => $width];
-            $table->columnformat['example'.$key] = ['align' => 'C'];
-            $helpicons[] = null;
-        }
-        $table->add_colgroup(count($table->checkmark->checkmark->examples), 'examples');
+
+        $table->addexamplecolumns($tablecolumns, $tableheaders, $helpicons);
 
         if ($table->checkmark->checkmark->grade != 0) {
             $tableheaders[] = get_string('grade');
@@ -653,16 +666,7 @@ class submissionstable extends \table_sql {
         $helpicons[] = null;
         $table->add_colgroup(1, 'timesubmitted');
 
-        // Dynamically add examples!
-        foreach ($table->checkmark->checkmark->examples as $key => $example) {
-            $width = strlen($example->shortname) + strlen($example->grade) + 4;
-            $tableheaders[] = $example->shortname." (".$example->grade.'P)';
-            $tablecolumns[] = 'example'.$key;
-            $table->cellwidth[] = ['mode' => 'Fixed', 'value' => $width];
-            $table->columnformat['example'.$key] = ['align' => 'C'];
-            $helpicons[] = null;
-        }
-        $table->add_colgroup(count($table->checkmark->checkmark->examples), 'examples');
+        $table->addexamplecolumns($tablecolumns, $tableheaders, $helpicons);
 
         if ((!empty($table->sumabs) || !empty($table->sumrel))) {
             $tableheaders[] = get_string('checkmarks', 'checkmark');
