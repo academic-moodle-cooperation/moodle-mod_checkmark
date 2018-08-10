@@ -2505,18 +2505,28 @@ class checkmark {
     }
 
     /**
-     * Returns applicable filters
+     * Returns applicable filters for this checkmark instance
      *
      * @return array applicable filters
      */
     protected function get_filters() {
+        return self::get_possible_filters($this->checkmark->trackattendance);
+    }
+
+    /**
+     * Returns all possible filters
+     *
+     * @param bool $trackattendance whether or not to include filters for attendance
+     * @return array all possible filters
+     */
+    public static function get_possible_filters($trackattendance = false) {
         $filters = [
-            self::FILTER_ALL             => get_string('all'),
-            self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
-            self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark')
+                self::FILTER_ALL             => get_string('all'),
+                self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
+                self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark')
         ];
 
-        if ($this->checkmark->trackattendance) {
+        if ($trackattendance) {
             $filters[self::FILTER_ATTENDANT] = get_string('all_attendant', 'checkmark');
             $filters[self::FILTER_ABSENT] = get_string('all_absent', 'checkmark');
             $filters[self::FILTER_UNKNOWN] = get_string('all_unknown', 'checkmark');
@@ -2530,7 +2540,7 @@ class checkmark {
      *
      * @return array export formats
      */
-    static protected function get_formats() {
+    public static function get_formats() {
         return [
             \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF        => 'PDF',
             \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLSX       => 'XLSX',
@@ -2672,29 +2682,15 @@ class checkmark {
 
         $pdf->setoutputformat($format);
 
-        $data = [
-            'groupmode'       => $groupmode,
-            'groupid'         => $currentgroup,
-            'selected'        => $usrlst,
-            'filter'          => $filter,
-            'filter_readable' => $filters[$filter],
-            'format'          => $format,
-            'format_readable' => $formats[$format],
-            'sumabs'          => $sumabs,
-            'sumrel'          => $sumrel,
-        ];
-
-        if ($data['format'] == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
-            $data['orientation']  = $orientation;
-            $data['printheader']  = $printheader;
-            $data['textsize']     = $textsize;
-            $data['printperpage'] = $printperpage;
-            $data['forcesinglelinenames'] = $forcesinglelinenames;
+        $export = new \mod_checkmark\export();
+        $export->set_general_data($groupmode, $currentgroup, $usrlst, $filter, $format, $sumabs, $sumrel);
+        if ($format === \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
+            $export->set_pdf_data($orientation, $printheader, $textsize, $printperpage, $forcesinglelinenames);
         }
         if ($template) {
-            $data['template'] = $template;
+            $export->set_used_template($template);
         }
-        \mod_checkmark\event\submissions_exported::exported($this->cm, $data)->trigger();
+        \mod_checkmark\event\submissions_exported::exported($this->cm, $export)->trigger();
 
         $filename = $this->course->shortname.'-'.$this->checkmark->name;
         if ($template) {
@@ -2800,29 +2796,15 @@ class checkmark {
                 $pdf->addrow(['', $text, '']);
             }
 
-            $data = [
-                    'groupmode' => $groupmode,
-                    'groupid' => $currentgroup->id,
-                    'selected' => $usrlst,
-                    'filter' => $filter,
-                    'filter_readable' => $filters[$filter],
-                    'format' => $format,
-                    'format_readable' => $formats[$format],
-                    'sumabs' => $sumabs,
-                    'sumrel' => $sumrel,
-            ];
-
-            if ($data['format'] == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
-                $data['orientation'] = $orientation;
-                $data['printheader'] = $printheader;
-                $data['textsize'] = $textsize;
-                $data['printperpage'] = $printperpage;
-                $data['forcesinglelinenames'] = $forcesinglelinenames;
+            $curexport = new \mod_checkmark\export();
+            $curexport->set_general_data($groupmode, $currentgroup ? $currentgroup->id : 0, $usrlst, $filter, $format, $sumabs, $sumrel);
+            if ($format === \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
+                $curexport->set_pdf_data($orientation, $printheader, $textsize, $printperpage, $forcesinglelinenames);
             }
             if ($template) {
-                $data['template'] = $template;
+                $curexport->set_used_template($template);
             }
-            \mod_checkmark\event\submissions_exported::exported($this->cm, $data)->trigger();
+            \mod_checkmark\event\submissions_exported::exported($this->cm, $curexport)->trigger();
 
             $filename = $this->course->shortname . '-' . $this->checkmark->name . '-' . $currentgroup->name;
             if ($template) {

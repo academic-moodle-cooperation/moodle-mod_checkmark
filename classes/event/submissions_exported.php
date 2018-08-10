@@ -50,33 +50,16 @@ class submissions_exported extends \core\event\base {
     /**
      * Create event object and return it.
      *
-     * Data array needs this elements:
-     * -- template = (optional, only when used) template name that has been used
-     * -- groupmode = groups_get_activity_groupmode($this->cm);
-     * -- groupid = currentgroup = groups_get_activity_group($this->cm, true);
-     * -- selected = optional_param_array('selected', array(), PARAM_INT);
-     * -- filter
-     * -- filter_readable
-     * -- format (following indented only if format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF)
-     *     -- orientation = optional_param('pageorientation', 0, PARAM_INT) ?
-     *                      \mod_checkmark\MTablePDF::PORTRAIT :
-     *                      \mod_checkmark\MTablePDF::LANDSCAPE;
-     *     -- printheader
-     *     -- textsize
-     *     -- printperpage    = get_user_preferences('checkmark_pdfprintperpage', null);
-     * -- format_readable
-     * -- sumabs = get_user_preferences('checkmark_sumabs', 1);
-     * -- sumrel = get_user_preferences('checkmark_sumrel', 1);
      *
      * @param \stdClass $cm course module object
-     * @param array $data event data
+     * @param \mod_checkmark\export $exportsettings Export settings object
      * @return \mod_checkmark\event\submissions_exported
      */
-    public static function exported(\stdClass $cm, $data) {
+    public static function exported(\stdClass $cm, \mod_checkmark\export $exportsettings) {
         $event = self::create(array(
             'objectid' => $cm->instance,
             'context'  => \context_module::instance($cm->id),
-            'other'    => $data,
+            'other'    => $exportsettings->get_event_data(),
         ));
 
         return $event;
