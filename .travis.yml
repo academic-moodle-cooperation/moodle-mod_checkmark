@@ -7,21 +7,6 @@ language: php
 # @see also https://github.com/moodlerooms/moodle-plugin-ci/issues/70
 sudo: false
 
-default:
-  extensions:
-    Behat\MinkExtension:
-      selenium2:
-        # This will probably be the same always, if you follow the guide for browsers below.
-        wd_host: http://localhost:8643/wd/hub
-        capabilities:
-          chrome:
-            switches:
-              - "--headless"
-              - "--disable-gpu"
-              - "--no-sandbox"
-      javascript_session: selenium2
-      browser_name: chrome
-
 addons:
   firefox: "47.0.1"
   postgresql: "9.3"
@@ -30,6 +15,9 @@ addons:
       - google-chrome
     packages:
       - google-chrome-stable
+      - oracle-java9-installer
+      - oracle-java9-set-default
+      - chromium-chromedriver
 
 # This tells Travis CI to cache Composer's cache.  Speeds up build times.
 cache:
