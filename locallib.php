@@ -2482,7 +2482,7 @@ class checkmark {
         $output = $OUTPUT->box_start('generalbox', 'notice');
         $output .= html_writer::tag('p', $message);
         $output .= html_writer::tag('div', $OUTPUT->render($continue) . (($cancel != null) ? $OUTPUT->render($cancel) : ''),
-                                    array('class' => 'buttons'));
+                ['class' => 'buttons']);
         $output .= $OUTPUT->box_end();
         return $output;
     }
@@ -2543,7 +2543,7 @@ class checkmark {
          */
         list($filter, , , , , , , , , ) = $this->print_preferences();
 
-        $usrlst = optional_param_array('selected', array(), PARAM_INT);
+        $usrlst = optional_param_array('selected', [], PARAM_INT);
 
         if (empty($usrlst)) {
             redirect($PAGE->url, get_string('nousers', 'checkmark'), null, 'notifyproblem');
@@ -2581,7 +2581,7 @@ class checkmark {
                     $forcesinglelinenames) = $classname::get_export_settings();
         }
 
-        $usrlst = optional_param_array('selected', array(), PARAM_INT);
+        $usrlst = optional_param_array('selected', [], PARAM_INT);
 
         $groupmode = groups_get_activity_groupmode($this->cm);
         $currentgroup = 0;
@@ -2617,7 +2617,7 @@ class checkmark {
         $notactivestr = get_string('notactive', 'checkmark');
         $timeavailablestr = !empty($this->checkmark->timeavailable) ? userdate($this->checkmark->timeavailable) : $notactivestr;
         $timeduestr = !empty($this->checkmark->timedue) ? userdate($this->checkmark->timedue) : $notactivestr;
-        $pdf->setHeaderText(get_string('course').':', $this->course->fullname,
+        $pdf->setheadertext(get_string('course').':', $this->course->fullname,
             get_string('availabledate', 'checkmark').':', $timeavailablestr,
             !$template ? get_string('strprintpreview', 'checkmark') : '', $filters[$filter],
             // Second header row!
@@ -2625,19 +2625,19 @@ class checkmark {
             get_string('duedate', 'checkmark').':', $timeduestr,
             get_string('groups').':', $grpname);
 
-        $pdf->ShowHeaderFooter($printheader);
-        $pdf->SetFontSize($textsize);
+        $pdf->showheaderfooter($printheader);
+        $pdf->setfontsize($textsize);
 
         if (is_number($printperpage) && $printperpage != 0) {
-            $pdf->setRowsperPage($printperpage);
+            $pdf->setrowsperpage($printperpage);
         }
 
         // Data present?
         if (count($data)) {
-            $pdf->setColumnFormat($columnformat);
-            $pdf->setTitles($tableheaders);
+            $pdf->setcolumnformat($columnformat);
+            $pdf->settitles($tableheaders);
             foreach ($data as $row) {
-                $pdf->addRow($row);
+                $pdf->addrow($row);
             }
         } else {
             if ($filter == self::FILTER_REQUIRE_GRADING) {
@@ -2645,13 +2645,13 @@ class checkmark {
             } else {
                 $text = get_string('nosubmisson', 'checkmark');
             }
-            $pdf->setTitles(array(' ', ' ', ' '));
-            $pdf->addRow(array('', $text, ''));
+            $pdf->settitles([' ', ' ', ' ']);
+            $pdf->addrow(['', $text, '']);
         }
 
-        $pdf->setOutputFormat($format);
+        $pdf->setoutputformat($format);
 
-        $data = array(
+        $data = [
             'groupmode'       => $groupmode,
             'groupid'         => $currentgroup,
             'selected'        => $usrlst,
@@ -2661,7 +2661,7 @@ class checkmark {
             'format_readable' => $formats[$format],
             'sumabs'          => $sumabs,
             'sumrel'          => $sumrel,
-        );
+        ];
 
         if ($data['format'] == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
             $data['orientation']  = $orientation;

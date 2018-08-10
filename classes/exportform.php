@@ -190,7 +190,7 @@ class exportform extends \moodleform {
 
         $activegroup = groups_get_activity_group($this->cm, true, $allowedgroups);
 
-        $groupsmenu = array();
+        $groupsmenu = [];
         if ((!$allowedgroups || $groupmode == VISIBLEGROUPS || $aag)) {
             $groupsmenu[0] = get_string('allparticipants');
         }

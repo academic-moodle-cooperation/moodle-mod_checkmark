@@ -45,9 +45,21 @@ class overrideform extends \moodleform {
     protected $cm;
     /** @var  \context_module object */
     protected $context;
-    /** @var  \int type of overrideform (USER or GROUP) */
+    /** @var  int type of overrideform (USER or GROUP) */
     protected $type;
 
+    /**
+     * overrideform constructor.
+     *
+     * @param int $type either self::USER or self::GROUP!
+     * @param string|\moodle_url|null $action
+     * @param \stdClass|mixed[]|null $customdata
+     * @param string $method
+     * @param string $target
+     * @param string[]|null $attributes
+     * @param bool $editable
+     * @param null $ajaxformdata
+     */
     public function __construct($type, $action = null, $customdata = null, $method = 'post', $target = '', $attributes = null,
                                 $editable = true, $ajaxformdata = null) {
         if (!in_array($type, [self::USER, self::GROUP])) {

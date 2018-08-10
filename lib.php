@@ -427,8 +427,8 @@ function checkmark_get_coursemodule_info($coursemodule) {
  *
  * It uses a static variable to cache the results and possibly lessen DB queries! TODO: examine if we need some other cache for it!
  *
- * @param $checkmarkid
- * @param int $userid
+ * @param int $checkmarkid The checkmark-ID to get the overridden dates for.
+ * @param int $userid (optional) 0 to get all user's overrides or a specific user's ID
  * @return bool
  */
 function checkmark_get_overridden_dates($checkmarkid, $userid=0) {

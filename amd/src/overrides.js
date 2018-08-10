@@ -48,7 +48,6 @@ define(['jquery', 'jqueryui', 'core/str', 'core/log'], function($, jqui, str, lo
 
         log.info('Initialize report JS!', 'mod_checkmark');
 
-
         var tofetch = [
             {key: 'dates_overwritten', component: 'mod_checkmark'},
             {key: 'availabledate', component: 'mod_checkmark'},

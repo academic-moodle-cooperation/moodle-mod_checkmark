@@ -26,7 +26,9 @@ namespace mod_checkmark;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir . '/pdflib.php');
+if (isset($CFG)) {
+    require_once($CFG->libdir . '/pdflib.php');
+}
 
 /**
  * MTablePDF class handles exports to PDF, XLSX, ODS, CSV...
@@ -75,34 +77,39 @@ class MTablePDF extends \pdf {
     /** Horizontal spacing is always applied */
     const STRETCH_FORCED_SPACING = 4;
 
-    /** @var $outputformat which format to export into */
+    /** @var $outputformat int which format to export into */
     private $outputformat = self::OUTPUT_FORMAT_PDF;
 
-    /** @var $orientation page orientation to use for PDF output */
+    /** @var $orientation string page orientation to use for PDF output */
     private $orientation = self::PORTRAIT;
-    /** @var $rowsperpage how many rows a PDF page contains at max (0 = auto pagination) */
+    /** @var $rowsperpage int how many rows a PDF page contains at max (0 = auto pagination) */
     private $rowsperpage = 0;
-    /** @var $fontsize which fontsize to use (8 pt, 10 pt or 12 pt) in PDF */
+    /** @var $fontsize int which fontsize to use (8 pt, 10 pt or 12 pt) in PDF */
     private $fontsize = self::FONTSIZE_MEDIUM;
-    /** @var $showheaderfooter if we should show header and footer in PDF */
+    /** @var $showheaderfooter bool if we should show header and footer in PDF */
     private $showheaderfooter = true;
 
-    /** @var $columnwidths columns widths */
-    private $columnwidths = array();
-    /** @var $titles columns titles */
+    /** @var $columnwidths array columns widths */
+    private $columnwidths = [];
+    /** @var $titles array|null columns titles */
     private $titles = null;
-    /** @var $columnformat columns formats */
+    /** @var $columnformat array columns formats */
     private $columnformat;
     /** @var $headerformat */
-    private $headerformat = array('title' => array(), 'desc' => array());
-
-    /** @var $data tables data */
-    private $data = array();
+    private $headerformat = ['title' => [], 'desc' => []];
+    /** @var string[] */
+    private $align = [];
+    /** @var int[] Calculated widths of tables */
+    protected $cw = [];
+    /** @var string[] Texts to use for the header */
+    private $header = [];
+    /** @var $data array tables data */
+    private $data = [];
 
     /**
      * Constructor
      *
-     * @param char $orientation Orientation to use for PDF export
+     * @param string $orientation Orientation to use for PDF export
      * @param object[] $columnwidths Width management for columns
      */
     public function __construct($orientation, $columnwidths) {
@@ -116,11 +123,11 @@ class MTablePDF extends \pdf {
         $this->columnwidths = $columnwidths;
 
         $this->orientation = $orientation;
-        $this->columnformat = array();
+        $this->columnformat = [];
         for ($i = 0; $i < count($columnwidths); $i++) {
-            $this->columnformat[] = array();
-            $this->columnformat[$i][] = array("fill" => 0, "align" => "L", "stretch" => self::STRETCH_DISABLED);
-            $this->columnformat[$i][] = array("fill" => 1, "align" => "L", "stretch" => self::STRETCH_DISABLED);
+            $this->columnformat[] = [];
+            $this->columnformat[$i][] = ["fill" => 0, "align" => "L", "stretch" => self::STRETCH_DISABLED];
+            $this->columnformat[$i][] = ["fill" => 1, "align" => "L", "stretch" => self::STRETCH_DISABLED];
         }
     }
 
@@ -146,23 +153,17 @@ class MTablePDF extends \pdf {
     /**
      * Set the texts for the header of the pdf
      *
-     * @param string $title1
-     * @param string $desc1
-     * @param string $title2
-     * @param string $desc2
-     * @param string $title3
-     * @param string $desc3
-     * @param string $title4
-     * @param string $desc4
-     * @param string $title5
-     * @param string $desc5
-     * @param string $title6
-     * @param string $desc6
+     * TODO: Replace this with proper class properties, setter-methods and fixed texts...
+     *
+     * @param string ...$header [$title1, $desc1, $title2, $desc2, $title3, $desc3,
+     *                          $title4, $desc4, $title5, $desc5, $title6, $desc6]
      */
-    public function setheadertext($title1, $desc1, $title2, $desc2, $title3, $desc3,
-            $title4, $desc4, $title5, $desc5, $title6, $desc6) {
-        $this->header = array($title1, $desc1, $title2, $desc2, $title3, $desc3,
-                $title4, $desc4, $title5, $desc5, $title6, $desc6);
+    public function setheadertext(string ...$header) {
+        list($title1, $desc1, $title2, $desc2, $title3, $desc3,
+                $title4, $desc4, $title5, $desc5, $title6, $desc6) = $header;
+        // We know this makes no sense, but it's just to visualize how they will be used!
+        $this->header = [$title1, $desc1, $title2, $desc2, $title3, $desc3,
+                         $title4, $desc4, $title5, $desc5, $title6, $desc6];
     }
 
     /**
@@ -179,8 +180,8 @@ class MTablePDF extends \pdf {
 
             $pagewidth = $this->getPageWidth();
             $scale = $pagewidth / 200;
-            $oldfontsize = $this->getFontSize();
-            $this->setFontSize('12');
+            $oldfontsize = (int)$this->getFontSize();
+            $this->setfontsize('12');
             // First row.
             $border = 0;
             $height = 4;
@@ -230,7 +231,7 @@ class MTablePDF extends \pdf {
             $this->Cell(31 * $scale, $height, $header[11], $border, false, 'R', 0, '', 1, false);
 
             $this->Ln();
-            $this->SetFontSize($oldfontsize);
+            $this->setfontsize($oldfontsize);
         }
     }
 
@@ -324,21 +325,21 @@ class MTablePDF extends \pdf {
 
         if ($fastmode) {
             // Fast mode.
-            $tmp = array();
+            $tmp = [];
 
             foreach ($row as $idx => $value) {
                 if (is_array($value)) {
                     print_error("Error: if you want to add a row using the fast mode, you cannot pass me an array");
                 }
 
-                $tmp[] = array("rowspan" => 0, "data" => $value);
+                $tmp[] = ["rowspan" => 0, "data" => $value];
             }
 
             $row = $tmp;
         } else {
             foreach ($row as $idx => $value) {
                 if (!is_array($value)) {
-                    $row[$idx] = array("rowspan" => 0, "data" => $value);
+                    $row[$idx] = ["rowspan" => 0, "data" => $value];
                 } else if (!isset($value["data"])) {
                     print_error("Error: you need to set a value for [\"data\"]");
                     return false;
@@ -359,7 +360,7 @@ class MTablePDF extends \pdf {
      * Sets the font size
      *
      * @param int $fontsize
-     * @param string $out (optional)
+     * @param bool $out (optional)
      */
     public function setfontsize($fontsize, $out=true) {
         if ($fontsize <= self::FONTSIZE_SMALL) {
@@ -742,18 +743,20 @@ class MTablePDF extends \pdf {
     /**
      * Fills workbook (either XLS or ODS) with data
      *
-     * @param MoodleExcelWorkbook $workbook workbook to put data into
+     * @param \MoodleExcelWorkbook|\MoodleODSWorkbook $workbook workbook to put data into
      */
     public function fill_workbook(&$workbook) {
         $time = time();
         $time = userdate($time);
         $worksheet = $workbook->add_worksheet($time);
 
-        $headlineprop = array('size' => 12,
+        $headlineprop = [
+            'size' => 12,
             'bold' => 1,
             'bottom' => 1,
             'align' => 'center',
-            'v_align' => 'vcenter');
+            'v_align' => 'vcenter'
+        ];
         $headlineformat = $workbook->add_format($headlineprop);
         $headlineformat->set_left(1);
         $headlinefirst = $workbook->add_format($headlineprop);
@@ -772,9 +775,11 @@ class MTablePDF extends \pdf {
             $hdrright->set_align('left');
         }
 
-        $textprop = array('size' => 10,
+        $textprop = [
+            'size' => 10,
             'align' => 'left',
-            'v_align' => 'vcenter');
+            'v_align' => 'vcenter'
+        ];
         $text = $workbook->add_format($textprop);
         $text->set_left(1);
         $textfirst = $workbook->add_format($textprop);
@@ -901,10 +906,10 @@ class MTablePDF extends \pdf {
      * Generate CSV
      *
      * @param string $filename Name of the exported file
-     * @param char $sep Character used to separate the data (usually tab or semicolon)
+     * @param string $sep Character used to separate the data (usually tab or semicolon)
      */
     public function get_csv($filename, $sep = "\t") {
-        $lines = array();
+        $lines = [];
 
         // Course information.
         for ($i = 0; $i < count($this->header); $i += 2) {
@@ -918,7 +923,7 @@ class MTablePDF extends \pdf {
 
         // Data.
         foreach ($this->data as $row) {
-            $r = array();
+            $r = [];
             foreach ($row as $idx => $cell) {
                 if (is_null($cell['data'])) {
                     $cell['data'] = $prev[$idx]['data'];
