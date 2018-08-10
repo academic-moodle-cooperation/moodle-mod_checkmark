@@ -17,6 +17,8 @@
 /**
  * mtablepdf.php
  *
+ * TODO maybe we should replace this library with a specialized export class, also improving design & co?
+ *
  * @package   mod_checkmark
  * @author    Philipp Hager
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
