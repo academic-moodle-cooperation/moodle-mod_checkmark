@@ -26,7 +26,7 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once('../../../config.php');
+require(__DIR__ . '/../../../config.php');
 $PAGE->set_url($CFG->wwwroot.'/mod/checkmark/db/fixmissinggradebookgrade.php');
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('admin');
