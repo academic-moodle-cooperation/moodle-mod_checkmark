@@ -1,5 +1,17 @@
 CHANGELOG
 =========
+3.5.0 (2018-08-17)
+------------------
+
+* Moodle 3.5 compatible version
+* [FEATURE] #3577 implemented support for privacy API
+* [FEATURE] #5017 added the possibility to download separate PDFs for each group as zipped archive in one step
+* [CHANGED] #5270 updated layout of submissions table to have proper columns for examples like export table had before
+* [CHANGED] #5090 removed german language file from repository
+* [CHANGED] #5089 removed long deprecated XLS-export methods
+* many small code improvements, bug fixes, etc.
+
+
 3.4.2 (2018-05-15)
 ------------------
 
