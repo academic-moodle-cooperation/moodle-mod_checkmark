@@ -112,12 +112,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $this->standard_coursemodule_elements();
 
         if ($this->submissioncount) {
-            $mform->freeze('grade');
             $mform->freeze('examplecount');
-            $mform->freeze('examplestart');
-            $mform->freeze('flexiblenaming');
-            $mform->freeze('examplenames');
-            $mform->freeze('examplegrades');
             $mform->addElement('hidden', 'allready_submit', 'yes');
         } else {
             $mform->addElement('hidden', 'allready_submit', 'no');
@@ -261,9 +256,6 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->addHelpButton('emailteachers', 'emailteachers', 'checkmark');
         $mform->setDefault('emailteachers', 0);
 
-        if (!empty($this->update) && $this->submissioncount) {
-            $mform->addElement('html', $OUTPUT->notification(get_string('elements_disabled', 'checkmark'), 'notifymessage'));
-        }
         $mform->addElement('text', 'examplecount', get_string('numberofexamples', 'checkmark'), array('id' => 'id_examplecount'));
         // We're going to clean them by ourselves...
         $mform->setType('examplecount', PARAM_INT);
@@ -353,13 +345,23 @@ class mod_checkmark_mod_form extends moodleform_mod {
      * @return object checkmark instance
      */
     protected function get_checkmark_instance() {
-        global $CFG;
+        global $CFG, $DB;
 
         if ($this->_checkmarkinstance) {
             return $this->_checkmarkinstance;
         }
         require_once($CFG->dirroot.'/mod/checkmark/lib.php');
-        $this->checkmarkinstance = new checkmark();
+        if (!empty($this->update)) {
+            if (empty($this->cm)) {
+                $this->cm = get_coursemodule_from_id('checkmark', $this->update);
+            }
+            $checkmark = $DB->get_record('checkmark', ['id' => $this->cm->instance]);
+            $course = $DB->get_record('course', ['id' => $this->cm->course]);
+            $this->checkmarkinstance = new checkmark($this->cm->id, $checkmark, $this->cm, $course);
+        } else {
+            $this->checkmarkinstance = new checkmark();
+        }
+
         return $this->checkmarkinstance;
     }
 
@@ -372,30 +374,34 @@ class mod_checkmark_mod_form extends moodleform_mod {
      * @param array $defaultvalues (called by reference) values to preprocess and alter if necessary
      */
     public function data_preprocessing(&$defaultvalues) {
-        $this->get_checkmark_instance()->form_data_preprocessing($defaultvalues, $this);
+        $mform = $this->_form;
 
         if ($defaultvalues['instance']) {
+            if (checkmark_count_real_submissions($this->cm) != 0) {
+                $mform->addElement('hidden', 'allready_submit', 'yes');
+                $defaultvalues['allready_submit'] = 'yes';
+            } else {
+                $mform->addElement('hidden', 'allready_submit', 'no');
+                $defaultvalues['allready_submit'] = 'no';
+            }
+
             $examples = checkmark::get_examples_static($defaultvalues['instance']);
             $flexiblenaming = false;
             $oldname = null;
             $oldgrade = null;
-            $names = '';
-            $grades = '';
+            $names = [];
+            $grades = [];
             $examplestart = '';
             $examplecount = count($examples);
 
             foreach ($examples as $example) {
-                $names .= checkmark::DELIMITER . $example->shortname;
-                $grades .= checkmark::DELIMITER . $example->grade;
+                $names[] = $example->shortname;
+                $grades[] = $example->grade;
                 // First we check the obvious...
                 if ($flexiblenaming || preg_match('*[^0-9]*', $example->shortname)) {
                     $flexiblenaming = true;
                 } else {
                     if (($oldname == null) && ($oldgrade == null)) {
-                        $oldname = $example->shortname;
-                        $oldgrade = $example->grade;
-                        $names = $example->shortname;
-                        $grades = $example->grade;
                         $examplestart = $example->shortname;
                     } else {
                         if ((intval($oldname) + 1 != intval($example->shortname))
@@ -407,13 +413,15 @@ class mod_checkmark_mod_form extends moodleform_mod {
                     $oldname = $example->shortname;
                 }
             }
+            $names = implode(checkmark::DELIMITER, $names);
+            $grades = implode(checkmark::DELIMITER, $grades);
 
             if ($flexiblenaming) {
                 $defaultvalues['examplegrades'] = $grades;
                 $defaultvalues['examplenames'] = $names;
                 $defaultvalues['flexiblenaming'] = true;
-                $defaultvalues['examplestart'] = get_config('checkmark', 'stdexamplestart');;
-                $defaultvalues['examplecount'] = get_config('checkmark', 'stdexamplecount');;
+                $defaultvalues['examplestart'] = get_config('checkmark', 'stdexamplestart');
+                $defaultvalues['examplecount'] = count($examples);
             } else {
                 $defaultvalues['flexiblenaming'] = false;
                 $defaultvalues['examplestart'] = $examplestart;
@@ -448,6 +456,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
                 $errors['cutoffdate'] = get_string('cutoffdatefromdatevalidation', 'assign');
             }
         }
+
         $errors = array_merge($errors, $this->get_checkmark_instance()->form_validation($data));
         return $errors;
     }

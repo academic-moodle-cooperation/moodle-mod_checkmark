@@ -153,26 +153,29 @@ function checkmark_update_instance($checkmark) {
         checkmark_presentation_item_delete($checkmark);
     }
 
-    if ($checkmark->allready_submit == 'yes') {
-        unset($checkmark->grade);
-    }
     $DB->update_record('checkmark', $checkmark);
 
-    if ($checkmark->allready_submit != 'yes') {
-        /*
-         * We won't change the examples after someone submitted allready - otherwise he/she would
-         * have submitted other examples than displayed
-         */
-        checkmark_update_examples($checkmark);
-    }
+    checkmark_update_examples($checkmark);
+
     checkmark_refresh_events($checkmark->course, $checkmark);
 
-    if ($checkmark->allready_submit != 'yes') {
-        /* We won't change the grades after someone submitted already - otherwise he/she would
-         * have submitted with other informations than displayed
-         *
-         * Get existing grade item!
-         */
+    if (!empty($examples)) {
+        if (empty($checkmark->flexiblenaming)) {
+            $examplecount = $checkmark->examplecount;
+        } else {
+            $examplecount = count(explode(checkmark::DELIMITER, $checkmark->examplenames));
+        }
+
+        if (!$DB->record_exists('checkmark_submissions', ['checkmarkid' => $checkmark->instance])
+                || count($examples) == $examplecount) {
+            /* We won't change the grades after someone submitted already - otherwise he/she would
+             * have submitted with other informations than displayed
+             *
+             * Get existing grade item!
+             */
+            checkmark_grade_item_update($checkmark);
+        }
+    } else {
         checkmark_grade_item_update($checkmark);
     }
 
@@ -230,7 +233,7 @@ function checkmark_add_instance($checkmark) {
     $returnid = $DB->insert_record('checkmark', $checkmark);
     $checkmark->instance = $returnid;
 
-    checkmark_update_examples($checkmark);
+    checkmark_update_examples($checkmark, $checkmark->coursemodule);
 
     checkmark_refresh_events($checkmark->course, $returnid);
 
@@ -251,8 +254,9 @@ function checkmark_add_instance($checkmark) {
  *
  * @since MOODLE 2.4
  * @param object $checkmark containing data from checkmarks mod_form
+ * @param int $cmid (optional, if not set, we get it via get_coursemodule_from_instance())
  */
-function checkmark_update_examples($checkmark) {
+function checkmark_update_examples($checkmark, $cmid=false) {
     global $DB;
 
     if (!is_object($checkmark)) {
@@ -261,18 +265,30 @@ function checkmark_update_examples($checkmark) {
                                    ' object containing data from the mod_form.');
     }
 
-    $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmark->instance), 'id ASC');
+    if (!$cmid) {
+        $cm = get_coursemodule_from_instance('checkmark', $checkmark->instance);
+        $cmid = $cm->id;
+    }
+    $examples = $DB->get_records('checkmark_examples', ['checkmarkid' => $checkmark->instance], 'id ASC');
 
     if (!empty($examples)) {
-        list($esql, $eparams) = $DB->get_in_or_equal(array_keys($examples));
+        if (empty($checkmark->flexiblenaming)) {
+            $examplecount = $checkmark->examplecount;
+        } else {
+            $examplecount = count(explode(checkmark::DELIMITER, $checkmark->examplenames));
+        }
 
-        if ($DB->record_exists_select('checkmark_checks', 'exampleid '.$esql, $eparams)) {
-            throw new coding_exception('Any alteration of the examples after a submission would break consistency!');
+        if ($DB->record_exists('checkmark_submissions', ['checkmarkid' => $checkmark->instance])
+                && count($examples) !== $examplecount) {
+            return;
+        }
+
+        if (checkmark::get_autograded_feedbacks($checkmark->instance)) {
+            \core\notification::info(get_string('remembertoupdategrades', 'checkmark'));
         }
     }
 
     reset($examples);
-
     if (empty($checkmark->flexiblenaming)) {
         // Standard-naming.
         $i = $checkmark->examplestart;
@@ -285,12 +301,17 @@ function checkmark_update_examples($checkmark) {
         while ($example = current($examples)) {
             if ($i < $checkmark->examplestart + $checkmark->examplecount) {
                 // If there are more new examples replace the old ones with the new ones!
-                $example->name = $i;
-                $example->grade = $grade;
-                $DB->update_record('checkmark_examples', $example);
+                if (($i != $example->name) || ($grade != $example->grade)) {
+                    $old = clone $example;
+                    $example->name = $i;
+                    $example->grade = $grade;
+                    $DB->update_record('checkmark_examples', $example);
+                    \mod_checkmark\event\example_updated::get($cmid, $old, $example)->trigger();
+                }
             } else {
                 // If there are enough examples delete the rest of the old ones!
-                $DB->delete_records('checkmark_examples', array('id' => $example->id));
+                $DB->delete_records('checkmark_examples', ['id' => $example->id]);
+                \mod_checkmark\event\example_deleted::get($cmid, $example);
             }
             $i++;
             next($examples);
@@ -301,7 +322,8 @@ function checkmark_update_examples($checkmark) {
             $example->name = $i;
             $example->grade = $grade;
             $example->checkmarkid = $checkmark->instance;
-            $DB->insert_record('checkmark_examples', $example);
+            $example->id = $DB->insert_record('checkmark_examples', $example);
+            \mod_checkmark\event\example_created::get($cmid, $example)->trigger();
             $i++;
         }
     } else {
@@ -311,22 +333,28 @@ function checkmark_update_examples($checkmark) {
         reset($examples);
         foreach (array_keys($names) as $key) {
             if ($next = current($examples)) {
-                // If there's an old example to update, we reuse them!
-                $next->name = html_entity_decode($names[$key]);
-                $next->grade = $grades[$key];
-                $DB->update_record('checkmark_examples', $next);
+                if (($next->name !== $names[$key]) || ($next->grade !== $grades[$key])) {
+                    $old = clone $next;
+                    // If there's an old example to update, we reuse them!
+                    $next->name = html_entity_decode($names[$key]);
+                    $next->grade = $grades[$key];
+                    $DB->update_record('checkmark_examples', $next);
+                    \mod_checkmark\event\example_updated::get($cmid, $old, $next)->trigger();
+                }
             } else {
                 // Or we create new ones if there aren't any old ones left!
                 $example = new stdClass();
                 $example->checkmarkid = $checkmark->instance;
                 $example->name = html_entity_decode($names[$key]);
                 $example->grade = $grades[$key];
-                $DB->insert_record('checkmark_examples', $example);
+                $example->id = $DB->insert_record('checkmark_examples', $example);
+                \mod_checkmark\event\example_created::get($cmid, $example)->trigger();
             }
             next($examples);
         }
         while ($next = current($examples)) { // We delete the rest if there are any old left!
             $DB->delete_records('checkmark_examples', ['id' => $next->id]);
+            \mod_checkmark\event\example_deleted::get($cmid, $next);
             next($examples);
         }
     }

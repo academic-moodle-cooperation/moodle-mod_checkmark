@@ -202,19 +202,9 @@ class checkmark {
      * @return object[] checkmark's examples from the DB (raw records)
      */
     public function get_examples() {
-        global $DB;
-
         if (!isset($this->checkmark->examples)) {
-            $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $this->checkmark->id), 'id ASC');
-
             $exampleprefix = $this->checkmark->exampleprefix;
-
-            foreach ($examples as $key => $cur) {
-                $examples[$key]->shortname = $cur->name;
-                $examples[$key]->name = $exampleprefix.$cur->name;
-            }
-
-            $this->checkmark->examples = $examples;
+            $this->checkmark->examples = self::get_examples_static($this->checkmark->id, $exampleprefix);
         }
 
         return $this->checkmark->examples;
@@ -226,14 +216,17 @@ class checkmark {
      * Adds the prefix if set and flexible naming is used
      *
      * @param object|int $checkmarkid the checkmark object containing ID or the ID itself
+     * @param string|false $exampleprefix If you already have it, you can save 1 query by setting it!
      * @return object[] checkmark's examples from the DB (raw records)
      */
-    public static function get_examples_static($checkmarkid) {
+    public static function get_examples_static($checkmarkid, $exampleprefix = false) {
         global $DB;
 
-        $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmarkid), 'id ASC');
+        $examples = $DB->get_records('checkmark_examples', ['checkmarkid' => $checkmarkid], 'id ASC');
 
-        $exampleprefix = $DB->get_field('checkmark', 'exampleprefix', array('id' => $checkmarkid));
+        if ($exampleprefix === false) {
+            $exampleprefix = $DB->get_field('checkmark', 'exampleprefix', ['id' => $checkmarkid]);
+        }
 
         foreach ($examples as $key => $cur) {
             $examples[$key]->shortname = $cur->name;
@@ -246,7 +239,7 @@ class checkmark {
     /**
      * print_example_preview() prints a preview of the set examples
      *
-     * TODO use a function to get a empty submission and checkmark::add_submission_elements() instead!
+     * TODO use a function to get an empty submission and use checkmark::add_submission_elements() instead!
      */
     public function print_example_preview() {
         global $USER;
@@ -292,8 +285,7 @@ class checkmark {
 
         $a = checkmark_getsubmissionstats($submission, $this->checkmark);
 
-        $output = html_writer::tag('div', get_string('checkmark_summary', 'checkmark', $a),
-                                   array('class' => 'chkmrksubmissionsummary')).
+        $output = html_writer::tag('div', get_string('checkmark_summary', 'checkmark', $a), ['class' => 'chkmrksubmissionsummary']).
                   html_writer::empty_tag('br');
 
         return $output;
@@ -1155,24 +1147,6 @@ class checkmark {
     }
 
     /**
-     * Any preprocessing needed for the settings form
-     *
-     * @param array $defaultvalues - array to fill in with the default values in the form 'formelement' => 'value'
-     * @param object $form - the form that is to be displayed
-     */
-    public function form_data_preprocessing(&$defaultvalues, $form) {
-        if (isset($this->checkmark)) {
-            if (checkmark_count_real_submissions($this->cm->id) != 0) {
-                $form->addElement('hidden', 'allready_submit', 'yes');
-                $defaultvalues['allready_submit'] = 'yes';
-            } else {
-                $form->addElement('hidden', 'allready_submit', 'no');
-                $defaultvalues['allready_submit'] = 'no';
-            }
-        }
-    }
-
-    /**
      * Return if flexiblenaming is used/can be used with this examples
      *
      * @return bool flexible naming is used or not
@@ -1229,15 +1203,27 @@ class checkmark {
      * @return array Array of strings with error messages
      */
     public function form_validation($data) {
+        global $DB;
         $errors = array();
-        if ($data['allready_submit'] == 'yes') {
-            $data['flexiblenaming'] = self::is_using_flexiblenaming_static($data['instance']);
-        } else if (!isset($data['flexiblenaming'])) {
+
+        if (!isset($data['flexiblenaming'])) {
             $data['flexiblenaming'] = 0;
         }
+
+        $checkspresent = false;
+        if (!empty($data['instance'])) {
+            $checks = $DB->get_records_sql("
+                            SELECT c.*
+                              FROM {checkmark_checks} c
+                              JOIN {checkmark_submissions} s ON c.submissionid = s.id
+                              WHERE s.checkmarkid = :checkmarkid", ['checkmarkid' => $data['instance']]);
+            if (is_array($checks) && count($checks) > 0) {
+                $checkspresent = true;
+            }
+        }
+
         if ($data['flexiblenaming'] == 1 && (intval($data['grade']) > 0)) {
             // Check if amount of examplenames equals amount of examplegrades?
-
             $grades = explode(self::DELIMITER, $data['examplegrades']);
             $names = explode(self::DELIMITER, $data['examplenames']);
             if (count($grades) != count($names)) {
@@ -1267,6 +1253,20 @@ class checkmark {
                 $errors['grade'] = get_string('gradesum_mismatch', 'checkmark', $a);
                 $errors['examplegrades'] .= get_string('gradesum_mismatch', 'checkmark', $a);
             }
+
+            if ($checkspresent) {
+                // Now we check if the examplecount has been changed!
+                $oldexamples = $this->get_examples();
+                $oldnames = [];
+                foreach ($oldexamples as $cur) {
+                    $oldnames[] = $cur->name;
+                }
+                if (count($oldexamples) !== count($names)) {
+                    $errors['examplenames'] = get_string('examplecount_changed_after_submission', 'checkmark', (object)[
+                            'old' => implode(', ', $oldnames)
+                    ]);
+                }
+            }
         } else if (intval($data['grade']) > 0) {
             if (($data['examplecount'] <= 0) || !is_numeric($data['examplecount'])) {
                 $errors['examplecount'] = get_string('posintrequired', 'checkmark');
@@ -1287,6 +1287,20 @@ class checkmark {
                 }
                 $errors['grade'] = get_string('grade_mismatch', 'checkmark');
             }
+
+            if ($checkspresent) {
+                // Now we check if the examplecount has been changed!
+                $oldexamples = $this->get_examples();
+                $oldnames = [];
+                foreach ($oldexamples as $cur) {
+                    $oldnames[] = $cur->name;
+                }
+                if (count($oldexamples) !== $data['examplecount']) {
+                    $errors['examplecount'] = get_string('examplecount_changed_after_submission', 'checkmark', (object)[
+                            'old' => implode(', ', $oldnames)
+                    ]);
+                }
+            }
         }
 
         return $errors;
@@ -1305,6 +1319,25 @@ class checkmark {
         if ($this->checkmark->presentationgrading && $this->checkmark->presentationgradebook) {
             checkmark_update_presentation_grades($this->checkmark, $feedback->userid);
         }
+    }
+
+
+    public static function get_autograded_feedbacks($id) {
+        global $DB;
+        /*
+         * Check for all autograded feedbacks and remind teacher to regrade them!
+         * TODO: currently we don't mark autograded feedbacks as such with a flag in the DB, do it in the future,
+         * so we don't have to rely on a certain string!
+         */
+        $strmanager = get_string_manager();
+        $translations = $strmanager->get_list_of_translations(true);
+        foreach (array_keys($translations) as $lang) {
+            $select[] = $DB->sql_like('feedback', ':'.$lang);
+            $params[$lang] = $strmanager->get_string('strautograded', 'checkmark', null, $lang);
+        }
+
+        return $DB->get_records_select('checkmark_feedbacks', "checkmarkid = :id AND (".implode(" OR ", $select).")",
+                ['id' => $id] + $params);
     }
 
     /**
