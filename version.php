@@ -26,8 +26,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2018081701;
-$plugin->requires  = 2018051700;
+$plugin->requires  = 2018120300;
 $plugin->component = 'mod_checkmark';
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = "v3.5.1";
+$plugin->maturity  = MATURITY_ALPHA;
+$plugin->release   = "v3.6-dev";
 
