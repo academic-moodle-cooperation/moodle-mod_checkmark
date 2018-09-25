@@ -31,13 +31,6 @@ require_once($CFG->libdir.'/gradelib.php');
 require_once($CFG->dirroot.'/mod/checkmark/submission_form.php');
 require_once($CFG->dirroot.'/mod/checkmark/grading_form.php');
 
-// Include eventslib.php!
-require_once($CFG->libdir.'/eventslib.php');
-// Include formslib.php!
-require_once($CFG->libdir.'/formslib.php');
-// Include calendar/lib.php!
-require_once($CFG->dirroot.'/calendar/lib.php');
-
 /**
  * This class provides all the basic functionality for an checkmark-module
  *
