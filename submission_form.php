@@ -58,8 +58,15 @@ class checkmark_submission_form extends moodleform {
                 break;
             }
 
+            $attr = [
+                'id' => 'example'.$key,
+                'group' => '1',
+                'data-grade' => $example->grade,
+                'data-name' => $example->shortname,
+                'data-example' => $example->id
+            ];
             $mform->addElement('advcheckbox', 'example'.$key, null, $example->name.' ('.$example->grade.' '.$pointsstring.')',
-                               array('id' => 'example'.$key, 'group' => '1'), array(0, 1));
+                    $attr, [0, 1]);
         }
 
         // Here come the hidden params!
@@ -78,9 +85,7 @@ class checkmark_submission_form extends moodleform {
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');
 
-        $params = new stdClass();
-        $params->examples = $this->_customdata->examples;
-        $PAGE->requires->js_call_amd('mod_checkmark/submission', 'initializer', array($params));
+        $PAGE->requires->js_call_amd('mod_checkmark/submission', 'initializer');
 
         // Set data from last submission and hidden fields!
         $this->set_data($this->_customdata);

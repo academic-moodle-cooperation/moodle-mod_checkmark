@@ -25,46 +25,37 @@
  /**
   * @module mod_checkmark/submission
   */
-define(['jquery', 'core/log'], function($, log) {
+define(['core/log'], function(log) {
 
     /**
      * @constructor
      * @alias module:mod_checkmark/submission
      */
     var Submission = function() {
-        // Structure: examples = {exkey: {grade: exgrade, name: exname}}!
-        this.examples = [];
     };
 
     /**
      * UpdateSummary updates the displayed summary during submission edit
      *
-     * @param {Event} e event object
-     * @return {bool} true if everything's allright (no error handling by now)
+     * @return {boolean} true if everything's allright (no error handling by now)
      */
-    Submission.prototype.updateSummary = function(e) {
+    Submission.prototype.updateSummary = function() {
         var examplesNew = 0;
         var gradeNew = 0;
-        // Defining local variables improves readability!
-        var examples = e.data.examples;
 
-        // Calculate values using flexible naming (var1 = names[], var2 = grades[])!
-        $.each(examples, function(key, cur) {
-            var isChecked = null;
-            if ($("input#example".concat(key.toString())) === null) {
-                // Compatibility to pre 2.2 and current needed ID - TODO: do we need this anymore?
-                isChecked = $("input[type=checkbox]#id_example".concat(key.toString())).prop('checked');
-            } else {
-                isChecked = $("input[type=checkbox]#example".concat(key.toString())).prop('checked');
+        var els = document.getElementsByTagName('input');
+        for(var i = 0; i < els.length; i++) {
+            if (els[i].attributes['data-example'] === undefined) {
+                continue;
             }
-            if (isChecked) {
+            if (els[i].checked) {
                 examplesNew++;
-                gradeNew += parseInt(cur.grade);
+                gradeNew += parseInt(els[i].dataset['grade']);
             }
-        });
+        }
 
-        $("span#examples").html(examplesNew.toString());
-        $("span#grade").html(gradeNew.toString());
+        document.getElementById('examples').innerHTML = examplesNew.toString();
+        document.getElementById('grade').innerHTML = gradeNew.toString();
 
         return true;
     };
@@ -75,13 +66,13 @@ define(['jquery', 'core/log'], function($, log) {
      *  II) resets the form manually
      * III) ensure to display updated data
      * @param {Event} e event-object
-     * @return {bool} true if everything's allright (no error handling by now)
+     * @return {boolean} true if everything's allright (no error handling by now)
      */
     Submission.prototype.resetSubmissionForm = function(e) {
         e.preventDefault();
 
-        $("#mform1")[0].reset();
-        e.data.updateSummary(e);
+        document.getElementById('mform1').reset();
+        Submission.prototype.updateSummary();
 
         return true;
     };
@@ -91,32 +82,29 @@ define(['jquery', 'core/log'], function($, log) {
     /**
      * Initializer prepares checkmark-data and registers event-listeners for each checkbox
      *
-     * @param {Array} params contains object with all examples
-     * @return {bool} true if everything's ok (no error-handling implemented)
+     * @return {boolean} true if everything's ok (no error-handling implemented)
      */
-    instance.initializer = function(params) {
-            instance.examples = params.examples;
+    instance.initializer = function() {
+        log.debug('Init checkmark submissions js!', 'checkmark');
 
-            log.debug('Init checkmark submissions js!', 'checkmark');
+        var els = document.getElementsByTagName('input');
+        for(var i = 0; i < els.length; i++) {
+            if (els[i].attributes['data-example'] == undefined) {
+                continue;
+            }
+            els[i].addEventListener('click', instance.updateSummary);
+        }
 
-            var idFieldname = null;
+        // Register event-listener on reset-button to ensure proper data to be displayed on form-reset!
+        document.getElementById('id_resetbutton').addEventListener('click', this.resetSubmissionForm);
 
-            $.each(this.examples, function(key) {
-                idFieldname = 'input#example'.concat(key.toString());
-                log.debug('Attach click handler to ' + idFieldname, 'checkmark');
-                $(idFieldname).click(instance, instance.updateSummary);    // Register event listener!
-            });
+        // Reset the formular after init to ensure correct checkbox-states after page-reload!
+        document.getElementById('mform1').reset();
 
-            // Register event-listener on reset-button to ensure proper data to be displayed on form-reset!
-            $('#id_resetbutton').click(this, this.resetSubmissionForm);
+        // Update summary to display correct data after form-reset!
+        this.updateSummary();
 
-            // Reset the formular after init to ensure correct checkbox-states after page-reload!
-            $("#mform1")[0].reset();
-
-            // Update summary to display correct data after form-reset!
-            this.updateSummary({data: this});
-
-            return true;
+        return true;
     };
 
     return instance;
