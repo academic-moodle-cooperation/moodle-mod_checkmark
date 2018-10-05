@@ -1765,13 +1765,15 @@ class checkmark {
         if ($mailinfo) {
             $DB->set_field_select('checkmark_feedbacks', 'mailed', 0, $select, $params);
         }
-        $grades = array();
-        foreach ($selected as $sel) {
-            $grades[$sel] = new stdClass();
-            $grades[$sel]->userid = $sel;
-            $grades[$sel]->rawgrade = $state;
+        if ($this->checkmark->trackattendance && $this->checkmark->attendancegradebook) {
+            $grades = [];
+            foreach ($selected as $sel) {
+                $grades[$sel] = new stdClass();
+                $grades[$sel]->userid = $sel;
+                $grades[$sel]->rawgrade = $state;
+            }
+            checkmark_attendance_item_update($this->checkmark, $grades);
         }
-        checkmark_attendance_item_update($this->checkmark, $grades);
     }
 
     /**
