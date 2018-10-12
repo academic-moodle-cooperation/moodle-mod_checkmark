@@ -192,7 +192,7 @@ class checkmark {
      *
      * Adds the prefix if set and flexible naming is used
      *
-     * @return object[] checkmark's examples from the DB (raw records)
+     * @return \mod_checkmark\example[] checkmark's examples from the DB (raw records)
      */
     public function get_examples() {
         if (!isset($this->checkmark->examples)) {
@@ -210,20 +210,19 @@ class checkmark {
      *
      * @param object|int $checkmarkid the checkmark object containing ID or the ID itself
      * @param string|false $exampleprefix If you already have it, you can save 1 query by setting it!
-     * @return object[] checkmark's examples from the DB (raw records)
+     * @return \mod_checkmark\example[] checkmark's examples from the DB (raw records)
      */
     public static function get_examples_static($checkmarkid, $exampleprefix = false) {
         global $DB;
 
-        $examples = $DB->get_records('checkmark_examples', ['checkmarkid' => $checkmarkid], 'id ASC');
+        $records = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmarkid), 'id ASC');
 
         if ($exampleprefix === false) {
             $exampleprefix = $DB->get_field('checkmark', 'exampleprefix', ['id' => $checkmarkid]);
         }
-
-        foreach ($examples as $key => $cur) {
-            $examples[$key]->shortname = $cur->name;
-            $examples[$key]->name = $exampleprefix.$cur->name;
+        $examples = [];
+        foreach ($records as $key => $cur) {
+            $examples[$key] = new \mod_checkmark\example($cur->name, $cur->grade, $exampleprefix);
         }
 
         return $examples;
@@ -250,16 +249,7 @@ class checkmark {
         $data = new stdClass();
         $data->examples = [];
         foreach ($examples as $example) {
-            switch ($example->grade) {
-                case '1':
-                    $pointsstring = get_string('strpoint', 'checkmark');
-                break;
-                case '2':
-                default:
-                    $pointsstring = get_string('strpoints', 'checkmark');
-                break;
-            }
-            $mform->addElement('checkbox', $example->shortname, '', $example->name.' ('.$example->grade.' '.$pointsstring.')');
+            $mform->addElement('static', $example->shortname, '', $example->print_example());
             $mform->freeze($example->shortname);
         }
         $mform->display();
@@ -3056,7 +3046,7 @@ class checkmark {
      * @param int $userid The id of the user whose submission we want or 0 in which case USER->id is used
      * @param bool $createnew (optional) defaults to false. If set to true a new submission object
      *                           will be created in the database
-     * @return object The submission
+     * @return \mod_checkmark\submission The submission
      */
     public function get_submission($userid=0, $createnew=false) {
         global $USER, $DB;
@@ -3064,8 +3054,8 @@ class checkmark {
             $userid = $USER->id;
         }
 
-        $submission = $DB->get_record('checkmark_submissions', array('checkmarkid' => $this->checkmark->id,
-                                                                     'userid'      => $userid));
+        $submission = mod_checkmark\submission::get_submission($this->checkmark->id, $userid);
+
         $examples = $this->get_examples();
         if ($submission || !$createnew) {
             if ($submission) {
@@ -3075,22 +3065,16 @@ class checkmark {
                      WHERE submissionid = :subid', array('subid' => $submission->id))) {
                     // Empty submission!
                     foreach ($examples as $key => $example) {
-                        $submission->examples[$key] = new stdClass();
-                        $submission->examples[$key]->id = $key;
-                        $submission->examples[$key]->name = $examples[$key]->name;
-                        $submission->examples[$key]->shortname = $examples[$key]->shortname;
-                        $submission->examples[$key]->grade = $examples[$key]->grade;
-                        $submission->examples[$key]->state = null;
+                        $submission->examples[$key] = $examples[$key];
                         $DB->insert_record('checkmark_checks', (object)['exampleid'    => $key,
                                                                         'submissionid' => $submission->id,
                                                                         'state'        => null]);
                     }
                 } else {
                     foreach ($submission->examples as $key => $ex) {
-                        $submission->examples[$key]->name = $examples[$ex->id]->name;
-                        $submission->examples[$key]->shortname = $examples[$ex->id]->shortname;
-                        $submission->examples[$key]->grade = $examples[$ex->id]->grade;
+                        $examples[$ex->id]->set_state($ex->state);
                     }
+                    $submission->examples = $examples;
                 }
             }
             return $submission;
@@ -3108,15 +3092,7 @@ class checkmark {
 
         $submission = $DB->get_record('checkmark_submissions', array('checkmarkid' => $this->checkmark->id,
                                                                      'userid'      => $userid));
-        $submission->examples = $DB->get_records_sql('SELECT exampleid AS id, state
-                                                        FROM {checkmark_checks} chks
-                                                       WHERE submissionid = :subid',
-                                                     array('subid' => $sid));
-        foreach ($submission->examples as $key => $ex) {
-            $submission->examples[$key]->name = $examples[$ex->id]->name;
-            $submission->examples[$key]->shortname = $examples[$ex->id]->shortname;
-            $submission->examples[$key]->grade = $examples[$ex->id]->grade;
-        }
+        $submission->examples = $examples;
 
         return $submission;
     }
@@ -3391,7 +3367,7 @@ class checkmark {
         }
 
         // TODO we use a form here for now, but plan to use a better template in the future!
-        $mform = new MoodleQuickForm('submission', 'get', '', '');
+        /*$mform = new MoodleQuickForm('submission', 'get', '', '');
 
         self::add_submission_elements($mform, $submission);
 
@@ -3400,7 +3376,9 @@ class checkmark {
             return $output;
         }
 
-        echo $output;
+        echo $output;*/
+        echo $submission->print();
+
 
         return true;
     }
