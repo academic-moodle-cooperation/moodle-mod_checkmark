@@ -1,5 +1,13 @@
 CHANGELOG
 =========
+
+3.5.1 (2018-11-07)
+------------------
+
+* [FIXED] #5738 fix attendance grade item being created on bulk action ignoring settings
+* [FEATURE] #5269 make example grades and names changeable after submissions are present
+
+
 3.5.0 (2018-08-17)
 ------------------
 
