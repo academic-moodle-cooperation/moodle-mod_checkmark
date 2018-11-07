@@ -51,15 +51,15 @@ class submission_updated extends \core\event\base {
      * Convenience method to create event from object.
      *
      * @param \stdClass $cm course module object
-     * @param \stdClass $submission submission object
+     * @param \mod_checkmark\submission $submission submission object
      * @return object event object
      */
-    public static function create_from_object(\stdClass $cm, \stdClass $submission) {
+    public static function create_from_object(\stdClass $cm, \mod_checkmark\submission $submission) {
         // Trigger overview event.
         $event = self::create(array(
-            'objectid'      => $submission->id,
+            'objectid'      => $submission->get_id(),
             'context'       => \context_module::instance($cm->id),
-            'relateduserid' => $submission->userid,
+            'relateduserid' => $submission->get_userid(),
         ));
         $event->add_record_snapshot('checkmark_submissions', $submission);
         return $event;

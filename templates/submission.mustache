@@ -1,0 +1,59 @@
+{{!
+    This file is part of mod_checkmark for Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_checkmark/submission
+
+    The complete submission
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    *
+    *
+
+    Example context (json):
+    {
+        "summary": {"checked": 2, "max": 3}
+        "examples": [
+            {
+                "checkid": 276432, "is_checked": true, "is_forced": false, "is_forced_checked": false, "get_name": "1",
+                "get_grade": "10", "get_pointsstring": "points"
+            },
+            {
+                "checkid": 276433, "is_checked": false, "is_forced": true, "is_forced_checked": true, "get_name": "2",
+                "get_grade": "10", "get_pointsstring": "points"
+            },
+            {
+                "checkid": 276432, "is_checked": true, "is_forced": true, "is_forced_checked": false, "get_name": "3",
+                "get_grade": "10", "get_pointsstring": "points"
+            },
+        ]
+    }
+}}
+
+<div class="mod_checkmark_submission row">
+    {{#summary}}
+
+    {{/summary}}
+    <div class="col-md-9 offset-md-3">{{#get_examples}}<div>
+    {{>mod_checkmark/example}}</div>{{/get_examples}}
+    </div>
+</div>

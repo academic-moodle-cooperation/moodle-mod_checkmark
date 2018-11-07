@@ -1672,7 +1672,7 @@ class submissionstable extends \table_sql {
         if (preg_match("/example([0-9]+)/i", $colname, $match)) {
             if (!empty($values->submissionid)) {
                 $submission = $this->checkmark->get_submission($values->id);
-                $example = $submission->examples[$match[1]];
+                $example = $submission->get_example($match[1]);
             } else {
                 $example = new example('', 1, '', example::UNCHECKED);
             }
