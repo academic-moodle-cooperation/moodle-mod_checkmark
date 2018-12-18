@@ -31,11 +31,14 @@ use \core_privacy\local\metadata\collection;
 use \core_privacy\local\metadata\provider as metadataprovider;
 use \core_privacy\local\request\contextlist;
 use \core_privacy\local\request\plugin\provider as pluginprovider;
-use \core_privacy\local\request\user_preference_provider as preference_provider;
+use \core_privacy\local\request\user_preference_provider as user_preference_provider;
 use \core_privacy\local\request\writer;
 use \core_privacy\local\request\approved_contextlist;
 use \core_privacy\local\request\transform;
 use \core_privacy\local\request\helper;
+use \core_privacy\local\request\core_userlist_provider;
+use core_privacy\local\request\userlist;
+use core_privacy\local\request\approved_userlist;
 
 if (isset($CFG)) {
     require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
@@ -49,7 +52,7 @@ if (isset($CFG)) {
  * @copyright  2018 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements metadataprovider, pluginprovider, preference_provider {
+class provider implements metadataprovider, pluginprovider, user_preference_provider, core_userlist_provider {
     /**
      * Provides meta data that is stored about a user with mod_checkmark
      *
@@ -142,6 +145,105 @@ LEFT JOIN {checkmark_overrides} o ON c.id = o.checkmarkid
         $contextlist->add_from_sql($sql, $params);
 
         return $contextlist;
+    }
+
+    /**
+     * Get the list of users who have data within a context.
+     *
+     * @param   userlist    $userlist   The userlist containing the list of users who have data in this context/plugin combination.
+     */
+    public static function get_users_in_context(userlist $userlist) {
+        $context = $userlist->get_context();
+
+        if ($context->contextlevel != CONTEXT_MODULE) {
+            return;
+        }
+
+        $params = [
+                'modulename' => 'checkmark',
+                'contextid' => $context->id,
+                'contextlevel' => CONTEXT_MODULE
+        ];
+
+        // Get all who submitted!
+        $sql = "SELECT s.userid
+                  FROM {context} ctx
+                  JOIN {course_modules} cm ON cm.id = ctx.instanceid
+                  JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
+                  JOIN {checkmark} c ON c.id = cm.instance
+                  JOIN {checkmark_submissions} s ON c.id = s.checkmarkid
+                 WHERE ctx.id = :contextid AND ctx.contextlevel = :contextlevel";
+        $userlist->add_from_sql('userid', $sql, $params);
+
+        // Get all whom anybody has given feedback or who gave feedback themselves!
+        $sql = "SELECT f.userid, f.graderid
+                  FROM {context} ctx
+                  JOIN {course_modules} cm ON cm.id = ctx.instanceid
+                  JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
+                  JOIN {checkmark} c ON c.id = cm.instance
+                  JOIN {checkmark_feedbacks} f ON c.id = f.checkmarkid
+                 WHERE ctx.id = :contextid AND ctx.contextlevel = :contextlevel";
+        $userlist->add_from_sql('userid', $sql, $params);
+        $userlist->add_from_sql('graderid', $sql, $params);
+
+        // Get all overrides or people who overridden!
+        $sql = "SELECT o.userid, o.modifierid
+                  FROM {context} ctx
+                  JOIN {course_modules} cm ON cm.id = ctx.instanceid
+                  JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
+                  JOIN {checkmark} c ON c.id = cm.instance
+                  JOIN {checkmark_overrides} o ON c.id = o.checkmarkid
+                 WHERE ctx.id = :contextid AND ctx.contextlevel = :contextlevel";
+        $userlist->add_from_sql('userid', $sql, $params);
+        $userlist->add_from_sql('graderid', $sql, $params);
+    }
+
+    /**
+     * Delete multiple users within a single context.
+     *
+     * @param   approved_userlist       $userlist The approved context and user information to delete information for.
+     */
+    public static function delete_data_for_users(approved_userlist $userlist) {
+        global $DB;
+
+        $context = $userlist->get_context();
+
+        if ($context->contextlevel == CONTEXT_MODULE) {
+            // Apparently we can't trust anything that comes via the context.
+            // Go go mega query to find out it we have an checkmark context that matches an existing checkmark.
+            $sql = "SELECT c.id
+                    FROM {checkmark} c
+                    JOIN {course_modules} cm ON c.id = cm.instance AND c.course = cm.course
+                    JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
+                    JOIN {context} ctx ON ctx.instanceid = cm.id AND ctx.contextlevel = :contextmodule
+                    WHERE ctx.id = :contextid";
+            $params = ['modulename' => 'checkmark', 'contextmodule' => CONTEXT_MODULE, 'contextid' => $context->id];
+            $id = $DB->get_field_sql($sql, $params);
+            // If we have an id over zero then we can proceed.
+            if ($id > 0) {
+                $userids = $userlist->get_userids();
+                if (count($userids) <= 0) {
+                    return;
+                }
+
+                list($usersql, $userparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'usr');
+                list($usersql2, $userparams2) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'usr2_');
+                // Get all checkmark submissions, feedbacks and extensions to delete them!
+                if ($submissions = $DB->get_records_select('checkmark_submissions', "checkmark = :id AND userid ".$usersql,
+                        ['id' => $id] + $userparams)) {
+                    $DB->delete_records_list('checkmark_checks', 'submissionid', array_keys($submissions));
+                }
+
+                $DB->delete_records_select('checkmark_submissions', "checkmarkid = :id AND userid ".$usersql,
+                        ['id' => $id] + $userparams);
+                $DB->delete_records_select('checkmark_feedbacks', "checkmarkid = :id AND (userid ".$usersql." OR graderid "
+                        .$usersql2.")",
+                        ['id' => $id] + $userparams + $userparams2);
+                $DB->delete_records('checkmark_overrides',
+                        "checkmarkid = :id AND (userid ".$usersql." OR modifierid ".$usersql2.")",
+                        ['id' => $id] + $userparams + $userparams2);
+            }
+        }
     }
 
     /**
