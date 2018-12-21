@@ -902,9 +902,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         // Fix bug from v2.9.1 where grade have not be written to gradebook correctly!
         $boxtext = 'Due to a bug in version 2.9.1 of the Checkmark plugin, grades may have not been transfered to '.
                    'gradebook correctly. You can check affected submissions under: ';
-        $link = new moodle_url('/mod/checkmark/db/fixmissinggradebookgrade.php');
-        $text = "Site administration ► Grades ► Checkmark: Check broken gradebook grades";
-        $boxtext = $OUTPUT->notification($boxtext.html_writer::link($link, $text));
+        $boxtext = $OUTPUT->notification($boxtext);
         echo $OUTPUT->box($boxtext, 'generalbox');
 
         // Checkmark savepoint reached.

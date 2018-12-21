@@ -5,3 +5,6 @@ autograde_req,mod_checkmark
 autograde_str,mod_checkmark
 autograde_str_help,mod_checkmark
 end_of_submission_for,mod_checkmark
+checkbrokengradebookgrades,mod_checkmark
+checkbrokengradebookgrades_desc,mod_checkmark
+checkbrokengradebookgrades_mail,mod_checkmark
