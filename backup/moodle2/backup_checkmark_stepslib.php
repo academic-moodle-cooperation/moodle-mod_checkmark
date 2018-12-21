@@ -47,7 +47,7 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         $checkmark = new backup_nested_element('checkmark', array('id'), array(
             'name', 'intro', 'introformat', 'alwaysshowdescription', 'resubmit', 'timeavailable', 'timedue', 'cutoffdate',
             'gradingdue', 'emailteachers', 'exampleprefix', 'grade', 'trackattendance', 'attendancegradelink',
-            'presentationgrading', 'presentationgrade', 'presentationgradebook', 'timemodified'));
+            'attendancegradebook', 'presentationgrading', 'presentationgrade', 'presentationgradebook', 'timemodified'));
 
         $overrides = new backup_nested_element('overrides');
 
