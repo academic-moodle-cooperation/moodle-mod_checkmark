@@ -1,9 +1,17 @@
 CHANGELOG
 =========
-3.6-dev
+3.6.0 (2019-01-20)
 ------------------
 
-*
+* Moodle 3.6 compatible version
+* [FIXED] #5605 got rid of humongous AMD-params-list and jQuery for submission form js
+* [FIXED] #5605 stopped requiring unused libs
+* [FIXED] #5848 added missing setting to backups
+* [FIXED] #5887 fixed bulk actions setting attendance and creating feedbacks when canceling
+* [FIXED] #5866 in v3.4.0 we missed to include a field and a key in install.xml, so we're fixing it now!
+* [UPDATE] #5753 added new privacy API methods
+* [UPDATE] #5606 updated .travis.yml
+* [CHANGED] #5847 removed deprecated/unused helper scripts (fixing github issue 30)
 
 
 3.5.1 (2018-11-07)
