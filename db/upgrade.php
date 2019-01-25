@@ -1079,5 +1079,40 @@ function xmldb_checkmark_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2017081300, 'checkmark');
     }
 
+    if ($oldversion < 2019012000) {
+        /*
+         * Seriously guys, I'm terrible sorry, I fucked up here! Field and key were just added during upgrades, not during fresh
+         * installs after v3.4.0!
+         */
+
+        // Define field modifierid to be added to checkmark_overrides (again).
+        $table = new xmldb_table('checkmark_overrides');
+        $field = new xmldb_field('modifierid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, "0", 'timecreated');
+        // Conditionally launch add field modifierid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define key modifierid (foreign) to be added to checkmark_overrides.
+        $key = new xmldb_key('modifierid', XMLDB_KEY_FOREIGN, ['modifierid'], 'user', ['id']);
+        // Moodle only created indexes, so we ask if there's an index for modifierid!
+        $index = new xmldb_index('modifierid', XMLDB_INDEX_NOTUNIQUE, ['modifierid']);
+        // We seriously fucked up here, we had diverging install.xml and upgrade.php, so we try to reinstall the key!
+        try {
+            if ($dbman->index_exists($table, $index)) {
+                $dbman->drop_key($table, $key);
+            }
+            $dbman->add_key($table, $key);
+        } catch (Exception $e) {
+            echo 'While trying to add a (propably) missing key, due to a bug, we failed. It may be the case, you\'re one of the '.
+                    'lucky ones, not affected by the bug. Otherwise please add a foreign key for field '.
+                    $DB->get_prefix().'checkmark_overrides.modifierid targeting '.$DB->get_prefix().'user.id! Thank you and sorry '.
+                    'for the inconveniences!';
+        }
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2019012000, 'checkmark');
+    }
+
     return true;
 }
