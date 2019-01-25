@@ -1399,23 +1399,28 @@ class checkmark {
                 }
                 if ($bulkaction && ($selected || ($confirm && !empty($SESSION->checkmark->autograde->selected)))) {
                     // Process bulk action!
-                    // Check if some of the selected users don't have a feedback entry and create on if so!
-                    foreach ($selected as $sel) {
-                        $this->prepare_new_feedback($sel); // Make one if missing!
-                    }
-                    // First only the attendance changes!
-                    switch($bulkaction) {
-                        case 'setattendantandgrade':
-                        case 'setattendant':
-                            $this->set_attendance($selected, 1, optional_param('mailinfo', 0, PARAM_BOOL));
-                            break;
-                        case 'setabsentandgrade':
-                        case 'setabsent':
-                            $this->set_attendance($selected, 0, optional_param('mailinfo', 0, PARAM_BOOL));
-                            break;
-                        case 'setunknown':
-                            $this->set_attendance($selected, null, optional_param('mailinfo', 0, PARAM_BOOL));
-                            break;
+                    $confirmedaction = in_array($bulkaction, ['setattendantandgrade', 'setabsentandgrade'])
+                            && optional_param('confirm', 0, PARAM_BOOL);
+                    if ($confirmedaction || in_array($bulkaction, ['setattendant', 'setabsent', 'setunknown'])) {
+                        // Check if some of the selected users don't have a feedback entry and create on if so!
+                        foreach ($selected as $sel) {
+                            $this->prepare_new_feedback($sel); // Make one if missing!
+                        }
+
+                        // First only the attendance changes!
+                        switch ($bulkaction) {
+                            case 'setattendantandgrade':
+                            case 'setattendant':
+                                $this->set_attendance($selected, 1, optional_param('mailinfo', 0, PARAM_BOOL));
+                                break;
+                            case 'setabsentandgrade':
+                            case 'setabsent':
+                                $this->set_attendance($selected, 0, optional_param('mailinfo', 0, PARAM_BOOL));
+                                break;
+                            case 'setunknown':
+                                $this->set_attendance($selected, null, optional_param('mailinfo', 0, PARAM_BOOL));
+                                break;
+                        }
                     }
 
                     // Now all the grading stuff!
@@ -1442,9 +1447,12 @@ class checkmark {
                                 $message .= $OUTPUT->notification(get_string('autograde_non_numeric_grades', 'checkmark'), 'error');
                             } else {
                                 if ($this->checkmark->trackattendance && $this->checkmark->attendancegradelink
-                                        && (count($selected) != $result)) {
+                                        && (count($selected) != $result)
+                                        && !in_array($bulkaction, ['setattendantandgrade', 'setabsentandgrade'])) {
                                     $amountinfo = get_string('autograde_users_with_unknown_attendance', 'checkmark',
                                                        (count($selected) - $result));
+                                } else if (in_array($bulkaction, ['setattendantandgrade', 'setabsentandgrade'])) {
+                                    $amount = count($selected);
                                 }
                                 echo $OUTPUT->header();
                                 $confirmboxcontent = $OUTPUT->notification(get_string('autograde_confirm', 'checkmark', $amount).
