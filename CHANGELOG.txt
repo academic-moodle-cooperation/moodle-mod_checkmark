@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+3.5.2 (2019-01-20)
+------------------
+
+* [FIXED] #5866 in v3.4.0 we missed to include a field and a key in install.xml, so we're fixing it now!
 
 3.5.1 (2018-11-07)
 ------------------
