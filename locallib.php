@@ -2173,8 +2173,8 @@ class checkmark {
             }
             if (($this->checkmark->grade <= 0)) {
                 // No autograde possible if no numeric grades are selected!
-                $mform->addElement('html',
-                                   $OUTPUT->notification(get_string('autograde_non_numeric_grades', 'checkmark'), 'error'));
+                $mform->addElement('html', html_writer::div(get_string('autograde_non_numeric_grades', 'checkmark'),
+                        'alert alert-error'));
                 $grp[0]->addOption(get_string('grade_automatically', 'checkmark'), 'grade', array('disabled' => 'disabled'));
             } else {
                 $grp[0]->addOption(get_string('grade_automatically', 'checkmark'), 'grade');
@@ -2184,7 +2184,8 @@ class checkmark {
             if ($this->checkmark->trackattendance
                     && has_capability('mod/checkmark:trackattendance', $this->context)) {
                 if ($this->checkmark->attendancegradelink) {
-                    $mform->addElement('html', $OUTPUT->notification(get_string('attendancegradelink_hint', 'checkmark'), 'info'));
+                    $mform->addElement('html', html_writer::div(get_string('attendancegradelink_hint', 'checkmark'),
+                            'alert alert-info'));
                 }
                 if (($this->checkmark->grade <= 0)) {
                     $attr = array('disabled' => 'disabled');
