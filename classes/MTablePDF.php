@@ -26,6 +26,9 @@
  */
 namespace mod_checkmark;
 
+use context_course;
+use context_system;
+
 defined('MOODLE_INTERNAL') || die();
 
 if (isset($CFG)) {
@@ -112,6 +115,8 @@ class MTablePDF extends \pdf {
     private $header = [];
     /** @var $data array tables data */
     private $data = [];
+
+
 
     /**
      * Constructor
@@ -783,6 +788,17 @@ class MTablePDF extends \pdf {
         $time = time();
         $time = userdate($time);
         $worksheet = $workbook->add_worksheet($time);
+        //Get system context in order to retrieve user fields
+        $systemcontext = context_system::instance();
+        //Get all user fields
+        $textonlycolumns = get_extra_user_fields($systemcontext);
+        array_push($textonlycolumns, "fullname");
+
+        //Translate all user fields keys to the local language used in the moodle instance for comparison with headers
+        //todo: Find an approach which directly works via keys
+        for ($i = 0;$i<sizeof($textonlycolumns);$i++) {
+            $textonlycolumns[$i] = get_string($textonlycolumns[$i],'moodle');
+        }
 
         $headlineprop = [
             'size' => 12,
@@ -815,11 +831,12 @@ class MTablePDF extends \pdf {
             'v_align' => 'vcenter'
         ];
         $text = $workbook->add_format($textprop);
+        $text->set_num_format(1);
         $text->set_left(1);
         $textfirst = $workbook->add_format($textprop);
 
         $line = 0;
-
+        $textonlyid = array();
         // Write header.
         for ($i = 0; $i < count($this->header); $i += 2) {
             $worksheet->write_string($line, 0, $this->header[$i], $hdrleft);
@@ -827,6 +844,7 @@ class MTablePDF extends \pdf {
             $line++;
         }
         $line++;
+
 
         // Table header.
         $i = 0;
@@ -838,6 +856,11 @@ class MTablePDF extends \pdf {
             } else {
                 $worksheet->write_string($line, $i, $header, $headlineformat);
                 $first = false;
+            }
+            //Check if the header string is a text only column and write its index to $textonlyid
+            if(in_array($header, $textonlycolumns)) {
+                array_push($textonlyid,$i);
+
             }
             $i++;
         }
@@ -856,10 +879,13 @@ class MTablePDF extends \pdf {
                 if (array_key_exists('format', $cell)) {
                     $worksheet->write_string($line, $i, $cell['data'], $workbook->add_format($cell['format']));
                 } else {
+                    //Only write numeric values via write_number if the current column is not text only ($i not in $textonlyid)
                     if ($first) {
                         $worksheet->write_string($line, $i, $cell['data'], $textfirst);
                         $first = false;
-                    } else {
+                    } else if (is_numeric($cell['data']) && (!in_array($i, $textonlyid))) {
+                        $worksheet->write_number($line, $i, $cell['data'], $text);
+                    }  else {
                         $worksheet->write_string($line, $i, $cell['data'], $text);
                     }
                 }
