@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="91068b27-8817-4f51-b495-9764a8e1dfb4" name="5720 Add default values for availability in site-administration" comment="">
+      <change beforePath="$PROJECT_DIR$/lang/en/checkmark.php" beforeDir="false" afterPath="$PROJECT_DIR$/lang/en/checkmark.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mod_form.php" beforeDir="false" afterPath="$PROJECT_DIR$/mod_form.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.php" beforeDir="false" afterPath="$PROJECT_DIR$/settings.php" afterDir="false" />
+    </list>
+    <list id="19a71983-3635-416a-ac9e-916c54d9292c" name="Default Changelist" comment="" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>backup_nest</find>
+      <find>showuseridentity</find>
+      <find>get_extra_user_fields</find>
+    </findStrings>
+    <replaceStrings>
+      <replace />
+    </replaceStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="1679db864e9d90d811444bf0e17f5514534c3204" />
+      </map>
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/tests/formvalidation_test.php" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="1">
+    <option name="x" value="953" />
+    <option name="width" value="974" />
+    <option name="height" value="1047" />
+  </component>
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane" />
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../.." />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="settings.editor.selected.configurable" value="Errors" />
+    <property name="start.from.branch" value="origin/master" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task id="Default" summary="Default task">
+      <branch name="feature/5296" repository="C:\Users\Daniel\AMC\Stable\moodle\mod\checkmark" />
+      <changelist id="19a71983-3635-416a-ac9e-916c54d9292c" name="Default Changelist" comment="" />
+      <created>1551261831539</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1552383929903</updated>
+      <workItem from="1551261832820" duration="4513000" />
+      <workItem from="1552383793234" duration="137000" />
+    </task>
+    <task id="5296" summary="Beim Export sollen Punkte gleich als Zahlen übergeben werden">
+      <branch name="feature/5296" repository="C:\Users\Daniel\AMC\Stable\moodle\mod\checkmark" original="true" />
+      <branch name="5296" repository="C:\Users\Daniel\AMC\Stable\moodle\mod\checkmark" />
+      <changelist id="19a71983-3635-416a-ac9e-916c54d9292c" name="Default Changelist" comment="" />
+      <created>1519374625000</created>
+      <option name="issue" value="true" />
+      <url>https://redmine.tsc.tuwien.ac.at/issues/5296</url>
+      <option name="number" value="5296" />
+      <option name="presentableId" value="5296" />
+      <option name="project" value="mod_checkmark" />
+      <option name="type" value="BUG" />
+      <updated>1552558453997</updated>
+      <workItem from="1552383930363" duration="1210000" />
+      <workItem from="1552467935088" duration="2922000" />
+      <workItem from="1552489673880" duration="22000" />
+      <workItem from="1552558339133" duration="115000" />
+    </task>
+    <task id="LOCAL-00001" summary="#5296: Change write_string to write_number for numeric values not part of a user field">
+      <created>1552468079635</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1552468079635</updated>
+    </task>
+    <task id="5271" summary="Beispiele nachkreuzen">
+      <created>1518602976000</created>
+      <option name="issue" value="true" />
+      <url>https://redmine.tsc.tuwien.ac.at/issues/5271</url>
+      <option name="number" value="5271" />
+      <option name="presentableId" value="5271" />
+      <option name="project" value="mod_checkmark" />
+      <option name="type" value="BUG" />
+      <updated>1554889182392</updated>
+      <workItem from="1552558454204" duration="604000" />
+      <workItem from="1552671213505" duration="2000" />
+      <workItem from="1554889010419" duration="172000" />
+    </task>
+    <task active="true" id="5720" summary="Add default values for availability in site-administration">
+      <branch name="origin/master" repository="C:\Users\Daniel\AMC\Stable\moodle\mod\checkmark" original="true" />
+      <branch name="feature/5720" repository="C:\Users\Daniel\AMC\Stable\moodle\mod\checkmark" />
+      <changelist id="91068b27-8817-4f51-b495-9764a8e1dfb4" name="5720 Add default values for availability in site-administration" comment="" />
+      <created>1536050155000</created>
+      <option name="issue" value="true" />
+      <url>https://redmine.tsc.tuwien.ac.at/issues/5720</url>
+      <option name="number" value="5720" />
+      <option name="presentableId" value="5720" />
+      <option name="project" value="mod_checkmark" />
+      <option name="type" value="BUG" />
+      <updated>1554894670000</updated>
+      <workItem from="1554889182596" duration="24000" />
+      <workItem from="1555430377876" duration="599000" />
+      <workItem from="1555438372682" duration="599000" />
+      <workItem from="1555496095892" duration="599000" />
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers>
+      <Redmine url="https://redmine.tsc.tuwien.ac.at">
+        <option name="assignedToMe" value="false" />
+        <option name="currentProject">
+          <RedmineProject id="9" identifier="mod_checkmark" />
+        </option>
+        <password>df98df9adf9bdf9ddf85dfebdfc6dfcfdfd2dfcbdfc4dfcedfd8dfc3dfc4dfcbdf85dfebdfe7dfe9df8b</password>
+        <option name="useHttpAuthentication" value="true" />
+        <username>dbinder</username>
+      </Redmine>
+    </servers>
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="11518000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="953" y="0" width="974" height="1047" extended-state="1" />
+    <layout>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.098468274" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Database Changes" order="8" />
+      <window_info anchor="bottom" id="Version Control" order="9" />
+      <window_info anchor="bottom" id="Terminal" order="10" />
+      <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Database" order="3" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="#5296: Change write_string to write_number for numeric values not part of a user field" />
+    <option name="LAST_COMMIT_MESSAGE" value="#5296: Change write_string to write_number for numeric values not part of a user field" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/classes/export.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1122">
+          <caret line="79" column="27" selection-start-line="79" selection-start-column="27" selection-end-line="79" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/settings.php">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mod_form.php">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/backup/moodle2/restore_checkmark_stepslib.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="850">
+          <caret line="63" column="30" lean-forward="true" selection-start-line="63" selection-start-column="30" selection-end-line="63" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/backup/moodle2/backup_checkmark_stepslib.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="561">
+          <caret line="46" column="36" selection-start-line="46" selection-start-column="25" selection-end-line="46" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/classes/event/grade_updated.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2125">
+          <caret line="138" lean-forward="true" selection-start-line="138" selection-end-line="138" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/classes/submissionstable.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="451">
+          <caret line="361" column="37" lean-forward="true" selection-start-line="361" selection-start-column="37" selection-end-line="361" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/formvalidation_test.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="578">
+          <caret line="47" column="37" selection-start-line="47" selection-start-column="37" selection-end-line="47" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/locallib.php">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+  </component>
+</project>

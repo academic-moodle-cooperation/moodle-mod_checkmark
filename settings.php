@@ -65,4 +65,56 @@ if ($ADMIN->fulltree) {
                                                   get_string('cfg_pdfexampleswarning_desc', 'checkmark'),
                                                   25,
                                                   $options));
+
+    /*
+     * Default settings for availability
+     */
+    $name = get_string('defaultsettings', 'checkmark');
+    $description = get_string('defaultsettings_help', 'checkmark');
+    $settings->add(new admin_setting_heading('defaultsettings', $name, $description));
+
+    $name = new lang_string('alwaysshowdescription', 'mod_assign');
+    $description = new lang_string('alwaysshowdescription_help', 'mod_assign');
+    $setting = new admin_setting_configcheckbox('checkmark/alwaysshowdescription',
+            $name,
+            $description,
+            1);
+    $settings->add($setting);
+
+    $name = new lang_string('allowsubmissionsfromdate', 'mod_assign');
+    $description = new lang_string('allowsubmissionsfromdate_help', 'mod_assign');
+    $setting = new admin_setting_configduration('checkmark/allowsubmissionsfromdate',
+            $name,
+            $description,
+            0);
+    $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, false);
+    $settings->add($setting);
+
+    $name = new lang_string('duedate', 'mod_assign');
+    $description = new lang_string('duedate_help', 'mod_assign');
+    $setting = new admin_setting_configduration('checkmark/duedate',
+            $name,
+            $description,
+            604800);
+    $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, false);
+    $settings->add($setting);
+
+    $name = new lang_string('cutoffdate', 'mod_assign');
+    $description = new lang_string('cutoffdate_help', 'mod_assign');
+    $setting = new admin_setting_configduration('checkmark/cutoffdate',
+            $name,
+            $description,
+            604800);
+    $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, false);
+    $settings->add($setting);
+
+    $name = new lang_string('gradingduedate', 'mod_assign');
+    $description = new lang_string('gradingduedate_help', 'mod_assign');
+    $setting = new admin_setting_configduration('checkmark/gradingduedate',
+            $name,
+            $description,
+            3024000);
+    $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, false);
+    $settings->add($setting);
+
 }
