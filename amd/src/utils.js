@@ -33,7 +33,7 @@ define(['jquery'], function($) {
             // Put whatever you like here. $ is available
             // to you as normal.
 
-            $.when(this).done(function (){ $('#id_hideexamples').click(function(){Utils.collapseorExpandExamples()})});
+            $.when(this).done(function (){ $('#id_hideexamples').click(function(){Utils.collapseorExpandExamples();});});
 
         }
     };
