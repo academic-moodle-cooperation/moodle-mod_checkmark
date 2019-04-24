@@ -157,6 +157,7 @@ $string['grade'] = 'Grade';
 $string['grade_help'] = 'When individual functions are activated the grade has to be the sum of all example grades (maximum 100).<br />When you\'re using standard examples the grade has to be a integral multiple of the example count. If so the points per example get automatically adjusted.<br />With activated JavaScript the grade gets selected automatically when using individual functions. In the case of usage of standard-examples with activated JavaScript only integral multiples of the example count will be accepted.';
 $string['gradingdue'] = 'Remind me to grade by';
 $string['gradingdue_help'] = 'The expected date that marking of the submissions should be completed by. This date is used to prioritise dashboard notifications for teachers.';
+$string['hideexamples'] = 'Hide examples in submissions table';
 $string['informstudents'] = 'Send notifications';
 $string['informstudents_help'] = 'If activated, the participant receives a notification about his/her attendance status.';
 $string['nostudents'] = 'There are no users to be displayed!';

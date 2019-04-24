@@ -26,6 +26,7 @@ namespace mod_checkmark;
 
 defined('MOODLE_INTERNAL') || die();
 
+
 /**
  * This class contains the grading form for checkmark-submissions
  *
@@ -168,8 +169,10 @@ class exportform extends \moodleform {
         $mform->addElement('header', 'data_preview_header', get_string('data_preview', 'checkmark'));
         $mform->addHelpButton('data_preview_header', 'data_preview', 'checkmark');
         $mform->setExpanded('data_preview_header');
-
+        $mform->addElement('advcheckbox','hideexamples',get_string('hideexamples','checkmark'));
         $mform->addElement('html', $this->table);
+
+
 
     }
 

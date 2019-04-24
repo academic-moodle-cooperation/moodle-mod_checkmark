@@ -30,6 +30,7 @@ require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->libdir.'/gradelib.php');
 require_once($CFG->dirroot.'/mod/checkmark/submission_form.php');
 require_once($CFG->dirroot.'/mod/checkmark/grading_form.php');
+$PAGE->requires->js_call_amd('mod_checkmark/utils', 'init');
 
 /**
  * This class provides all the basic functionality for an checkmark-module
@@ -2138,8 +2139,10 @@ class checkmark {
             $table->out($total < $perpage ? $total : $perpage, true);
             $tablehtml = ob_get_contents();
             ob_end_clean();
+            //Element for hiding or showing all examples
+            $mform->addElement('advcheckbox','hideexamples',get_string('hideexamples','checkmark'));
+            //$mform->addElement('button','showexamples','Display examples in table');
             $mform->addElement('html', $tablehtml);
-
             $mform->addElement('advcheckbox', 'mailinfo', get_string('enablenotification', 'checkmark'));
             $mform->addHelpButton('mailinfo', 'enablenotification', 'checkmark');
             $mailinfopref = false;
