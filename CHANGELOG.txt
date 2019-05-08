@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+
+NEXT VERSION
+------------------
+* [FEATURE] #5720 Add default values for availability in site-administration
+
 3.6.0 (2019-01-20)
 ------------------
 
