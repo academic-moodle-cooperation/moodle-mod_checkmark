@@ -82,7 +82,6 @@ $string['all_absent'] = 'All absent participants';
 $string['all_attendant'] = 'All attendant participants';
 $string['all_unknown'] = 'All with unknown attendance status';
 $string['alwaysshowdescription'] = 'Always show description';
-$string['alwaysshowdescription_help'] = 'If disabled, the checkmarks description above will only become visible to students at the "Allow submissions from" date.';
 $string['attendance'] = 'Attendance';
 $string['attendance_help'] = 'The colum status represents the students attendance:<br /><ul><li>? - unknown</li><li>✓ - present</li><li>✖ - absent</li></ul>';
 $string['attendance_not_set_grade_locked'] = 'The attendance for {$a} couldn\'t be set, because the grade is locked or overridden in gradebook.';

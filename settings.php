@@ -73,16 +73,16 @@ if ($ADMIN->fulltree) {
     $description = get_string('defaultsettings_help', 'checkmark');
     $settings->add(new admin_setting_heading('defaultsettings', $name, $description));
 
-    $name = new lang_string('alwaysshowdescription', 'mod_assign');
-    $description = new lang_string('alwaysshowdescription_help', 'mod_assign');
+    $name = new lang_string('alwaysshowdescription', 'checkmark');
+    $description = new lang_string('alwaysshowdescription_help', 'checkmark');
     $setting = new admin_setting_configcheckbox('checkmark/alwaysshowdescription',
             $name,
             $description,
             1);
     $settings->add($setting);
 
-    $name = new lang_string('allowsubmissionsfromdate', 'mod_assign');
-    $description = new lang_string('allowsubmissionsfromdate_help', 'mod_assign');
+    $name = new lang_string('allowsubmissionsfromdate', 'checkmark');
+    $description = new lang_string('allowsubmissionsfromdate_help', 'checkmark');
     $setting = new admin_setting_configduration('checkmark/allowsubmissionsfromdate',
             $name,
             $description,
@@ -90,8 +90,8 @@ if ($ADMIN->fulltree) {
     $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, true);
     $settings->add($setting);
 
-    $name = new lang_string('duedate', 'mod_assign');
-    $description = new lang_string('duedate_help', 'mod_assign');
+    $name = new lang_string('duedate', 'checkmark');
+    $description = new lang_string('duedate_help', 'checkmark');
     $setting = new admin_setting_configduration('checkmark/duedate',
             $name,
             $description,
@@ -99,8 +99,8 @@ if ($ADMIN->fulltree) {
     $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, true);
     $settings->add($setting);
 
-    $name = new lang_string('cutoffdate', 'mod_assign');
-    $description = new lang_string('cutoffdate_help', 'mod_assign');
+    $name = new lang_string('cutoffdate', 'checkmark');
+    $description = new lang_string('cutoffdate_help', 'checkmark');
     $setting = new admin_setting_configduration('checkmark/cutoffdate',
             $name,
             $description,
@@ -108,8 +108,8 @@ if ($ADMIN->fulltree) {
     $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, false);
     $settings->add($setting);
 
-    $name = new lang_string('gradingduedate', 'mod_assign');
-    $description = new lang_string('gradingduedate_help', 'mod_assign');
+    $name = new lang_string('gradingduedate', 'checkmark');
+    $description = new lang_string('gradingduedate_help', 'checkmark');
     $setting = new admin_setting_configduration('checkmark/gradingduedate',
             $name,
             $description,

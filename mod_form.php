@@ -102,78 +102,58 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->addElement('header', 'availability', get_string('availability', 'assign'));
         $mform->setExpanded('availability', true);
 
-
-        $allInfo = get_config('checkmark');
+        $allinfo = get_config('checkmark');
         $name = get_string('availabledate', 'checkmark');
 
-
-
         $mform->addElement('date_time_selector', 'timeavailable', $name, array('optional' => true));
-        $setTime = strtotime('00:00',time()) + $allInfo->allowsubmissionsfromdate;
-        $mform->setDefault('timeavailable', date('U',$setTime));
-
-        if(!$allInfo->allowsubmissionsfromdate_enabled) {
+        $settime = strtotime('00:00', time()) + $allinfo->allowsubmissionsfromdate;
+        $mform->setDefault('timeavailable', date('U', $settime));
+        if (!$allinfo->allowsubmissionsfromdate_enabled) {
             $mform->setDefault('timeavailable', null);
         }
         $mform->addHelpButton('timeavailable', 'availabledate', 'checkmark');
 
-
         $name = get_string('duedate', 'checkmark');
-
         $mform->addElement('date_time_selector', 'timedue', $name, array('optional' => true));
-        $setTime = strtotime('00:00',time()) + $allInfo->duedate;
-        //$setTime = strtotime("23:55",$setTime);
-        $mform->setDefault('timedue', date('U', $setTime));
+        $settime = strtotime('00:00', time()) + $allinfo->duedate;
 
-        if(!$allInfo->duedate_enabled) {
+        $mform->setDefault('timedue', date('U', $settime));
+        if (!$allinfo->duedate_enabled) {
             $mform->setDefault('timedue', null);
         }
         $mform->addHelpButton('timedue', 'duedate', 'checkmark');
 
-
-
         $name = get_string('cutoffdate', 'checkmark');
-
         $mform->addElement('date_time_selector', 'cutoffdate', $name, array('optional' => true));
-        $setTime = strtotime('00:00',time()) + $allInfo->cutoffdate;
-        //$setTime = strtotime("23:55",$setTime);
-        $mform->setDefault('cutoffdate', date('U', $setTime));
+        $settime = strtotime('00:00', time()) + $allinfo->cutoffdate;
 
-        if(!$allInfo->cutoffdate_enabled) {
+        $mform->setDefault('cutoffdate', date('U', $settime));
+        if (!$allinfo->cutoffdate_enabled) {
             $mform->setDefault('cutoffdate', null);
-
         }
         $mform->addHelpButton('cutoffdate', 'cutoffdate', 'checkmark');
 
-
-
         $name = get_string('gradingdue', 'checkmark');
-
         $mform->addElement('date_time_selector', 'gradingdue', $name, array('optional' => true));
-        $setTime = strtotime('00:00',time()) + $allInfo->gradingduedate;
-        //$setTime = strtotime("23:55",$setTime);
-        $mform->setDefault('gradingdue', date('U', $setTime));
+        $settime = strtotime('00:00', time()) + $allinfo->gradingduedate;
 
-
-        if(!$allInfo->gradingduedate_enabled)
-        {
+        $mform->setDefault('gradingdue', date('U', $settime));
+        if (!$allinfo->gradingduedate_enabled) {
             $mform->setDefault('gradingdue', null);
         }
         $mform->addHelpButton('gradingdue', 'gradingdue', 'checkmark');
 
-        $defDesc = get_config('checkmark', 'alwaysshowdescription');
+        $defdesc = get_config('checkmark', 'alwaysshowdescription');
         $name = get_string('alwaysshowdescription', 'checkmark');
         $mform->addElement('advcheckbox', 'alwaysshowdescription', $name);
         $mform->addHelpButton('alwaysshowdescription', 'alwaysshowdescription', 'checkmark');
-        if($defDesc) {
+        if ($defdesc) {
             $mform->setDefault('alwaysshowdescription', 1);
-        }
-        else {
+        } else {
             $mform->setDefault('alwaysshowdescription', 0);
         }
         $mform->hideIf('alwaysshowdescription', 'timeavailable[enabled]', 'notchecked');
     }
-
     /**
      * Overwritten from moodleform_mod, calls parent
      *
