@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="91068b27-8817-4f51-b495-9764a8e1dfb4" name="5720 Add default values for availability in site-administration" comment="">
-      <change beforePath="$PROJECT_DIR$/lang/en/checkmark.php" beforeDir="false" afterPath="$PROJECT_DIR$/lang/en/checkmark.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mod_form.php" beforeDir="false" afterPath="$PROJECT_DIR$/mod_form.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings.php" beforeDir="false" afterPath="$PROJECT_DIR$/settings.php" afterDir="false" />
     </list>
     <list id="19a71983-3635-416a-ac9e-916c54d9292c" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -38,7 +36,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="1">
+  <component name="ProjectFrameBounds">
     <option name="x" value="953" />
     <option name="width" value="974" />
     <option name="height" value="1047" />
@@ -118,7 +116,7 @@
       <option name="presentableId" value="5271" />
       <option name="project" value="mod_checkmark" />
       <option name="type" value="BUG" />
-      <updated>1554889182392</updated>
+      <updated>1556112471000</updated>
       <workItem from="1552558454204" duration="604000" />
       <workItem from="1552671213505" duration="2000" />
       <workItem from="1554889010419" duration="172000" />
@@ -134,11 +132,12 @@
       <option name="presentableId" value="5720" />
       <option name="project" value="mod_checkmark" />
       <option name="type" value="BUG" />
-      <updated>1554894670000</updated>
+      <updated>1556111694000</updated>
       <workItem from="1554889182596" duration="24000" />
       <workItem from="1555430377876" duration="599000" />
       <workItem from="1555438372682" duration="599000" />
       <workItem from="1555496095892" duration="599000" />
+      <workItem from="1556630318392" duration="628000" />
     </task>
     <option name="localTasksCounter" value="2" />
     <servers>
@@ -154,12 +153,12 @@
     </servers>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="11518000" />
+    <option name="totallyTimeSpent" value="12146000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="953" y="0" width="974" height="1047" extended-state="1" />
+    <frame x="953" y="0" width="974" height="1047" extended-state="0" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.098468274" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.10065646" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />

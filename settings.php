@@ -87,7 +87,7 @@ if ($ADMIN->fulltree) {
             $name,
             $description,
             0);
-    $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, false);
+    $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, true);
     $settings->add($setting);
 
     $name = new lang_string('duedate', 'mod_assign');
@@ -96,7 +96,7 @@ if ($ADMIN->fulltree) {
             $name,
             $description,
             604800);
-    $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, false);
+    $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, true);
     $settings->add($setting);
 
     $name = new lang_string('cutoffdate', 'mod_assign');
