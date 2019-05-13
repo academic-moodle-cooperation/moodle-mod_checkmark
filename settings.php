@@ -108,8 +108,8 @@ if ($ADMIN->fulltree) {
     $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, false);
     $settings->add($setting);
 
-    $name = new lang_string('gradingduedate', 'checkmark');
-    $description = new lang_string('gradingduedate_help', 'checkmark');
+    $name = new lang_string('gradingdue', 'checkmark');
+    $description = new lang_string('gradingdue_help', 'checkmark');
     $setting = new admin_setting_configduration('checkmark/gradingduedate',
             $name,
             $description,
