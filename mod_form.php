@@ -106,8 +106,10 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $name = get_string('availabledate', 'checkmark');
 
         $mform->addElement('date_time_selector', 'timeavailable', $name, array('optional' => true));
-        $settime = strtotime('00:00', time()) + $allinfo->allowsubmissionsfromdate;
-        $mform->setDefault('timeavailable', date('U', $settime));
+
+        $settime = strtotime('00:00') + $allinfo->allowsubmissionsfromdate;
+        $mform->setDefault('timeavailable', $settime);
+
         if (!$allinfo->allowsubmissionsfromdate_enabled) {
             $mform->setDefault('timeavailable', null);
         }
@@ -115,9 +117,9 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         $name = get_string('duedate', 'checkmark');
         $mform->addElement('date_time_selector', 'timedue', $name, array('optional' => true));
-        $settime = strtotime('00:00', time()) + $allinfo->duedate;
+        $settime = strtotime('00:00') + $allinfo->duedate;
 
-        $mform->setDefault('timedue', date('U', $settime));
+        $mform->setDefault('timedue',  $settime);
         if (!$allinfo->duedate_enabled) {
             $mform->setDefault('timedue', null);
         }
@@ -125,9 +127,9 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         $name = get_string('cutoffdate', 'checkmark');
         $mform->addElement('date_time_selector', 'cutoffdate', $name, array('optional' => true));
-        $settime = strtotime('00:00', time()) + $allinfo->cutoffdate;
+        $settime = strtotime('00:00') + $allinfo->cutoffdate;
 
-        $mform->setDefault('cutoffdate', date('U', $settime));
+        $mform->setDefault('cutoffdate', $settime);
         if (!$allinfo->cutoffdate_enabled) {
             $mform->setDefault('cutoffdate', null);
         }
@@ -135,9 +137,9 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         $name = get_string('gradingdue', 'checkmark');
         $mform->addElement('date_time_selector', 'gradingdue', $name, array('optional' => true));
-        $settime = strtotime('00:00', time()) + $allinfo->gradingduedate;
+        $settime = strtotime('00:00') + $allinfo->gradingduedate;
 
-        $mform->setDefault('gradingdue', date('U', $settime));
+        $mform->setDefault('gradingdue', $settime);
         if (!$allinfo->gradingduedate_enabled) {
             $mform->setDefault('gradingdue', null);
         }
