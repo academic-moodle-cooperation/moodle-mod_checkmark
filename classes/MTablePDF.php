@@ -790,15 +790,36 @@ class MTablePDF extends \pdf {
         $worksheet = $workbook->add_worksheet($time);
         //Get system context in order to retrieve user fields
         $systemcontext = context_system::instance();
+        // Codereview SN: comments must start with an empty space between // and the first word, and must end with a .?!
         //Get all user fields
+        // Get all user fields.
         $textonlycolumns = get_extra_user_fields($systemcontext);
+
         array_push($textonlycolumns, "fullname");
 
+        // Codereview SN: comment formatting applicable here too!
         //Translate all user fields keys to the local language used in the moodle instance for comparison with headers
         //todo: Find an approach which directly works via keys
+        // Codereview SN: here you can use foreach instead of for($i = 0; $i < sizeof(..)..
+        foreach ($textonlycolumns as $key => $value) {
+            $textonlycolumns[$key] = get_string($value,'moodle');
+            // Codereview SN: just in case you can make sure that the string you are trying to fetch really exists.
+            // $stringmanager = get_string_manager(); // this comes before the foreach loop to avoid unnecessary calls
+            // if ($stringmanager->string_exists($identifier, $component)) ...
+        }
+        /*
         for ($i = 0;$i<sizeof($textonlycolumns);$i++) {
             $textonlycolumns[$i] = get_string($textonlycolumns[$i],'moodle');
-        }
+        }*/
+
+
+
+        // Codereview SN: here you can use a handy function array_flip. It flips the keys and the values of an array like that:
+        // $a = [0 => 'a', 1 => 'b', 2 => 'c'];
+        // $a = array_flip($a);
+        // $a now equals ['a' => 1, 'b' => 2, 'c' => 3]
+        // this allows to use the faster function isset($a['a']) instead of in_array($a, 'a') ;)
+        // so you have to can add here: $textonlycolumns = array_flip($textonlycolumns);
 
         $headlineprop = [
             'size' => 12,
@@ -836,6 +857,10 @@ class MTablePDF extends \pdf {
         $textfirst = $workbook->add_format($textprop);
 
         $line = 0;
+        // Codereview SN: you can change the variable name here to be plural, cause it holds more than one id.
+        // $textonlyids = array();
+        // Also, you can use the short form for array creation cause it simply looks nicer :)
+        // $textonlyids = [];
         $textonlyid = array();
         // Write header.
         for ($i = 0; $i < count($this->header); $i += 2) {
@@ -857,7 +882,14 @@ class MTablePDF extends \pdf {
                 $worksheet->write_string($line, $i, $header, $headlineformat);
                 $first = false;
             }
+            // Codereview SN: comment format.
             //Check if the header string is a text only column and write its index to $textonlyid
+            // Codereview SN: here, instead of pushing to the array values, you can simply add keys and then use isset($array[$key]) to check if a key exists
+            // same principle as with array_flip
+            // So if you used array_flip with $textonlycolumns, then this code becomes
+            // if (isset($textonlycolumns[$header])) {
+            //      $textonlyids[$i] = true;
+            // }
             if(in_array($header, $textonlycolumns)) {
                 array_push($textonlyid,$i);
 
@@ -876,13 +908,21 @@ class MTablePDF extends \pdf {
                     $cell['data'] = $prev[$idx]['data'];
                 }
 
+
+                // Codereview SN: array_key_exists($key, $array) is equivalent to isset($array[$key]).
                 if (array_key_exists('format', $cell)) {
                     $worksheet->write_string($line, $i, $cell['data'], $workbook->add_format($cell['format']));
                 } else {
+                    // Codereview SN: again comments :)
                     //Only write numeric values via write_number if the current column is not text only ($i not in $textonlyid)
+                    // Codereview SN: out of curiosity, is there a special reason why the first column is strictly string?
                     if ($first) {
                         $worksheet->write_string($line, $i, $cell['data'], $textfirst);
                         $first = false;
+                    // Codereview SN: if you've set the ids as keys beforehand, here you can replace the !in_array(..) with !isset
+                    // so it becomes:
+                    // } else if (is_numeric($cell['data']) && !isset($textonlyid[$i])) {
+                    // the main advantage of this function is that it is generally faster for larger arrays than in_array
                     } else if (is_numeric($cell['data']) && (!in_array($i, $textonlyid))) {
                         $worksheet->write_number($line, $i, $cell['data'], $text);
                     }  else {
