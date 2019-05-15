@@ -1,5 +1,8 @@
 CHANGELOG
 =========
+
+* [FEATURE] #5729 Make all examples in submissions and export collapsible at once
+
 3.6.0 (2019-01-20)
 ------------------
 

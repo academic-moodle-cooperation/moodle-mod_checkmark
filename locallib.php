@@ -2139,8 +2139,6 @@ class checkmark {
             $table->out($total < $perpage ? $total : $perpage, true);
             $tablehtml = ob_get_contents();
             ob_end_clean();
-            //Element for hiding or showing all examples
-            $mform->addElement('advcheckbox','hideexamples',get_string('hideexamples','checkmark'));
             //$mform->addElement('button','showexamples','Display examples in table');
             $mform->addElement('html', $tablehtml);
             $mform->addElement('advcheckbox', 'mailinfo', get_string('enablenotification', 'checkmark'));
