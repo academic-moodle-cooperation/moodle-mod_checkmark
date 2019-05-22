@@ -24,7 +24,11 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_checkmark;
+
+use context_course;
+use context_system;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -58,8 +62,9 @@ class MTablePDF extends \pdf {
     /** Output as XLSX */
     const OUTPUT_FORMAT_XLSX = 1;
     /** Output as XLS
-      * @deprecated since 2.8
-      */
+     *
+     * @deprecated since 2.8
+     */
     const OUTPUT_FORMAT_XLS = 2;
     /** Output as ODS */
     const OUTPUT_FORMAT_ODS = 3;
@@ -146,7 +151,7 @@ class MTablePDF extends \pdf {
     public function setcolumnformat($columnformat) {
         if (count($columnformat) != count($this->columnwidths)) {
             print_error("Columnformat (" . count($columnformat) . ") count doesnt match " .
-                "column count (" . count($this->columnwidths) . ")");
+                    "column count (" . count($this->columnwidths) . ")");
         }
 
         $columnformat = array_values($columnformat);
@@ -170,7 +175,7 @@ class MTablePDF extends \pdf {
                 $title4, $desc4, $title5, $desc5, $title6, $desc6) = $header;
         // We know this makes no sense, but it's just to visualize how they will be used!
         $this->header = [$title1, $desc1, $title2, $desc2, $title3, $desc3,
-                         $title4, $desc4, $title5, $desc5, $title6, $desc6];
+                $title4, $desc4, $title5, $desc5, $title6, $desc6];
     }
 
     /**
@@ -187,7 +192,7 @@ class MTablePDF extends \pdf {
 
             $pagewidth = $this->getPageWidth();
             $scale = $pagewidth / 200;
-            $oldfontsize = (int)$this->getFontSize();
+            $oldfontsize = (int) $this->getFontSize();
             $this->setfontsize('12');
             // First row.
             $border = 0;
@@ -254,7 +259,7 @@ class MTablePDF extends \pdf {
             $this->SetY(-15);
 
             // Page number.
-            $this->Cell(0, 10, $this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+            $this->Cell(0, 10, $this->getAliasNumPage() . '/' . $this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
         }
     }
 
@@ -319,7 +324,7 @@ class MTablePDF extends \pdf {
     public function addrow($row) {
         if (count($row) != count($this->columnwidths)) {
             print_error("number of columns from row (" . count($row) . ") doenst match " .
-                "the number defined (" . count($this->columnwidths) . ")");
+                    "the number defined (" . count($this->columnwidths) . ")");
             return false;
         }
 
@@ -369,7 +374,7 @@ class MTablePDF extends \pdf {
      * @param int $fontsize
      * @param bool $out (optional)
      */
-    public function setfontsize($fontsize, $out=true) {
+    public function setfontsize($fontsize, $out = true) {
         if ($fontsize <= self::FONTSIZE_SMALL) {
             $fontsize = self::FONTSIZE_SMALL;
         } else if ($fontsize > self::FONTSIZE_SMALL && $fontsize < self::FONTSIZE_LARGE) {
@@ -405,7 +410,7 @@ class MTablePDF extends \pdf {
 
         $filename = clean_filename($filename);
 
-        switch($this->outputformat) {
+        switch ($this->outputformat) {
             case self::OUTPUT_FORMAT_XLSX:
                 $this->get_xlsx($filename);
                 break;
@@ -716,6 +721,7 @@ class MTablePDF extends \pdf {
             $fill = !$fill;
         }
     }
+
     /**
      * Generate pdf
      *
@@ -763,11 +769,11 @@ class MTablePDF extends \pdf {
 
         // Output the PDF!
         try {
-            $this->Output($tmpdir.$filename, 'F');
+            $this->Output($tmpdir . $filename, 'F');
             return $tmpdir . $filename;
         } catch (\Exception $e) {
             // TODO proper error handling and error localized strings!
-            \core\notification::add('Problem during PDF-export.<br/>\n'.$e->getMessage().'<br/>\n'.$e->getTraceAsString(),
+            \core\notification::add('Problem during PDF-export.<br/>\n' . $e->getMessage() . '<br/>\n' . $e->getTraceAsString(),
                     'error');
         }
 
@@ -783,13 +789,29 @@ class MTablePDF extends \pdf {
         $time = time();
         $time = userdate($time);
         $worksheet = $workbook->add_worksheet($time);
+        // Get system context in order to retrieve user fields
+        $systemcontext = context_system::instance();
+        // Get all user fields.
+        $textonlycolumns = get_extra_user_fields($systemcontext);
+
+        array_push($textonlycolumns, "fullname");
+
+        // Translate all user fields keys to the local language used in the moodle instance for comparison with headers
+        // Codereview SN: here you can use foreach instead of for($i = 0; $i < sizeof(..)..
+        $stringmanager = get_string_manager();
+        foreach ($textonlycolumns as $key => $value) {
+            if ($stringmanager->string_exists($value, 'moodle')) {
+                $textonlycolumns[$key] = get_string($value, 'moodle');
+            }
+        }
+        $textonlycolumns = array_flip($textonlycolumns);
 
         $headlineprop = [
-            'size' => 12,
-            'bold' => 1,
-            'bottom' => 1,
-            'align' => 'center',
-            'v_align' => 'vcenter'
+                'size' => 12,
+                'bold' => 1,
+                'bottom' => 1,
+                'align' => 'center',
+                'v_align' => 'vcenter'
         ];
         $headlineformat = $workbook->add_format($headlineprop);
         $headlineformat->set_left(1);
@@ -810,16 +832,17 @@ class MTablePDF extends \pdf {
         }
 
         $textprop = [
-            'size' => 10,
-            'align' => 'left',
-            'v_align' => 'vcenter'
+                'size' => 10,
+                'align' => 'left',
+                'v_align' => 'vcenter'
         ];
         $text = $workbook->add_format($textprop);
+        $text->set_num_format(1);
         $text->set_left(1);
         $textfirst = $workbook->add_format($textprop);
 
         $line = 0;
-
+        $textonlyids = [];
         // Write header.
         for ($i = 0; $i < count($this->header); $i += 2) {
             $worksheet->write_string($line, 0, $this->header[$i], $hdrleft);
@@ -838,6 +861,9 @@ class MTablePDF extends \pdf {
             } else {
                 $worksheet->write_string($line, $i, $header, $headlineformat);
                 $first = false;
+            }
+            if (isset($textonlycolumns[$header])) {
+                $textonlyids[$i] = true;
             }
             $i++;
         }
@@ -859,7 +885,10 @@ class MTablePDF extends \pdf {
                     if ($first) {
                         $worksheet->write_string($line, $i, $cell['data'], $textfirst);
                         $first = false;
-                    } else {
+                    } else if (is_numeric($cell['data']) && !isset($textonlyid[$i])) {
+                        $worksheet->write_number($line, $i, $cell['data'], $text);
+                    }
+                    else {
                         $worksheet->write_string($line, $i, $cell['data'], $text);
                     }
                 }
@@ -877,8 +906,8 @@ class MTablePDF extends \pdf {
      * @param array $headerdescformat Headerdescriptionformats for workbooks
      */
     public function set_headerformat($headertitleformat, $headerdescformat) {
-             $this->headerformat['title'] = $headertitleformat;
-             $this->headerformat['desc'] = $headerdescformat;
+        $this->headerformat['title'] = $headertitleformat;
+        $this->headerformat['desc'] = $headerdescformat;
     }
 
     /**
@@ -913,7 +942,7 @@ class MTablePDF extends \pdf {
 
         $this->fill_workbook($workbook);
 
-        $workbook->send($filename.'.ods');
+        $workbook->send($filename . '.ods');
         $workbook->close();
     }
 
@@ -964,7 +993,7 @@ class MTablePDF extends \pdf {
         ob_clean();
         header('Content-Type: text/plain');
         header('Content-Length: ' . strlen($filecontent));
-        header('Content-Disposition: attachment; filename="'.$filename.'"; filename*="'.rawurlencode($filename));
+        header('Content-Disposition: attachment; filename="' . $filename . '"; filename*="' . rawurlencode($filename));
         header('Content-Transfer-Encoding: binary');
         header('Content-Encoding: utf-8');
         echo $filecontent;
