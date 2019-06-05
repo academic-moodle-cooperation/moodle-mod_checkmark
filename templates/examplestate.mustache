@@ -1,0 +1,44 @@
+{{!
+    This file is part of mod_checkmark for Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_checkmark/examplestate
+
+    Single state of a checkmark example.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    *
+    *
+
+    Example context (json):
+    {
+        "checkid": 276432
+        "is_checked": true,
+        "is_forced": { "checked": false, "unchecked": true }
+    }
+}}
+<span {{#checkid}}data-checkid="{{.}}"{{/checkid}}{{!
+        }} class="mod_checkmark_examplestate fa-stack">
+  <i class="fa fa-square-o fa-stack-2x{{#is_forced}} text-error{{/is_forced}}"></i>
+  {{^is_forced}}{{#is_checked}}<i class="fa fa-times fa-stack-1x"></i>{{/is_checked}}{{/is_forced}}
+  {{#is_forced_checked}}<i class="fa fa-times fa-stack-1x text-info"></i>{{/is_forced_checked}}
+</span>

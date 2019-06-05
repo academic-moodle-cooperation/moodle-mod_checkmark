@@ -1670,23 +1670,16 @@ class submissionstable extends \table_sql {
     public function other_cols($colname, $values) {
         // Process examples!
         if (preg_match("/example([0-9]+)/i", $colname, $match)) {
-            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
-                $checked = 'X';
-                $unchecked = ' ';
-            } else {
-                $checked = \checkmark::CHECKEDBOX;
-                $unchecked = \checkmark::EMPTYBOX;
-            }
             if (!empty($values->submissionid)) {
                 $submission = $this->checkmark->get_submission($values->id);
-                $state = $submission->examples[$match[1]]->state ? $checked : $unchecked;
+                $example = $submission->get_example($match[1]);
             } else {
-                $state = $unchecked;
+                $example = new example('', 1, '', example::UNCHECKED);
             }
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
-                return $state;
+                return $example->is_checked() ? 'X' : ' ';
             } else {
-                return \html_writer::tag('div', $state, ['id' => 'ex'.$values->id.'_'.$match[1]]);
+                return \html_writer::tag('div', $example->print_examplestate(), ['id' => 'ex'.$values->id.'_'.$match[1]]);
             }
         }
 

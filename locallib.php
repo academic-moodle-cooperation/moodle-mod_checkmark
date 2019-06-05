@@ -93,6 +93,9 @@ class checkmark {
      * @param object $checkmark usually null, but if we have it we pass it to save db access
      * @param object $cm usually null, but if we have it we pass it to save db access
      * @param object $course usually null, but if we have it we pass it to save db access
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function __construct($cmid='staticonly', $checkmark=null, $cm=null, $course=null) {
         global $COURSE, $DB, $USER;
@@ -114,14 +117,13 @@ class checkmark {
             $this->course = $course;
         } else if ($this->cm->course == $COURSE->id) {
             $this->course = $COURSE;
-        } else if (! $this->course = $DB->get_record('course', array('id' => $this->cm->course))) {
+        } else if (! $this->course = $DB->get_record('course', ['id' => $this->cm->course])) {
             print_error('invalidid', 'checkmark');
         }
 
         if ($checkmark) {
             $this->checkmark = $checkmark;
-        } else if (! $this->checkmark = $DB->get_record('checkmark',
-                                                        array('id' => $this->cm->instance))) {
+        } else if (! $this->checkmark = $DB->get_record('checkmark', ['id' => $this->cm->instance])) {
             print_error('invalidid', 'checkmark');
         }
 
@@ -153,6 +155,10 @@ class checkmark {
      * @param int $c checkmark instance id or 0 (either $id or $c have to be set!)
      * @param moodle_url $url current url of the viewed page
      * @return object[] Returns array with coursemodule, checkmark and course objects
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws require_login_exception
      */
     public static function init_checks($id, $c, $url) {
         global $PAGE, $DB;
@@ -192,7 +198,8 @@ class checkmark {
      *
      * Adds the prefix if set and flexible naming is used
      *
-     * @return object[] checkmark's examples from the DB (raw records)
+     * @return \mod_checkmark\example[] checkmark's examples from the DB (raw records)
+     * @throws dml_exception
      */
     public function get_examples() {
         if (!isset($this->checkmark->examples)) {
@@ -210,20 +217,20 @@ class checkmark {
      *
      * @param object|int $checkmarkid the checkmark object containing ID or the ID itself
      * @param string|false $exampleprefix If you already have it, you can save 1 query by setting it!
-     * @return object[] checkmark's examples from the DB (raw records)
+     * @return \mod_checkmark\example[] checkmark's examples from the DB (raw records)
+     * @throws dml_exception
      */
     public static function get_examples_static($checkmarkid, $exampleprefix = false) {
         global $DB;
 
-        $examples = $DB->get_records('checkmark_examples', ['checkmarkid' => $checkmarkid], 'id ASC');
+        $records = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmarkid), 'id ASC');
 
         if ($exampleprefix === false) {
             $exampleprefix = $DB->get_field('checkmark', 'exampleprefix', ['id' => $checkmarkid]);
         }
-
-        foreach ($examples as $key => $cur) {
-            $examples[$key]->shortname = $cur->name;
-            $examples[$key]->name = $exampleprefix.$cur->name;
+        $examples = [];
+        foreach ($records as $key => $cur) {
+            $examples[$key] = new \mod_checkmark\example($cur->name, $cur->grade, $exampleprefix);
         }
 
         return $examples;
@@ -233,6 +240,10 @@ class checkmark {
      * print_example_preview() prints a preview of the set examples
      *
      * TODO use a function to get an empty submission and use checkmark::add_submission_elements() instead!
+     *
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     public function print_example_preview() {
         global $USER;
@@ -250,16 +261,7 @@ class checkmark {
         $data = new stdClass();
         $data->examples = [];
         foreach ($examples as $example) {
-            switch ($example->grade) {
-                case '1':
-                    $pointsstring = get_string('strpoint', 'checkmark');
-                break;
-                case '2':
-                default:
-                    $pointsstring = get_string('strpoints', 'checkmark');
-                break;
-            }
-            $mform->addElement('checkbox', $example->shortname, '', $example->name.' ('.$example->grade.' '.$pointsstring.')');
+            $mform->addElement('static', $example->shortname, '', $example->print_example());
             $mform->freeze($example->shortname);
         }
         $mform->display();
@@ -270,6 +272,8 @@ class checkmark {
      * You've checked out X from a maximum of Y examples. (A out of B points)
      *
      * @return string short summary
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function print_summary() {
         global $USER;
@@ -290,6 +294,8 @@ class checkmark {
      *
      * @param int $userid The user-ID to print the student anwer for.
      * @return string checked examples
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function print_student_answer($userid) {
         $output = '';
@@ -298,19 +304,18 @@ class checkmark {
             return get_string('nosubmission', 'checkmark');
         }
 
-        foreach ($submission->examples as $example) {
+        foreach ($submission->get_examples() as $example) {
             if ($output != '') {
                 $output .= ', ';
             } else {
                 $output .= get_string('strexamples', 'checkmark').': ';
             }
-            if ($example->state) { // Is it checked?
+            if ($example->is_checked()) { // Is it checked?
                 $class = 'checked';
             } else {
                 $class = 'unchecked';
             }
-            $output .= html_writer::tag('span', $example->shortname,
-                                        array('class' => $class));
+            $output .= html_writer::tag('span', $example->shortname, array('class' => $class));
         }
 
         // Wrapper!
@@ -319,6 +324,11 @@ class checkmark {
 
     /**
      * Every view for checkmark (teacher/student/etc.)
+     *
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function view() {
         global $OUTPUT, $USER, $PAGE;
@@ -363,17 +373,17 @@ class checkmark {
         $data->edit       = $editmode;
         $data->examples   = $this->get_examples();
         if ($submission) {
-            $data->sid        = $submission->id;
+            $data->sid        = $submission->get_id();
+            if (!empty($submission->get_examples())) {
+                foreach ($submission->get_examples() as $key => $example) {
+                    $name = 'example'.$key;
+                    $data->$name = empty($example->is_checked()) ? 0 : 1;
+                }
+            }
         } else {
             $data->sid        = null;
         }
 
-        if (!empty($submission->examples)) {
-            foreach ($submission->examples as $key => $example) {
-                $name = 'example'.$key;
-                $data->$name = empty($example->state) ? 0 : 1;
-            }
-        }
         $mform = new checkmark_submission_form(null, $data);
 
         if ($editmode) {
@@ -388,12 +398,12 @@ class checkmark {
                 // Create the submission if needed & return its id!
                 $submission = $this->get_submission($USER->id, true);
 
-                foreach ($submission->examples as $key => $example) {
+                foreach ($submission->get_examples() as $key => $example) {
                     $name = 'example'.$key;
                     if (isset($formdata->{$name}) && ($formdata->{$name} != 0)) {
-                        $submission->examples[$key]->state = 1;
+                        $submission->get_example($key)->set_state(\mod_checkmark\example::CHECKED);
                     } else {
-                        $submission->examples[$key]->state = 0;
+                        $submission->get_example($key)->set_state(\mod_checkmark\example::UNCHECKED);
                     }
                 }
 
@@ -490,6 +500,7 @@ class checkmark {
      * page in the navigation trail should be passed as an argument
      *
      * @param string $subpage Description of subpage to be used in navigation trail
+     * @throws coding_exception
      */
     public function view_header($subpage='') {
         global $CFG, $PAGE, $OUTPUT;
@@ -534,6 +545,7 @@ class checkmark {
      * Display the checkmark dates
      *
      * Prints the checkmark start and end dates in a box.
+     * @throws coding_exception
      */
     public function view_dates() {
         global $OUTPUT;
@@ -598,6 +610,8 @@ class checkmark {
 
     /**
      * Display the hint if attendance is tracked and linked to grades
+     *
+     * @throws coding_exception
      */
     public function view_attendancehint() {
         global $OUTPUT;
@@ -625,6 +639,9 @@ class checkmark {
      * grade and teacher submissioncomment.
      *
      * @param object $feedback The feedback object or null in which case it will be loaded
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function view_feedback($feedback=null) {
         global $USER, $CFG, $DB, $OUTPUT;
@@ -828,6 +845,8 @@ class checkmark {
      *
      * @param bool $allgroups print all groups info if user can access all groups, suitable for index.php
      * @return string
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function submittedlink($allgroups=false) {
         global $USER, $CFG;
@@ -843,28 +862,30 @@ class checkmark {
                 $group = groups_get_activity_group($this->cm);
             }
             if ($cnt = $this->count_real_submissions($group)) {
-                $submitted = html_writer::tag('a', get_string('viewsubmissions', 'checkmark', $cnt),
-                                              array('href'  => $urlbase.'submissions.php?id='.$this->cm->id,
-                                                    'id' => 'submissions'));
+                $submitted = html_writer::tag('a', get_string('viewsubmissions', 'checkmark', $cnt), [
+                        'href'  => $urlbase.'submissions.php?id='.$this->cm->id,
+                        'id'    => 'submissions'
+                ]);
             } else {
-                $submitted = html_writer::tag('a', get_string('noattempts', 'checkmark'),
-                                              array('href'  => $urlbase.'submissions.php?id='.$this->cm->id,
-                                                    'id' => 'submissions'));
+                $submitted = html_writer::tag('a', get_string('noattempts', 'checkmark'), [
+                        'href'  => $urlbase.'submissions.php?id='.$this->cm->id,
+                        'id'    => 'submissions'
+                ]);
             }
         } else {
             if (isloggedin()) {
                 if ($submission = $this->get_submission($USER->id)) {
-                    if ($submission->timemodified) {
-                        $date = userdate($submission->timemodified);
+                    if ($submission->get_timemodified()) {
+                        $date = userdate($submission->get_timemodified());
                         if ($this->overrides && $this->overrides->timedue) {
                             $timedue = $this->overrides->timedue;
                         } else {
                             $timedue = $this->checkmark->timedue;
                         }
-                        if ($submission->timemodified <= $timedue || empty($timedue)) {
-                            $submitted = html_writer::tag('span', $date, array('class' => 'text-success'));
+                        if ($submission->get_timemodified() <= $timedue || empty($timedue)) {
+                            $submitted = html_writer::tag('span', $date, ['class' => 'text-success']);
                         } else {
-                            $submitted = html_writer::tag('span', $date, array('class' => 'text-error'));
+                            $submitted = html_writer::tag('span', $date, ['class' => 'text-error']);
                         }
                     }
                 }
@@ -916,6 +937,7 @@ class checkmark {
      *
      * @param int $userid the user's ID
      * @return int the user's grade according to his checks
+     * @throws dml_exception
      */
     public function calculate_grade($userid) {
         global $USER;
@@ -928,9 +950,9 @@ class checkmark {
         $submission = $this->get_submission($userid, false); // Get the submission!
 
         if ($submission) {
-            foreach ($submission->examples as $example) {
-                if ($example->state) { // Is it checked?
-                    $grade += $example->grade;
+            foreach ($submission->get_examples() as $example) {
+                if ($example->is_checked()) { // Is it checked?
+                    $grade += $example->get_grade();
                 }
             }
         } else {
@@ -947,6 +969,8 @@ class checkmark {
      * @param int[] $selected (optional) selected users, used if filter equals self::FILTER_SELECTED
      * @param bool $countonly (optional) defaults to false, should we only count the submissions or grade them?
      * @return int|array 0 if everything's ok, otherwise error code
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function autograde_submissions($filter = self::FILTER_ALL, $selected = array(), $countonly = false) {
         global $DB, $USER;
@@ -1143,6 +1167,7 @@ class checkmark {
      * Return if flexiblenaming is used/can be used with this examples
      *
      * @return bool flexible naming is used or not
+     * @throws dml_exception
      */
     public function is_using_flexiblenaming() {
         // We try to cache the value while we're in object context...
@@ -1161,6 +1186,7 @@ class checkmark {
      *
      * @param int $instanceid ID of the current instance
      * @return bool flexible naming is used or not
+     * @throws dml_exception
      */
     public static function is_using_flexiblenaming_static($instanceid) {
         global $DB;
@@ -1194,6 +1220,8 @@ class checkmark {
      *
      * @param array $data Form data as submitted
      * @return array Array of strings with error messages
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function form_validation($data) {
         global $DB;
@@ -1339,6 +1367,9 @@ class checkmark {
      * This is for handling the teacher interaction with the grading interface
      *
      * @param string $mode Specifies the kind of teacher interaction taking place
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function submissions($mode) {
         global $SESSION, $USER, $OUTPUT, $DB, $PAGE;
@@ -1752,6 +1783,8 @@ class checkmark {
      * @param int[] $selected Array of userids
      * @param mixed $state 1, 0 or null
      * @param bool $mailinfo whether or not the users should be notified
+     * @throws coding_exception
+     * @throws dml_exception
      */
     protected function set_attendance($selected, $state, $mailinfo) {
         global $DB, $USER, $OUTPUT;
@@ -1816,6 +1849,7 @@ class checkmark {
      * @param mixed $grade
      * @param int $gradeitem Which gradeitem to use (CHECKMARK_GRADE_ITEM, CHECKMARK_PRESENTATION_ITEM)
      * @return string User-friendly representation of grade
+     * @throws dml_exception
      */
     public function display_grade($grade, $gradeitem=CHECKMARK_GRADE_ITEM) {
         global $DB;
@@ -1876,10 +1910,12 @@ class checkmark {
      * to process submissions before they are graded
      * This method gets its arguments from the page parameters userid and offset
      * TODO look through this method - this method's buggy, due to submission-table saving it's settings elsewhere now!
-     * TODO 3.4 --> rewrite to use submissionstable-class!
      *
      * @param int $userid
      * @return stdClass|true
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function display_submission($userid) {
         global $CFG, $DB, $PAGE, $OUTPUT, $SESSION;
@@ -1961,7 +1997,7 @@ class checkmark {
                 $mformdata->presentationfeedback = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$userid]->feedback;
             }
         }
-        $mformdata->lateness = $this->display_lateness($submission->timemodified, $user->id);
+        $mformdata->lateness = $this->display_lateness($submission->get_timemodified(), $user->id);
         $mformdata->user = $user;
         $mformdata->userid = $userid;
         $mformdata->cm = $this->cm;
@@ -2006,6 +2042,7 @@ class checkmark {
      * update_submission($submission) - updates the submission for the actual user
      *
      * @param object $submission Submission object to update
+     * @throws dml_exception
      */
     public function update_submission(&$submission) {
         global $USER, $DB;
@@ -2038,6 +2075,9 @@ class checkmark {
      *
      * @param string $message
      * @return bool|void
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function display_submissions($message='') {
         global $SESSION, $OUTPUT, $CFG, $DB, $OUTPUT, $PAGE;
@@ -2268,6 +2308,7 @@ class checkmark {
      * Prints the submission and export tabs
      *
      * @param string $tab currently active tab
+     * @throws coding_exception
      */
     public function print_submission_tabs($tab) {
         global $CFG;
@@ -2289,6 +2330,9 @@ class checkmark {
      * @param int[] $ids (optional) User-IDs to filter for
      * @param bool $dataonly (optional) return raw data-object or HTML table
      * @return array|\mod_checkmark\submissionstable
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function get_print_data($filter, $ids=array(), $dataonly=false) {
         global $DB, $OUTPUT;
@@ -2331,6 +2375,7 @@ class checkmark {
      *
      * @return array print preferences ($filter, $sumabs, $sumrel, $format, $printperpage, $printoptimum, $textsize,
      *                                  $pageorientation, $printheader, $forcesinglelinenames, $zipped)
+     * @throws coding_exception
      */
     public function print_preferences() {
         $updatepref = optional_param('updatepref', 0, PARAM_INT);
@@ -2409,6 +2454,9 @@ class checkmark {
      * Returns export form
      *
      * @return bool|\mod_checkmark\exportform
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function get_export_form() {
         static $mform = false;
@@ -2465,6 +2513,9 @@ class checkmark {
      * Echo the print preview tab including a optional message!
      *
      * @param string $message The message to display in the tab!
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function view_export($message='') {
         global $CFG, $OUTPUT, $PAGE;
@@ -2505,6 +2556,8 @@ class checkmark {
      *                                                the Cancel answer.
      *                                                Can also be a moodle_url or string URL
      * @return string HTML fragment
+     * @throws coding_exception
+     * @throws moodle_exception
      */
     public function confirm($message, $continue, $cancel = null) {
         global $OUTPUT;
@@ -2545,6 +2598,7 @@ class checkmark {
      * Returns applicable filters for this checkmark instance
      *
      * @return array applicable filters
+     * @throws coding_exception
      */
     protected function get_filters() {
         return self::get_possible_filters($this->checkmark->trackattendance);
@@ -2555,6 +2609,7 @@ class checkmark {
      *
      * @param bool $trackattendance whether or not to include filters for attendance
      * @return array all possible filters
+     * @throws coding_exception
      */
     public static function get_possible_filters($trackattendance = false) {
         $filters = [
@@ -2592,6 +2647,8 @@ class checkmark {
      *
      * @param bool|string $template The templates name
      * @return array|void
+     * @throws coding_exception
+     * @throws moodle_exception
      */
     public function quick_export($template = false) {
         global $PAGE;
@@ -2628,6 +2685,8 @@ class checkmark {
      *
      * @param mixed[] $exportdata Returned by table object's get_data()
      * @param string $template (optional) Template name if used
+     * @throws coding_exception
+     * @throws moodle_exception
      */
     protected function exportpdf($exportdata, $template = '') {
         global $PAGE;
@@ -2741,6 +2800,9 @@ class checkmark {
      * Exports a separate PDF for each group collected in a ZIP file
      *
      * @param string|false $template The template name to use or false
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     protected function export_zipped_group_pdfs($template = false) {
         global $USER;
@@ -2870,6 +2932,10 @@ class checkmark {
 
     /**
      * Finaly print the submissions!
+     *
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function submissions_print() {
         global $PAGE;
@@ -2904,6 +2970,8 @@ class checkmark {
      * It gets its data from the submitted form.
      *
      * @return object|bool The updated submission object or false
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function process_feedback() {
         global $CFG, $USER, $DB;
@@ -3057,7 +3125,8 @@ class checkmark {
      * @param int $userid The id of the user whose submission we want or 0 in which case USER->id is used
      * @param bool $createnew (optional) defaults to false. If set to true a new submission object
      *                           will be created in the database
-     * @return object The submission
+     * @return \mod_checkmark\submission The submission
+     * @throws dml_exception
      */
     public function get_submission($userid=0, $createnew=false) {
         global $USER, $DB;
@@ -3065,35 +3134,11 @@ class checkmark {
             $userid = $USER->id;
         }
 
-        $submission = $DB->get_record('checkmark_submissions', array('checkmarkid' => $this->checkmark->id,
-                                                                     'userid'      => $userid));
+        $submission = mod_checkmark\submission::get_submission($this->checkmark->id, $userid);
+
         $examples = $this->get_examples();
         if ($submission || !$createnew) {
-            if ($submission) {
-                if (!$submission->examples = $DB->get_records_sql('
-                    SELECT exampleid AS id, state
-                      FROM {checkmark_checks}
-                     WHERE submissionid = :subid', array('subid' => $submission->id))) {
-                    // Empty submission!
-                    foreach ($examples as $key => $example) {
-                        $submission->examples[$key] = new stdClass();
-                        $submission->examples[$key]->id = $key;
-                        $submission->examples[$key]->name = $examples[$key]->name;
-                        $submission->examples[$key]->shortname = $examples[$key]->shortname;
-                        $submission->examples[$key]->grade = $examples[$key]->grade;
-                        $submission->examples[$key]->state = null;
-                        $DB->insert_record('checkmark_checks', (object)['exampleid'    => $key,
-                                                                        'submissionid' => $submission->id,
-                                                                        'state'        => null]);
-                    }
-                } else {
-                    foreach ($submission->examples as $key => $ex) {
-                        $submission->examples[$key]->name = $examples[$ex->id]->name;
-                        $submission->examples[$key]->shortname = $examples[$ex->id]->shortname;
-                        $submission->examples[$key]->grade = $examples[$ex->id]->grade;
-                    }
-                }
-            }
+
             return $submission;
         }
 
@@ -3109,15 +3154,7 @@ class checkmark {
 
         $submission = $DB->get_record('checkmark_submissions', array('checkmarkid' => $this->checkmark->id,
                                                                      'userid'      => $userid));
-        $submission->examples = $DB->get_records_sql('SELECT exampleid AS id, state
-                                                        FROM {checkmark_checks} chks
-                                                       WHERE submissionid = :subid',
-                                                     array('subid' => $sid));
-        foreach ($submission->examples as $key => $ex) {
-            $submission->examples[$key]->name = $examples[$ex->id]->name;
-            $submission->examples[$key]->shortname = $examples[$ex->id]->shortname;
-            $submission->examples[$key]->grade = $examples[$ex->id]->grade;
-        }
+        $submission->examples = $examples;
 
         return $submission;
     }
@@ -3127,6 +3164,7 @@ class checkmark {
      *
      * @param int $userid The id of the user for whom feedback we want or 0 in which case USER->id is used
      * @return object The feedback
+     * @throws dml_exception
      */
     public function prepare_new_feedback($userid=0) {
         global $USER, $DB;
@@ -3163,6 +3201,7 @@ class checkmark {
      *
      * @param int $userid The id of the user for whom feedback we want or 0 in which case USER->id is used
      * @return object|bool The feedback or false if there is none!
+     * @throws dml_exception
      */
     public function get_feedback($userid=0) {
         global $USER, $DB;
@@ -3234,6 +3273,8 @@ class checkmark {
      *
      * @param object $submission The submission that has changed
      * @return void
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function email_teachers($submission) {
         global $CFG, $DB;
@@ -3285,6 +3326,7 @@ class checkmark {
      *
      * @param object $user
      * @return array Array of users able to grade
+     * @throws coding_exception
      */
     public function get_graders($user) {
         // Get potential graders!
@@ -3333,6 +3375,7 @@ class checkmark {
      *
      * @param object $info The info used by the 'emailteachermail' language string
      * @return string Plain-Text snippet to use in messages
+     * @throws coding_exception
      */
     public function email_teachers_text($info) {
         $posttext  = format_string($this->course->shortname).' -> '.
@@ -3351,6 +3394,7 @@ class checkmark {
      *
      * @param object $info The info used by the 'emailteachermailhtml' language string
      * @return string HTML snippet to use in messages
+     * @throws coding_exception
      */
     public function email_teachers_html($info) {
         global $CFG;
@@ -3373,6 +3417,7 @@ class checkmark {
      * @param int $userid (optional) id of the user. If 0 then $USER->id is used.
      * @param bool $return (optional) defaults to false. If true the html snippet is returned
      * @return string|bool HTML snippet if $return is true or true if $return is anything else
+     * @throws dml_exception
      */
     public function print_user_submission($userid=0, $return=false) {
         global $USER;
@@ -3392,7 +3437,7 @@ class checkmark {
         }
 
         // TODO we use a form here for now, but plan to use a better template in the future!
-        $mform = new MoodleQuickForm('submission', 'get', '', '');
+        /*$mform = new MoodleQuickForm('submission', 'get', '', '');
 
         self::add_submission_elements($mform, $submission);
 
@@ -3401,7 +3446,9 @@ class checkmark {
             return $output;
         }
 
-        echo $output;
+        echo $output;*/
+        echo $submission->render();
+
 
         return true;
     }
@@ -3410,26 +3457,18 @@ class checkmark {
      * Adds the elements representing the submission to the MoodleQuickForm!
      *
      * @param \MoodleQuickForm $mform
-     * @param \stdClass $submission
+     * @param \mod_checkmark\submission $submission
      */
-    public static function add_submission_elements(\MoodleQuickForm &$mform, \stdClass $submission) {
-        if (empty($submission) || !object_property_exists($submission, 'examples') || empty($submission->examples)) {
+    public static function add_submission_elements(\MoodleQuickForm &$mform, \mod_checkmark\submission $submission) {
+        if (empty($submission) || empty($submission->get_examples())) {
             // If there's no submission, we have nothing to do here!
             return;
         }
 
-        foreach ($submission->examples as $example) {
-            switch ($example->grade) {
-                case '1':
-                    $pointsstring = get_string('strpoint', 'checkmark');
-                    break;
-                case '2':
-                default:
-                    $pointsstring = get_string('strpoints', 'checkmark');
-                    break;
-            }
-            $mform->addElement('checkbox', $example->shortname, '', $example->name.' ('.$example->grade.' '.$pointsstring.')');
-            if ($example->state) { // Is it checked?
+        foreach ($submission->get_examples() as $example) {
+            $mform->addElement('checkbox', $example->shortname, '', $example->get_name().' ('.$example->get_grade().' '.
+                    $example->get_pointsstring().')');
+            if ($example->is_checked()) { // Is it checked?
                 $mform->setDefault($example->shortname, 1);
             }
             $mform->freeze($example->shortname);
@@ -3479,6 +3518,7 @@ class checkmark {
      *
      * @param object $grade Grade object
      * @return object with properties ->info and ->time
+     * @throws coding_exception
      */
     public function user_outline($grade) {
 
@@ -3493,6 +3533,9 @@ class checkmark {
      *
      * @param object $user User object
      * @param object $grade (optional) Grade object
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function user_complete($user, $grade=null) {
         global $OUTPUT;
@@ -3507,8 +3550,8 @@ class checkmark {
 
         if ($submission = $this->get_submission($user->id)) {
             echo get_string('lastmodified').': ';
-            echo userdate($submission->timemodified);
-            echo $this->display_lateness($submission->timemodified, $user->id);
+            echo userdate($submission->get_timemodified());
+            echo $this->display_lateness($submission->get_timemodified(), $user->id);
         } else {
             print_string('notsubmittedyet', 'checkmark');
         }

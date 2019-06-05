@@ -1542,11 +1542,13 @@ function checkmark_getsummarystring($submission, $checkmark) {
  * checked examples in this checkmarksubmission
  * checked out X of Y examples (A of B points) graded/not graded
  *
- * @param object $submission Submission object
+ * @param \mod_checkmark\submission $submission Submission object
  * @param object $checkmark Checkmark-Instance object
  * @return object submissions statistics data
+ * @throws dml_exception
+ * @throws coding_exception
  */
-function checkmark_getsubmissionstats($submission, $checkmark) {
+function checkmark_getsubmissionstats(\mod_checkmark\submission $submission, $checkmark) {
     global $DB, $USER;
 
     $checkedexamples = 0;
@@ -1555,11 +1557,11 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
     $maxcheckedgrades = 0;
 
     if ($submission) {
-        $maxcheckedexamples = count($submission->examples);
-        foreach ($submission->examples as $example) {
-            $checkedgrades += $example->state ? $example->grade : 0;
-            $checkedexamples += $example->state ? 1 : 0;
-            $maxcheckedgrades += $example->grade;
+        $maxcheckedexamples = count($submission->get_examples());
+        foreach ($submission->get_examples() as $example) {
+            $checkedgrades += $example->is_checked() ? $example->get_grade() : 0;
+            $checkedexamples += $example->is_checked() ? 1 : 0;
+            $maxcheckedgrades += $example->get_grade();
         }
     } else {
         $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmark->id));
@@ -1578,13 +1580,13 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
     $a->total_grade = $maxcheckedgrades;
     $a->name = $checkmark->name;
 
-    if (empty($submission->userid)) {
+    if (empty($submission->get_userid())) {
         $feedback = false;
         $userid = $USER->id;
     } else {
         $feedback = $DB->get_record('checkmark_feedbacks', array('checkmarkid' => $checkmark->id,
-                                                                 'userid'      => $submission->userid));
-        $userid = $submission->userid;
+                                                                 'userid'      => $submission->get_userid()));
+        $userid = $submission->get_userid();
     }
 
     $gradinginfo = grade_get_grades($checkmark->course, 'mod', 'checkmark', $checkmark->id, $userid);
@@ -1654,6 +1656,9 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
  * @todo The final deprecation of this function will take place in Moodle 3.7 - see MDL-57487.
  * @param int[] $courses Courses to print overview for
  * @param string[] $htmlarray array of html snippets to be printed
+ * @throws coding_exception
+ * @throws dml_exception
+ * @throws moodle_exception
  */
 function checkmark_print_overview($courses, &$htmlarray) {
     global $USER, $CFG, $DB;
