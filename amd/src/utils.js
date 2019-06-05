@@ -21,18 +21,18 @@ define(['jquery', 'core/str'], function ($) {
     Utils.prototype.toggleExamples = function (show) {
         if (show) {
             this.getForAllExamples('false');
-            if (loadedclosed) {
-                location.reload();
-                return;
-            }
+            /*
             $("th.colexample").show();
             $('#showall').hide();
             $('#hideall').show();
+            */
         } else {
             this.getForAllExamples('true');
+            /*
             $("th.colexample").hide();
             $('#showall').show();
             $('#hideall').hide();
+            */
         }
     };
 
@@ -42,6 +42,13 @@ define(['jquery', 'core/str'], function ($) {
             url: baseurl, data: {
                 hide: key,
                 columns: allexamples
+            },
+            statusCode: {
+                200: function () {
+                    if(key === 'false')
+                        console.log("200");
+                        location.reload();
+                }
             }
         });
         // ...$.get(this.getBaseUrl()+"?hide=" + key + "&columns=" + allexamples.join(','));!
@@ -114,8 +121,9 @@ define(['jquery', 'core/str'], function ($) {
                 $('#showall').hide();
             } else {
                 $('#hideall').hide();
-                utils.toggleExamples(false);
-                loadedclosed = true;
+                $("th.colexample").hide();
+                $('#showall').show();
+
             }
             $(document).ready(function () {
                 $('#hideall').click(function () {
