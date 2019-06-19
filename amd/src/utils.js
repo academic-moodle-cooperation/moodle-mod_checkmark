@@ -2,7 +2,7 @@
 // Put this file in path/to/plugin/amd/src
 // You can call it anything you like
 
-define(['jquery', 'core/str'], function ($) {
+define(['jquery', 'core/str'], function ($, str) {
 // Codereview SN: make sure that you don't have double empty lines one after the other!
 
     var Utils = function () {
@@ -57,6 +57,7 @@ define(['jquery', 'core/str'], function ($) {
     // Codereview SN: replace the forEach loopp with a regex that gets the example... name
     // sth like /(example[0-9]+)/;
     // What would be the difference? I need to iterate through the concrete example anyways, don't I?
+    // - Yes
     Utils.prototype.getExampleSelectors = function () {
         var allexamples = [];
 
@@ -75,6 +76,8 @@ define(['jquery', 'core/str'], function ($) {
     };
     Utils.prototype.allExamplesCollapsed = function () {
         var stat = true;
+        // Codereview SN: this can be shortened to:
+        // return $('th.colexample > .commands').length > 0;
         $("th.colexample").each(function () {
             var val = $(this).children('.commands').length;
             if (val > 0) {
@@ -84,7 +87,13 @@ define(['jquery', 'core/str'], function ($) {
         return stat;
     };
     Utils.prototype.getBaseUrl = function () {
+
+        // Codereview SN;
+        // here you can use the global variable M.cfg.wwwroot which is the js equvalent of $CFG->wwwroot in php
+        // and mod/checkmark will not change unless the name of the module changes which is really highly unlikely
+        // var url = M.cfg.wwwroot + "/mod/checkmark/handlehideall.php";
         var url = window.location.href;
+
         url = url.slice(0, url.lastIndexOf('/')) + "/handlehideall.php";
         return url;
     };
@@ -101,21 +110,34 @@ define(['jquery', 'core/str'], function ($) {
                 'mod-checkmark-submissions_r3_c8" ' + 'href="javascript:void(0)"><i class="icon fa fa-minus fa-fw "' +
                 ' id="hidealltoggle" title="Hide" aria-label="Hide"></i></a></div>');
 
-            require(['core/str'], function (str) {
 
+            // Codereview SN: this is the proper way to fetch strings from js
+            var strings = [ {
+                    key: 'showalltoggle',
+                    component: 'checkmark'
+                },{
+                    key: 'hidealltoggle',
+                    component: 'checkmark'
+                }
+            ];
+
+
+            str.get_strings(strings).then(function (results) {
+                //console.log(results);
+                $('#showalltoogle').prop('aria-label', results[0]).prop('title', results[0]);
+                $('#hidealltoogle').prop('aria-label', results[1]).prop('title', results[1]);
+            });
+
+                /*
                 var showalltooglePresent = str.get_string('showalltoogle', 'checkmark', '', '');
                 var hidealltooglePresent = str.get_string('hidealltoogle', 'checkmark', '', '');
 
                 // Question SN: I have tried roughly 5 hours to make this work but couldn't figure out how.
                 $.when(showalltooglePresent).done(function (localizedEditString) {
-                    $('#showalltoogle').prop('aria-label', localizedEditString);
-                    $('#showalltoogle').prop('title', localizedEditString);
                 });
                 $.when(hidealltooglePresent).done(function (localizedEditString) {
-                    $('#hidealltoogle').prop('aria-label', localizedEditString);
-                    $('#hidealltoogle').prop('title', localizedEditString);
-                });
-            });
+                });*/
+
 
             if ($("th.colexample").length > 0 && !utils.allExamplesCollapsed()) {
                 $('#showall').hide();
