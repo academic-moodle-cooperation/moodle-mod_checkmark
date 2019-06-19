@@ -6,6 +6,10 @@ define(['jquery', 'core/str'], function ($, str) {
 // Codereview SN: make sure that you don't have double empty lines one after the other!
 
     var Utils = function () {
+        // Codereview SN: you can set the baseurl here and then use it with this.baseurl
+        // also, you can use the global variable M.cfg.wwwroot which is the js equvalent of $CFG->wwwroot in php
+        // and mod/checkmark will not change unless the name of the module changes which is really highly unlikely
+        //this.baseurl = M.cfg.wwwroot + "/mod/checkmark/handlehideall.php";
     };
     var baseurl;
     var loadedclosed = false;
@@ -89,9 +93,7 @@ define(['jquery', 'core/str'], function ($, str) {
     Utils.prototype.getBaseUrl = function () {
 
         // Codereview SN;
-        // here you can use the global variable M.cfg.wwwroot which is the js equvalent of $CFG->wwwroot in php
-        // and mod/checkmark will not change unless the name of the module changes which is really highly unlikely
-        // var url = M.cfg.wwwroot + "/mod/checkmark/handlehideall.php";
+        // return this.baseurl;
         var url = window.location.href;
 
         url = url.slice(0, url.lastIndexOf('/')) + "/handlehideall.php";
