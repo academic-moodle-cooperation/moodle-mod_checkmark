@@ -48,10 +48,10 @@ class example {
     const CHECKED_OVERWRITTEN = 0x0005;   // Equals: 0b000000000000101!
 
     protected $id = 0;
-    protected $name = '';
-    protected $grade = 0;
+    public $name = '';
+    public $grade = 0;
     protected $prefix = '';
-    protected $state = 0x0000;
+    public $state = 0x0000;
 
     /**
      * example constructor.
@@ -61,7 +61,8 @@ class example {
      * @param string $prefix
      * @param int|null $state
      */
-    public function __construct($name, $grade, $prefix, $state=null) {
+    public function __construct($id, $name, $grade, $prefix, $state=null) {
+        $this->id = $id;
         $this->name = $name;
         $this->grade = $grade;
         $this->prefix = $prefix;
@@ -248,4 +249,15 @@ class example {
     public function is_forced_unchecked() {
         return self::static_is_forced_unchecked($this->state);
     }
+    public static function get_static_pointstring($grade) {
+        switch (grade) {
+            case '1':
+                return get_string('strpoint', 'checkmark');
+                break;
+            case '2':
+            default:
+                return get_string('strpoints', 'checkmark');
+                break;
+        }
+}
 }

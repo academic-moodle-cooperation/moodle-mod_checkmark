@@ -61,7 +61,7 @@ class submission_updated extends \core\event\base {
             'context'       => \context_module::instance($cm->id),
             'relateduserid' => $submission->get_userid(),
         ));
-        $event->add_record_snapshot('checkmark_submissions', $submission);
+        $event->add_record_snapshot('checkmark_submissions', (object) $submission);
         return $event;
     }
 

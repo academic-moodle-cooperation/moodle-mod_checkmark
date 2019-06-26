@@ -23,6 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_checkmark\submission;
+
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->dirroot . '/mod/checkmark/lib.php');
@@ -230,7 +232,7 @@ class checkmark {
         }
         $examples = [];
         foreach ($records as $key => $cur) {
-            $examples[$key] = new \mod_checkmark\example($cur->name, $cur->grade, $exampleprefix);
+            $examples[$key] = new \mod_checkmark\example($key,$cur->name, $cur->grade, $exampleprefix);
         }
 
         return $examples;
@@ -3138,7 +3140,6 @@ class checkmark {
 
         $examples = $this->get_examples();
         if ($submission || !$createnew) {
-
             return $submission;
         }
 
@@ -3154,6 +3155,7 @@ class checkmark {
 
         $submission = $DB->get_record('checkmark_submissions', array('checkmarkid' => $this->checkmark->id,
                                                                      'userid'      => $userid));
+        $submission = new Submission(0,$submission);
         $submission->examples = $examples;
 
         return $submission;

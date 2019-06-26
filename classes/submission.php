@@ -36,17 +36,17 @@ defined('MOODLE_INTERNAL') || die();
  */
 class submission {
     /** @var int */
-    protected $id = 0;
+    public $id = 0;
     /** @var int */
-    protected $checkmarkid = 0;
+    public $checkmarkid = 0;
     /** @var int */
-    protected $userid = null;
+    public $userid = null;
     /** @var example[] */
-    protected $examples = [];
+    public $examples = [];
     /** @var int */
-    protected $timecreated = null;
+    public $timecreated = null;
     /** @var int */
-    protected $timemodified = null;
+    public $timemodified = null;
 
     /**
      * submission constructor.

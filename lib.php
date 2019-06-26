@@ -1548,7 +1548,7 @@ function checkmark_getsummarystring($submission, $checkmark) {
  * @throws dml_exception
  * @throws coding_exception
  */
-function checkmark_getsubmissionstats(\mod_checkmark\submission $submission, $checkmark) {
+function checkmark_getsubmissionstats($submission, $checkmark) {
     global $DB, $USER;
 
     $checkedexamples = 0;
@@ -1559,9 +1559,9 @@ function checkmark_getsubmissionstats(\mod_checkmark\submission $submission, $ch
     if ($submission) {
         $maxcheckedexamples = count($submission->get_examples());
         foreach ($submission->get_examples() as $example) {
-            $checkedgrades += $example->is_checked() ? $example->get_grade() : 0;
-            $checkedexamples += $example->is_checked() ? 1 : 0;
-            $maxcheckedgrades += $example->get_grade();
+            $checkedgrades += \mod_checkmark\example::static_is_checked($example->state) ? $example->grade : 0;
+            $checkedexamples += \mod_checkmark\example::static_is_checked($example->state) ? 1 : 0;
+            $maxcheckedgrades += $example->grade;
         }
     } else {
         $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmark->id));
@@ -1580,7 +1580,7 @@ function checkmark_getsubmissionstats(\mod_checkmark\submission $submission, $ch
     $a->total_grade = $maxcheckedgrades;
     $a->name = $checkmark->name;
 
-    if (empty($submission->get_userid())) {
+    if (getType($submission) === 'boolean' || $submission->get_userid()) {
         $feedback = false;
         $userid = $USER->id;
     } else {
