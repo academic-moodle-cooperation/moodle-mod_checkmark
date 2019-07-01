@@ -65,7 +65,7 @@ class checkmark_submission_form extends moodleform {
                 'data-name' => $example->shortname,
                 'data-example' => $example->id
             ];
-            $mform->addElement('advcheckbox', 'example'.$key, null, $example->name.' ('.$example->grade.' '.$pointsstring.')',
+            $mform->addElement('advcheckbox', $key, null, $example->prefix . $example->name.' ('.$example->grade.' '.$pointsstring.')',
                     $attr, [0, 1]);
         }
 

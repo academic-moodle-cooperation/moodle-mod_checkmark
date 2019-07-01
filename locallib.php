@@ -3155,7 +3155,7 @@ class checkmark {
 
         $submission = $DB->get_record('checkmark_submissions', array('checkmarkid' => $this->checkmark->id,
                                                                      'userid'      => $userid));
-        $submission = new Submission(0,$submission);
+        $submission = new Submission($sid,$submission);
         $submission->examples = $examples;
 
         return $submission;
