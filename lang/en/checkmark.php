@@ -153,6 +153,7 @@ $string['firstexamplenumber'] = 'Number of first example';
 $string['firstexamplenumber_help'] = 'Number of the first example. The following examples get by 1 increased numbers of their predecessor.';
 $string['flexiblenaming'] = 'Individual naming/grading';
 $string['flexiblenaming_help'] = 'If activated individual names and grades are being used for each example.';
+$string['forced'] = 'overwritten by teacher';
 $string['format'] = 'Format';
 $string['grade_automatically'] = 'grade automatically';
 $string['gradesum_mismatch'] = 'The sum of the individual grades won\'t match the chosen total grades ({$a->gradesum}/{$a->maxgrade})!';

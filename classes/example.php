@@ -41,6 +41,8 @@ class example {
 
     const CHECKEDBOX = \checkmark::CHECKEDBOX;
     const EMPTYBOX = \checkmark::EMPTYBOX;
+    const FORCED_EMPTYBOX = \checkmark::FORCED_EMPTYBOX;
+    const FORCED_CHECKEDBOX = \checkmark::FORCED_CHECKEDBOX;
 
     const UNCHECKED = 0x0000;             // Equals: 0b000000000000000!
     const CHECKED = 0x0001;               // Equals: 0b000000000000001!
@@ -139,6 +141,13 @@ class example {
         }
     }
 
+    public function get_forcedstring() {
+        if(self::is_forced()) {
+            return '[' . get_string('forced','checkmark') . ']';
+        }
+        return '';
+    }
+
     public static function from_id($id, $userid=false) {
         global $DB;
 
@@ -181,7 +190,11 @@ class example {
     }
 
     public function get_examplestate_for_export() {
-        if (self::is_checked($this->state)) {
+        if (self::is_forced_checked()) {
+            return self::FORCED_CHECKEDBOX;
+        } else if (self::is_forced_unchecked()) {
+            return self::FORCED_EMPTYBOX;
+        } else if (self::is_checked($this->state)) {
             return self::CHECKEDBOX;
         } else {
             return self::EMPTYBOX;

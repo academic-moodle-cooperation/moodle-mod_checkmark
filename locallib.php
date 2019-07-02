@@ -62,9 +62,13 @@ class checkmark {
     const DELIMITER = ',';
 
     /** EMPTYBOX UTF-8 empty box = &#x2610; = '☐'! */
-    const EMPTYBOX = '&#x2610;';
+    const EMPTYBOX = '';
     /** CHECKEDBOX UTF-8 box with x-mark = &#x2612; = '☒'! */
-    const CHECKEDBOX = '&#x2612;';
+    const CHECKEDBOX = 'X';
+    /** FORCED_EMPTYBOX UTF-8 empty box surrounded by parenthesis = &#x0028;&#x2610;&#x0029; = '(☐)'! */
+    const FORCED_EMPTYBOX = '()';
+    /** FORCED_EMPTYBOX UTF-8 box with x-mark surrounded by parenthesis = &#x0028;&#x2612;&#x0029; = '(☒)'! */
+    const FORCED_CHECKEDBOX = '(X)';
 
     /** @var object */
     public $cm;

@@ -1677,7 +1677,8 @@ class submissionstable extends \table_sql {
                 $example = new example('', 1, '', example::UNCHECKED);
             }
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
-                return $example->is_checked() ? 'X' : ' ';
+                //return $example->is_checked() ? 'X' : ' ';
+                return $example->get_examplestate_for_export();
             } else {
                 return \html_writer::tag('div', $example->print_examplestate(), ['id' => 'ex'.$values->id.'_'.$match[1]]);
             }
