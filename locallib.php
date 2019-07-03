@@ -405,7 +405,7 @@ class checkmark {
                 $submission = $this->get_submission($USER->id, true);
 
                 foreach ($submission->get_examples() as $key => $example) {
-                    $name = 'example'.$key;
+                    $name = $key;
                     if (isset($formdata->{$name}) && ($formdata->{$name} != 0)) {
                         $submission->get_example($key)->set_state(\mod_checkmark\example::CHECKED);
                     } else {
