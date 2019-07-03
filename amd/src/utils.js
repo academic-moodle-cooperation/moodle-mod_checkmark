@@ -55,6 +55,9 @@ define(['jquery', 'core/str'], function ($, str) {
         // Codereview SN: this can be shortened to:
         // Didn't get it to work with this command unfortunately
         // return $('th.colexample > .commands').length > 0;
+        // Re: I just saw that this function actually returns the opposite
+        // so maybe you could try with
+        // return $('th.colexample > .commands').length == 0;
         $("th.colexample").each(function () {
             var val = $(this).children('.commands').length;
             if (val > 0) {
