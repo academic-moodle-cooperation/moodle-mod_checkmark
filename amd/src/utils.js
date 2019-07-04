@@ -1,7 +1,3 @@
-// Codereview SN: Get rid of sample comments from tutorials ;)
-// Put this file in path/to/plugin/amd/src
-// You can call it anything you like
-
 define(['jquery', 'core/str'], function ($, str) {
 
     var Utils = function () {
@@ -26,9 +22,7 @@ define(['jquery', 'core/str'], function ($, str) {
             },
             statusCode: {
                 200: function () {
-                    if(key === 'false') {
                         location.reload();
-                    }
                 }
             }
         });
@@ -47,24 +41,10 @@ define(['jquery', 'core/str'], function ($, str) {
                 }
             });
         });
-
         return allexamples;
     };
     Utils.prototype.allExamplesCollapsed = function () {
-        var stat = true;
-        // Codereview SN: this can be shortened to:
-        // Didn't get it to work with this command unfortunately
-        // return $('th.colexample > .commands').length > 0;
-        // Re: I just saw that this function actually returns the opposite
-        // so maybe you could try with
-        // return $('th.colexample > .commands').length == 0;
-        $("th.colexample").each(function () {
-            var val = $(this).children('.commands').length;
-            if (val > 0) {
-                stat = false;
-            }
-        });
-        return stat;
+        return $('th.colexample > .commands').length == 0;
     };
     Utils.prototype.getBaseUrl = function () {
         return this.baseurl;
@@ -97,7 +77,6 @@ define(['jquery', 'core/str'], function ($, str) {
             ];
 
             str.get_strings(strings).then(function (results) {
-                //console.log(results);
                 $('#showalltoogle').prop('aria-label', results[0]).prop('title', results[0]);
                 $('#hidealltoogle').prop('aria-label', results[1]).prop('title', results[1]);
                 $('#showalllabel').text(results[2]);
