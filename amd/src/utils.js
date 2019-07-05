@@ -58,11 +58,11 @@ define(['jquery', 'core/str'], function ($, str) {
                 'aria-controls="mod-checkmark-submissions_r0_c3 mod-checkmark-submissions_r1_c3 mod-checkmark-submissions_r2_c3 ' +
                 'mod-checkmark-submissions_r3_c3" ' + 'href="javascript:void(0)">' +
                 '<i class="icon fa fa-plus fa-fw " id="showallcontainer" title="Show" aria-label="Show"></i></a></div>');
-            $("th.colexample:eq(" + 0 + ")").prepend('<div id="showallcontainer" style="position: absolute; margin-top: -25px">' +
+            $("th.colexample:eq(" + 0 + ")").prepend('<div id="showallcontainer" style="position: absolute;">' +
                 '<span id="hidealllabel" style="margin-right: 5px "></span><a title="Hide All" id="hideall" aria-expanded="true" ' +
                 'aria-controls="mod-checkmark-submissions_r0_c8 mod-checkmark-submissions_r1_c8 mod-checkmark-submissions_r2_c8 ' +
                 'mod-checkmark-submissions_r3_c8" ' + 'href="javascript:void(0)"><i class="icon fa fa-minus fa-fw "' +
-                ' id="hidealltoggle" title="Hide" aria-label="Hide"></i></a></div>');
+                ' id="hidealltoggle" title="Hide" aria-label="Hide"></i></a></div><div>&nbsp;</div>');
 
             var strings = [ {
                     key: 'showalltoggle',
