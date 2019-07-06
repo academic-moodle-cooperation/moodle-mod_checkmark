@@ -30,7 +30,6 @@ require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->libdir.'/gradelib.php');
 require_once($CFG->dirroot.'/mod/checkmark/submission_form.php');
 require_once($CFG->dirroot.'/mod/checkmark/grading_form.php');
-$PAGE->requires->js_call_amd('mod_checkmark/utils', 'init');
 
 /**
  * This class provides all the basic functionality for an checkmark-module

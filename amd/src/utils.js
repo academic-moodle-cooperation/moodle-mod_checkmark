@@ -22,7 +22,12 @@ define(['jquery', 'core/str'], function ($, str) {
             },
             statusCode: {
                 200: function () {
-                        location.reload();
+                    var url = window.location.href;
+                    var lastParam = url.substring(url.lastIndexOf('&'));
+                    if(lastParam.startsWith('&tshow') || lastParam.startsWith('&thide')) {
+                        url = url.substring(0,url.lastIndexOf('&'));
+                    }
+                    window.location.replace(url);
                 }
             }
         });

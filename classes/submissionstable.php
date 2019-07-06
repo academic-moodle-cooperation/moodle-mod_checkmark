@@ -139,7 +139,8 @@ class submissionstable extends \table_sql {
      * @throws moodle_exception
      */
     public function __construct($uniqueid, $checkmarkorcmid = null) {
-        global $CFG, $DB;
+        global $CFG, $DB, $PAGE;
+        $PAGE->requires->js_call_amd('mod_checkmark/utils', 'init');
 
         parent::__construct($uniqueid);
 
