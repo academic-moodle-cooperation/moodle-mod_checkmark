@@ -3453,10 +3453,7 @@ class checkmark {
         }
 
         echo $output;*/
-        echo $submission->render();
-
-
-        return true;
+        return $submission->render();
     }
 
     /**

@@ -66,6 +66,8 @@ class submission {
             }
             $this->checkmarkid = $submission->checkmarkid;
             $this->userid = $submission->userid;
+            $this->timecreated = $submission->timecreated;
+            $this->timemodified = $submission->timemodified;
 
             $this->examples = \checkmark::get_examples_static($this->checkmarkid);
 
