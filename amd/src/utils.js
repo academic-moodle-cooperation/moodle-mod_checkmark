@@ -16,7 +16,8 @@ define(['jquery', 'core/str'], function ($, str) {
     Utils.prototype.getForAllExamples = function (key) {
         var allexamples = this.getExampleSelectors();
         $.ajax({
-            url: baseurl, data: {
+            url: baseurl,
+            data: {
                 hide: key,
                 columns: allexamples
             },
@@ -29,10 +30,11 @@ define(['jquery', 'core/str'], function ($, str) {
                         removed from the url
                      */
 
-                    url = url.replace(/thide=[a-z0-9]+/, '') // Removes thide=....3242 !
-                        .replace(/tshow=[a-z0-9]+/, '') // Removes tshow=....3432 !
-                        .replace(/\?&/, '?') // Removes accidentally left ?&..
-                        .replace(/&&/, '&'); // Removes accidentally left &&..
+                    url = url.replace(/thide=[a-z0-9]+/, '') /* Removes thide=....3242 !*/
+                             .replace(/tshow=[a-z0-9]+/, '') /* Removes tshow=....3432 ! */
+                             .replace(/\?&/, '?') /* Removes accidentally left ?&.. */
+                             .replace(/&&/, '&') /* Removes accidentally left &&.. */
+                             .replace(/&$/, ''); /* Removes trailing &.. */
                     /*var lastParam = url.substring(url.lastIndexOf('&'));
                     if(lastParam.startsWith('&tshow') || lastParam.startsWith('&thide')) {
                         url = url.substring(0,url.lastIndexOf('&'));
@@ -59,7 +61,7 @@ define(['jquery', 'core/str'], function ($, str) {
         return allexamples;
     };
     Utils.prototype.allExamplesCollapsed = function () {
-        return $('th.colexample > .commands').length == 0;
+        return $('th.colexample > .commands').length === 0;
     };
     Utils.prototype.getBaseUrl = function () {
         return this.baseurl;
@@ -92,26 +94,28 @@ define(['jquery', 'core/str'], function ($, str) {
             the whole thing
 
             also,
-            $("th.colexample:eq(" + 0 + ")") is equal to $('th.colexample:first-child')
+            $("th.colexample:eq(" + 0 + ")") is equal to $('th.colexample:eq(0)')
+
+            also, is there a specific reason why the "hideallcontainer" contains the button which shows all examples,
+            and "showallcontainer" contains the button which hides all examples?
+
 
             New code
             */
+            var showallContainer = '<div id="showallcontainer">';
+            showallContainer += '<span id="showalllabel" style="margin-right: 5px"></span>';
+            showallContainer += '<a id="showall" href="javascript:void(0)">' +
+                                '<i class="icon fa fa-plus fa-fw " id="showalltoggle"></i></a>';
+            showallContainer += '</div>';
+            $('th.timesubmitted').prepend(showallContainer);
+
             var hideallContainer = '<div id="hideallcontainer">';
-            hideallContainer += '<span id="showalllabel" style="margin-right: 5px"></span>';
-            hideallContainer += '<a id="showall" href="javascript:void(0)">' +
-                                '<i class="icon fa fa-plus fa-fw " id="showallcontainer"></i></a>';
+            hideallContainer += '<span id="hidealllabel" style="margin-right: 5px "></span>';
+            hideallContainer += '<a id="hideall" href="javascript:void(0);">';
+            hideallContainer += '<i class="icon fa fa-minus fa-fw " id="hidealltoggle"></i></a>';
             hideallContainer += '</div>';
 
-            $('th.timesubmitted').prepend(hideallContainer);
-
-            var showallContainer = '<div id="showallcontainer" style="position: absolute;">';
-            showallContainer += '<span id="hidealllabel" style="margin-right: 5px "></span>';
-            showallContainer += '<a id="hideall" href="javascript:void(0);">';
-            showallContainer += '<i class="icon fa fa-minus fa-fw " id="hidealltoggle"></i></a.';
-            showallContainer += '</div>';
-
-            $('th.colexample:first-child').prepend(showallContainer);
-
+            $('th.colexample:eq(0)').prepend(hideallContainer);
             var strings = [ {
                     key: 'showalltoggle',
                     component: 'checkmark'
@@ -125,19 +129,22 @@ define(['jquery', 'core/str'], function ($, str) {
             ];
 
             str.get_strings(strings).then(function (results) {
-                $('#showalltoogle').prop('aria-label', results[0]).prop('title', results[0]);
-                $('#hidealltoogle').prop('aria-label', results[1]).prop('title', results[1]);
+                $('#showall').prop('aria-label', results[0]).prop('title', results[0]);
+                $('#hideall').prop('aria-label', results[1]).prop('title', results[1]);
                 $('#showalllabel').text(results[2]);
                 $('#hidealllabel').text(results[2]);
             });
 
             if ($("th.colexample").length > 0 && !utils.allExamplesCollapsed()) {
-                $('#hideallcontainer').hide();
+                $('#hideallcontainer').show();
+                $('#showallcontainer').hide();
+                console.log('test');
             } else {
                 $('#hideallcontainer').hide();
                 $("th.colexample").hide();
-                $('#hideallcontainer').show();
+                $('#showallcontainer').show();
             }
+
             $(document).ready(function () {
                 $('#hideall').click(function () {
                     utils.toggleExamples(false);
