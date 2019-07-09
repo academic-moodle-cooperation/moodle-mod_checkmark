@@ -142,7 +142,12 @@ class example {
     }
 
     public function get_forcedstring() {
-        if(self::is_forced()) {
+        /*
+         * Codereview SN;
+         * same thing here, self:: vs $this
+         */
+        //if(self::is_forced()) {
+        if($this->is_forced()) {
             return '[' . get_string('forced','checkmark') . ']';
         }
         return '';
@@ -190,11 +195,17 @@ class example {
     }
 
     public function get_examplestate_for_export() {
-        if (self::is_forced_checked()) {
+        /*
+         * Codereview SN;
+         * make sure you differentiate between self and $this
+         * self:: is used to access static variables and functions
+         * $this is used to access the current class instance variables and functions
+         */
+        if ($this->is_forced_checked()) {
             return self::FORCED_CHECKEDBOX;
-        } else if (self::is_forced_unchecked()) {
+        } else if ($this->is_forced_unchecked()) {
             return self::FORCED_EMPTYBOX;
-        } else if (self::is_checked($this->state)) {
+        } else if ($this->is_checked()) {
             return self::CHECKEDBOX;
         } else {
             return self::EMPTYBOX;
