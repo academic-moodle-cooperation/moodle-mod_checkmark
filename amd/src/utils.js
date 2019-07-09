@@ -23,10 +23,20 @@ define(['jquery', 'core/str'], function ($, str) {
             statusCode: {
                 200: function () {
                     var url = window.location.href;
-                    var lastParam = url.substring(url.lastIndexOf('&'));
+                    /*
+                    Codereview SN:
+                        the problem here is that if thide or tshow is not the last parameter, they won't be
+                        removed from the url
+                     */
+
+                    url = url.replace(/thide=[a-z0-9]+/, '') // Removes thide=....3242 !
+                        .replace(/tshow=[a-z0-9]+/, '') // Removes tshow=....3432 !
+                        .replace(/\?&/, '?') // Removes accidentally left ?&..
+                        .replace(/&&/, '&'); // Removes accidentally left &&..
+                    /*var lastParam = url.substring(url.lastIndexOf('&'));
                     if(lastParam.startsWith('&tshow') || lastParam.startsWith('&thide')) {
                         url = url.substring(0,url.lastIndexOf('&'));
-                    }
+                    }*/
                     window.location.replace(url);
                 }
             }
@@ -58,6 +68,12 @@ define(['jquery', 'core/str'], function ($, str) {
         init: function () {
             var utils = new Utils();
 
+
+            /*
+            Codereview SN;
+                here you don't need the aria-controls, aria-label, title, and aria-expanded attributes
+
+            old code:
             $("th.timesubmitted").prepend('<div id="hideallcontainer"><span id="showalllabel" style="margin-right: 5px">' +
                 '</span><a title="Show All" id="showall" aria-expanded="false" ' +
                 'aria-controls="mod-checkmark-submissions_r0_c3 mod-checkmark-submissions_r1_c3 mod-checkmark-submissions_r2_c3 ' +
@@ -68,6 +84,33 @@ define(['jquery', 'core/str'], function ($, str) {
                 'aria-controls="mod-checkmark-submissions_r0_c8 mod-checkmark-submissions_r1_c8 mod-checkmark-submissions_r2_c8 ' +
                 'mod-checkmark-submissions_r3_c8" ' + 'href="javascript:void(0)"><i class="icon fa fa-minus fa-fw "' +
                 ' id="hidealltoggle" title="Hide" aria-label="Hide"></i></a></div><div>&nbsp;</div>');
+
+            Aria-.. attributes are used for accessibility purposes, and here they just take too much space
+            title and other strings - you are filling them up when the strings are fetched anyway
+            Ideally, mustache templates should be used when you have to render html. If not, at least try to organize
+            the html a little bit more so that it's easier to see what is being rendered without having to read through
+            the whole thing
+
+            also,
+            $("th.colexample:eq(" + 0 + ")") is equal to $('th.colexample:first-child')
+
+            New code
+            */
+            var hideallContainer = '<div id="hideallcontainer">';
+            hideallContainer += '<span id="showalllabel" style="margin-right: 5px"></span>';
+            hideallContainer += '<a id="showall" href="javascript:void(0)">' +
+                                '<i class="icon fa fa-plus fa-fw " id="showallcontainer"></i></a>';
+            hideallContainer += '</div>';
+
+            $('th.timesubmitted').prepend(hideallContainer);
+
+            var showallContainer = '<div id="showallcontainer" style="position: absolute;">';
+            showallContainer += '<span id="hidealllabel" style="margin-right: 5px "></span>';
+            showallContainer += '<a id="hideall" href="javascript:void(0);">';
+            showallContainer += '<i class="icon fa fa-minus fa-fw " id="hidealltoggle"></i></a.';
+            showallContainer += '</div>';
+
+            $('th.colexample:first-child').prepend(showallContainer);
 
             var strings = [ {
                     key: 'showalltoggle',
