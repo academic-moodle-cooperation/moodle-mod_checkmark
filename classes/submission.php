@@ -111,12 +111,6 @@ class submission {
     }
 
 
-    /*
-     * Codereview SN:
-     * instead of making all the variables public (generally not a very good practice) just for the event snapshot,
-     * you can make a function which exports only the relevant variables in a
-     * new object
-     */
     public function export_for_snapshot() {
         $record = new \stdClass;
         $record->id = $this->id;

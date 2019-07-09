@@ -61,10 +61,6 @@ class submission_updated extends \core\event\base {
             'context'       => \context_module::instance($cm->id),
             'relateduserid' => $submission->get_userid(),
         ));
-        /*
-         * Codereview SN;
-         * here you use the new function and not the "almost uncontrollable" (object)(array)$submission ;)
-         */
         $event->add_record_snapshot('checkmark_submissions', $submission->export_for_snapshot());
         return $event;
     }
