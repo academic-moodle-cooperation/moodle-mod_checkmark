@@ -24,21 +24,11 @@ define(['jquery', 'core/str'], function ($, str) {
             statusCode: {
                 200: function () {
                     var url = window.location.href;
-                    /*
-                    Codereview SN:
-                        the problem here is that if thide or tshow is not the last parameter, they won't be
-                        removed from the url
-                     */
-
                     url = url.replace(/thide=[a-z0-9]+/, '') /* Removes thide=....3242 !*/
                              .replace(/tshow=[a-z0-9]+/, '') /* Removes tshow=....3432 ! */
                              .replace(/\?&/, '?') /* Removes accidentally left ?&.. */
                              .replace(/&&/, '&') /* Removes accidentally left &&.. */
                              .replace(/&$/, ''); /* Removes trailing &.. */
-                    /*var lastParam = url.substring(url.lastIndexOf('&'));
-                    if(lastParam.startsWith('&tshow') || lastParam.startsWith('&thide')) {
-                        url = url.substring(0,url.lastIndexOf('&'));
-                    }*/
                     window.location.replace(url);
                 }
             }
@@ -97,7 +87,8 @@ define(['jquery', 'core/str'], function ($, str) {
             $("th.colexample:eq(" + 0 + ")") is equal to $('th.colexample:eq(0)')
 
             also, is there a specific reason why the "hideallcontainer" contains the button which shows all examples,
-            and "showallcontainer" contains the button which hides all examples?
+            and "showallcontainer" contains the button which hides all examples?.
+            DB: Not really. I guess I just confused the names. Thanks for correcting it ;)
 
 
             New code
@@ -109,11 +100,16 @@ define(['jquery', 'core/str'], function ($, str) {
             showallContainer += '</div>';
             $('th.timesubmitted').prepend(showallContainer);
 
-            var hideallContainer = '<div id="hideallcontainer">';
-            hideallContainer += '<span id="hidealllabel" style="margin-right: 5px "></span>';
+
+            /*
+            The additional div and position: absolute is necessary so the tag is not becoming
+            part of the flow of the example column thus making it bigger than the others
+             */
+            var hideallContainer = '<div id="hideallcontainer" style="position: absolute">';
+            hideallContainer += '<span id="hidealllabel" style="margin-right: 5px"></span>';
             hideallContainer += '<a id="hideall" href="javascript:void(0);">';
             hideallContainer += '<i class="icon fa fa-minus fa-fw " id="hidealltoggle"></i></a>';
-            hideallContainer += '</div>';
+            hideallContainer += '</div><div>&nbsp;</div>';
 
             $('th.colexample:eq(0)').prepend(hideallContainer);
             var strings = [ {
@@ -138,7 +134,6 @@ define(['jquery', 'core/str'], function ($, str) {
             if ($("th.colexample").length > 0 && !utils.allExamplesCollapsed()) {
                 $('#hideallcontainer').show();
                 $('#showallcontainer').hide();
-                console.log('test');
             } else {
                 $('#hideallcontainer').hide();
                 $("th.colexample").hide();
