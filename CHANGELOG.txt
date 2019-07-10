@@ -1,6 +1,9 @@
 CHANGELOG
 =========
 
+NEXT VERSION
+------------------
+* [FEATURE] #5720 Add default values for availability in site-administration
 * [FEATURE] #5729 Make all examples in submissions and export collapsible at once
 
 3.6.0 (2019-01-20)
