@@ -139,7 +139,8 @@ class submissionstable extends \table_sql {
      * @throws moodle_exception
      */
     public function __construct($uniqueid, $checkmarkorcmid = null) {
-        global $CFG, $DB;
+        global $CFG, $DB, $PAGE;
+        $PAGE->requires->js_call_amd('mod_checkmark/utils', 'init');
 
         parent::__construct($uniqueid);
 
@@ -320,6 +321,8 @@ class submissionstable extends \table_sql {
      */
     private function addexamplecolumns(&$tablecolumns, &$tableheaders, &$helpicons) {
         // Dynamically add examples!
+        $middle = count($this->checkmark->checkmark->examples) / 2;
+        $count = 0;
         foreach ($this->checkmark->checkmark->examples as $key => $example) {
             $width = strlen($example->shortname) + strlen($example->grade) + 4;
             $tableheaders[] = $example->shortname." (".$example->grade.'P)';
@@ -328,6 +331,7 @@ class submissionstable extends \table_sql {
             $this->columnformat['example'.$key] = ['align' => 'C'];
             $helpicons[] = null;
         }
+
         $this->add_colgroup(count($this->checkmark->checkmark->examples), 'examples');
 
     }
@@ -454,7 +458,7 @@ class submissionstable extends \table_sql {
         $table->column_class('timesubmitted', 'timesubmitted');
 
         foreach ($table->checkmark->checkmark->examples as $key => $example) {
-            $table->column_class('example'.$key, 'example'.$key);
+            $table->column_class('example'.$key, 'example'.$key . ' colexample');
             $table->no_sorting('example'.$key);
         }
 
@@ -758,7 +762,7 @@ class submissionstable extends \table_sql {
         $table->column_class('timesubmitted', 'timesubmitted');
 
         foreach ($table->checkmark->checkmark->examples as $key => $example) {
-            $table->column_class('example'.$key, 'example'.$key);
+            $table->column_class('example'.$key, 'example'.$key . ' colexample');
             $table->no_sorting('example'.$key);
         }
 
@@ -1078,7 +1082,7 @@ class submissionstable extends \table_sql {
     /**
      * This function is called for each data row to allow processing of the
      * user picture.
-     *
+     *\
      * @param object $values Contains object with all the values of record.
      * @return string Return user picture markup.
      */

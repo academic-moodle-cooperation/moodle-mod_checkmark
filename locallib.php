@@ -2184,8 +2184,8 @@ class checkmark {
             $table->out($total < $perpage ? $total : $perpage, true);
             $tablehtml = ob_get_contents();
             ob_end_clean();
+            //$mform->addElement('button','showexamples','Display examples in table');
             $mform->addElement('html', $tablehtml);
-
             $mform->addElement('advcheckbox', 'mailinfo', get_string('enablenotification', 'checkmark'));
             $mform->addHelpButton('mailinfo', 'enablenotification', 'checkmark');
             $mailinfopref = false;
