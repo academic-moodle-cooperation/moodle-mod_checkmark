@@ -1,10 +1,15 @@
 CHANGELOG
 =========
 
-NEXT VERSION
+3.7.0 (2019-07-10)
 ------------------
-* [FEATURE] #5720 Add default values for availability in site-administration
+* [FEATURE] #6146 Improve layout of checks for easier readability
+* [FEATURE] #6147 Enable display of overwritten checks for upcoming overwrite checks feature (#5271)
 * [FEATURE] #5729 Make all examples in submissions and export collapsible at once
+* [FEATURE] #5720 Add default values for availability in site-administration
+* [FEATURE] #6129 Add support for editdates plugin
+* [FEATURE] #5296 Set field type of cells containing numeric values in .xlsx and .ods to number
+
 
 3.6.0 (2019-01-20)
 ------------------
