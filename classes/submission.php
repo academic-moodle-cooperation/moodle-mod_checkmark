@@ -122,6 +122,10 @@ class submission {
         return $this->examples[$name];
     }
 
+    public function overwrite_examples($overwritten_examples) {
+
+    }
+
     /**
      * @return example[]
      */

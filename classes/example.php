@@ -121,6 +121,9 @@ class example {
         $this->state = $state;
     }
 
+    public function get_id() {
+        return $this->id;
+    }
     public function get_name() {
         return $this->prefix . $this->name;
     }
@@ -143,9 +146,12 @@ class example {
 
     public function get_forcedstring() {
         if(self::is_forced()) {
-            return '[' . get_string('forced','checkmark') . ']';
+            return $this->get_forcedstring_unconditionally();
         }
         return '';
+    }
+    public function get_forcedstring_unconditionally() {
+        return '[' . get_string('forced','checkmark') . ']';
     }
 
     public static function from_id($id, $userid=false) {
@@ -187,6 +193,28 @@ class example {
         global $OUTPUT;
 
         return $OUTPUT->render_from_template('mod_checkmark/example', $this);
+    }
+
+    public function print_forced_hint() {
+        global $OUTPUT;
+
+        return $OUTPUT->render_from_template('mod_checkmark/overwriteinfo', $this);
+    }
+
+    public function overwrite_example($overwritten_example_state) {
+        if($this->state == self::CHECKED && $overwritten_example_state== self::UNCHECKED) {
+            $this->state = self::CHECKED_OVERWRITTEN;
+        }
+        else if($this->state == self::UNCHECKED && $overwritten_example_state == self::CHECKED) {
+            $this->state = self::UNCHECKED_OVERWRITTEN;
+        }
+        else if($this->state == self::CHECKED_OVERWRITTEN && $overwritten_example_state == self::CHECKED) {
+            $this->state = self::CHECKED;
+        }
+        else if($this->state == self::UNCHECKED_OVERWRITTEN && $overwritten_example_state == self::UNCHECKED) {
+            $this->state = self::UNCHECKED;
+        }
+        return;
     }
 
     public function get_examplestate_for_export() {

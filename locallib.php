@@ -1398,6 +1398,8 @@ class checkmark {
             $mode = 'saveandprevious';
         } else if (optional_param('bulk', null, PARAM_BOOL)) {
             $mode = 'bulk';
+        } else if(optional_param('overwritechecks',null,PARAM_BOOL)) {
+            $mode = 'overwritechecks';
         }
 
         // This is no security check, this just tells us if there is posted data!
@@ -1766,11 +1768,29 @@ class checkmark {
                 $id = required_param('id', PARAM_INT);
                 redirect('submissions.php?id='.$id.'&userid='. $previousid . '&filter='.$filter.'&mode=single');
                 break;
-
-            case 'singlenosave':
+            case 'overwritechecks':
+                //todo Implement this
+                echo 'I will implement this very soon';
                 $userid = required_param('userid', PARAM_INT);
+                if ($formdata = data_submitted() and confirm_sesskey()) {
+
+                    // Create the submission if needed & return its id!
+                    $submission = $this->get_submission($userid, false);
+
+                    foreach ($submission->get_examples() as $key => $example) {
+                        $name = $key;
+                        if (isset($formdata->{$name}) && ($formdata->{$name} != 0)) {
+                            $submission->get_example($key)->overwrite_example(\mod_checkmark\example::CHECKED);
+                        } else {
+                            $submission->get_example($key)->overwrite_example(\mod_checkmark\example::UNCHECKED);
+                        }
+                    }
+                }
+                $this->update_submission($submission);
                 $this->display_submission($userid);
                 break;
+
+            case 'singlenosave':
 
             case 'print':
                 $userid = required_param('userid', PARAM_INT);
@@ -2071,7 +2091,7 @@ class checkmark {
                 $DB->update_record('checkmark_checks', $stateupdate);
             }
         }
-        $submission = $this->get_submission($USER->id);
+        //$submission = $this->get_submission($USER->id);
 
         $this->update_grade($submission);
     }
@@ -3456,27 +3476,6 @@ class checkmark {
         return $submission->render();
     }
 
-    /**
-     * Adds the elements representing the submission to the MoodleQuickForm!
-     *
-     * @param \MoodleQuickForm $mform
-     * @param \mod_checkmark\submission $submission
-     */
-    public static function add_submission_elements(\MoodleQuickForm &$mform, \mod_checkmark\submission $submission) {
-        if (empty($submission) || empty($submission->get_examples())) {
-            // If there's no submission, we have nothing to do here!
-            return;
-        }
-
-        foreach ($submission->get_examples() as $example) {
-            $mform->addElement('checkbox', $example->shortname, '', $example->get_name().' ('.$example->get_grade().' '.
-                    $example->get_pointsstring().')');
-            if ($example->is_checked()) { // Is it checked?
-                $mform->setDefault($example->shortname, 1);
-            }
-            $mform->freeze($example->shortname);
-        }
-    }
 
     /**
      * Returns true if the student is allowed to submit
