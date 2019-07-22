@@ -797,7 +797,6 @@ class MTablePDF extends \pdf {
         array_push($textonlycolumns, "fullname");
 
         // Translate all user fields keys to the local language used in the moodle instance for comparison with headers
-        // Codereview SN: here you can use foreach instead of for($i = 0; $i < sizeof(..)..
         $stringmanager = get_string_manager();
         foreach ($textonlycolumns as $key => $value) {
             if ($stringmanager->string_exists($value, 'moodle')) {

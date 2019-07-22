@@ -145,8 +145,8 @@ class example {
     }
 
     public function get_forcedstring() {
-        if(self::is_forced()) {
-            return $this->get_forcedstring_unconditionally();
+        if($this->is_forced()) {
+            return '[' . get_string('forced','checkmark') . ']';
         }
         return '';
     }
@@ -218,11 +218,11 @@ class example {
     }
 
     public function get_examplestate_for_export() {
-        if (self::is_forced_checked()) {
+        if ($this->is_forced_checked()) {
             return self::FORCED_CHECKEDBOX;
-        } else if (self::is_forced_unchecked()) {
+        } else if ($this->is_forced_unchecked()) {
             return self::FORCED_EMPTYBOX;
-        } else if (self::is_checked($this->state)) {
+        } else if ($this->is_checked()) {
             return self::CHECKEDBOX;
         } else {
             return self::EMPTYBOX;

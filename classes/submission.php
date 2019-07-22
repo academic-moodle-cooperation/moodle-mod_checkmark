@@ -110,6 +110,18 @@ class submission {
         return new self($submission->id, $submission);
     }
 
+
+    public function export_for_snapshot() {
+        $record = new \stdClass;
+        $record->id = $this->id;
+        $record->checkmarkid = $this->checkmarkid;
+        $record->userid = $this->userid;
+        $record->examples = $this->examples;
+        $record->timecreated = $this->timecreated;
+        $record->timemodified = $this->timemodified;
+        return $record;
+    }
+
     /**
      * @param $name
      * @return false|example
