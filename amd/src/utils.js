@@ -93,12 +93,14 @@ define(['jquery', 'core/str'], function ($, str) {
 
             New code
             */
-            var showallContainer = '<div id="showallcontainer">';
+            var showallContainer = '<th><div id="showallcontainer">';
             showallContainer += '<span id="showalllabel" style="margin-right: 5px"></span>';
             showallContainer += '<a id="showall" href="javascript:void(0)">' +
-                                '<i class="icon fa fa-plus fa-fw " id="showalltoggle"></i></a>';
-            showallContainer += '</div>';
-            $('th.timesubmitted').prepend(showallContainer);
+                '<i class="icon fa fa-plus fa-fw " id="showalltoggle"></i></a>';
+            showallContainer += '</div></th>';
+            $('th.timesubmitted').after(showallContainer);
+            var showallPlaceholder = '<td></td>';
+            $('td.timesubmitted').after(showallPlaceholder);
 
 
             /*
@@ -136,7 +138,7 @@ define(['jquery', 'core/str'], function ($, str) {
                 $('#showallcontainer').hide();
             } else {
                 $('#hideallcontainer').hide();
-                $("th.colexample").hide();
+                $(".colexample").hide();
                 $('#showallcontainer').show();
             }
 
