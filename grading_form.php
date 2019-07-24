@@ -426,7 +426,7 @@ class mod_checkmark_grading_form extends moodleform {
         foreach ($submission->get_examples() as $example) {
             $examplearray=array();
             $examplearray[] =& $mform->createElement('advcheckbox', $example->get_id(), '', $example->get_name().' ('.$example->get_grade().' '.
-                    $example->get_pointsstring().')',array('class'=>'examplecheck'));
+                    $example->get_pointsstring().')',array('class'=>'examplecheck $' . $example->get_grade()));
             $examplearray[] =& $mform->createElement('html', $example->print_forced_hint());
             $mform->addGroup($examplearray, 'examplearr', '', array(' '), false);
             /*
@@ -438,11 +438,13 @@ class mod_checkmark_grading_form extends moodleform {
             }
             //$mform->freeze($example->shortname);
         }
+        /*
         $buttonarray = array();
         $buttonarray[] = &$mform->createElement('submit', 'overwritechecks',
                 get_string('savechanges'));
         $buttonarray[] = &$mform->createElement('reset', 'resetbutton', get_string('revert'),
                 array('class' => 'btn btn-secondary'));
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        */
     }
 }

@@ -1409,6 +1409,22 @@ class checkmark {
 
         switch ($mode) {
             case 'grade':                       // We are in a main window grading!
+                $userid = required_param('userid', PARAM_INT);
+                if ($formdata = data_submitted() and confirm_sesskey()) {
+
+                    // Create the submission if needed & return its id!
+                    $submission = $this->get_submission($userid, false);
+
+                    foreach ($submission->get_examples() as $key => $example) {
+                        $name = $key;
+                        if (isset($formdata->{$name}) && ($formdata->{$name} != 0)) {
+                            $submission->get_example($key)->overwrite_example(\mod_checkmark\example::CHECKED);
+                        } else {
+                            $submission->get_example($key)->overwrite_example(\mod_checkmark\example::UNCHECKED);
+                        }
+                    }
+                }
+                $this->update_submission($submission);
                 if ($this->process_feedback()) {
                     $this->display_submissions(get_string('changessaved'));
                 } else {

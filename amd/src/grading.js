@@ -20,7 +20,39 @@ define(['jquery', 'core/str'], function ($, str) {
     Grading.prototype.resetOverwrite = function () {
         console.log(this.originalState);
     };
+    
+    Grading.prototype.calculateSum = function () {
+        var sum = 0;
+        $('input.examplecheck').each(function (index) {
+            if($(this).is(':checked')) {
+                var classname = $(this).attr('class');
+                var classes = classname.split(' ');
+                classes.forEach(function (value) {
+                    if (value.startsWith("$")) {
+                        sum += parseFloat(value.substring(1));
+                    }
+                });
+            }
+        });
+        console.log(sum);
+        return sum;
+    };
+    Grading.prototype.setPoints = function (points) {
+        $('#id_xgrade').val(points);
+        var strings = [
+            {
+                key: 'strautograded',
+                component: 'checkmark'
+            },
+        ];
+        str.get_strings(strings).then(function (results) {
+            $('#id_feedback_editoreditable:first-child').text(results[0]);
+        });
+    };
 
+    Grading.prototype.resetFeedback = function () {
+        $('#id_feedback_editoreditable:first-child').text('');
+    };
     return {
         init: function () {
             var originalState = [];
@@ -31,7 +63,11 @@ define(['jquery', 'core/str'], function ($, str) {
             grading.originalState = originalState;
             console.log(grading.originalState);
             $(document).ready(function () {
-                $('input.examplecheck').change(grading.toogleOverwiteHint);
+                $('input.examplecheck').change(function (event) {
+                    grading.toogleOverwiteHint(event);
+                    grading.setPoints(grading.calculateSum());
+                });
+                $('#id_xgrade').change(grading.resetFeedback);
                 $('#id_resetbutton').click(grading.resetOverwrite);
             });
 
