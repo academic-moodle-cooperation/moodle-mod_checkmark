@@ -403,10 +403,12 @@ class checkmark {
 
                 // Create the submission if needed & return its id!
                 $submission = $this->get_submission($USER->id, true);
+                $formarray = json_decode(json_encode($formdata), true);
 
                 foreach ($submission->get_examples() as $key => $example) {
                     $name = $key;
-                    if (isset($formdata->{$name}) && ($formdata->{$name} != 0)) {
+
+                    if (isset($formarray[$name]) && ($formarray[$name] != 0)) {
                         $submission->get_example($key)->set_state(\mod_checkmark\example::CHECKED);
                     } else {
                         $submission->get_example($key)->set_state(\mod_checkmark\example::UNCHECKED);
