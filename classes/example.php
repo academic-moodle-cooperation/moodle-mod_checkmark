@@ -117,6 +117,16 @@ class example {
         }
     }
 
+    public function export_for_snapshot() {
+        $record = new \stdClass;
+        $record->id = $this->id;
+        $record->name = $this->name;
+        $record->grade = $this->grade;
+        $record->prefix = $this->prefix;
+        $record->state = $this->state;
+        return $record;
+    }
+
     public function set_state($state) {
         $this->state = $state;
     }
