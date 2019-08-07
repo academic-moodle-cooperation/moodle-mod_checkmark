@@ -557,8 +557,8 @@ class checkmark {
      */
     public function view_dates() {
         global $OUTPUT;
-        if (!$this->checkmark->timeavailable && !$this->checkmark->timedue && !$this->overrides &&
-                !$this->overrides->timeavailable && !$this->overrides->timedue) {
+        if (!$this->checkmark->timeavailable && !$this->checkmark->timedue && (!$this->overrides ||
+                        ($this->overrides && !$this->overrides->timeavailable && !$this->overrides->timedue))) {
             return;
         }
 
