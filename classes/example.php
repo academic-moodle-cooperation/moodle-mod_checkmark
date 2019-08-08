@@ -301,6 +301,7 @@ class example {
         return self::static_is_forced_unchecked($this->state);
     }
     public static function get_static_pointstring($grade) {
+        //Codereview SN : Are you sure that here it shouldn't be $grade and not just grade?
         switch (grade) {
             case '1':
                 return get_string('strpoint', 'checkmark');

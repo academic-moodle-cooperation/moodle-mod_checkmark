@@ -424,6 +424,8 @@ class mod_checkmark_grading_form extends moodleform {
         }
 
         foreach ($submission->get_examples() as $example) {
+            // Codereview SN: add empty spaces between the $examplearray, =, and array();
+            // also, use [] instead of array() :)
             $examplearray=array();
             $examplearray[] =& $mform->createElement('advcheckbox', $example->get_id(), '', $example->get_name().' ('.$example->get_grade().' '.
                     $example->get_pointsstring().')',array('class'=>'examplecheck $' . $example->get_grade()));
@@ -438,6 +440,7 @@ class mod_checkmark_grading_form extends moodleform {
             }
             //$mform->freeze($example->shortname);
         }
+        // Codereview SN: delete unused and commented out code! :)
         /*
         $buttonarray = array();
         $buttonarray[] = &$mform->createElement('submit', 'overwritechecks',

@@ -135,7 +135,7 @@ class submission {
     }
 
     public function overwrite_examples($overwritten_examples) {
-
+        //Codereview SN: is this function intentionally empty?
     }
 
     /**

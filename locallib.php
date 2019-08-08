@@ -403,6 +403,17 @@ class checkmark {
 
                 // Create the submission if needed & return its id!
                 $submission = $this->get_submission($USER->id, true);
+                /*
+                 *  Codereview SN: this is a bit strange
+                 * you can check if an object attribute exists by using the
+                 * isset($formdata->{$name})
+                 * so it will become
+                 * if (isset($formdata->{$name}) && $formdata->{$name} != 0)
+                 *
+                 *
+                 * I just saw that it was like that before your commit. Is there a special
+                 * reason why you did it this way?
+                 */
                 $formarray = json_decode(json_encode($formdata), true);
 
                 foreach ($submission->get_examples() as $key => $example) {
@@ -1400,6 +1411,7 @@ class checkmark {
             $mode = 'saveandprevious';
         } else if (optional_param('bulk', null, PARAM_BOOL)) {
             $mode = 'bulk';
+            // Codereview SN: add empty spaces after , in the line below
         } else if(optional_param('overwritechecks',null,PARAM_BOOL)) {
             $mode = 'overwritechecks';
         }
@@ -1418,6 +1430,7 @@ class checkmark {
                     $submission = $this->get_submission($userid, false);
 
                     foreach ($submission->get_examples() as $key => $example) {
+                        // Codereview SN: Is there a special reason to use $name and not $key?
                         $name = $key;
                         if (isset($formdata->{$name}) && ($formdata->{$name} != 0)) {
                             $submission->get_example($key)->overwrite_example(\mod_checkmark\example::CHECKED);
@@ -1787,6 +1800,7 @@ class checkmark {
                 redirect('submissions.php?id='.$id.'&userid='. $previousid . '&filter='.$filter.'&mode=single');
                 break;
             case 'overwritechecks':
+                // Codereview SN: this looks like it's already implemented. What is still missing?
                 //todo Implement this
                 echo 'I will implement this very soon';
                 $userid = required_param('userid', PARAM_INT);
@@ -1796,6 +1810,7 @@ class checkmark {
                     $submission = $this->get_submission($userid, false);
 
                     foreach ($submission->get_examples() as $key => $example) {
+                        // Codereview SN: is there a special reason to use $name and not $key
                         $name = $key;
                         if (isset($formdata->{$name}) && ($formdata->{$name} != 0)) {
                             $submission->get_example($key)->overwrite_example(\mod_checkmark\example::CHECKED);

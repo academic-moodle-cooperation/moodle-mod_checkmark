@@ -67,6 +67,12 @@ class checkmark_submission_form extends moodleform {
             ];
             $mform->addElement('advcheckbox', $key, null, $example->prefix . $example->name.' ('.$example->grade.' '.$pointsstring.')',
                     $attr, [0, 1]);
+            /*
+             * Codereview SN:
+             * 1. you need to add blank spaces after , and around .
+             * 2. you can check more efficiently if an array key exists simply
+             * with isset($this->_customdata['example' . $key]
+             */
             if(array_key_exists('example'.$key,$this->_customdata)) {
                 $mform->setDefault($key,$this->_customdata->{'example'.$key});
             }
@@ -95,6 +101,8 @@ class checkmark_submission_form extends moodleform {
 
 
         $std_examples = array();
+        // Codereview SN: is there a special reason not to write
+        // $this->_customdata->examples = [];
         $this->_customdata->examples = $std_examples;
         $this->set_data($this->_customdata);
     }
