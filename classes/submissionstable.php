@@ -884,6 +884,9 @@ class submissionstable extends \table_sql {
             $params->id = $this->attributes['id'];
             $PAGE->requires->js_call_amd('mod_checkmark/overrides', 'initializer', [$params]);
         }
+        if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+            $PAGE->requires->js_call_amd('mod_checkmark/quickgrade','init');
+        }
 
         parent::start_html();
         if (!empty($this->colgroups)) {
@@ -1683,7 +1686,13 @@ class submissionstable extends \table_sql {
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 //return $example->is_checked() ? 'X' : ' ';
                 return $example->get_examplestate_for_export();
-            } else {
+            }
+            else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+                $attributes = ['class' => 'examplecheck checkline' . $values->id . ' $' . $example->grade];
+                $cb =  \html_writer::checkbox('ex'.$values->id.'_'.$match[1], $values->id, $example->is_checked(), null, $attributes);
+                return \html_writer::tag('div', $cb, ['id' => 'ex'.$values->id.'_'.$match[1]]);
+            }
+            else {
                 return \html_writer::tag('div', $example->print_examplestate(), ['id' => 'ex'.$values->id.'_'.$match[1]]);
             }
         }
