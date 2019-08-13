@@ -2136,7 +2136,7 @@ class checkmark {
             set_user_preference('checkmark_perpage', $perpage);
         }
         $quickgrade = get_user_preferences('checkmark_quickgrade', 0);
-        $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
+        $filter = self::FILTER_ALL;
 
         $page = optional_param('page', 0, PARAM_INT);
 
