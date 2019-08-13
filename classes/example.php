@@ -39,10 +39,10 @@ class example {
     const BITMASK_TEACHER = 0x0002;
     const BITMASK_FORCED = 0x0004;
 
-    const CHECKEDBOX = \checkmark::CHECKEDBOX;
-    const EMPTYBOX = \checkmark::EMPTYBOX;
-    const FORCED_EMPTYBOX = \checkmark::FORCED_EMPTYBOX;
-    const FORCED_CHECKEDBOX = \checkmark::FORCED_CHECKEDBOX;
+    const CHECKEDBOX = 'X';
+    const EMPTYBOX = '';
+    const FORCED_EMPTYBOX = '()';
+    const FORCED_CHECKEDBOX = '(X)';
 
     const UNCHECKED = 0x0000;             // Equals: 0b000000000000000!
     const CHECKED = 0x0001;               // Equals: 0b000000000000001!
