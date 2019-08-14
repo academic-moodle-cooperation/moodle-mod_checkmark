@@ -2139,7 +2139,7 @@ class checkmark {
             set_user_preference('checkmark_perpage', $perpage);
         }
         $quickgrade = get_user_preferences('checkmark_quickgrade', 0);
-        $filter = self::FILTER_ALL;
+        $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
 
         $page = optional_param('page', 0, PARAM_INT);
 
@@ -2392,7 +2392,7 @@ class checkmark {
         $updatepref = optional_param('updatepref', 0, PARAM_INT);
         if ($updatepref && confirm_sesskey()) {
             $filter = optional_param('datafilter', self::FILTER_ALL, PARAM_INT);
-            set_user_preference('checkmark_filter', $filter);
+            set_user_preference('checkmark_filter_export', $filter);
             $format = optional_param('format', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF, PARAM_INT);
             set_user_preference('checkmark_format', $format);
             $sumabs = optional_param('sumabs', 0, PARAM_INT);
@@ -2418,7 +2418,7 @@ class checkmark {
                 set_user_preference('checkmark_zipped', \mod_checkmark\MTablePDF::UNCOMPRESSED);
             }
         } else {
-            $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
+            $filter = get_user_preferences('checkmark_filter_export', self::FILTER_ALL);
             $sumabs = get_user_preferences('checkmark_sumabs', 1);
             $sumrel = get_user_preferences('checkmark_sumrel', 1);
             $format = get_user_preferences('checkmark_format', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
