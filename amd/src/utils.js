@@ -56,6 +56,9 @@ define(['jquery', 'core/str'], function ($, str) {
     Utils.prototype.getBaseUrl = function () {
         return this.baseurl;
     };
+    Utils.prototype.clearPointerEventsFromIcons = function () {
+        $('.fa-minus,.fa-plus').css('pointer-events','none');
+    };
     return {
         init: function () {
             var utils = new Utils();
@@ -149,7 +152,10 @@ define(['jquery', 'core/str'], function ($, str) {
                 $('#showall').click(function () {
                     utils.toggleExamples(true);
                 });
-            });
+                utils.clearPointerEventsFromIcons();
+            }
+
+            );
             baseurl = utils.getBaseUrl();
         }
     };
