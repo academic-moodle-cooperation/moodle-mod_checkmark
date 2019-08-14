@@ -110,7 +110,6 @@ class submission {
         return new self($submission->id, $submission);
     }
 
-    // Codereview SN: add empty space after ,
     public static function get_mock_submission($checkmarkid,$userid) {
         $submission = new Submission(0,0);
         $submission->checkmarkid            = $checkmarkid;

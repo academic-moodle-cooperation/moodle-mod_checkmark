@@ -1936,8 +1936,7 @@ class checkmark {
         }
 
         if (!$submission = $this->get_submission($user->id)) {
-            // Codereview SN: add empty space after ,
-            $submission = \mod_checkmark\submission::get_mock_submission($this->checkmark->id,$userid);
+            $submission = \mod_checkmark\submission::get_mock_submission($this->checkmark->id, $userid);
         }
 
         $feedback = $this->get_feedback($user->id);
@@ -3154,8 +3153,7 @@ class checkmark {
         }
 
         // Create a new and empty submission!
-        // Codereview SN: add empty space after ,
-        $newsubmission = \mod_checkmark\submission::get_mock_submission($this->checkmark->id,$userid);
+        $newsubmission = \mod_checkmark\submission::get_mock_submission($this->checkmark->id, $userid);
         $sid = $DB->insert_record('checkmark_submissions', $newsubmission);
 
         foreach ($examples as $key => $example) {
