@@ -1936,7 +1936,7 @@ class checkmark {
         }
 
         if (!$submission = $this->get_submission($user->id)) {
-            $submission = $this->prepare_new_submission($userid);
+            $submission = \mod_checkmark\submission::get_mock_submission($this->checkmark->id,$userid);
         }
 
         $feedback = $this->get_feedback($user->id);
@@ -2005,7 +2005,10 @@ class checkmark {
                 $mformdata->presentationfeedback = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$userid]->feedback;
             }
         }
-        $mformdata->lateness = $this->display_lateness($submission->get_timemodified(), $user->id);
+        if($submission) {
+            $mformdata->lateness = $this->display_lateness($submission->get_timemodified(), $user->id);
+        }
+
         $mformdata->user = $user;
         $mformdata->userid = $userid;
         $mformdata->cm = $this->cm;
@@ -2389,7 +2392,7 @@ class checkmark {
         $updatepref = optional_param('updatepref', 0, PARAM_INT);
         if ($updatepref && confirm_sesskey()) {
             $filter = optional_param('datafilter', self::FILTER_ALL, PARAM_INT);
-            set_user_preference('checkmark_filter', $filter);
+            set_user_preference('checkmark_filter_export', $filter);
             $format = optional_param('format', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF, PARAM_INT);
             set_user_preference('checkmark_format', $format);
             $sumabs = optional_param('sumabs', 0, PARAM_INT);
@@ -2415,7 +2418,7 @@ class checkmark {
                 set_user_preference('checkmark_zipped', \mod_checkmark\MTablePDF::UNCOMPRESSED);
             }
         } else {
-            $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
+            $filter = get_user_preferences('checkmark_filter_export', self::FILTER_ALL);
             $sumabs = get_user_preferences('checkmark_sumabs', 1);
             $sumrel = get_user_preferences('checkmark_sumrel', 1);
             $format = get_user_preferences('checkmark_format', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
@@ -3150,7 +3153,7 @@ class checkmark {
         }
 
         // Create a new and empty submission!
-        $newsubmission = $this->prepare_new_submission($userid);
+        $newsubmission = \mod_checkmark\submission::get_mock_submission($this->checkmark->id,$userid);
         $sid = $DB->insert_record('checkmark_submissions', $newsubmission);
 
         foreach ($examples as $key => $example) {
@@ -3225,22 +3228,7 @@ class checkmark {
         return $feedback;
     }
 
-    /**
-     * Instantiates a new submission object for a given user
-     *
-     * Sets the checkmark, userid and times, everything else is set to default values.
-     *
-     * @param int $userid The userid for which we want a submission object
-     * @return object The submission
-     */
-    public function prepare_new_submission($userid) {
-        $submission = new stdClass();
-        $submission->checkmarkid            = $this->checkmark->id;
-        $submission->userid                 = $userid;
-        $submission->timecreated            = time();
-        $submission->timemodified           = $submission->timecreated;
-        return $submission;
-    }
+
 
     /**
      * Return all checkmark submissions by ENROLLED students (even empty)

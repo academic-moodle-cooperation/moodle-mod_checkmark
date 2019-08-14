@@ -56,6 +56,9 @@ define(['jquery', 'core/str'], function ($, str) {
     Utils.prototype.getBaseUrl = function () {
         return this.baseurl;
     };
+    Utils.prototype.clearPointerEventsFromIcons = function () {
+        $('.fa-minus,.fa-plus').css('pointer-events','none');
+    };
     return {
         init: function () {
             var utils = new Utils();
@@ -94,7 +97,6 @@ define(['jquery', 'core/str'], function ($, str) {
             New code
             */
             var showallContainer = '<th><div id="showallcontainer">';
-            showallContainer += '<span id="showalllabel" style="margin-right: 5px"></span>';
             showallContainer += '<a id="showall" href="javascript:void(0)">' +
                 '<i class="icon fa fa-plus fa-fw " id="showalltoggle"></i></a>';
             showallContainer += '</div></th>';
@@ -129,7 +131,6 @@ define(['jquery', 'core/str'], function ($, str) {
             str.get_strings(strings).then(function (results) {
                 $('#showall').prop('aria-label', results[0]).prop('title', results[0]);
                 $('#hideall').prop('aria-label', results[1]).prop('title', results[1]);
-                $('#showalllabel').text(results[2]);
                 $('#hidealllabel').text(results[2]);
             });
 
@@ -149,7 +150,10 @@ define(['jquery', 'core/str'], function ($, str) {
                 $('#showall').click(function () {
                     utils.toggleExamples(true);
                 });
-            });
+                utils.clearPointerEventsFromIcons();
+            }
+
+            );
             baseurl = utils.getBaseUrl();
         }
     };
