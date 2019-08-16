@@ -111,6 +111,7 @@ define(['jquery', 'core/str'], function ($, str) {
                 $('#hideallcontainer').hide();
                 $(".colexample").hide();
                 $('#showallcontainer').show();
+                $('colgroup.examples').hide();
             }
 
             $(document).ready(function () {
