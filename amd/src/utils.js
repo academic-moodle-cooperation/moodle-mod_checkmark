@@ -80,8 +80,12 @@ define(['jquery', 'core/str'], function ($, str) {
             hideallContainer += '<a id="hideall" href="javascript:void(0);">';
             hideallContainer += '<i class="icon fa fa-minus fa-fw " id="hidealltoggle"></i></a>';
             hideallContainer += '</div><div>&nbsp;</div>';
-
             $('th.colexample:eq(0)').prepend(hideallContainer);
+
+            var showallColgroup = '<colgroup class="showall" span="1"><col></colgroup>';
+            console.log($('colgroup.timesubmitted'));
+            $('colgroup.timesubmitted').after(showallColgroup);
+
             var strings = [ {
                     key: 'showalltoggle',
                     component: 'checkmark'
