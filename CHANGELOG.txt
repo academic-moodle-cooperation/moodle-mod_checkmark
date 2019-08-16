@@ -13,7 +13,7 @@ CHANGELOG
 * [FIXED] #6253 Fixed debug messages occurring when grading
 * [FIXED] #6252 Removed overlaying tooltip triggers for collapse/expand buttons in table headers
 * [FIXED] #6238 Fix occasional debug notices when previewing a checkmark exercise
-
+* [FIXED] #6257 Fix positioning of separation line between attendance/presentation grading and grading columns
 
 3.6.0 (2019-01-20)
 ------------------
