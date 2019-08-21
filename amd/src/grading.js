@@ -1,26 +1,16 @@
 define(['jquery', 'core/str'], function ($, str) {
-    // Codereview SN: are these variables used anywhere?
-    var name;
-    var state;
+
     var State = function (name,state) {
         this.name = name;
         this.state = state;
     };
-    // Codereview SN: is this variable used anywhere?
-    var originalState;
+
     var Grading = function (originalstate) {
         this.originalState = originalstate;
     };
 
     Grading.prototype.toogleOverwiteHint = function (event) {
-        //console.log("Hurray!" + event.target.id);
         $('.' + event.target.id).toggle();
-    };
-
-    Grading.prototype.resetOverwrite = function () {
-        // Codereview SN: is this function doing anything else apart from debug info?
-        console.log(this.originalState);
-
     };
     
     Grading.prototype.calculateSum = function () {
@@ -62,10 +52,6 @@ define(['jquery', 'core/str'], function ($, str) {
                originalState.push(new State(this.getAttribute('class'),this.style.display !== 'none'));
             });
             var grading = new Grading(originalState);
-            // Codereview SN: the line below is not needed, because Grading constructor already assigns
-            // this.originalState = originalState;
-            grading.originalState = originalState;
-            console.log(grading.originalState);
             $(document).ready(function () {
                 $('input.examplecheck').change(function (event) {
                     grading.toogleOverwiteHint(event);
@@ -76,10 +62,10 @@ define(['jquery', 'core/str'], function ($, str) {
                 when you use the function in that way - grading.resetOverwrite, and not function() {grading.resetOverwrite()},
                 then you don't have access to "this" object inside resetOverwrite function
                 If it is a static function, then it's fine. But in the code it says console.log(this.originalState)
+                Well the thing with this code is that I thought the "Nachkreuzen" feature gets extra controls but that wasn't the case. As there is no reset button, there is no need for resetting the checks
 
                  */
                 $('#id_xgrade').change(grading.resetFeedback);
-                $('#id_resetbutton').click(grading.resetOverwrite);
             });
 
         }

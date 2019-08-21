@@ -134,10 +134,6 @@ class submission {
         return $this->examples[$name];
     }
 
-    public function overwrite_examples($overwritten_examples) {
-        //Codereview SN: is this function intentionally empty?
-    }
-
     /**
      * @return example[]
      */

@@ -72,11 +72,13 @@ class checkmark_submission_form extends moodleform {
              * 1. you need to add blank spaces after , and around .
              * 2. you can check more efficiently if an array key exists simply
              * with isset($this->_customdata['example' . $key]
+             *
+             * Answer DB: Doesn't work for me unfortunately I am getting the following error when trying to open an exercise:
+             * "Fehler: Cannot use object of type stdClass as array"
              */
-            if(array_key_exists('example'.$key,$this->_customdata)) {
-                $mform->setDefault($key,$this->_customdata->{'example'.$key});
+            if(array_key_exists('example' . $key, $this->_customdata)) {
+                $mform->setDefault($key, $this->_customdata->{'example' . $key});
             }
-
         }
 
         // Here come the hidden params!
@@ -98,12 +100,7 @@ class checkmark_submission_form extends moodleform {
         $PAGE->requires->js_call_amd('mod_checkmark/submission', 'initializer');
 
         // Set data from last submission and hidden fields!
-
-
-        $std_examples = array();
-        // Codereview SN: is there a special reason not to write
-        // $this->_customdata->examples = [];
-        $this->_customdata->examples = $std_examples;
+        $this->_customdata->examples = [];
         $this->set_data($this->_customdata);
     }
 }

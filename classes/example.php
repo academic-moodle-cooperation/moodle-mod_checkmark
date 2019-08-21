@@ -302,7 +302,7 @@ class example {
     }
     public static function get_static_pointstring($grade) {
         //Codereview SN : Are you sure that here it shouldn't be $grade and not just grade?
-        switch (grade) {
+        switch ($grade) {
             case '1':
                 return get_string('strpoint', 'checkmark');
                 break;
