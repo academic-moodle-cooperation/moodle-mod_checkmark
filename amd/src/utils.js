@@ -89,7 +89,7 @@ define(['jquery', 'core/str'], function ($, str) {
             also, is there a specific reason why the "hideallcontainer" contains the button which shows all examples,
             and "showallcontainer" contains the button which hides all examples?.
             DB: Not really. I guess I just confused the names. Thanks for correcting it ;)
-
+            SN: clean up the comments now :)
 
             New code
             */

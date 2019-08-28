@@ -416,6 +416,10 @@ class checkmark {
                  *
                  * Answer DB: This was the hotfix for the error occurring on assembled qa due to a type missmatch. However, it worked on my instance
                  * It is regardless of the "nachkreuzen" implementation and already part of master
+                 *
+                 * SN: okay, the fact that it is on master doesn't mean it shouldn't be updated any more, right? :)
+                 * json_decode(json_encode means you have some other issues with the object access that you weren't able
+                 * to solve ;)
                  */
                 $formarray = json_decode(json_encode($formdata), true);
 
