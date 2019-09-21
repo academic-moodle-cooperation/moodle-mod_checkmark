@@ -10,7 +10,14 @@ define(['jquery', 'core/str'], function ($, str) {
     };
 
     Grading.prototype.toogleOverwiteHint = function (event) {
-        $('.' + event.target.id).toggle();
+        console.log("In function");
+        if($('.' + event.target.id).hasClass('d-none')) {
+            $('.' + event.target.id).removeClass("d-none");
+            console.log("In");
+        } else {
+            $('.' + event.target.id).addClass("d-none");
+            console.log("Out");
+        }
     };
     
     Grading.prototype.calculateSum = function () {
@@ -57,14 +64,6 @@ define(['jquery', 'core/str'], function ($, str) {
                     grading.toogleOverwiteHint(event);
                     grading.setPoints(grading.calculateSum());
                 });
-                /*
-                Codereview SN:
-                when you use the function in that way - grading.resetOverwrite, and not function() {grading.resetOverwrite()},
-                then you don't have access to "this" object inside resetOverwrite function
-                If it is a static function, then it's fine. But in the code it says console.log(this.originalState)
-                Well the thing with this code is that I thought the "Nachkreuzen" feature gets extra controls but that wasn't the case. As there is no reset button, there is no need for resetting the checks
-
-                 */
                 $('#id_xgrade').change(grading.resetFeedback);
             });
 

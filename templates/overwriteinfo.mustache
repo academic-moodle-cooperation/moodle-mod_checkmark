@@ -1,5 +1,3 @@
-{{! Codereview SN: instad of using style="display: none;" you can use the bootstrap d-none css class, which does the same thing
-Answer DB: But then I would also need to add/remove d-nome in JS or set display: none !important. Is that more elegant?
-Answer SN: yes :)}}
 
-<span class="text-error overwritetag id_{{get_id}}" id="overwrite{{get_id}}" {{^is_forced}} style="display: none;" {{/is_forced}} >{{get_forcedstring_unconditionally}}</span>
+
+<span class="text-error overwritetag id_{{get_id}} {{^is_forced}}d-none{{/is_forced}}" id="overwrite{{get_id}}"  >{{get_forcedstring_unconditionally}}</span>
