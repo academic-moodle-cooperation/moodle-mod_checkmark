@@ -1572,6 +1572,7 @@ class checkmark {
                 $grades = optional_param_array('menu', array(), PARAM_INT);
                 $feedbacks = optional_param_array('feedback', array(), PARAM_TEXT);
                 $attendances = optional_param_array('attendance', array(), PARAM_INT);
+                $checks = optional_param_array('ex',array(),PARAM_BOOL);
                 $presgrades = optional_param_array('presentationgrade', array(), PARAM_INT);
                 $presfeedbacks = optional_param_array('presentationfeedback', array(), PARAM_TEXT);
                 $oldgrades = optional_param_array('oldgrade', array(), PARAM_INT);
@@ -1582,6 +1583,7 @@ class checkmark {
 
                 $cantrackattendances = has_capability('mod/checkmark:trackattendance',  $this->context);
                 $cangradepres = has_capability('mod/checkmark:gradepresentation', $this->context);
+                $checksPerUser = $this->split_by_user($checks);
 
                 $ids = array();
 
@@ -1618,6 +1620,28 @@ class checkmark {
                 if (!(data_submitted() && confirm_sesskey())) {
                     $col = false;
                 }
+                if ($formdata = data_submitted() and confirm_sesskey()) {
+
+                    foreach ($checksPerUser as $userid => $userchecks)
+                    {
+                        $submission = $this->get_submission($userid, false);
+
+                        if($submission) {
+                            foreach ($submission->get_examples() as $key => $example) {
+                                $name = $key;
+                                if (isset($userchecks[$name]) && ($userchecks[$name] != 0)) {
+                                    $submission->get_example($key)->overwrite_example(\mod_checkmark\example::CHECKED);
+                                } else {
+                                    $submission->get_example($key)->overwrite_example(\mod_checkmark\example::UNCHECKED);
+                                }
+                                $this->update_submission($submission);
+                            }
+                        }
+                    }
+
+                    }
+                    // Create the submission if needed & return its id!
+
 
                 if (!$col) {
                     // All columns (submissioncomment, grade & attendance) were collapsed!
@@ -1632,6 +1656,7 @@ class checkmark {
                     $feedback = $this->get_feedback($id); // Don't write a feedback in the DB right now!
 
                     // For fast grade, we need to check if any changes take place!
+                    //todo Check if the checks changed method fits in here somehow
                     $updatedb = false;
 
                     if (!array_key_exists($id, $oldgrades)) {
@@ -3690,6 +3715,15 @@ class checkmark {
         }
 
         return $status;
+    }
+
+    private function split_by_user(array $checks) {
+        $split_check_array = [];
+        foreach($checks as $check => $value) {
+            $check_fragments = explode('_',$check);
+            $split_check_array[$check_fragments[0]][$check_fragments[1]] = $value;
+        }
+        return $split_check_array;
     }
 
 }

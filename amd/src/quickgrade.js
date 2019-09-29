@@ -12,9 +12,14 @@ define(['jquery', 'core/str'], function ($, str) {
         this.originalState = originalstate;
     };
 
-    Quickgrade.prototype.toogleOverwiteHint = function (event) {
-        //console.log("Hurray!" + event.target.id);
-        $('.' + event.target.id).toggle();
+    Quickgrade.prototype.toogleOverwiteHint = function (element) {
+        console.log("Hurray!" + event.target.id);
+        if($(element).hasClass('exborder')) {
+            $(element).removeClass('exborder');
+        } else {
+            $(element).addClass('exborder');
+        }
+
     };
 
     Quickgrade.prototype.resetOverwrite = function () {
@@ -38,7 +43,7 @@ define(['jquery', 'core/str'], function ($, str) {
         return sum;
     };
     Quickgrade.prototype.setPoints = function (line,points) {
-        console.log('#menumenu' . line);
+        console.log('#menumenu' + line);
         $('#menumenu' + line).val(points);
         /*
         var strings = [
@@ -68,6 +73,7 @@ define(['jquery', 'core/str'], function ($, str) {
                 $('input.examplecheck').change(function (event) {
                     var line = event.target.attributes['value'].nodeValue;
                     quickgrade.setPoints(line,quickgrade.calculateSum(line));
+                    quickgrade.toogleOverwiteHint(event.target.parentElement.lastChild);
                 });
                 /*
                 $('#id_xgrade').change(grading.resetFeedback);

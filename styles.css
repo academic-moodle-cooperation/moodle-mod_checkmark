@@ -220,3 +220,16 @@
 .path-mod-checkmark .clearfloat {
     clear: both;
 }
+.excontainer {
+    width: fit-content;
+    height: fit-content;
+    position: relative;
+    top: -21px;
+    left: -6.5px;
+    width: 25px;
+    height: 25px;
+    pointer-events: none;
+}
+.exborder {
+    border: 5px red solid;
+}
