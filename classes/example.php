@@ -114,7 +114,7 @@ class example {
      * @param string $name: Name of the example to create
      * @param double $grade: Grade of the example to create
      * @param string $prefix: Prefix of the example to create
-     * @param null int $state: State of the example to create
+     * @param null|int $state: State of the example to create
      */
     public function __construct($id, $name, $grade, $prefix, $state=null) {
         $this->id = $id;
@@ -135,7 +135,7 @@ class example {
      *
      * @param string $name: Name of the string that should be returned
      *
-     * @return string: Requested name string
+     * @return string Requested name string
      * @throws \coding_exception
      */
     public function __get($name) {
