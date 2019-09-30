@@ -55,7 +55,7 @@ class submission {
      * @param null $submission
      * @throws \dml_exception
      */
-    public function __construct($id = 0, $submission=null) {
+    public function __construct($id = 0, $submission = null) {
         global $DB;
 
         $this->id = $id;
@@ -108,6 +108,15 @@ class submission {
         }
 
         return new self($submission->id, $submission);
+    }
+
+    public static function get_mock_submission($checkmarkid,$userid) {
+        $submission = new Submission(0,0);
+        $submission->checkmarkid            = $checkmarkid;
+        $submission->userid                 = $userid;
+        $submission->timecreated            = time();
+        $submission->timemodified           = $submission->timecreated;
+        return $submission;
     }
 
 
