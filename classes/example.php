@@ -185,7 +185,7 @@ class example {
      * @throws \coding_exception
      */
     public function set_state($state) {
-        if($state != self::UNCHECKED && $state != self::CHECKED && $state != self::UNCHECKED_OVERWRITTEN && $state != self::CHECKED_OVERWRITTEN) {
+        if ($state != self::UNCHECKED && $state != self::CHECKED && $state != self::UNCHECKED_OVERWRITTEN && $state != self::CHECKED_OVERWRITTEN) {
             throw new \coding_exception('State can only be UNCHECKED, CHECKED, UNCHECKED_OVERWRITTEN or CHECKED_OVERWRITTEN');
         }
         $this->state = $state;
