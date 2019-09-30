@@ -110,11 +110,11 @@ class example {
     /**
      * example constructor.
      *
-     * @param int $id: Id of the example to create
-     * @param string $name: Name of the example to create
-     * @param double $grade: Grade of the example to create
-     * @param string $prefix: Prefix of the example to create
-     * @param null|int $state: State of the example to create
+     * @param int $id Id of the example to create
+     * @param string $name Name of the example to create
+     * @param float $grade Grade of the example to create
+     * @param string $prefix Prefix of the example to create
+     * @param null|int $state State of the example to create
      */
     public function __construct($id, $name, $grade, $prefix, $state=null) {
         $this->id = $id;
@@ -133,7 +133,7 @@ class example {
      * 'name' will return $this->prefix . $this->name (e.g. Example 3.5)
      * 'pointstring will return the appropriate expression for 'points' (singular or plural)
      *
-     * @param string $name: Name of the string that should be returned
+     * @param string $name Name of the string that should be returned
      *
      * @return string Requested name string
      * @throws \coding_exception
@@ -181,7 +181,7 @@ class example {
     /**
      * Sets the state of the present example
      *
-     * @param int $state: Needs to be either UNCHECKED, CHECKED, UNCHECKED_OVERWRITTEN or CHECKED_OVERWRITTEN
+     * @param int $state Needs to be either UNCHECKED, CHECKED, UNCHECKED_OVERWRITTEN or CHECKED_OVERWRITTEN
      * @throws \coding_exception
      */
     public function set_state($state) {
@@ -194,7 +194,7 @@ class example {
     /**
      * Returns the full name of the present example
      *
-     * @return string: Full name of the present example
+     * @return string Full name of the present example
      */
     public function get_name() {
         return $this->prefix . $this->name;
@@ -203,7 +203,7 @@ class example {
     /**
      * Returns the grade of the present example
      *
-     * @return int|string: Grade of the present example
+     * @return int|string Grade of the present example
      */
     public function get_grade() {
         return $this->grade;
