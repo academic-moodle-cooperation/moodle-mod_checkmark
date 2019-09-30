@@ -165,8 +165,7 @@ class MTablePDF extends \pdf {
     /**
      * Set the texts for the header of the pdf
      *
-     * @param string ...$header [$title1, $desc1, $title2, $desc2, $title3, $desc3,
-     *                          $title4, $desc4, $title5, $desc5, $title6, $desc6]
+     * @param string ...$header
      */
     public function setheadertext(string ...$header) {
         list($title1, $desc1, $title2, $desc2, $title3, $desc3,
