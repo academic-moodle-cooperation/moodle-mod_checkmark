@@ -9,7 +9,11 @@ CHANGELOG
 * [FEATURE] #5720 Add default values for availability in site-administration
 * [FEATURE] #6129 Add support for editdates plugin
 * [FEATURE] #5296 Set field type of cells containing numeric values in .xlsx and .ods to number
-
+* [FIXED] #6254 Separated functionality of filter dropdowns in Submissions and Export view
+* [FIXED] #6253 Fixed debug messages occurring when grading
+* [FIXED] #6252 Removed overlaying tooltip triggers for collapse/expand buttons in table headers
+* [FIXED] #6238 Fix occasional debug notices when previewing a checkmark exercise
+* [FIXED] #6257 Fix positioning of separation line between attendance/presentation grading and grading columns
 
 3.6.0 (2019-01-20)
 ------------------
