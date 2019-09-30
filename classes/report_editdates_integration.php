@@ -42,7 +42,7 @@ extends report_editdates_mod_date_extractor {
     /**
      * Constructor.
      *
-     * @param $course
+     * @param object $course
      */
     public function __construct($course) {
         parent::__construct($course, 'checkmark');

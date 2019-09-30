@@ -114,7 +114,7 @@ class example {
      * @param string $name: Name of the example to create
      * @param double $grade: Grade of the example to create
      * @param string $prefix: Prefix of the example to create
-     * @param int $state: State of the example to create
+     * @param null int $state: State of the example to create
      */
     public function __construct($id, $name, $grade, $prefix, $state=null) {
         $this->id = $id;
@@ -243,8 +243,8 @@ class example {
     /**
      * Queries the DB for an example with a given id and returns a new example instance with its data
      *
-     * @param int $id: Id of the requested example
-     * @param bool $userid: Id of the user the example is requested for
+     * @param int $id Id of the requested example
+     * @param bool $userid Id of the user the example is requested for
      *
      * @return example
      * @throws \dml_exception
