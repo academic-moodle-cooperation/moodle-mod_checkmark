@@ -2759,13 +2759,14 @@ class checkmark {
         $notactivestr = get_string('notactive', 'checkmark');
         $timeavailablestr = !empty($this->checkmark->timeavailable) ? userdate($this->checkmark->timeavailable) : $notactivestr;
         $timeduestr = !empty($this->checkmark->timedue) ? userdate($this->checkmark->timedue) : $notactivestr;
-        $pdf->setheadertext(get_string('course').':', $this->course->fullname,
-            get_string('availabledate', 'checkmark').':', $timeavailablestr,
-            !$template ? get_string('strprintpreview', 'checkmark') : '', $filters[$filter],
+        $paramarray = array(get_string('course').':', $this->course->fullname,
+                get_string('availabledate', 'checkmark').':', $timeavailablestr,
+                !$template ? get_string('strprintpreview', 'checkmark') : '', $filters[$filter],
             // Second header row!
-            get_string('strassignment', 'checkmark').':', $this->checkmark->name,
-            get_string('duedate', 'checkmark').':', $timeduestr,
-            get_string('groups').':', $grpname);
+                get_string('strassignment', 'checkmark').':', $this->checkmark->name,
+                get_string('duedate', 'checkmark').':', $timeduestr,
+                get_string('groups').':', $grpname);
+        $pdf->setheadertext($paramarray);
 
         $pdf->showheaderfooter($printheader);
         $pdf->setfontsize($textsize);
@@ -2884,14 +2885,14 @@ class checkmark {
             if (is_number($printperpage) && $printperpage != 0) {
                 $pdf->setrowsperpage($printperpage);
             }
-
-            $pdf->setheadertext(get_string('course') . ':', $this->course->fullname,
+            $paramarray = array(get_string('course') . ':', $this->course->fullname,
                     get_string('availabledate', 'checkmark') . ':', $timeavailablestr,
                     !$template ? get_string('strprintpreview', 'checkmark') : '', $filters[$filter],
-                    // Second header row!
+                // Second header row!
                     get_string('strassignment', 'checkmark') . ':', $this->checkmark->name,
                     get_string('duedate', 'checkmark') . ':', $timeduestr,
                     get_string('groups') . ':', $grpname);
+            $pdf->setheadertext($paramarray);
 
             // Data present?
             if (count($data)) {
