@@ -18,8 +18,8 @@
  * submissionstable.php
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Philipp Hager, extended and maintained by Daniel Binder
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_checkmark;
@@ -42,8 +42,8 @@ require_once($CFG->libdir.'/gradelib.php');
  * submissionstable class handles display of submissions for print preview and submissions view...
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Philipp Hager, extended and maintained by Daniel Binder
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class submissionstable extends \table_sql {
@@ -1681,13 +1681,11 @@ class submissionstable extends \table_sql {
                 $example = new example('', 1, '', example::UNCHECKED);
             }
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
-                //return $example->is_checked() ? 'X' : ' ';
                 return $example->get_examplestate_for_export();
             } else {
                 return \html_writer::tag('div', $example->print_examplestate(), ['id' => 'ex'.$values->id.'_'.$match[1]]);
             }
         }
-
         // Process user identity fields!
         $useridentity = get_extra_user_fields($this->context);
         if ($colname === 'phone') {

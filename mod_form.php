@@ -95,6 +95,10 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $this->add_action_buttons();
     }
 
+    /**
+     * Add availability elements.
+     *
+     */
     public function add_availability_elements() {
         global $OUTPUT, $PAGE;
         $mform = $this->_form;
