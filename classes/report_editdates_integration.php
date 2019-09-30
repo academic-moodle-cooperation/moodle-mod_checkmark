@@ -14,19 +14,47 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * This file contains checkmark-class report_editdates_mod_date_extractor
+ *
+ * @package   mod_checkmark
+ * @author    Daniel Binder
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die;
 
 
 require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
 
+/**
+ * Class mod_checkmark_report_editdates_integration
+ *
+ * @package   mod_checkmark
+ * @author    Daniel Binder
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class mod_checkmark_report_editdates_integration
 extends report_editdates_mod_date_extractor {
 
+    /**
+     * Constructor.
+     *
+     * @param $course
+     */
     public function __construct($course) {
         parent::__construct($course, 'checkmark');
         parent::load_data();
     }
 
+    /**
+     * Returns date settings of checkmark
+     * @param cm_info $cm
+     * @return array
+     * @throws coding_exception
+     */
     public function get_settings(cm_info $cm) {
         $checkmark = $this->mods[$cm->instance];
 
@@ -50,6 +78,13 @@ extends report_editdates_mod_date_extractor {
                 );
     }
 
+    /**
+     * Checks if set dates are valid
+     * @param cm_info $cm
+     * @param array $dates
+     * @return array
+     * @throws coding_exception
+     */
     public function validate_dates(cm_info $cm, array $dates) {
         $errors = array();
         if ($dates['timeavailable'] && $dates['timedue']
@@ -79,6 +114,12 @@ extends report_editdates_mod_date_extractor {
         return $errors;
     }
 
+    /**
+     * Save dates set in editdates to checkmark
+     * @param cm_info $cm
+     * @param array $dates
+     * @throws dml_exception
+     */
     public function save_dates(cm_info $cm, array $dates) {
         global $DB, $COURSE;
 
@@ -89,7 +130,7 @@ extends report_editdates_mod_date_extractor {
         $update->cutoffdate = $dates['cutoffdate'];
         $update->gradingdue  = $dates['gradingduedate'];
 
-        $result = $DB->update_record('checkmark', $update);
+        $DB->update_record('checkmark', $update);
 
         checkmark_refresh_events(0, $cm->instance);
     }
