@@ -144,11 +144,13 @@ class example {
             case 'grade':
             case 'state':
             case 'prefix':
-            case 'shortname':
                 return $this->$name;
                 break;
             case 'name':
                 return $this->prefix . $this->name;
+                break;
+            case 'shortname':
+                return $this->name;
                 break;
             case 'pointsstring':
                 switch ($this->grade) {
