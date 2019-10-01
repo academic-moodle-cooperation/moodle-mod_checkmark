@@ -187,7 +187,8 @@ class example {
      * @throws \coding_exception
      */
     public function set_state($state) {
-        if ($state != self::UNCHECKED && $state != self::CHECKED && $state != self::UNCHECKED_OVERWRITTEN && $state != self::CHECKED_OVERWRITTEN) {
+        if ($state != self::UNCHECKED && $state != self::CHECKED && $state != self::UNCHECKED_OVERWRITTEN &&
+                $state != self::CHECKED_OVERWRITTEN) {
             throw new \coding_exception('State can only be UNCHECKED, CHECKED, UNCHECKED_OVERWRITTEN or CHECKED_OVERWRITTEN');
         }
         $this->state = $state;
@@ -326,16 +327,13 @@ class example {
      * @param int $overwrittenexamplestate State the example should be overwritten to
      */
     public function overwrite_example($overwrittenexamplestate) {
-        if($this->state == self::CHECKED && $overwrittenexamplestate== self::UNCHECKED) {
+        if ($this->state == self::CHECKED && $overwrittenexamplestate == self::UNCHECKED) {
             $this->state = self::CHECKED_OVERWRITTEN;
-        }
-        else if($this->state == self::UNCHECKED && $overwrittenexamplestate == self::CHECKED) {
+        } else if ($this->state == self::UNCHECKED && $overwrittenexamplestate == self::CHECKED) {
             $this->state = self::UNCHECKED_OVERWRITTEN;
-        }
-        else if($this->state == self::CHECKED_OVERWRITTEN && $overwrittenexamplestate == self::CHECKED) {
+        } else if ( $this->state == self::CHECKED_OVERWRITTEN && $overwrittenexamplestate == self::CHECKED) {
             $this->state = self::CHECKED;
-        }
-        else if($this->state == self::UNCHECKED_OVERWRITTEN && $overwrittenexamplestate == self::UNCHECKED) {
+        } else if ($this->state == self::UNCHECKED_OVERWRITTEN && $overwrittenexamplestate == self::UNCHECKED) {
             $this->state = self::UNCHECKED;
         }
         return;

@@ -1404,7 +1404,7 @@ class checkmark {
             $mode = 'saveandprevious';
         } else if (optional_param('bulk', null, PARAM_BOOL)) {
             $mode = 'bulk';
-        } else if(optional_param('overwritechecks', null, PARAM_BOOL)) {
+        } else if (optional_param('overwritechecks', null, PARAM_BOOL)) {
             $mode = 'overwritechecks';
         }
 
@@ -2112,8 +2112,6 @@ class checkmark {
                 $DB->update_record('checkmark_checks', $stateupdate);
             }
         }
-        //$submission = $this->get_submission($USER->id);
-
         $this->update_grade($submission);
     }
 
