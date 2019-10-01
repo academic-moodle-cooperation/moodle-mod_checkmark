@@ -110,11 +110,11 @@ class example {
     /**
      * example constructor.
      *
-     * @param $id: Id of the example to create
-     * @param $name: Name of the example to create
-     * @param $grade: Grade of the example to create
-     * @param $prefix: Prefix of the example to create
-     * @param $state: State of the example to create
+     * @param int $id Id of the example to create
+     * @param string $name Name of the example to create
+     * @param float $grade Grade of the example to create
+     * @param string $prefix Prefix of the example to create
+     * @param null|int $state State of the example to create
      */
     public function __construct($id, $name, $grade, $prefix, $state=null) {
         $this->id = $id;
@@ -131,11 +131,11 @@ class example {
      * Compatibility function with legacy parts of checkmark. Returns a namestring based on $name
      * 'id','grade','state','prefix','shortname' will return $this->name (e.g. 3.5)
      * 'name' will return $this->prefix . $this->name (e.g. Example 3.5)
-     * 'pointsstring will return the appropriate expression for 'points' (singular or plural)
+     * 'pointstring will return the appropriate expression for 'points' (singular or plural)
      *
-     * @param $name: Name of the string that should be returned
+     * @param string $name Name of the string that should be returned
      *
-     * @return string: Requested name string
+     * @return string Requested name string
      * @throws \coding_exception
      */
     public function __get($name) {
@@ -144,11 +144,13 @@ class example {
             case 'grade':
             case 'state':
             case 'prefix':
-            case 'shortname':
                 return $this->$name;
                 break;
             case 'name':
                 return $this->prefix . $this->name;
+                break;
+            case 'shortname':
+                return $this->name;
                 break;
             case 'pointsstring':
                 switch ($this->grade) {
@@ -181,11 +183,11 @@ class example {
     /**
      * Sets the state of the present example
      *
-     * @param $state: Needs to be either UNCHECKED, CHECKED, UNCHECKED_OVERWRITTEN or CHECKED_OVERWRITTEN
+     * @param int $state Needs to be either UNCHECKED, CHECKED, UNCHECKED_OVERWRITTEN or CHECKED_OVERWRITTEN
      * @throws \coding_exception
      */
     public function set_state($state) {
-        if($state != self::UNCHECKED && $state != self::CHECKED && $state != self::UNCHECKED_OVERWRITTEN && $state != self::CHECKED_OVERWRITTEN) {
+        if ($state != self::UNCHECKED && $state != self::CHECKED && $state != self::UNCHECKED_OVERWRITTEN && $state != self::CHECKED_OVERWRITTEN) {
             throw new \coding_exception('State can only be UNCHECKED, CHECKED, UNCHECKED_OVERWRITTEN or CHECKED_OVERWRITTEN');
         }
         $this->state = $state;
@@ -194,7 +196,7 @@ class example {
     /**
      * Returns the full name of the present example
      *
-     * @return string: Full name of the present example
+     * @return string Full name of the present example
      */
     public function get_name() {
         return $this->prefix . $this->name;
@@ -203,7 +205,7 @@ class example {
     /**
      * Returns the grade of the present example
      *
-     * @return int|string: Grade of the present example
+     * @return int|string Grade of the present example
      */
     public function get_grade() {
         return $this->grade;
@@ -243,8 +245,8 @@ class example {
     /**
      * Queries the DB for an example with a given id and returns a new example instance with its data
      *
-     * @param $id: Id of the requested example
-     * @param bool $userid: Id of the user the example is requested for
+     * @param int $id Id of the requested example
+     * @param bool $userid Id of the user the example is requested for
      *
      * @return example
      * @throws \dml_exception
@@ -262,7 +264,6 @@ class example {
             $checkjoin = "";
             $checkparams = [];
         }
-
 
         $sql = "SELECT ex.id, ex.checkmarkid, ex.name AS shortname, ex.grade,
                        ".$DB->sql_concat('c.exampleprefix', 'ex.name')." AS name
@@ -317,7 +318,7 @@ class example {
     /**
      * Checks if a given state results in a checked example (CHECKED or OVERWRITTEN_CHECKED)
      *
-     * @param $state
+     * @param int $state
      *
      * @return bool: TRUE if checked, FALSE if unchecked
      */
@@ -330,7 +331,7 @@ class example {
     /**
      * Checks if a given state was overwritten by teacher (OVERWRITTEN_UNCHECKED or OVERWRITTEN_CHECKED)
      *
-     * @param $state
+     * @param int $state
      *
      * @return bool: TRUE if overwritten, FALSE if not overwritten
      */
@@ -341,7 +342,7 @@ class example {
     /**
      * Checks if a given state was overwritten by teacher to checked (OVERWRITTEN_CHECKED)
      *
-     * @param $state
+     * @param int $state
      *
      * @return bool: TRUE if OVERWRITTEN_CHECKED, FALSE if not OVERWRITTEN_CHECKED
      */
@@ -352,7 +353,7 @@ class example {
     /**
      * Checks if a given state was overwritten by teacher to unchecked (OVERWRITTEN_UNCHECKED)
      *
-     * @param $state
+     * @param int $state
      *
      * @return bool: TRUE if OVERWRITTEN_UNCHECKED, FALSE if not OVERWRITTEN_UNCHECKED
      */
@@ -395,13 +396,11 @@ class example {
     /**
      * Returns the appropriate expression for 'points' (singular or plural)
      *
-     * @param $grade
-     *
      * @return string
      * @throws \coding_exception
      */
-    public static function get_static_pointstring($grade) {
-        switch (grade) {
+    public static function get_static_pointstring() {
+        switch ($grade) {
             case '1':
                 return get_string('strpoint', 'checkmark');
                 break;
@@ -410,5 +409,5 @@ class example {
                 return get_string('strpoints', 'checkmark');
                 break;
         }
-}
+    }
 }

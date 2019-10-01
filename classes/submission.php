@@ -97,8 +97,8 @@ class submission {
     /**
      * Returns a single submission for a given $checkmarkid and $userid
      *
-     * @param $checkmarkid
-     * @param $userid
+     * @param int $checkmarkid
+     * @param int $userid
      *
      * @return false|self
      * @throws \coding_exception
@@ -118,8 +118,8 @@ class submission {
     /**
      * Creates an empty submission for a given $checkmarkid and $userid using the current date
      *
-     * @param $checkmarkid
-     * @param $userid
+     * @param int $checkmarkid
+     * @param int $userid
      *
      * @return submission
      * @throws \coding_exception
@@ -153,7 +153,7 @@ class submission {
     /**
      * Gets the example for a given $name or false if none was found
      *
-     * @param $name
+     * @param string $name
      * @return false|example
      */
     public function get_example($name) {
