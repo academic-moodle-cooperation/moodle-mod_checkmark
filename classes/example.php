@@ -400,7 +400,7 @@ class example {
      * @throws \coding_exception
      */
     public static function get_static_pointstring() {
-        switch (grade) {
+        switch ($grade) {
             case '1':
                 return get_string('strpoint', 'checkmark');
                 break;
