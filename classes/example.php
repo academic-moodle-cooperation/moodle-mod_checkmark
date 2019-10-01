@@ -323,7 +323,7 @@ class example {
     /**
      * Method used for overwriting an example. It ensures that state is valid after overwrite
      *
-     * @param $overwrittenexamplestate
+     * @param int $overwrittenexamplestate State the example should be overwritten to
      */
     public function overwrite_example($overwrittenexamplestate) {
         if($this->state == self::CHECKED && $overwrittenexamplestate== self::UNCHECKED) {
