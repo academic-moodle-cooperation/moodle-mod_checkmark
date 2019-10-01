@@ -1082,7 +1082,7 @@ class submissionstable extends \table_sql {
     /**
      * This function is called for each data row to allow processing of the
      * user picture.
-     *\
+     * \
      * @param object $values Contains object with all the values of record.
      * @return string Return user picture markup.
      */

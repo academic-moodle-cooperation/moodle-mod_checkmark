@@ -263,7 +263,6 @@ class example {
             $checkparams = [];
         }
 
-
         $sql = "SELECT ex.id, ex.checkmarkid, ex.name AS shortname, ex.grade,
                        ".$DB->sql_concat('c.exampleprefix', 'ex.name')." AS name
                        $checkfields
@@ -408,5 +407,5 @@ class example {
                 return get_string('strpoints', 'checkmark');
                 break;
         }
-}
+    }
 }
