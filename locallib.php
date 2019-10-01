@@ -18,8 +18,8 @@
  * This file contains checkmark-class with all logic-methods used by checkmark
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Philipp Hager, extended and maintained by Daniel Binder
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -37,8 +37,8 @@ require_once($CFG->dirroot.'/mod/checkmark/grading_form.php');
  * This class provides all the basic functionality for an checkmark-module
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Philipp Hager, extended and maintained by Daniel Binder
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class checkmark {
@@ -236,7 +236,7 @@ class checkmark {
         }
         $examples = [];
         foreach ($records as $key => $cur) {
-            $examples[$key] = new \mod_checkmark\example($key,$cur->name, $cur->grade, $exampleprefix);
+            $examples[$key] = new \mod_checkmark\example($key, $cur->name, $cur->grade, $exampleprefix);
         }
 
         return $examples;
@@ -1350,6 +1350,11 @@ class checkmark {
     }
 
 
+    /**
+     * Check for all autograded feedbacks and remind teacher to regrade them.
+     *
+     * @param string $id checkmark-id
+     */
     public static function get_autograded_feedbacks($id) {
         global $DB;
         /*
@@ -2036,7 +2041,7 @@ class checkmark {
                 $mformdata->presentationfeedback = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$userid]->feedback;
             }
         }
-        if($submission) {
+        if ($submission) {
             $mformdata->lateness = $this->display_lateness($submission->get_timemodified(), $user->id);
         }
 
@@ -2220,7 +2225,6 @@ class checkmark {
             $table->out($total < $perpage ? $total : $perpage, true);
             $tablehtml = ob_get_contents();
             ob_end_clean();
-            //$mform->addElement('button','showexamples','Display examples in table');
             $mform->addElement('html', $tablehtml);
             $mform->addElement('advcheckbox', 'mailinfo', get_string('enablenotification', 'checkmark'));
             $mform->addHelpButton('mailinfo', 'enablenotification', 'checkmark');
@@ -2786,13 +2790,14 @@ class checkmark {
         $notactivestr = get_string('notactive', 'checkmark');
         $timeavailablestr = !empty($this->checkmark->timeavailable) ? userdate($this->checkmark->timeavailable) : $notactivestr;
         $timeduestr = !empty($this->checkmark->timedue) ? userdate($this->checkmark->timedue) : $notactivestr;
-        $pdf->setheadertext(get_string('course').':', $this->course->fullname,
-            get_string('availabledate', 'checkmark').':', $timeavailablestr,
-            !$template ? get_string('strprintpreview', 'checkmark') : '', $filters[$filter],
+        $paramarray = array(get_string('course').':', $this->course->fullname,
+                get_string('availabledate', 'checkmark').':', $timeavailablestr,
+                !$template ? get_string('strprintpreview', 'checkmark') : '', $filters[$filter],
             // Second header row!
-            get_string('strassignment', 'checkmark').':', $this->checkmark->name,
-            get_string('duedate', 'checkmark').':', $timeduestr,
-            get_string('groups').':', $grpname);
+                get_string('strassignment', 'checkmark').':', $this->checkmark->name,
+                get_string('duedate', 'checkmark').':', $timeduestr,
+                get_string('groups').':', $grpname);
+        $pdf->setheadertext($paramarray);
 
         $pdf->showheaderfooter($printheader);
         $pdf->setfontsize($textsize);
@@ -2911,14 +2916,14 @@ class checkmark {
             if (is_number($printperpage) && $printperpage != 0) {
                 $pdf->setrowsperpage($printperpage);
             }
-
-            $pdf->setheadertext(get_string('course') . ':', $this->course->fullname,
+            $paramarray = array(get_string('course') . ':', $this->course->fullname,
                     get_string('availabledate', 'checkmark') . ':', $timeavailablestr,
                     !$template ? get_string('strprintpreview', 'checkmark') : '', $filters[$filter],
-                    // Second header row!
+                // Second header row!
                     get_string('strassignment', 'checkmark') . ':', $this->checkmark->name,
                     get_string('duedate', 'checkmark') . ':', $timeduestr,
                     get_string('groups') . ':', $grpname);
+            $pdf->setheadertext($paramarray);
 
             // Data present?
             if (count($data)) {
@@ -3195,7 +3200,7 @@ class checkmark {
 
         $submission = $DB->get_record('checkmark_submissions', array('checkmarkid' => $this->checkmark->id,
                                                                      'userid'      => $userid));
-        $submission = new Submission($sid,$submission);
+        $submission = new Submission($sid, $submission);
         $submission->examples = $examples;
 
         return $submission;
@@ -3464,16 +3469,7 @@ class checkmark {
         }
 
         // TODO we use a form here for now, but plan to use a better template in the future!
-        /*$mform = new MoodleQuickForm('submission', 'get', '', '');
 
-        self::add_submission_elements($mform, $submission);
-
-        if ($return === true) {
-            $output = $mform->toHtml();
-            return $output;
-        }
-
-        echo $output;*/
         return $submission->render();
     }
 

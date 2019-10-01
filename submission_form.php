@@ -18,8 +18,8 @@
  * submission_form.php Extends the moodleform class for checkmark submission form
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Philipp Hager, extended and maintained by Daniel Binder
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -33,8 +33,8 @@ require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
  * additionally it invokes some JS to display the amount of currently checked examples and points
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Philipp Hager, xtended and maintained by Daniel Binder
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class checkmark_submission_form extends moodleform {
@@ -65,19 +65,11 @@ class checkmark_submission_form extends moodleform {
                 'data-name' => $example->shortname,
                 'data-example' => $example->id
             ];
-            $mform->addElement('advcheckbox', $key, null, $example->prefix . $example->name.' ('.$example->grade.' '.$pointsstring.')',
+            $mform->addElement('advcheckbox',
+                    $key, null, $example->prefix . $example->name.' ('.$example->grade.' '.$pointsstring.')',
                     $attr, [0, 1]);
-            /*
-             * Codereview SN:
-             * 1. you need to add blank spaces after , and around .
-             * 2. you can check more efficiently if an array key exists simply
-             * with isset($this->_customdata['example' . $key]
-             *
-             * Answer DB: Doesn't work for me unfortunately I am getting the following error when trying to open an exercise:
-             * "Fehler: Cannot use object of type stdClass as array"
-             */
-            if(array_key_exists('example' . $key, $this->_customdata)) {
-                $mform->setDefault($key, $this->_customdata->{'example' . $key});
+            if (array_key_exists('example'.$key, $this->_customdata)) {
+                $mform->setDefault($key, $this->_customdata->{'example'.$key});
             }
         }
 
