@@ -195,6 +195,15 @@ class example {
     }
 
     /**
+     * Returns the id of the present example
+     *
+     * @return int Id of the example
+     */
+    public function get_id() {
+        return $this->id;
+    }
+
+    /**
      * Returns the full name of the present example
      *
      * @return string Full name of the present example

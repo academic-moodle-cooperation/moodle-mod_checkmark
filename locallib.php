@@ -1419,9 +1419,9 @@ class checkmark {
                 if ($formdata = data_submitted() and confirm_sesskey()) {
 
                     // Create the submission if needed & return its id!
-                    $submission = $this->get_submission($userid, false);
+                    $submission = $this->get_submission($userid, true);
 
-                    foreach ($submission->get_examples() as $key => $example) {
+                    foreach ($submission->get_examples_or_example_template() as $key => $example) {
                         if (isset($formdata->{$key}) && ($formdata->{$key} != 0)) {
                             $submission->get_example($key)->overwrite_example(\mod_checkmark\example::CHECKED);
                         } else {

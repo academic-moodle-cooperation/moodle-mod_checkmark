@@ -420,13 +420,15 @@ class mod_checkmark_grading_form extends moodleform {
      * @param \MoodleQuickForm $mform
      * @param \mod_checkmark\submission $submission
      * @throws coding_exception
+     * @throws dml_exception
      */
     public function add_submission_elements(\MoodleQuickForm &$mform, \mod_checkmark\submission $submission) {
-        if (empty($submission) || empty($submission->get_examples())) {
+        if (empty($submission)) {
             // If there's no submission, we have nothing to do here!
             return;
         }
-        foreach ($submission->get_examples() as $example) {
+        $examples = $submission->get_examples_or_example_template();
+        foreach ($examples as $example) {
             $examplearray = [];
             $examplearray[] =& $mform->createElement('advcheckbox', $example->get_id(), '',
                     $example->get_name().' ('.$example->get_grade().' '.
