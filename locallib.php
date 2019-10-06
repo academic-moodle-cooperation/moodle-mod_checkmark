@@ -1429,7 +1429,7 @@ class checkmark {
                         }
                     }
                 }
-                $this->update_submission($submission);
+                $this->update_submission($submission,true);
                 if ($this->process_feedback()) {
                     $this->display_submissions(get_string('changessaved'));
                 } else {
@@ -1804,7 +1804,7 @@ class checkmark {
                         }
                     }
                 }
-                $this->update_submission($submission);
+                $this->update_submission($submission,true);
                 $this->display_submission($userid);
                 break;
 
@@ -2089,15 +2089,20 @@ class checkmark {
      * update_submission($submission) - updates the submission for the actual user
      *
      * @param object $submission Submission object to update
+     * @param bool $is_overwrite Indicates of submission is updated due to overwrite -> Submission date doesn't get changed
      * @throws dml_exception
      */
-    public function update_submission(&$submission) {
+    public function update_submission($submission,$is_overwrite = false) {
         global $USER, $DB;
-
         $update = new stdClass();
         $update->id           = $submission->id;
-        $update->timemodified = time();
-        $DB->update_record('checkmark_submissions', $update);
+        if ($is_overwrite && isset($submission)) {
+
+        } else {
+            $update->timemodified = time();
+            $DB->update_record('checkmark_submissions', $update);
+        }
+
         foreach ($submission->examples as $key => $example) {
             $stateupdate = new stdClass();
             $stateupdate->exampleid = $key;
