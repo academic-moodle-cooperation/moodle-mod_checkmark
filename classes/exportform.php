@@ -171,8 +171,6 @@ class exportform extends \moodleform {
         $mform->setExpanded('data_preview_header');
         $mform->addElement('html', $this->table);
 
-
-
     }
 
     /**

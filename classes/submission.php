@@ -18,8 +18,8 @@
  * submission.php
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2018 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Philipp Hager, extended and maintained by Daniel Binder
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_checkmark;
@@ -30,8 +30,8 @@ defined('MOODLE_INTERNAL') || die();
  * This class contains a submission definition
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2018 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Philipp Hager, extended and maintained by Daniel Binder
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class submission {
@@ -53,6 +53,7 @@ class submission {
      *
      * @param int $id
      * @param null $submission
+     * @throws \coding_exception
      * @throws \dml_exception
      */
     public function __construct($id = 0, $submission = null) {
@@ -94,9 +95,13 @@ class submission {
     }
 
     /**
-     * @param $checkmarkid
-     * @param $userid
+     * Returns a single submission for a given $checkmarkid and $userid
+     *
+     * @param int $checkmarkid
+     * @param int $userid
+     *
      * @return false|self
+     * @throws \coding_exception
      * @throws \dml_exception
      */
     public static function get_submission($checkmarkid, $userid) {
@@ -110,8 +115,18 @@ class submission {
         return new self($submission->id, $submission);
     }
 
-    public static function get_mock_submission($checkmarkid,$userid) {
-        $submission = new Submission(0,0);
+    /**
+     * Creates an empty submission for a given $checkmarkid and $userid using the current date
+     *
+     * @param int $checkmarkid
+     * @param int $userid
+     *
+     * @return submission
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    public static function get_mock_submission($checkmarkid, $userid) {
+        $submission = new Submission(0, 0);
         $submission->checkmarkid            = $checkmarkid;
         $submission->userid                 = $userid;
         $submission->timecreated            = time();
@@ -119,7 +134,11 @@ class submission {
         return $submission;
     }
 
-
+    /**
+     * Returns the present object of submission as stdClass
+     *
+     * @return \stdClass
+     */
     public function export_for_snapshot() {
         $record = new \stdClass;
         $record->id = $this->id;
@@ -132,7 +151,9 @@ class submission {
     }
 
     /**
-     * @param $name
+     * Gets the example for a given $name or false if none was found
+     *
+     * @param string $name
      * @return false|example
      */
     public function get_example($name) {
@@ -143,11 +164,9 @@ class submission {
         return $this->examples[$name];
     }
 
-    public function overwrite_examples($overwritten_examples) {
-
-    }
-
     /**
+     * Gets all examples from the present submission
+     *
      * @return example[]
      */
     public function get_examples() {
@@ -155,6 +174,21 @@ class submission {
     }
 
     /**
+     * Gets all examples from the present submission or unchecked examples if there are no examples present in the submission yet
+     *
+     * @return example[]
+     * @throws \dml_exception
+     */
+    public function get_examples_or_example_template() {
+        if (empty($this->examples)) {
+            return \checkmark::get_examples_static($this->checkmarkid);
+        }
+        return $this->examples;
+    }
+
+    /**
+     * Gets the most recent modification time of the present example
+     *
      * @return int
      */
     public function get_timemodified() {
@@ -162,6 +196,8 @@ class submission {
     }
 
     /**
+     * Returns the id of the present submission
+     *
      * @return int
      */
     public function get_id() {
@@ -169,6 +205,8 @@ class submission {
     }
 
     /**
+     * Returns the userid of the present submission
+     *
      * @return int
      */
     public function get_userid() {
@@ -176,6 +214,17 @@ class submission {
     }
 
     /**
+     * Returns the Id of the respective Checkmark exercise
+     *
+     * @return int Id of the respective Checkmark exercise
+     */
+    public function get_checkmarkid() {
+        return $this->checkmarkid;
+    }
+
+    /**
+     * Returns html output for displaying all examples of the present submission
+     *
      * @return string
      */
     public function render() {

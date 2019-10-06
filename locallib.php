@@ -18,8 +18,8 @@
  * This file contains checkmark-class with all logic-methods used by checkmark
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Philipp Hager, extended and maintained by Daniel Binder
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -37,8 +37,8 @@ require_once($CFG->dirroot.'/mod/checkmark/grading_form.php');
  * This class provides all the basic functionality for an checkmark-module
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Philipp Hager, extended and maintained by Daniel Binder
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class checkmark {
@@ -236,7 +236,7 @@ class checkmark {
         }
         $examples = [];
         foreach ($records as $key => $cur) {
-            $examples[$key] = new \mod_checkmark\example($key,$cur->name, $cur->grade, $exampleprefix);
+            $examples[$key] = new \mod_checkmark\example($key, $cur->name, $cur->grade, $exampleprefix);
         }
 
         return $examples;
@@ -416,7 +416,6 @@ class checkmark {
                 }
 
                 $this->update_submission($submission);
-
                 $this->email_teachers($submission);
 
                 // Trigger the event!
@@ -1351,6 +1350,11 @@ class checkmark {
     }
 
 
+    /**
+     * Check for all autograded feedbacks and remind teacher to regrade them.
+     *
+     * @param string $id checkmark-id
+     */
     public static function get_autograded_feedbacks($id) {
         global $DB;
         /*
@@ -1400,7 +1404,7 @@ class checkmark {
             $mode = 'saveandprevious';
         } else if (optional_param('bulk', null, PARAM_BOOL)) {
             $mode = 'bulk';
-        } else if(optional_param('overwritechecks',null,PARAM_BOOL)) {
+        } else if (optional_param('overwritechecks', null, PARAM_BOOL)) {
             $mode = 'overwritechecks';
         }
 
@@ -1415,18 +1419,17 @@ class checkmark {
                 if ($formdata = data_submitted() and confirm_sesskey()) {
 
                     // Create the submission if needed & return its id!
-                    $submission = $this->get_submission($userid, false);
+                    $submission = $this->get_submission($userid, true);
 
-                    foreach ($submission->get_examples() as $key => $example) {
-                        $name = $key;
-                        if (isset($formdata->{$name}) && ($formdata->{$name} != 0)) {
+                    foreach ($submission->get_examples_or_example_template() as $key => $example) {
+                        if (isset($formdata->{$key}) && ($formdata->{$key} != 0)) {
                             $submission->get_example($key)->overwrite_example(\mod_checkmark\example::CHECKED);
                         } else {
                             $submission->get_example($key)->overwrite_example(\mod_checkmark\example::UNCHECKED);
                         }
                     }
                 }
-                $this->update_submission($submission);
+                $this->update_submission($submission,true);
                 if ($this->process_feedback()) {
                     $this->display_submissions(get_string('changessaved'));
                 } else {
@@ -1812,8 +1815,6 @@ class checkmark {
                 redirect('submissions.php?id='.$id.'&userid='. $previousid . '&filter='.$filter.'&mode=single');
                 break;
             case 'overwritechecks':
-                //todo Implement this
-                echo 'I will implement this very soon';
                 $userid = required_param('userid', PARAM_INT);
                 if ($formdata = data_submitted() and confirm_sesskey()) {
 
@@ -1821,15 +1822,14 @@ class checkmark {
                     $submission = $this->get_submission($userid, false);
 
                     foreach ($submission->get_examples() as $key => $example) {
-                        $name = $key;
-                        if (isset($formdata->{$name}) && ($formdata->{$name} != 0)) {
+                        if (isset($formdata->{$key}) && ($formdata->{$key} != 0)) {
                             $submission->get_example($key)->overwrite_example(\mod_checkmark\example::CHECKED);
                         } else {
                             $submission->get_example($key)->overwrite_example(\mod_checkmark\example::UNCHECKED);
                         }
                     }
                 }
-                $this->update_submission($submission);
+                $this->update_submission($submission,true);
                 $this->display_submission($userid);
                 break;
 
@@ -2066,7 +2066,7 @@ class checkmark {
                 $mformdata->presentationfeedback = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$userid]->feedback;
             }
         }
-        if($submission) {
+        if ($submission) {
             $mformdata->lateness = $this->display_lateness($submission->get_timemodified(), $user->id);
         }
 
@@ -2114,15 +2114,20 @@ class checkmark {
      * update_submission($submission) - updates the submission for the actual user
      *
      * @param object $submission Submission object to update
+     * @param bool $is_overwrite Indicates of submission is updated due to overwrite -> Submission date doesn't get changed
      * @throws dml_exception
      */
-    public function update_submission(&$submission) {
+    public function update_submission($submission,$is_overwrite = false) {
         global $USER, $DB;
-
         $update = new stdClass();
         $update->id           = $submission->id;
-        $update->timemodified = time();
-        $DB->update_record('checkmark_submissions', $update);
+        if ($is_overwrite && isset($submission)) {
+
+        } else {
+            $update->timemodified = time();
+            $DB->update_record('checkmark_submissions', $update);
+        }
+
         foreach ($submission->examples as $key => $example) {
             $stateupdate = new stdClass();
             $stateupdate->exampleid = $key;
@@ -2137,8 +2142,6 @@ class checkmark {
                 $DB->update_record('checkmark_checks', $stateupdate);
             }
         }
-        //$submission = $this->get_submission($USER->id);
-
         $this->update_grade($submission);
     }
 
@@ -2250,7 +2253,6 @@ class checkmark {
             $table->out($total < $perpage ? $total : $perpage, true);
             $tablehtml = ob_get_contents();
             ob_end_clean();
-            //$mform->addElement('button','showexamples','Display examples in table');
             $mform->addElement('html', $tablehtml);
             $mform->addElement('advcheckbox', 'mailinfo', get_string('enablenotification', 'checkmark'));
             $mform->addHelpButton('mailinfo', 'enablenotification', 'checkmark');
@@ -2816,13 +2818,14 @@ class checkmark {
         $notactivestr = get_string('notactive', 'checkmark');
         $timeavailablestr = !empty($this->checkmark->timeavailable) ? userdate($this->checkmark->timeavailable) : $notactivestr;
         $timeduestr = !empty($this->checkmark->timedue) ? userdate($this->checkmark->timedue) : $notactivestr;
-        $pdf->setheadertext(get_string('course').':', $this->course->fullname,
-            get_string('availabledate', 'checkmark').':', $timeavailablestr,
-            !$template ? get_string('strprintpreview', 'checkmark') : '', $filters[$filter],
+        $paramarray = array(get_string('course').':', $this->course->fullname,
+                get_string('availabledate', 'checkmark').':', $timeavailablestr,
+                !$template ? get_string('strprintpreview', 'checkmark') : '', $filters[$filter],
             // Second header row!
-            get_string('strassignment', 'checkmark').':', $this->checkmark->name,
-            get_string('duedate', 'checkmark').':', $timeduestr,
-            get_string('groups').':', $grpname);
+                get_string('strassignment', 'checkmark').':', $this->checkmark->name,
+                get_string('duedate', 'checkmark').':', $timeduestr,
+                get_string('groups').':', $grpname);
+        $pdf->setheadertext($paramarray);
 
         $pdf->showheaderfooter($printheader);
         $pdf->setfontsize($textsize);
@@ -2941,14 +2944,14 @@ class checkmark {
             if (is_number($printperpage) && $printperpage != 0) {
                 $pdf->setrowsperpage($printperpage);
             }
-
-            $pdf->setheadertext(get_string('course') . ':', $this->course->fullname,
+            $paramarray = array(get_string('course') . ':', $this->course->fullname,
                     get_string('availabledate', 'checkmark') . ':', $timeavailablestr,
                     !$template ? get_string('strprintpreview', 'checkmark') : '', $filters[$filter],
-                    // Second header row!
+                // Second header row!
                     get_string('strassignment', 'checkmark') . ':', $this->checkmark->name,
                     get_string('duedate', 'checkmark') . ':', $timeduestr,
                     get_string('groups') . ':', $grpname);
+            $pdf->setheadertext($paramarray);
 
             // Data present?
             if (count($data)) {
@@ -3225,7 +3228,7 @@ class checkmark {
 
         $submission = $DB->get_record('checkmark_submissions', array('checkmarkid' => $this->checkmark->id,
                                                                      'userid'      => $userid));
-        $submission = new Submission($sid,$submission);
+        $submission = new Submission($sid, $submission);
         $submission->examples = $examples;
 
         return $submission;
@@ -3494,16 +3497,7 @@ class checkmark {
         }
 
         // TODO we use a form here for now, but plan to use a better template in the future!
-        /*$mform = new MoodleQuickForm('submission', 'get', '', '');
 
-        self::add_submission_elements($mform, $submission);
-
-        if ($return === true) {
-            $output = $mform->toHtml();
-            return $output;
-        }
-
-        echo $output;*/
         return $submission->render();
     }
 

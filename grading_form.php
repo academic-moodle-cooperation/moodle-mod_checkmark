@@ -19,7 +19,8 @@
  *
  * @package   mod_checkmark
  * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Daniel Binder (from 2019 onwards)
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +31,8 @@ defined('MOODLE_INTERNAL') || die;
  *
  * @package   mod_checkmark
  * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Daniel Binder (from 2019 onwards)
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_checkmark_grading_form extends moodleform {
@@ -40,7 +42,7 @@ class mod_checkmark_grading_form extends moodleform {
      */
     public function definition() {
         global $OUTPUT, $PAGE;
-        $PAGE->requires->js_call_amd('mod_checkmark/grading','init');
+        $PAGE->requires->js_call_amd('mod_checkmark/grading', 'init');
         $mform =& $this->_form;
         $formattr = $mform->getAttributes();
         $formattr['id'] = 'submitform';
@@ -411,40 +413,32 @@ class mod_checkmark_grading_form extends moodleform {
         }
         return $data;
     }
+
     /**
      * Adds the elements representing the submission to the MoodleQuickForm!
      *
      * @param \MoodleQuickForm $mform
      * @param \mod_checkmark\submission $submission
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function add_submission_elements(\MoodleQuickForm &$mform, \mod_checkmark\submission $submission) {
-        if (empty($submission) || empty($submission->get_examples())) {
+        if (empty($submission)) {
             // If there's no submission, we have nothing to do here!
             return;
         }
-
-        foreach ($submission->get_examples() as $example) {
-            $examplearray=array();
-            $examplearray[] =& $mform->createElement('advcheckbox', $example->get_id(), '', $example->get_name().' ('.$example->get_grade().' '.
-                    $example->get_pointsstring().')',array('class'=>'examplecheck $' . $example->get_grade()));
-            $examplearray[] =& $mform->createElement('html', $example->print_forced_hint());
+        $examples = $submission->get_examples_or_example_template();
+        foreach ($examples as $example) {
+            $examplearray = [];
+            $examplearray[] =& $mform->createElement('advcheckbox', $example->get_id(), '',
+                    $example->get_name().' ('.$example->get_grade().' '.
+                    $example->get_pointsstring().')', array('class' => 'examplecheck $' . $example->get_grade()));
+            $examplearray[] =& $mform->createElement('html', $example->render_forced_hint());
             $mform->addGroup($examplearray, 'examplearr', '', array(' '), false);
-            /*
-            $mform->addElement('advcheckbox', $example->get_id(), '', $example->get_name().' ('.$example->get_grade().' '.
-                    $example->get_pointsstring().')');
-            */
+
             if ($example->is_checked()) { // Is it checked?
                 $mform->setDefault($example->get_id(), 1);
             }
-            //$mform->freeze($example->shortname);
         }
-        /*
-        $buttonarray = array();
-        $buttonarray[] = &$mform->createElement('submit', 'overwritechecks',
-                get_string('savechanges'));
-        $buttonarray[] = &$mform->createElement('reset', 'resetbutton', get_string('revert'),
-                array('class' => 'btn btn-secondary'));
-        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
-        */
     }
 }

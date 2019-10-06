@@ -20,8 +20,8 @@
  * TODO maybe we should replace this library with a specialized export class, also improving design & co?
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Philipp Hager, extended and maintained by Daniel Binder
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -40,8 +40,8 @@ if (isset($CFG)) {
  * MTablePDF class handles exports to PDF, XLSX, ODS, CSV...
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Philipp Hager, extended and maintained by Daniel Binder
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class MTablePDF extends \pdf {
@@ -165,12 +165,9 @@ class MTablePDF extends \pdf {
     /**
      * Set the texts for the header of the pdf
      *
-     * TODO: Replace this with proper class properties, setter-methods and fixed texts...
-     *
-     * @param string ...$header [$title1, $desc1, $title2, $desc2, $title3, $desc3,
-     *                          $title4, $desc4, $title5, $desc5, $title6, $desc6]
+     * @param array|string $header
      */
-    public function setheadertext(string ...$header) {
+    public function setheadertext($header) {
         list($title1, $desc1, $title2, $desc2, $title3, $desc3,
                 $title4, $desc4, $title5, $desc5, $title6, $desc6) = $header;
         // We know this makes no sense, but it's just to visualize how they will be used!
@@ -789,14 +786,14 @@ class MTablePDF extends \pdf {
         $time = time();
         $time = userdate($time);
         $worksheet = $workbook->add_worksheet($time);
-        // Get system context in order to retrieve user fields
+        // Get system context in order to retrieve user fields.
         $systemcontext = context_system::instance();
         // Get all user fields.
         $textonlycolumns = get_extra_user_fields($systemcontext);
 
         array_push($textonlycolumns, "fullname");
 
-        // Translate all user fields keys to the local language used in the moodle instance for comparison with headers
+        // Translate all user fields keys to the local language used in the moodle instance for comparison with headers.
         $stringmanager = get_string_manager();
         foreach ($textonlycolumns as $key => $value) {
             if ($stringmanager->string_exists($value, 'moodle')) {
@@ -886,8 +883,7 @@ class MTablePDF extends \pdf {
                         $first = false;
                     } else if (is_numeric($cell['data']) && !isset($textonlyid[$i])) {
                         $worksheet->write_number($line, $i, $cell['data'], $text);
-                    }
-                    else {
+                    } else {
                         $worksheet->write_string($line, $i, $cell['data'], $text);
                     }
                 }
