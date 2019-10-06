@@ -83,7 +83,6 @@ define(['jquery', 'core/str'], function ($, str) {
             $('th.colexample:eq(0)').prepend(hideallContainer);
 
             var showallColgroup = '<colgroup class="showall" span="1"><col></colgroup>';
-            console.log($('colgroup.timesubmitted'));
             $('colgroup.timesubmitted').after(showallColgroup);
 
             var strings = [ {

@@ -10,19 +10,15 @@ define(['jquery', 'core/str'], function ($, str) {
     };
 
     Grading.prototype.toogleOverwiteHint = function (event) {
-        console.log("In function");
         if($('.' + event.target.id).hasClass('d-none')) {
             $('.' + event.target.id).removeClass("d-none");
-            console.log("In");
         } else {
             $('.' + event.target.id).addClass("d-none");
-            console.log("Out");
         }
     };
-    
     Grading.prototype.calculateSum = function () {
         var sum = 0;
-        $('input.examplecheck').each(function (index) {
+        $('input.examplecheck').each(function () {
             if($(this).is(':checked')) {
                 var classname = $(this).attr('class');
                 var classes = classname.split(' ');
@@ -33,7 +29,6 @@ define(['jquery', 'core/str'], function ($, str) {
                 });
             }
         });
-        console.log(sum);
         return sum;
     };
     Grading.prototype.setPoints = function (points) {
@@ -55,7 +50,7 @@ define(['jquery', 'core/str'], function ($, str) {
     return {
         init: function () {
             var originalState = [];
-            $('.overwritetag').each(function( index ) {
+            $('.overwritetag').each(function() {
                originalState.push(new State(this.getAttribute('class'),this.style.display !== 'none'));
             });
             var grading = new Grading(originalState);

@@ -315,7 +315,7 @@ class example {
      *
      * @return string HTML string indicating an overwrite
      */
-    public function print_forced_hint() {
+    public function render_forced_hint() {
         global $OUTPUT;
 
         return $OUTPUT->render_from_template('mod_checkmark/overwriteinfo', $this);

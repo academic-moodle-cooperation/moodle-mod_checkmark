@@ -431,7 +431,7 @@ class mod_checkmark_grading_form extends moodleform {
             $examplearray[] =& $mform->createElement('advcheckbox', $example->get_id(), '',
                     $example->get_name().' ('.$example->get_grade().' '.
                     $example->get_pointsstring().')', array('class' => 'examplecheck $' . $example->get_grade()));
-            $examplearray[] =& $mform->createElement('html', $example->print_forced_hint());
+            $examplearray[] =& $mform->createElement('html', $example->render_forced_hint());
             $mform->addGroup($examplearray, 'examplearr', '', array(' '), false);
 
             if ($example->is_checked()) { // Is it checked?
