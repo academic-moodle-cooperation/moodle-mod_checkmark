@@ -2092,11 +2092,11 @@ class checkmark {
      * @param bool $isOverwrite Indicates of submission is updated due to overwrite -> Submission date doesn't get changed
      * @throws dml_exception
      */
-    public function update_submission($submission, $isOverwrite = false) {
+    public function update_submission($submission, $isoverwrite = false) {
         global $DB;
         $update = new stdClass();
         $update->id           = $submission->id;
-        if (!$isOverwrite) {
+        if (!$isoverwrite) {
             $update->timemodified = time();
             $DB->update_record('checkmark_submissions', $update);
         }
