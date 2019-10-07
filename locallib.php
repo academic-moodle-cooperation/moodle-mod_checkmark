@@ -2089,7 +2089,7 @@ class checkmark {
      * update_submission($submission) - updates the submission for the actual user
      *
      * @param object $submission Submission object to update
-     * @param bool $isOverwrite Indicates of submission is updated due to overwrite -> Submission date doesn't get changed
+     * @param bool $isoverwrite Indicates of submission is updated due to overwrite -> Submission date doesn't get changed
      * @throws dml_exception
      */
     public function update_submission($submission, $isoverwrite = false) {
