@@ -1,19 +1,14 @@
 define(['jquery', 'core/str'], function ($, str) {
 
-    var name;
-    var state;
     var State = function (name,state) {
         this.name = name;
         this.state = state;
     };
 
-    var originalState;
-    var Quickgrade = function (originalstate) {
-        this.originalState = originalstate;
+    var Quickgrade = function () {
     };
 
     Quickgrade.prototype.toogleOverwiteHint = function (element) {
-        console.log("Hurray!" + event.target.id);
         if($(element).hasClass('exborder')) {
             $(element).removeClass('exborder');
         } else {
@@ -22,13 +17,9 @@ define(['jquery', 'core/str'], function ($, str) {
 
     };
 
-    Quickgrade.prototype.resetOverwrite = function () {
-        console.log(this.originalState);
-    };
-
     Quickgrade.prototype.calculateSum = function (line) {
         var sum = 0;
-        $('input.checkline' + line).each(function (index) {
+        $('input.checkline' + line).each(function () {
             if($(this).is(':checked')) {
                 var classname = $(this).attr('class');
                 var classes = classname.split(' ');
@@ -39,13 +30,11 @@ define(['jquery', 'core/str'], function ($, str) {
                 });
             }
         });
-        console.log(sum);
         return sum;
     };
     Quickgrade.prototype.setPoints = function (line,points) {
-        console.log('#menumenu' + line);
         $('#menumenu' + line).val(points);
-        /*
+
         var strings = [
             {
                 key: 'strautograded',
@@ -53,9 +42,9 @@ define(['jquery', 'core/str'], function ($, str) {
             },
         ];
         str.get_strings(strings).then(function (results) {
-            $('#id_feedback_editoreditable:first-child').text(results[0]);
+            $('#feedback' + line).text(results[0]);
         });
-        */
+
     };
 
     Quickgrade.prototype.resetFeedback = function () {
@@ -64,7 +53,7 @@ define(['jquery', 'core/str'], function ($, str) {
     return {
         init: function () {
             var originalState = [];
-            $('.overwritetag').each(function( index ) {
+            $('.overwritetag').each(function() {
                 originalState.push(new State(this.getAttribute('class'),this.style.display !== 'none'));
             });
             var quickgrade = new Quickgrade(originalState);

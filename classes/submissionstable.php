@@ -1683,7 +1683,8 @@ class submissionstable extends \table_sql {
                 $submission = $this->checkmark->get_submission($values->id);
                 $example = $submission->get_example($match[1]);
             } else {
-                $example = new example('', 1, '', example::UNCHECKED);
+                $mockexample = $this->checkmark->get_examples()[$match[1]];
+                $example = new example('', 1, $mockexample->grade, example::UNCHECKED);
             }
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return $example->get_examplestate_for_export();

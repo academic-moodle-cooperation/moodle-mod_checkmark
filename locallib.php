@@ -1630,7 +1630,7 @@ class checkmark {
                     $oldChecksPerUser = $this->split_by_user($oldchecks);
 
                     foreach ($checksPerUser as $userid => $userchecks) {
-                        $submission = $this->get_submission($userid, false);
+                        $submission = $this->get_submission($userid, true);
 
                         if ($submission && $userchecks !== $oldChecksPerUser[$userid]) {
                             foreach ($submission->get_examples() as $key => $example) {

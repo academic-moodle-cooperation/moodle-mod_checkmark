@@ -164,6 +164,7 @@ class submission {
         return $this->examples[$name];
     }
 
+
     /**
      * Gets all examples from the present submission
      *
