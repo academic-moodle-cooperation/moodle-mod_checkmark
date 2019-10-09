@@ -3696,6 +3696,12 @@ class checkmark {
         return $status;
     }
 
+    /**
+     * Splits a given checks array by users into a three-dimensional array
+     *
+     * @param array $checks Return 'checks' array of submissionstable
+     * @return array Three-dimensional array split by users
+     */
     private function split_by_user(array $checks) {
         $split_check_array = [];
         foreach ($checks as $check => $value) {
