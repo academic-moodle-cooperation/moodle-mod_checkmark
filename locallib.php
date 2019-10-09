@@ -28,10 +28,10 @@ use mod_checkmark\submission;
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->dirroot . '/mod/checkmark/lib.php');
-require_once($CFG->libdir.'/formslib.php');
-require_once($CFG->libdir.'/gradelib.php');
-require_once($CFG->dirroot.'/mod/checkmark/submission_form.php');
-require_once($CFG->dirroot.'/mod/checkmark/grading_form.php');
+require_once($CFG->libdir . '/formslib.php');
+require_once($CFG->libdir . '/gradelib.php');
+require_once($CFG->dirroot . '/mod/checkmark/submission_form.php');
+require_once($CFG->dirroot . '/mod/checkmark/grading_form.php');
 
 /**
  * This class provides all the basic functionality for an checkmark-module
@@ -44,9 +44,9 @@ require_once($CFG->dirroot.'/mod/checkmark/grading_form.php');
 class checkmark {
 
     /** FILTER_ALL */
-    const FILTER_ALL             = 1;
+    const FILTER_ALL = 1;
     /** FILTER_SUBMITTED */
-    const FILTER_SUBMITTED       = 2;
+    const FILTER_SUBMITTED = 2;
     /** FILTER_REQUIRE_GRADING */
     const FILTER_REQUIRE_GRADING = 3;
     /** FILTER_SELECTED */
@@ -103,7 +103,7 @@ class checkmark {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function __construct($cmid='staticonly', $checkmark=null, $cm=null, $course=null) {
+    public function __construct($cmid = 'staticonly', $checkmark = null, $cm = null, $course = null) {
         global $COURSE, $DB, $USER;
 
         if ($cmid == 'staticonly') {
@@ -113,7 +113,7 @@ class checkmark {
 
         if ($cm) {
             $this->cm = $cm;
-        } else if (! $this->cm = get_coursemodule_from_id('checkmark', $cmid)) {
+        } else if (!$this->cm = get_coursemodule_from_id('checkmark', $cmid)) {
             print_error('invalidcoursemodule');
         }
 
@@ -123,13 +123,13 @@ class checkmark {
             $this->course = $course;
         } else if ($this->cm->course == $COURSE->id) {
             $this->course = $COURSE;
-        } else if (! $this->course = $DB->get_record('course', ['id' => $this->cm->course])) {
+        } else if (!$this->course = $DB->get_record('course', ['id' => $this->cm->course])) {
             print_error('invalidid', 'checkmark');
         }
 
         if ($checkmark) {
             $this->checkmark = $checkmark;
-        } else if (! $this->checkmark = $DB->get_record('checkmark', ['id' => $this->cm->instance])) {
+        } else if (!$this->checkmark = $DB->get_record('checkmark', ['id' => $this->cm->instance])) {
             print_error('invalidid', 'checkmark');
         }
 
@@ -140,7 +140,7 @@ class checkmark {
 
         // Ensure compatibility with modedit checkmark obj!
         $this->checkmark->cmidnumber = $this->cm->idnumber;
-        $this->checkmark->course   = $this->course->id;
+        $this->checkmark->course = $this->course->id;
 
         /*
          * Visibility handled by require_login() with $cm parameter
@@ -288,8 +288,9 @@ class checkmark {
 
         $a = checkmark_getsubmissionstats($submission, $this->checkmark);
 
-        $output = html_writer::tag('div', get_string('checkmark_summary', 'checkmark', $a), ['class' => 'chkmrksubmissionsummary']).
-                  html_writer::empty_tag('br');
+        $output =
+                html_writer::tag('div', get_string('checkmark_summary', 'checkmark', $a), ['class' => 'chkmrksubmissionsummary']) .
+                html_writer::empty_tag('br');
 
         return $output;
     }
@@ -314,7 +315,7 @@ class checkmark {
             if ($output != '') {
                 $output .= ', ';
             } else {
-                $output .= get_string('strexamples', 'checkmark').': ';
+                $output .= get_string('strexamples', 'checkmark') . ': ';
             }
             if ($example->is_checked()) { // Is it checked?
                 $class = 'checked';
@@ -339,7 +340,7 @@ class checkmark {
     public function view() {
         global $OUTPUT, $USER, $PAGE;
 
-        $edit  = optional_param('edit', 0, PARAM_BOOL);
+        $edit = optional_param('edit', 0, PARAM_BOOL);
         $saved = optional_param('saved', 0, PARAM_BOOL);
 
         $context = context_module::instance($this->cm->id);
@@ -347,11 +348,11 @@ class checkmark {
 
         /* TRIGGER THE VIEW EVENT */
         $event = \mod_checkmark\event\course_module_viewed::create(array(
-            'objectid' => $this->cm->instance,
-            'context'  => context_module::instance($this->cm->id),
-            'other'    => array(
-                'name' => $this->checkmark->name,
-            ),
+                'objectid' => $this->cm->instance,
+                'context' => context_module::instance($this->cm->id),
+                'other' => array(
+                        'name' => $this->checkmark->name,
+                ),
         ));
         $event->add_record_snapshot('course', $this->course);
         // In the next line you can use $PAGE->activityrecord if you have set it, or skip this line if you don't have a record.
@@ -366,7 +367,7 @@ class checkmark {
         if (!is_enrolled($this->context, $USER, 'mod/checkmark:submit')) {
             $editable = false;
         } else {
-            $editable = $this->isopen() && (!$submission || $this->checkmark->resubmit || ($feedback === false) );
+            $editable = $this->isopen() && (!$submission || $this->checkmark->resubmit || ($feedback === false));
             if (groups_get_activity_groupmode($this->cm, $this->course) != NOGROUPS) {
                 $editable = $editable && groups_has_membership($this->cm);
             }
@@ -374,20 +375,20 @@ class checkmark {
         $editmode = ($editable and $edit);
 
         $data = new stdClass();
-        $data->id         = $this->cm->id;
+        $data->id = $this->cm->id;
         $data->checkmarkid = $this->checkmark->id;
-        $data->edit       = $editmode;
-        $data->examples   = $this->get_examples();
+        $data->edit = $editmode;
+        $data->examples = $this->get_examples();
         if ($submission) {
-            $data->sid        = $submission->get_id();
+            $data->sid = $submission->get_id();
             if (!empty($submission->get_examples())) {
                 foreach ($submission->get_examples() as $key => $example) {
-                    $name = 'example'.$key;
+                    $name = 'example' . $key;
                     $data->$name = empty($example->is_checked()) ? 0 : 1;
                 }
             }
         } else {
-            $data->sid        = null;
+            $data->sid = null;
         }
 
         $mform = new checkmark_submission_form(null, $data);
@@ -487,7 +488,7 @@ class checkmark {
                 $submitbutton = 'addsubmission';
             }
             $url = new moodle_url('view.php',
-                                 array('id' => $this->cm->id, 'edit' => '1'));
+                    array('id' => $this->cm->id, 'edit' => '1'));
             $button = $OUTPUT->single_button($url, get_string($submitbutton, 'checkmark'), 'post', array('primary' => true));
             echo html_writer::tag('div', $button, array('class' => 'centered'));
             echo "\n";
@@ -509,22 +510,22 @@ class checkmark {
      * @param string $subpage Description of subpage to be used in navigation trail
      * @throws coding_exception
      */
-    public function view_header($subpage='') {
+    public function view_header($subpage = '') {
         global $CFG, $PAGE, $OUTPUT;
 
         if ($subpage) {
             $PAGE->navbar->add($subpage);
         }
 
-        $pagetitle = strip_tags($this->course->shortname.': '.get_string('modulename', 'checkmark').
-                                ': '.format_string($this->checkmark->name, true));
+        $pagetitle = strip_tags($this->course->shortname . ': ' . get_string('modulename', 'checkmark') .
+                ': ' . format_string($this->checkmark->name, true));
         $PAGE->set_title($pagetitle);
         $PAGE->set_heading($this->course->fullname);
 
         echo $OUTPUT->header();
 
         groups_print_activity_menu($this->cm,
-                                   $CFG->wwwroot . '/mod/checkmark/view.php?id=' . $this->cm->id);
+                $CFG->wwwroot . '/mod/checkmark/view.php?id=' . $this->cm->id);
 
         echo html_writer::tag('div', $this->submittedlink(), array('class' => 'text-info'));
         echo html_writer::tag('div', '', array('class' => 'clearer'));
@@ -552,6 +553,7 @@ class checkmark {
      * Display the checkmark dates
      *
      * Prints the checkmark start and end dates in a box.
+     *
      * @throws coding_exception
      */
     public function view_dates() {
@@ -568,7 +570,7 @@ class checkmark {
         if ($this->checkmark->timeavailable
                 || ($this->overrides && $this->overrides->timeavailable &&
                         ($this->overrides->timeavailable !== $this->checkmark->timeavailable))) {
-            $row = [new html_table_cell(get_string('availabledate', 'checkmark').':')];
+            $row = [new html_table_cell(get_string('availabledate', 'checkmark') . ':')];
             $row[0]->attributes['class'] = 'title';
             if ($this->checkmark->timeavailable) {
                 $timeavailable = userdate($this->checkmark->timeavailable);
@@ -590,7 +592,7 @@ class checkmark {
         }
         if ($this->checkmark->timedue
                 || ($this->overrides && $this->overrides->timedue && ($this->overrides->timedue !== $this->checkmark->timedue))) {
-            $row = [new html_table_cell(get_string('duedate', 'checkmark').':')];
+            $row = [new html_table_cell(get_string('duedate', 'checkmark') . ':')];
             $row[0]->attributes['class'] = 'title';
             if ($this->checkmark->timedue) {
                 $due = userdate($this->checkmark->timedue);
@@ -650,9 +652,9 @@ class checkmark {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function view_feedback($feedback=null) {
+    public function view_feedback($feedback = null) {
         global $USER, $CFG, $DB, $OUTPUT;
-        require_once($CFG->libdir.'/gradelib.php');
+        require_once($CFG->libdir . '/gradelib.php');
 
         if (!is_enrolled($this->context, $USER, 'mod/checkmark:view')) {
             // Can not submit checkmarks -> no feedback!
@@ -667,7 +669,7 @@ class checkmark {
         }
 
         $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark',
-                                        $this->checkmark->id, $userid);
+                $this->checkmark->id, $userid);
         $item = $gradinginfo->items[CHECKMARK_GRADE_ITEM];
         $grade = $item->grades[$userid];
 
@@ -688,7 +690,7 @@ class checkmark {
                 && (!$item || !$grade || (($grade->grade == null) && ($grade->feedback == null)))
                 && (!$attendanceitem || !$attendancegrade || ($attendancegrade->grade == null))
                 && (empty($presentationitem) || empty($presentationgrade)
-                    || (($presentationgrade->grade == null) && ($presentationgrade->feedback == null)))) {
+                        || (($presentationgrade->grade == null) && ($presentationgrade->feedback == null)))) {
             return;
         } else if ($feedback == false) {
             $feedback = new stdClass();
@@ -740,21 +742,21 @@ class checkmark {
         if (($grade->hidden || $grade->grade === false)
                 && (!$this->checkmark->trackattendance || ($this->checkmark->attendancegradebook && $attendanceitem->hidden))
                 && (!$this->checkmark->presentationgrading || ($this->checkmark->presentationgradebook
-                                                               && $presentationitem->hidden))) { // Hidden or error!
+                                && $presentationitem->hidden))) { // Hidden or error!
             return;
         }
 
         if ($grade->grade === null && empty($grade->str_feedback)
                 && (!$this->checkmark->trackattendance || $feedback->attendance === null)
                 && (!$this->checkmark->presentationgrading
-                    || (!$this->checkmark->presentationgrade && $feedback->presentationfeedback === null)
-                    || ($this->checkmark->presentationgrade && $feedback->presentationgrade === null
-                        && $feedback->presentationfeedback === null))) {   // Nothing to show yet!
+                        || (!$this->checkmark->presentationgrade && $feedback->presentationfeedback === null)
+                        || ($this->checkmark->presentationgrade && $feedback->presentationgrade === null
+                                && $feedback->presentationfeedback === null))) {   // Nothing to show yet!
             return;
         }
 
         $dategraded = $grade->dategraded;
-        $gradedby   = $grade->usermodified;
+        $gradedby = $grade->usermodified;
         $showfeedback = false;
         if (empty($gradedby)) {
             // Only show attendance or presentationgrade!
@@ -788,13 +790,13 @@ class checkmark {
         // Second row!
         if ($showfeedback) {
             if ($this->checkmark->grade) {
-                $content = html_writer::tag('div', html_writer::tag('strong', get_string('grade').': ').$grade->str_long_grade,
-                                            array('class' => 'grade'));
+                $content = html_writer::tag('div', html_writer::tag('strong', get_string('grade') . ': ') . $grade->str_long_grade,
+                        array('class' => 'grade'));
             } else {
                 $content = '';
             }
-            $content .= html_writer::tag('div', '', array('class' => 'clearer')).
-                        html_writer::tag('div', $grade->str_feedback, array('class' => 'comment'));
+            $content .= html_writer::tag('div', '', array('class' => 'clearer')) .
+                    html_writer::tag('div', $grade->str_feedback, array('class' => 'comment'));
             $row = html_writer::tag('td', $content, array('class' => 'content', 'colspan' => 2));
             $tablecontent .= html_writer::tag('tr', $row);
         }
@@ -810,10 +812,10 @@ class checkmark {
             } else {
                 $attendancestr = strtolower(get_string('unknown', 'checkmark'));
             }
-            $attendance = checkmark_get_attendance_symbol($feedback->attendance).$attendancestr;
+            $attendance = checkmark_get_attendance_symbol($feedback->attendance) . $attendancestr;
             // Third row --> attendance info!
-            $row = html_writer::tag('td', html_writer::tag('strong', get_string('attendance', 'checkmark').': ').$attendance,
-                                    array('class' => 'content', 'colspan' => 2));
+            $row = html_writer::tag('td', html_writer::tag('strong', get_string('attendance', 'checkmark') . ': ') . $attendance,
+                    array('class' => 'content', 'colspan' => 2));
             $tablecontent .= html_writer::tag('tr', $row);
         }
 
@@ -831,10 +833,10 @@ class checkmark {
                 $presfeedback = $feedback->presentationfeedback;
             }
             if ($presgrade != "" || $presfeedback != "") {
-                $content = html_writer::tag('div', html_writer::tag('strong', get_string('presentationgrade', 'checkmark').': ').
-                                                   $presgrade, array('class' => 'grade')).
-                           html_writer::tag('div', '', array('class' => 'clearer')).
-                           html_writer::tag('div', $presfeedback, array('class' => 'comment'));
+                $content = html_writer::tag('div', html_writer::tag('strong', get_string('presentationgrade', 'checkmark') . ': ') .
+                                $presgrade, array('class' => 'grade')) .
+                        html_writer::tag('div', '', array('class' => 'clearer')) .
+                        html_writer::tag('div', $presfeedback, array('class' => 'comment'));
                 $row = html_writer::tag('td', $content, array('class' => 'content', 'colspan' => 2));
                 $tablecontent .= html_writer::tag('tr', $row);
             }
@@ -855,11 +857,11 @@ class checkmark {
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function submittedlink($allgroups=false) {
+    public function submittedlink($allgroups = false) {
         global $USER, $CFG;
 
         $submitted = '';
-        $urlbase = $CFG->wwwroot.'/mod/checkmark/';
+        $urlbase = $CFG->wwwroot . '/mod/checkmark/';
 
         $context = context_module::instance($this->cm->id);
         if (has_capability('mod/checkmark:grade', $context)) {
@@ -870,13 +872,13 @@ class checkmark {
             }
             if ($cnt = $this->count_real_submissions($group)) {
                 $submitted = html_writer::tag('a', get_string('viewsubmissions', 'checkmark', $cnt), [
-                        'href'  => $urlbase.'submissions.php?id='.$this->cm->id,
-                        'id'    => 'submissions'
+                        'href' => $urlbase . 'submissions.php?id=' . $this->cm->id,
+                        'id' => 'submissions'
                 ]);
             } else {
                 $submitted = html_writer::tag('a', get_string('noattempts', 'checkmark'), [
-                        'href'  => $urlbase.'submissions.php?id='.$this->cm->id,
-                        'id'    => 'submissions'
+                        'href' => $urlbase . 'submissions.php?id=' . $this->cm->id,
+                        'id' => 'submissions'
                 ]);
             }
         } else {
@@ -987,12 +989,12 @@ class checkmark {
         $result['updated'] = '0';
 
         $params = array('itemname' => $this->checkmark->name,
-                        'idnumber' => $this->checkmark->cmidnumber);
+                'idnumber' => $this->checkmark->cmidnumber);
 
         if ($this->checkmark->grade > 0) {
             $params['gradetype'] = GRADE_TYPE_VALUE;
-            $params['grademax']  = $this->checkmark->grade;
-            $params['grademin']  = 0;
+            $params['grademax'] = $this->checkmark->grade;
+            $params['grademin'] = 0;
         } else {
             $result['status'] = GRADE_UPDATE_FAILED;
             if ($countonly) {
@@ -1031,31 +1033,31 @@ class checkmark {
                 $sql = "SELECT u.id, f.attendance
                           FROM {user} u
                      LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid
-                         WHERE u.deleted = 0 AND u.id ".$sqluserids;
+                         WHERE u.deleted = 0 AND u.id " . $sqluserids;
                 $params['checkmarkid'] = $this->checkmark->id;
                 break;
             case self::FILTER_REQUIRE_GRADING:
                 $wherefilter = ' AND (COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0)) ';
                 $sql = "  SELECT u.id, f.attendance
                             FROM {user} u
-                       LEFT JOIN (".$esql.") eu ON eu.id=u.id
+                       LEFT JOIN (" . $esql . ") eu ON eu.id=u.id
                        LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid)
                        LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND s.checkmarkid = f.checkmarkid
                            WHERE u.deleted = 0
-                                 AND s.checkmarkid = :checkmarkid".
-                       $wherefilter;
-                       $params = array_merge_recursive($params, array('checkmarkid' => $this->checkmark->id));
+                                 AND s.checkmarkid = :checkmarkid" .
+                        $wherefilter;
+                $params = array_merge_recursive($params, array('checkmarkid' => $this->checkmark->id));
                 break;
             case self::FILTER_ALL:
             default:
                 $sql = "  SELECT u.id, f.attendance
                             FROM {user} u
-                       LEFT JOIN (".$esql.") eu ON eu.id=u.id
+                       LEFT JOIN (" . $esql . ") eu ON eu.id=u.id
                        LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid) AND s.checkmarkid = :checkmarkid
                        LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid
                            WHERE u.deleted = 0
                                  AND eu.id=u.id";
-                       $params['checkmarkid'] = $this->checkmark->id;
+                $params['checkmarkid'] = $this->checkmark->id;
                 break;
         }
 
@@ -1078,7 +1080,7 @@ class checkmark {
                 if ($attendanceitem && key_exists($user->id, $attendanceitem->grades)
                         && ($attendanceitem->grades[$user->id]->locked || $attendanceitem->grades[$user->id]->overridden)) {
                     if ($attendanceitem->grades[$user->id]->grade === null || (($attendanceitem->grades[$user->id]->grade != 1)
-                            && ($attendanceitem->grades[$user->id]->grade != 0))) {
+                                    && ($attendanceitem->grades[$user->id]->grade != 0))) {
                         unset($users[$user->id]);
                     }
                 } else {
@@ -1116,12 +1118,12 @@ class checkmark {
                     $feedback->timemodified = $timemarked;
                     if ($attendanceitem) {
                         $lockedoroverridden = $attendanceitem->grades[$currentuser->id]->locked
-                                                  || $attendanceitem->grades[$currentuser->id]->overridden;
+                                || $attendanceitem->grades[$currentuser->id]->overridden;
                     } else {
                         $lockedoroverridden = false;
                     }
                     if ($attendancecoupled && ((!$lockedoroverridden && $feedback->attendance == 0)
-                                               || ($lockedoroverridden && $attendanceitem->grades[$currentuser->id]->grade == 0))) {
+                                    || ($lockedoroverridden && $attendanceitem->grades[$currentuser->id]->grade == 0))) {
                         // We set grade to 0 if it's coupled with attendance and the user was absent!
                         $calculatedgrade = 0;
                     } else {
@@ -1153,15 +1155,15 @@ class checkmark {
                     $result['updated']++;
 
                     // Trigger the event!
-                    \mod_checkmark\event\grade_updated::automatic($this->cm, array('userid'     => $currentuser->id,
-                                                                                   'feedbackid' => $feedback->id))->trigger();
+                    \mod_checkmark\event\grade_updated::automatic($this->cm, array('userid' => $currentuser->id,
+                            'feedbackid' => $feedback->id))->trigger();
                 }
             }
 
             if (!empty($grades)) {
                 $result['status'] = grade_update('mod/checkmark', $this->checkmark->course, 'mod',
-                                                 'checkmark', $this->checkmark->id, 0, $grades,
-                                                 $params);
+                        'checkmark', $this->checkmark->id, 0, $grades,
+                        $params);
                 return $result;
             } else {
                 $result['status'] = GRADE_UPDATE_OK;
@@ -1209,7 +1211,7 @@ class checkmark {
         foreach ($examples as $example) {
             if (($oldname != null) && ($oldgrade != null)) {
                 if ((intval($oldname + 1) != intval($example->name))
-                    || (intval($oldgrade) != intval($example->grade))) {
+                        || (intval($oldgrade) != intval($example->grade))) {
                     $flexiblenaming = true;
                 }
             }
@@ -1257,7 +1259,7 @@ class checkmark {
             if (count($grades) != count($names)) {
                 $a = new stdClass();
                 $a->gradecount = count($grades);
-                $a->namecount  = count($names);
+                $a->namecount = count($names);
                 $errors['examplegrades'] = get_string('count_individuals_mismatch', 'checkmark', $a);
                 $errors['examplenames'] = get_string('count_individuals_mismatch', 'checkmark', $a);
             }
@@ -1290,7 +1292,7 @@ class checkmark {
                     $oldnames[] = $cur->name;
                 }
                 if (count($oldexamples) !== count($names)) {
-                    $errors['examplenames'] = get_string('examplecount_changed_after_submission', 'checkmark', (object)[
+                    $errors['examplenames'] = get_string('examplecount_changed_after_submission', 'checkmark', (object) [
                             'old' => implode(', ', $oldnames)
                     ]);
                 }
@@ -1311,7 +1313,7 @@ class checkmark {
                 if (!isset($errors['examplecount'])) {
                     $errors['examplecount'] = get_string('grade_mismatch', 'checkmark');
                 } else {
-                    $errors['examplecount'] .= '<br />'.get_string('grade_mismatch', 'checkmark');
+                    $errors['examplecount'] .= '<br />' . get_string('grade_mismatch', 'checkmark');
                 }
                 $errors['grade'] = get_string('grade_mismatch', 'checkmark');
             }
@@ -1324,7 +1326,7 @@ class checkmark {
                     $oldnames[] = $cur->name;
                 }
                 if (count($oldexamples) !== $data['examplecount']) {
-                    $errors['examplecount'] = get_string('examplecount_changed_after_submission', 'checkmark', (object)[
+                    $errors['examplecount'] = get_string('examplecount_changed_after_submission', 'checkmark', (object) [
                             'old' => implode(', ', $oldnames)
                     ]);
                 }
@@ -1349,7 +1351,6 @@ class checkmark {
         }
     }
 
-
     /**
      * Check for all autograded feedbacks and remind teacher to regrade them.
      *
@@ -1365,11 +1366,11 @@ class checkmark {
         $strmanager = get_string_manager();
         $translations = $strmanager->get_list_of_translations(true);
         foreach (array_keys($translations) as $lang) {
-            $select[] = $DB->sql_like('feedback', ':'.$lang);
+            $select[] = $DB->sql_like('feedback', ':' . $lang);
             $params[$lang] = $strmanager->get_string('strautograded', 'checkmark', null, $lang);
         }
 
-        return $DB->get_records_select('checkmark_feedbacks', "checkmarkid = :id AND (".implode(" OR ", $select).")",
+        return $DB->get_records_select('checkmark_feedbacks', "checkmarkid = :id AND (" . implode(" OR ", $select) . ")",
                 ['id' => $id] + $params);
     }
 
@@ -1510,17 +1511,17 @@ class checkmark {
                                         && (count($selected) != $result)
                                         && !in_array($bulkaction, ['setattendantandgrade', 'setabsentandgrade'])) {
                                     $amountinfo = get_string('autograde_users_with_unknown_attendance', 'checkmark',
-                                                       (count($selected) - $result));
+                                            (count($selected) - $result));
                                 } else if (in_array($bulkaction, ['setattendantandgrade', 'setabsentandgrade'])) {
                                     $amount = count($selected);
                                 }
                                 echo $OUTPUT->header();
-                                $confirmboxcontent = $OUTPUT->notification(get_string('autograde_confirm', 'checkmark', $amount).
-                                                                           html_writer::empty_tag('br').$amountinfo, 'info').
-                                                     $OUTPUT->confirm(get_string('autograde_confirm_continue', 'checkmark'),
-                                                                      'submissions.php?id='.$this->cm->id.'&bulk=1&bulkaction='.
-                                                                      $bulkaction.'&confirm=1',
-                                                                      'submissions.php?id='.$this->cm->id);
+                                $confirmboxcontent = $OUTPUT->notification(get_string('autograde_confirm', 'checkmark', $amount) .
+                                                html_writer::empty_tag('br') . $amountinfo, 'info') .
+                                        $OUTPUT->confirm(get_string('autograde_confirm_continue', 'checkmark'),
+                                                'submissions.php?id=' . $this->cm->id . '&bulk=1&bulkaction=' .
+                                                $bulkaction . '&confirm=1',
+                                                'submissions.php?id=' . $this->cm->id);
                                 echo $OUTPUT->box($confirmboxcontent, 'generalbox');
                                 echo $OUTPUT->footer();
                                 die();
@@ -1529,8 +1530,8 @@ class checkmark {
                             if (($this->checkmark->grade <= 0)) {
                                 // No autograde possible if no numeric grades are selected!
                                 $message .= $OUTPUT->notification(get_string('autograde_non_numeric_grades',
-                                                                             'checkmark'),
-                                                                 'notifyproblem');
+                                        'checkmark'),
+                                        'notifyproblem');
                             } else if (has_capability('mod/checkmark:grade', context_module::instance($this->cm->id))) {
                                 $result = $this->autograde_submissions(self::FILTER_SELECTED, $selected);
                                 if (!isset($message)) {
@@ -1545,10 +1546,10 @@ class checkmark {
                                         $string = 'autograde_success';
                                     }
                                     $message .= $OUTPUT->notification(get_string($string, 'checkmark', $result['updated']),
-                                                                      'notifysuccess');
+                                            'notifysuccess');
                                 } else {
                                     $message .= $OUTPUT->notification(get_string('autograde_failed', 'checkmark'),
-                                                                      'notifyproblem');
+                                            'notifyproblem');
                                 }
                             } else {
                                 print_error('autogradegrade_error', 'checkmark');
@@ -1565,17 +1566,17 @@ class checkmark {
 
             case 'fastgrade':
                 // Do the fast grading stuff  - this process should work for all 3 subclasses!
-                $attendance     = false;
-                $presgrading    = false;
+                $attendance = false;
+                $presgrading = false;
                 $prescommenting = false;
-                $grading        = false;
-                $commenting     = false;
-                $col            = false;
+                $grading = false;
+                $commenting = false;
+                $col = false;
 
                 $grades = optional_param_array('menu', array(), PARAM_INT);
                 $feedbacks = optional_param_array('feedback', array(), PARAM_TEXT);
                 $attendances = optional_param_array('attendance', array(), PARAM_INT);
-                $checks = optional_param_array('ex',array(),PARAM_BOOL);
+                $checks = optional_param_array('ex', array(), PARAM_BOOL);
                 $presgrades = optional_param_array('presentationgrade', array(), PARAM_INT);
                 $presfeedbacks = optional_param_array('presentationfeedback', array(), PARAM_TEXT);
                 $oldgrades = optional_param_array('oldgrade', array(), PARAM_INT);
@@ -1583,10 +1584,10 @@ class checkmark {
                 $oldattendances = optional_param_array('oldattendance', array(), PARAM_INT);
                 $oldpresgrades = optional_param_array('oldpresentationgrade', array(), PARAM_INT);
                 $oldpresfeedbacks = optional_param_array('oldpresentationfeedback', array(), PARAM_TEXT);
+                $oldchecks = optional_param_array('oldex', array(), PARAM_BOOL);
 
-                $cantrackattendances = has_capability('mod/checkmark:trackattendance',  $this->context);
+                $cantrackattendances = has_capability('mod/checkmark:trackattendance', $this->context);
                 $cangradepres = has_capability('mod/checkmark:gradepresentation', $this->context);
-                $checksPerUser = $this->split_by_user($checks);
 
                 $ids = array();
 
@@ -1623,13 +1624,15 @@ class checkmark {
                 if (!(data_submitted() && confirm_sesskey())) {
                     $col = false;
                 }
-                if ($formdata = data_submitted() and confirm_sesskey()) {
+                if ($formdata = data_submitted() && confirm_sesskey() && $checks !== $oldchecks) {
 
-                    foreach ($checksPerUser as $userid => $userchecks)
-                    {
+                    $checksPerUser = $this->split_by_user($checks);
+                    $oldChecksPerUser = $this->split_by_user($oldchecks);
+
+                    foreach ($checksPerUser as $userid => $userchecks) {
                         $submission = $this->get_submission($userid, false);
 
-                        if($submission) {
+                        if ($submission && $userchecks !== $oldChecksPerUser[$userid]) {
                             foreach ($submission->get_examples() as $key => $example) {
                                 $name = $key;
                                 if (isset($userchecks[$name]) && ($userchecks[$name] != 0)) {
@@ -1637,14 +1640,12 @@ class checkmark {
                                 } else {
                                     $submission->get_example($key)->overwrite_example(\mod_checkmark\example::UNCHECKED);
                                 }
-                                $this->update_submission($submission);
+                                $this->update_submission($submission, true);
                             }
                         }
                     }
-
-                    }
-                    // Create the submission if needed & return its id!
-
+                }
+                // Create the submission if needed & return its id!
 
                 if (!$col) {
                     // All columns (submissioncomment, grade & attendance) were collapsed!
@@ -1698,7 +1699,7 @@ class checkmark {
                     }
 
                     if ($presgrading && key_exists($id, $presgrades) && (($oldpresgrades[$id] != $presgrades[$id])
-                            && !($oldpresgrades[$id] === null && $presgrades[$id] == -1))) {
+                                    && !($oldpresgrades[$id] === null && $presgrades[$id] == -1))) {
                         $presgrade = $presgrades[$id];
                         if ($presgrade == -1) {
                             $presgrade = null;
@@ -1725,7 +1726,7 @@ class checkmark {
                     }
 
                     if ($grading && key_exists($id, $grades) && (($oldgrades[$id] != $grades[$id])
-                            && !($oldgrades[$id] === null && $grades[$id] == -1))) {
+                                    && !($oldgrades[$id] === null && $grades[$id] == -1))) {
                         $grade = $grades[$id];
                         $updatedb = $updatedb || ($oldgrades[$id] != $grade);
                         if ($feedback === false) {
@@ -1748,8 +1749,8 @@ class checkmark {
                     }
 
                     if ($updatedb) {
-                        $feedback->graderid    = $USER->id;
-                        $feedback->mailed = (int)(!$mailinfo);
+                        $feedback->graderid = $USER->id;
+                        $feedback->mailed = (int) (!$mailinfo);
                     }
 
                     /*
@@ -1767,8 +1768,8 @@ class checkmark {
                         $this->update_grade($feedback);
 
                         // Trigger the event!
-                        \mod_checkmark\event\grade_updated::manual($this->cm, array('userid'     => $feedback->userid,
-                                                                                    'feedbackid' => $feedback->id))->trigger();
+                        \mod_checkmark\event\grade_updated::manual($this->cm, array('userid' => $feedback->userid,
+                                'feedbackid' => $feedback->id))->trigger();
                     }
                 }
 
@@ -1783,7 +1784,7 @@ class checkmark {
                  * first we save the current changes!
                  */
                 $this->process_feedback();
-                // Now we continue straight to with the next one!
+            // Now we continue straight to with the next one!
             case 'next':
                 /*
                  * We are currently in pop up, but we want to skip to next one without saving.
@@ -1793,7 +1794,7 @@ class checkmark {
                 $nextid = required_param('nextid', PARAM_INT);
                 $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
                 $id = required_param('id', PARAM_INT);
-                redirect('submissions.php?id='.$id.'&userid='.$nextid.'&filter='.$filter.'&mode=single');
+                redirect('submissions.php?id=' . $id . '&userid=' . $nextid . '&filter=' . $filter . '&mode=single');
                 break;
 
             case 'saveandprevious':
@@ -1802,7 +1803,7 @@ class checkmark {
                  * first we save the current changes!
                  */
                 $this->process_feedback();
-                // Now we continue straight to with the next one!
+            // Now we continue straight to with the next one!
             case 'previous':
                 /*
                  * We are currently in pop up, but we want to skip to next one without saving.
@@ -1812,7 +1813,7 @@ class checkmark {
                 $previousid = required_param('previousid', PARAM_INT);
                 $filter = optional_param('filter', self::FILTER_ALL, PARAM_INT);
                 $id = required_param('id', PARAM_INT);
-                redirect('submissions.php?id='.$id.'&userid='. $previousid . '&filter='.$filter.'&mode=single');
+                redirect('submissions.php?id=' . $id . '&userid=' . $previousid . '&filter=' . $filter . '&mode=single');
                 break;
             case 'overwritechecks':
                 $userid = required_param('userid', PARAM_INT);
@@ -1886,7 +1887,7 @@ class checkmark {
 
         if (!empty($selected) && is_array($selected)) {
             list($selsql, $selparams) = $DB->get_in_or_equal($selected, SQL_PARAMS_NAMED);
-            $selsql = ' AND userid '.$selsql;
+            $selsql = ' AND userid ' . $selsql;
         } else {
             $selsql = ' AND userid = -1';
             $selparams = array();
@@ -1920,7 +1921,7 @@ class checkmark {
      * @return string User-friendly representation of grade
      * @throws dml_exception
      */
-    public function display_grade($grade, $gradeitem=CHECKMARK_GRADE_ITEM) {
+    public function display_grade($grade, $gradeitem = CHECKMARK_GRADE_ITEM) {
         global $DB;
 
         // Cache scales for each checkmark - they might have different scales!
@@ -1929,11 +1930,11 @@ class checkmark {
 
         switch ($gradeitem) {
             case CHECKMARK_PRESENTATION_ITEM:
-                $maxgrade = (int)$this->checkmark->presentationgrade;
+                $maxgrade = (int) $this->checkmark->presentationgrade;
                 break;
             default:
             case CHECKMARK_GRADE_ITEM:
-                $maxgrade = (int)$this->checkmark->grade;
+                $maxgrade = (int) $this->checkmark->grade;
                 break;
         }
 
@@ -1941,7 +1942,7 @@ class checkmark {
             if (($grade == -1) || ($grade === null)) {
                 return '-';
             } else {
-                return round($grade, 2).' / '.$maxgrade;
+                return round($grade, 2) . ' / ' . $maxgrade;
             }
         } else {                                // Scale?
             switch ($gradeitem) {
@@ -1962,8 +1963,8 @@ class checkmark {
                     return '-';
                 }
             }
-            if (isset(${$scalecache}[$this->checkmark->id][(int)$grade])) {
-                return ${$scalecache}[$this->checkmark->id][(int)$grade];
+            if (isset(${$scalecache}[$this->checkmark->id][(int) $grade])) {
+                return ${$scalecache}[$this->checkmark->id][(int) $grade];
             }
             return '-';
         }
@@ -2003,18 +2004,18 @@ class checkmark {
         $feedback = $this->get_feedback($user->id);
 
         $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark',
-                                        $this->checkmark->id, array($user->id));
+                $this->checkmark->id, array($user->id));
         $gradingdisabled = $gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$userid]->locked
-                               || $gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$userid]->overridden;
+                || $gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$userid]->overridden;
         if ($this->checkmark->trackattendance && $this->checkmark->attendancegradebook) {
             $attendancedisabled = $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM]->grades[$userid]->locked
-                                      || $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM]->grades[$userid]->overridden;
+                    || $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM]->grades[$userid]->overridden;
         } else {
             $attendancedisabled = false;
         }
         if ($this->checkmark->presentationgradebook) {
             $presgradedisabled = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$userid]->locked
-                                            || $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$userid]->overridden;
+                    || $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$userid]->overridden;
         } else {
             $presgradedisabled = false;
         }
@@ -2084,23 +2085,23 @@ class checkmark {
         $mformdata->filter = $filter;
         $mformdata->mailinfo = get_user_preferences('checkmark_mailinfo', 0);
 
-        $submitform = new mod_checkmark_grading_form( null, $mformdata );
+        $submitform = new mod_checkmark_grading_form(null, $mformdata);
 
         if ($submitform->is_cancelled()) {
-            redirect('submissions.php?id='.$this->cm->id);
+            redirect('submissions.php?id=' . $this->cm->id);
         }
 
         $submitform->set_data($mformdata);
 
-        $PAGE->set_title($this->course->fullname . ': ' .get_string('feedback', 'checkmark').' - '.
-                         fullname($user));
+        $PAGE->set_title($this->course->fullname . ': ' . get_string('feedback', 'checkmark') . ' - ' .
+                fullname($user));
         $PAGE->set_heading($this->course->fullname);
         $PAGE->navbar->add(get_string('submissions', 'checkmark'),
-                           new moodle_url('/mod/checkmark/submissions.php', array('id' => $this->cm->id)));
+                new moodle_url('/mod/checkmark/submissions.php', array('id' => $this->cm->id)));
         $PAGE->navbar->add(fullname($user));
 
         echo $OUTPUT->header();
-        echo $OUTPUT->heading(get_string('feedback', 'checkmark').': '.fullname($user));
+        echo $OUTPUT->heading(get_string('feedback', 'checkmark') . ': ' . fullname($user));
 
         // Display mform here!
         $submitform->display();
@@ -2120,7 +2121,7 @@ class checkmark {
     public function update_submission($submission, $isoverwrite = false) {
         global $DB;
         $update = new stdClass();
-        $update->id           = $submission->id;
+        $update->id = $submission->id;
         if (!$isoverwrite) {
             $update->timemodified = time();
             $DB->update_record('checkmark_submissions', $update);
@@ -2130,7 +2131,7 @@ class checkmark {
             $stateupdate = new stdClass();
             $stateupdate->exampleid = $key;
             if (!$id = $DB->get_field('checkmark_checks', 'id', array('submissionid' => $submission->id,
-                                                                      'exampleid'    => $key), IGNORE_MISSING)) {
+                    'exampleid' => $key), IGNORE_MISSING)) {
                 $stateupdate->submissionid = $submission->id;
                 $stateupdate->state = $example->state;
                 $DB->insert_record('checkmark_checks', $stateupdate);
@@ -2152,7 +2153,7 @@ class checkmark {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function display_submissions($message='') {
+    public function display_submissions($message = '') {
         global $SESSION, $OUTPUT, $CFG, $DB, $OUTPUT, $PAGE;
 
         if (!isset($SESSION->checkmark)) {
@@ -2168,9 +2169,9 @@ class checkmark {
          * to request user_preference updates!
          */
 
-        $filters = array(self::FILTER_ALL             => get_string('all'),
-            self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
-            self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
+        $filters = array(self::FILTER_ALL => get_string('all'),
+                self::FILTER_SUBMITTED => get_string('submitted', 'checkmark'),
+                self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'));
 
         if ($this->checkmark->trackattendance) {
             $filters[self::FILTER_ATTENDANT] = get_string('all_attendant', 'checkmark');
@@ -2194,7 +2195,7 @@ class checkmark {
          * Next we get perpage and quickgrade (allow quick grade) params
          * from database!
          */
-        $perpage    = get_user_preferences('checkmark_perpage', 10);
+        $perpage = get_user_preferences('checkmark_perpage', 10);
         // Replace invalid values with our standard value!
         if ($perpage < 0 || $perpage > 100) {
             $perpage = 10;
@@ -2207,8 +2208,8 @@ class checkmark {
 
         // Some shortcuts to make the code read better!
 
-        $course     = $this->course;
-        $cm         = $this->cm;
+        $course = $this->course;
+        $cm = $this->cm;
 
         // Trigger the event!
         \mod_checkmark\event\submissions_viewed::submissions($this->cm)->trigger();
@@ -2221,9 +2222,9 @@ class checkmark {
         $coursecontext = context_course::instance($course->id);
         if (has_capability('gradereport/grader:view', $coursecontext)
                 && has_capability('moodle/grade:viewall', $coursecontext)) {
-            $linkhref = $CFG->wwwroot.'/grade/report/grader/index.php?id='.$course->id;
+            $linkhref = $CFG->wwwroot . '/grade/report/grader/index.php?id=' . $course->id;
             $link = html_writer::tag('a', get_string('seeallcoursegrades', 'grades'),
-                                     array('href' => $linkhref));
+                    array('href' => $linkhref));
             echo html_writer::tag('div', $link, array('class' => 'allcoursegrades'));
         }
 
@@ -2231,11 +2232,11 @@ class checkmark {
             echo $message;   // Display messages here if any!
         }
 
-        groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/checkmark/submissions.php?id='.$this->cm->id);
+        groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/checkmark/submissions.php?id=' . $this->cm->id);
 
         // Print quickgrade form around the table!
-        $formaction = new moodle_url('/mod/checkmark/submissions.php', array('id'      => $this->cm->id,
-                                                                             'sesskey' => sesskey()));
+        $formaction = new moodle_url('/mod/checkmark/submissions.php', array('id' => $this->cm->id,
+                'sesskey' => sesskey()));
         $mform = new MoodleQuickForm('fastg', 'post', $formaction, '', array('class' => 'combinedprintpreviewform'));
 
         $mform->addElement('hidden', 'id');
@@ -2269,13 +2270,13 @@ class checkmark {
             $mform->addElement('static', 'checkboxcontroller', get_string('select', 'checkmark'), $table->checkbox_controller());
 
             $grp = array();
-            $grp[] =& $mform->createElement( 'select', 'bulkaction', '' );
+            $grp[] =& $mform->createElement('select', 'bulkaction', '');
             $enablebulk = false;
             if ($this->checkmark->trackattendance
-                && has_capability('mod/checkmark:trackattendance', $this->context)) {
+                    && has_capability('mod/checkmark:trackattendance', $this->context)) {
                 $grp[0]->addOption(get_string('setattendant', 'checkmark'), 'setattendant');
                 $grp[0]->addOption(get_string('setabsent', 'checkmark'), 'setabsent');
-                $grp[0]->addOption('---', '', array( 'disabled' => 'disabled' ) );
+                $grp[0]->addOption('---', '', array('disabled' => 'disabled'));
                 $enablebulk = true;
             }
             if (has_capability('mod/checkmark:manageoverrides', $this->context)) {
@@ -2305,7 +2306,7 @@ class checkmark {
                     $attr = array();
                     $enablebulk = true;
                 }
-                $grp[0]->addOption('---', '', array( 'disabled' => 'disabled' ) );
+                $grp[0]->addOption('---', '', array('disabled' => 'disabled'));
                 $grp[0]->addOption(get_string('setattendantandgrade', 'checkmark'), 'setattendantandgrade', $attr);
                 $grp[0]->addOption(get_string('setabsentandgrade', 'checkmark'), 'setabsentandgrade', $attr);
             }
@@ -2317,22 +2318,22 @@ class checkmark {
 
             if ($enablebulk) {
                 $grp[] =& $mform->createElement('submit', 'bulk', get_string('start', 'checkmark'), $attr);
-                $mform->addGroup($grp, 'actiongrp', get_string('selection', 'checkmark').'...', ' ', false);
+                $mform->addGroup($grp, 'actiongrp', get_string('selection', 'checkmark') . '...', ' ', false);
                 $mform->addHelpButton('actiongrp', 'bulk', 'checkmark');
             }
         } else {
             if ($filter == self::FILTER_SUBMITTED) {
                 $mform->addElement('html',
-                                   $OUTPUT->notification(html_writer::tag('div', get_string('nosubmisson', 'checkmark'),
-                                                                          array('class' => 'nosubmission')), 'notifymessage'));
+                        $OUTPUT->notification(html_writer::tag('div', get_string('nosubmisson', 'checkmark'),
+                                array('class' => 'nosubmission')), 'notifymessage'));
             } else if ($filter == self::FILTER_REQUIRE_GRADING) {
                 $mform->addElement('html',
-                                   $OUTPUT->notification(html_writer::tag('div', get_string('norequiregrading', 'checkmark'),
-                                                                          array('class' => 'norequiregrading')), 'notifymessage'));
+                        $OUTPUT->notification(html_writer::tag('div', get_string('norequiregrading', 'checkmark'),
+                                array('class' => 'norequiregrading')), 'notifymessage'));
             } else {
                 $mform->addElement('html',
-                                   $OUTPUT->notification(html_writer::tag('div', get_string('nostudents', 'checkmark'),
-                                                                          array('class' => 'nostudents')), 'notifymessage'));
+                        $OUTPUT->notification(html_writer::tag('div', get_string('nostudents', 'checkmark'),
+                                array('class' => 'nostudents')), 'notifymessage'));
             }
         }
 
@@ -2357,11 +2358,11 @@ class checkmark {
         $mform->setDefault('filter', $filter);
 
         $mform->addElement('select', 'perpage', get_string('pagesize', 'checkmark'), [
-            0 => get_string('all'),
-            10 => 10,
-            20 => 20,
-            50 => 50,
-            100 => 100
+                0 => get_string('all'),
+                10 => 10,
+                20 => 20,
+                50 => 50,
+                100 => 100
         ]);
         $mform->setDefault('perpage', $perpage);
 
@@ -2386,10 +2387,10 @@ class checkmark {
         global $CFG;
 
         $tabs = [[
-            new tabobject('submissions', $CFG->wwwroot.'/mod/checkmark/submissions.php?id='.$this->cm->id,
-                    get_string('strsubmissions', 'checkmark'), get_string('strsubmissionstabalt', 'checkmark'), false),
-            new tabobject('export', $CFG->wwwroot.'/mod/checkmark/export.php?id='.$this->cm->id,
-                    get_string('strprintpreview', 'checkmark'), get_string('strprintpreviewtabalt', 'checkmark'), false)
+                new tabobject('submissions', $CFG->wwwroot . '/mod/checkmark/submissions.php?id=' . $this->cm->id,
+                        get_string('strsubmissions', 'checkmark'), get_string('strsubmissionstabalt', 'checkmark'), false),
+                new tabobject('export', $CFG->wwwroot . '/mod/checkmark/export.php?id=' . $this->cm->id,
+                        get_string('strprintpreview', 'checkmark'), get_string('strprintpreviewtabalt', 'checkmark'), false)
         ]];
 
         print_tabs($tabs, $tab, [$tab], []);
@@ -2406,7 +2407,7 @@ class checkmark {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function get_print_data($filter, $ids=array(), $dataonly=false) {
+    public function get_print_data($filter, $ids = array(), $dataonly = false) {
         global $DB, $OUTPUT;
 
         $table = \mod_checkmark\submissionstable::create_export_table($this->cm->id, $filter, $ids);
@@ -2415,7 +2416,7 @@ class checkmark {
                 return $table->get_data();
             } else {
                 echo html_writer::start_tag('div', array('class' => 'fcontainer scroll_forced',
-                                                         'id'    => 'table_begin'));
+                        'id' => 'table_begin'));
                 echo html_writer::tag('div', $table->checkbox_controller(), array('class' => 'checkboxcontroller'));
                 $table->out(0, true);
                 echo html_writer::end_tag('div');
@@ -2425,13 +2426,13 @@ class checkmark {
             if (empty($dataonly)) {
                 if ($filter == self::FILTER_SUBMITTED) {
                     echo $OUTPUT->notification(html_writer::tag('div', get_string('nosubmisson', 'checkmark'),
-                                                                array('class' => 'nosubmisson')), 'notifymessage');
+                            array('class' => 'nosubmisson')), 'notifymessage');
                 } else if ($filter == self::FILTER_REQUIRE_GRADING) {
                     echo $OUTPUT->notification(html_writer::tag('div', get_string('norequiregrading', 'checkmark'),
-                                                                array('class' => 'norequiregrading')), 'notifymessage');
+                            array('class' => 'norequiregrading')), 'notifymessage');
                 } else {
                     echo $OUTPUT->notification(html_writer::tag('div', get_string('nostudents', 'checkmark'),
-                                                                array('class' => 'norequiregrading')), 'notifymessage');
+                            array('class' => 'norequiregrading')), 'notifymessage');
                 }
                 return $table;
             } else {
@@ -2487,7 +2488,7 @@ class checkmark {
 
         if ($format != \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF
                 || !($updatepref && confirm_sesskey())) {
-            $printperpage    = get_user_preferences('checkmark_pdfprintperpage', 0);
+            $printperpage = get_user_preferences('checkmark_pdfprintperpage', 0);
             if ($printperpage == 0) {
                 $printoptimum = 1;
             } else {
@@ -2508,17 +2509,17 @@ class checkmark {
         }
 
         return [
-            $filter,
-            $sumabs,
-            $sumrel,
-            $format,
-            $printperpage,
-            $printoptimum,
-            $textsize,
-            $pageorientation,
-            $printheader,
-            $forcesinglelinenames,
-            $zipped
+                $filter,
+                $sumabs,
+                $sumrel,
+                $format,
+                $printperpage,
+                $printoptimum,
+                $textsize,
+                $pageorientation,
+                $printheader,
+                $forcesinglelinenames,
+                $zipped
         ];
     }
 
@@ -2539,7 +2540,7 @@ class checkmark {
              * to request user_preference updates!
              */
             list($filter, $sumabs, $sumrel, $format, $printperpage, $printoptimum, $textsize, $pageorientation,
-                $printheader, $forcesinglelinenames, $zipped) = $this->print_preferences();
+                    $printheader, $forcesinglelinenames, $zipped) = $this->print_preferences();
 
             ob_start();
             $this->get_print_data($filter);
@@ -2547,33 +2548,33 @@ class checkmark {
             ob_end_clean();
 
             $customdata = [
-                'cm' => $this->cm,
-                'context' => $this->context,
-                'examplescount' => count($this->get_examples()),
-                'table' => $tablehtml,
-                'tracksattendance' => $this->checkmark->trackattendance
+                    'cm' => $this->cm,
+                    'context' => $this->context,
+                    'examplescount' => count($this->get_examples()),
+                    'table' => $tablehtml,
+                    'tracksattendance' => $this->checkmark->trackattendance
             ];
             $formaction = new moodle_url('/mod/checkmark/export.php', [
-                'id'      => $this->cm->id,
-                'sesskey' => sesskey()
+                    'id' => $this->cm->id,
+                    'sesskey' => sesskey()
             ]);
             $mform = new \mod_checkmark\exportform($formaction, $customdata, 'post', '', [
-                'name' => 'optionspref',
-                'class' => 'combinedprintpreviewform'
+                    'name' => 'optionspref',
+                    'class' => 'combinedprintpreviewform'
             ]);
 
             $data = [
-                'filter' => $filter,
-                'sumabs' => $sumabs,
-                'sumrel' => $sumrel,
-                'format' => $format,
-                'printperpage' => $printperpage,
-                'printoptimum' => $printoptimum,
-                'textsize' => $textsize,
-                'pageorientation' => $pageorientation,
-                'printheader' => $printheader,
-                'forcesinglelinenames' => $forcesinglelinenames,
-                'zipped' => $zipped,
+                    'filter' => $filter,
+                    'sumabs' => $sumabs,
+                    'sumrel' => $sumrel,
+                    'format' => $format,
+                    'printperpage' => $printperpage,
+                    'printoptimum' => $printoptimum,
+                    'textsize' => $textsize,
+                    'pageorientation' => $pageorientation,
+                    'printheader' => $printheader,
+                    'forcesinglelinenames' => $forcesinglelinenames,
+                    'zipped' => $zipped,
             ];
             $mform->set_data($data);
         }
@@ -2589,9 +2590,9 @@ class checkmark {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function view_export($message='') {
+    public function view_export($message = '') {
         global $CFG, $OUTPUT, $PAGE;
-        require_once($CFG->libdir.'/gradelib.php');
+        require_once($CFG->libdir . '/gradelib.php');
 
         // Trigger the event!
         \mod_checkmark\event\printpreview_viewed::printpreview($this->cm)->trigger();
@@ -2636,12 +2637,12 @@ class checkmark {
         if (!($continue instanceof single_button)) {
             if (is_string($continue)) {
                 $continue = new single_button(new moodle_url($continue), get_string('continue'),
-                                              'post', true);
+                        'post', true);
             } else if ($continue instanceof moodle_url) {
                 $continue = new single_button($continue, get_string('continue'), 'post', true);
             } else {
-                throw new coding_exception('The continue param to $OUTPUT->confirm() must be either a'.
-                                           ' URL (str/moodle_url), a single_button instance or null.');
+                throw new coding_exception('The continue param to $OUTPUT->confirm() must be either a' .
+                        ' URL (str/moodle_url), a single_button instance or null.');
             }
         }
 
@@ -2653,8 +2654,8 @@ class checkmark {
             } else if ($cancel == null) {
                 $cancel = null;
             } else {
-                throw new coding_exception('The cancel param to $OUTPUT->confirm() must be either a'.
-                                           ' URL (str/moodle_url), a single_button instance or null.');
+                throw new coding_exception('The cancel param to $OUTPUT->confirm() must be either a' .
+                        ' URL (str/moodle_url), a single_button instance or null.');
             }
         }
 
@@ -2685,8 +2686,8 @@ class checkmark {
      */
     public static function get_possible_filters($trackattendance = false) {
         $filters = [
-                self::FILTER_ALL             => get_string('all'),
-                self::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
+                self::FILTER_ALL => get_string('all'),
+                self::FILTER_SUBMITTED => get_string('submitted', 'checkmark'),
                 self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark')
         ];
 
@@ -2706,11 +2707,11 @@ class checkmark {
      */
     public static function get_formats() {
         return [
-            \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF        => 'PDF',
-            \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLSX       => 'XLSX',
-            \mod_checkmark\MTablePDF::OUTPUT_FORMAT_ODS        => 'ODS',
-            \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_COMMA  => 'CSV (;)',
-            \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_TAB    => 'CSV (tab)'
+                \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF => 'PDF',
+                \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLSX => 'XLSX',
+                \mod_checkmark\MTablePDF::OUTPUT_FORMAT_ODS => 'ODS',
+                \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_COMMA => 'CSV (;)',
+                \mod_checkmark\MTablePDF::OUTPUT_FORMAT_CSV_TAB => 'CSV (tab)'
         ];
     }
 
@@ -2725,7 +2726,7 @@ class checkmark {
     public function quick_export($template = false) {
         global $PAGE;
 
-        $classname = '\\mod_checkmark\\local\\exporttemplates\\'.$template;
+        $classname = '\\mod_checkmark\\local\\exporttemplates\\' . $template;
         if (!class_exists($classname)) {
             return;
         }
@@ -2772,10 +2773,10 @@ class checkmark {
          * Get all settings preferences, some will be overwritten if a template is used!
          */
         list($filter, $sumabs, $sumrel, $format, $printperpage, ,
-             $textsize, $orientation, $printheader, $forcesinglelinenames) = $this->print_preferences();
+                $textsize, $orientation, $printheader, $forcesinglelinenames) = $this->print_preferences();
 
         if (!empty($template)) {
-            $classname = '\\mod_checkmark\\local\\exporttemplates\\'.$template;
+            $classname = '\\mod_checkmark\\local\\exporttemplates\\' . $template;
             list($sumabs, $sumrel, $orientation, $textsize, $printheader,
                     $forcesinglelinenames) = $classname::get_export_settings();
         }
@@ -2805,9 +2806,9 @@ class checkmark {
 
         if (!count($data)) {
             $cellwidth = [
-                ['mode' => 'Fixed', 'value' => '15'],
-                ['mode' => 'Fixed', 'value' => '50'],
-                ['mode' => 'Fixed', 'value' => '15']
+                    ['mode' => 'Fixed', 'value' => '15'],
+                    ['mode' => 'Fixed', 'value' => '50'],
+                    ['mode' => 'Fixed', 'value' => '15']
             ];
             $printheader = true;
         }
@@ -2816,13 +2817,13 @@ class checkmark {
         $notactivestr = get_string('notactive', 'checkmark');
         $timeavailablestr = !empty($this->checkmark->timeavailable) ? userdate($this->checkmark->timeavailable) : $notactivestr;
         $timeduestr = !empty($this->checkmark->timedue) ? userdate($this->checkmark->timedue) : $notactivestr;
-        $paramarray = array(get_string('course').':', $this->course->fullname,
-                get_string('availabledate', 'checkmark').':', $timeavailablestr,
+        $paramarray = array(get_string('course') . ':', $this->course->fullname,
+                get_string('availabledate', 'checkmark') . ':', $timeavailablestr,
                 !$template ? get_string('strprintpreview', 'checkmark') : '', $filters[$filter],
             // Second header row!
-                get_string('strassignment', 'checkmark').':', $this->checkmark->name,
-                get_string('duedate', 'checkmark').':', $timeduestr,
-                get_string('groups').':', $grpname);
+                get_string('strassignment', 'checkmark') . ':', $this->checkmark->name,
+                get_string('duedate', 'checkmark') . ':', $timeduestr,
+                get_string('groups') . ':', $grpname);
         $pdf->setheadertext($paramarray);
 
         $pdf->showheaderfooter($printheader);
@@ -2861,7 +2862,7 @@ class checkmark {
         }
         \mod_checkmark\event\submissions_exported::exported($this->cm, $export)->trigger();
 
-        $filename = $this->course->shortname.'-'.$this->checkmark->name;
+        $filename = $this->course->shortname . '-' . $this->checkmark->name;
         if ($template) {
             $filename .= '-' . get_string('exporttemplate_' . $template, 'checkmark');
         }
@@ -2901,7 +2902,7 @@ class checkmark {
                 $textsize, $orientation, $printheader, $forcesinglelinenames) = $this->print_preferences();
 
         if (!empty($template)) {
-            $classname = '\\mod_checkmark\\local\\exporttemplates\\'.$template;
+            $classname = '\\mod_checkmark\\local\\exporttemplates\\' . $template;
             list($sumabs, $sumrel, $orientation, $textsize, $printheader,
                     $forcesinglelinenames) = $classname::get_export_settings();
         }
@@ -3025,8 +3026,8 @@ class checkmark {
             $usrlst = optional_param_array('selected', [], PARAM_INT);
 
             if (empty($usrlst)) {
-                    redirect($PAGE->url, get_string('nousers', 'checkmark'), null, 'notifyproblem');
-                    return;
+                redirect($PAGE->url, get_string('nousers', 'checkmark'), null, 'notifyproblem');
+                return;
             }
 
             // Get data!
@@ -3048,7 +3049,7 @@ class checkmark {
      */
     public function process_feedback() {
         global $CFG, $USER, $DB;
-        require_once($CFG->libdir.'/gradelib.php');
+        require_once($CFG->libdir . '/gradelib.php');
 
         if (!$formdata = data_submitted() or !confirm_sesskey()) {      // No incoming data?
             return false;
@@ -3059,7 +3060,7 @@ class checkmark {
          * We use a new hidden field in the form, and set it to -1. If it's set, we use this
          * as the userid to store!
          */
-        if ((int)$formdata->saveuserid !== -1) {
+        if ((int) $formdata->saveuserid !== -1) {
             $formdata->userid = $formdata->saveuserid;
         }
 
@@ -3073,7 +3074,7 @@ class checkmark {
         }
 
         $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark',
-                                        $this->checkmark->id, $formdata->userid);
+                $this->checkmark->id, $formdata->userid);
 
         // Store outcomes if needed!
         $this->process_outcomes($formdata->userid);
@@ -3088,7 +3089,7 @@ class checkmark {
         $update = false;
 
         if (!($gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$formdata->userid]->locked
-              || $gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$formdata->userid]->overridden) ) {
+                || $gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$formdata->userid]->overridden)) {
             $feedback->grade = $formdata->xgrade;
             $feedback->feedback = $formdata->feedback_editor['text'];
             $feedback->graderid = $USER->id;
@@ -3096,7 +3097,7 @@ class checkmark {
         }
         if ($this->checkmark->attendancegradebook) {
             $lockedoroverridden = $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM]->grades[$formdata->userid]->locked
-                                      || $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM]->grades[$formdata->userid]->overridden;
+                    || $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM]->grades[$formdata->userid]->overridden;
         } else {
             $lockedoroverridden = false;
         }
@@ -3115,12 +3116,12 @@ class checkmark {
         if ($this->checkmark->presentationgradebook) {
             $presitem = $gradinginfo->items[CHECKMARK_PRESENTATION_ITEM];
             $presgradedisabled = $presitem->grades[$formdata->userid]->locked
-                                 || $presitem->grades[$formdata->userid]->overridden;
+                    || $presitem->grades[$formdata->userid]->overridden;
         } else {
             $presgradedisabled = false;
         }
         if ($this->checkmark->presentationgrading && has_capability('mod/checkmark:gradepresentation', $this->context)
-            && !$presgradedisabled) {
+                && !$presgradedisabled) {
             if ($this->checkmark->presentationgrade) {
                 $feedback->presentationgrade = $formdata->presentationgrade;
                 if ($formdata->presentationgrade == -1) {
@@ -3146,8 +3147,8 @@ class checkmark {
             $this->update_grade($feedback);
 
             // Trigger the event!
-            \mod_checkmark\event\grade_updated::manual($this->cm, array('userid'       => $feedback->userid,
-                                                                        'feedbackid' => $feedback->id))->trigger();
+            \mod_checkmark\event\grade_updated::manual($this->cm, array('userid' => $feedback->userid,
+                    'feedbackid' => $feedback->id))->trigger();
         }
 
         return $feedback;
@@ -3166,7 +3167,7 @@ class checkmark {
             return;
         }
 
-        require_once($CFG->libdir.'/gradelib.php');
+        require_once($CFG->libdir . '/gradelib.php');
 
         if (!$formdata = data_submitted() or !confirm_sesskey()) {
             return;
@@ -3174,20 +3175,20 @@ class checkmark {
 
         $data = array();
         $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark',
-                                        $this->checkmark->id, $userid);
+                $this->checkmark->id, $userid);
 
         if (!empty($gradinginfo->outcomes)) {
             foreach ($gradinginfo->outcomes as $n => $old) {
-                $name = 'outcome_'.$n;
+                $name = 'outcome_' . $n;
                 if (isset($formdata->{$name}[$userid])
-                    && $old->grades[$userid]->grade != $formdata->{$name}[$userid]) {
+                        && $old->grades[$userid]->grade != $formdata->{$name}[$userid]) {
                     $data[$n] = $formdata->{$name}[$userid];
                 }
             }
         }
         if (count($data) > 0) {
             grade_update_outcomes('mod/checkmark', $this->course->id, 'mod', 'checkmark',
-                                  $this->checkmark->id, $userid, $data);
+                    $this->checkmark->id, $userid, $data);
         }
 
     }
@@ -3201,7 +3202,7 @@ class checkmark {
      * @return \mod_checkmark\submission The submission
      * @throws dml_exception
      */
-    public function get_submission($userid=0, $createnew=false) {
+    public function get_submission($userid = 0, $createnew = false) {
         global $USER, $DB;
         if (empty($userid)) {
             $userid = $USER->id;
@@ -3219,13 +3220,13 @@ class checkmark {
         $sid = $DB->insert_record('checkmark_submissions', $newsubmission);
 
         foreach ($examples as $key => $example) {
-            $DB->insert_record('checkmark_checks', (object)['exampleid'    => $key,
-                                                            'submissionid' => $sid,
-                                                            'state'        => null]);
+            $DB->insert_record('checkmark_checks', (object) ['exampleid' => $key,
+                    'submissionid' => $sid,
+                    'state' => null]);
         }
 
         $submission = $DB->get_record('checkmark_submissions', array('checkmarkid' => $this->checkmark->id,
-                                                                     'userid'      => $userid));
+                'userid' => $userid));
         $submission = new Submission($sid, $submission);
         $submission->examples = $examples;
 
@@ -3239,7 +3240,7 @@ class checkmark {
      * @return object The feedback
      * @throws dml_exception
      */
-    public function prepare_new_feedback($userid=0) {
+    public function prepare_new_feedback($userid = 0) {
         global $USER, $DB;
 
         if (empty($userid)) {
@@ -3276,21 +3277,19 @@ class checkmark {
      * @return object|bool The feedback or false if there is none!
      * @throws dml_exception
      */
-    public function get_feedback($userid=0) {
+    public function get_feedback($userid = 0) {
         global $USER, $DB;
         if (empty($userid)) {
             $userid = $USER->id;
         }
 
         if (!$feedback = $DB->get_record('checkmark_feedbacks', array('checkmarkid' => $this->checkmark->id,
-                                                                      'userid'      => $userid))) {
+                'userid' => $userid))) {
             return false;
         }
 
         return $feedback;
     }
-
-
 
     /**
      * Return all checkmark submissions by ENROLLED students (even empty)
@@ -3299,7 +3298,7 @@ class checkmark {
      * @param string $dir optional specifying the sort direction, defaults to DESC
      * @return array The submission objects indexed by id
      */
-    public function get_submissions($sort='', $dir='DESC') {
+    public function get_submissions($sort = '', $dir = 'DESC') {
         return checkmark_get_all_submissions($this->checkmark, $sort, $dir);
     }
 
@@ -3309,7 +3308,7 @@ class checkmark {
      * @param int $groupid optional If nonzero then count is restricted to this group
      * @return int The number of submissions
      */
-    public function count_real_submissions($groupid=0) {
+    public function count_real_submissions($groupid = 0) {
         return checkmark_count_real_submissions($this->cm, $groupid);
     }
 
@@ -3345,34 +3344,34 @@ class checkmark {
 
         if ($teachers = $this->get_graders($user)) {
 
-            $strsubmitted  = get_string('submitted', 'checkmark');
+            $strsubmitted = get_string('submitted', 'checkmark');
 
             foreach ($teachers as $teacher) {
                 $info = new stdClass();
                 $info->username = fullname($user);
                 $info->checkmark = format_string($this->checkmark->name, true);
-                $info->url = $CFG->wwwroot.'/mod/checkmark/submissions.php?id='.$this->cm->id;
+                $info->url = $CFG->wwwroot . '/mod/checkmark/submissions.php?id=' . $this->cm->id;
                 $info->dayupdated = userdate($submission->timemodified, get_string('strftimedate'));
                 $info->timeupdated = userdate($submission->timemodified, get_string('strftimetime'));
 
-                $postsubject = $strsubmitted.': '.$info->username.' -> '.$this->checkmark->name;
+                $postsubject = $strsubmitted . ': ' . $info->username . ' -> ' . $this->checkmark->name;
                 $posttext = $this->email_teachers_text($info);
                 $posthtml = ($teacher->mailformat == 1) ? $this->email_teachers_html($info) : '';
 
                 $message = new \core\message\message();
-                $message->component         = 'mod_checkmark';
-                $message->name              = 'checkmark_updates';
-                $message->courseid          = $this->checkmark->course;
-                $message->userfrom          = $user;
-                $message->userto            = $teacher;
-                $message->subject           = $postsubject;
-                $message->fullmessage       = $posttext;
+                $message->component = 'mod_checkmark';
+                $message->name = 'checkmark_updates';
+                $message->courseid = $this->checkmark->course;
+                $message->userfrom = $user;
+                $message->userto = $teacher;
+                $message->subject = $postsubject;
+                $message->fullmessage = $posttext;
                 $message->fullmessageformat = FORMAT_HTML;
-                $message->fullmessagehtml   = $posthtml;
-                $message->smallmessage      = $postsubject;
-                $message->notification      = 1;
-                $message->contexturl        = $info->url;
-                $message->contexturlname    = $info->checkmark;
+                $message->fullmessagehtml = $posthtml;
+                $message->smallmessage = $postsubject;
+                $message->notification = 1;
+                $message->contexturl = $info->url;
+                $message->contexturlname = $info->checkmark;
 
                 message_send($message);
             }
@@ -3389,7 +3388,7 @@ class checkmark {
     public function get_graders($user) {
         // Get potential graders!
         $potgraders = get_users_by_capability($this->context, 'mod/checkmark:grade', '', '', '',
-                                              '', '', '', false, false);
+                '', '', '', false, false);
 
         $graders = array();
         if (groups_get_activity_groupmode($this->cm) == SEPARATEGROUPS) {
@@ -3436,11 +3435,11 @@ class checkmark {
      * @throws coding_exception
      */
     public function email_teachers_text($info) {
-        $posttext  = format_string($this->course->shortname).' -> '.
-                     get_string('modulenameplural', 'checkmark').' -> '.
-                     format_string($this->checkmark->name)."\n";
+        $posttext = format_string($this->course->shortname) . ' -> ' .
+                get_string('modulenameplural', 'checkmark') . ' -> ' .
+                format_string($this->checkmark->name) . "\n";
         $posttext .= "---------------------------------------------------------------------\n";
-        $posttext .= get_string('emailteachermail', 'checkmark', $info)."\n";
+        $posttext .= get_string('emailteachermail', 'checkmark', $info) . "\n";
         $posttext .= "---------------------------------------------------------------------\n";
         return $posttext;
     }
@@ -3456,15 +3455,15 @@ class checkmark {
      */
     public function email_teachers_html($info) {
         global $CFG;
-        $posthtml  = '<p><font face="sans-serif">'.
-                     '<a href="'.$CFG->wwwroot.'/course/view.php?id='.$this->course->id.'">'.
-                     format_string($this->course->shortname).'</a> ->'.
-                     '<a href="'.$CFG->wwwroot.'/mod/checkmark/index.php?id='.
-                     $this->course->id.'">'.get_string('modulenameplural', 'checkmark').'</a> ->'.
-                     '<a href="'.$CFG->wwwroot.'/mod/checkmark/view.php?id='.$this->cm->id.'">'.
-                     format_string($this->checkmark->name).'</a></font></p>';
+        $posthtml = '<p><font face="sans-serif">' .
+                '<a href="' . $CFG->wwwroot . '/course/view.php?id=' . $this->course->id . '">' .
+                format_string($this->course->shortname) . '</a> ->' .
+                '<a href="' . $CFG->wwwroot . '/mod/checkmark/index.php?id=' .
+                $this->course->id . '">' . get_string('modulenameplural', 'checkmark') . '</a> ->' .
+                '<a href="' . $CFG->wwwroot . '/mod/checkmark/view.php?id=' . $this->cm->id . '">' .
+                format_string($this->checkmark->name) . '</a></font></p>';
         $posthtml .= '<hr /><font face="sans-serif">';
-        $posthtml .= '<p>'.get_string('emailteachermailhtml', 'checkmark', $info).'</p>';
+        $posthtml .= '<p>' . get_string('emailteachermailhtml', 'checkmark', $info) . '</p>';
         $posthtml .= '</font><hr />';
         return $posthtml;
     }
@@ -3477,7 +3476,7 @@ class checkmark {
      * @return string|bool HTML snippet if $return is true or true if $return is anything else
      * @throws dml_exception
      */
-    public function print_user_submission($userid=0, $return=false) {
+    public function print_user_submission($userid = 0, $return = false) {
         global $USER;
 
         if (!$userid) {
@@ -3499,12 +3498,12 @@ class checkmark {
         return $submission->render();
     }
 
-
     /**
      * Returns true if the student is allowed to submit
      *
      * Checks that the checkmark has started and, cut-off-date or duedate hasn't
      * passed already.
+     *
      * @return bool
      */
     public function isopen() {
@@ -3548,7 +3547,7 @@ class checkmark {
     public function user_outline($grade) {
 
         $result = new stdClass();
-        $result->info = get_string('grade').': '.$grade->str_long_grade;
+        $result->info = get_string('grade') . ': ' . $grade->str_long_grade;
         $result->time = $grade->dategraded;
         return $result;
     }
@@ -3562,19 +3561,19 @@ class checkmark {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function user_complete($user, $grade=null) {
+    public function user_complete($user, $grade = null) {
         global $OUTPUT;
         if ($grade) {
-            echo $OUTPUT->container(get_string('grade').': '.$grade->str_long_grade);
+            echo $OUTPUT->container(get_string('grade') . ': ' . $grade->str_long_grade);
             if ($grade->str_feedback) {
-                echo $OUTPUT->container(get_string('feedback').': '.$grade->str_feedback);
+                echo $OUTPUT->container(get_string('feedback') . ': ' . $grade->str_feedback);
             }
         }
 
         echo $OUTPUT->box_start();
 
         if ($submission = $this->get_submission($user->id)) {
-            echo get_string('lastmodified').': ';
+            echo get_string('lastmodified') . ': ';
             echo userdate($submission->get_timemodified());
             echo $this->display_lateness($submission->get_timemodified(), $user->id);
         } else {
@@ -3637,14 +3636,14 @@ class checkmark {
 
                 $submissions = $DB->get_fieldset_sql('SELECT id
                                                         FROM {checkmark_submissions}
-                                                       WHERE checkmarkid '.$checkmarksql, $params);
+                                                       WHERE checkmarkid ' . $checkmarksql, $params);
                 $examples = $DB->get_fieldset_sql('SELECT id
                                                      FROM {checkmark_examples}
-                                                    WHERE checkmarkid '.$checkmarksql, $params);
+                                                    WHERE checkmarkid ' . $checkmarksql, $params);
                 $DB->delete_records_select('checkmark_submissions',
-                                           'checkmarkid '.$checkmarksql, $params);
+                        'checkmarkid ' . $checkmarksql, $params);
                 $DB->delete_records_select('checkmark_feedbacks',
-                                           'checkmarkid '.$checkmarksql, $params);
+                        'checkmarkid ' . $checkmarksql, $params);
                 if (!count($submissions)) {
                     $ssql = ' = NULL';
                     $sparams = array();
@@ -3658,12 +3657,12 @@ class checkmark {
                     list($esql, $eparams) = $DB->get_in_or_equal($examples, SQL_PARAMS_NAMED);
                 }
 
-                $DB->delete_records_select('checkmark_checks', 'submissionid '.$ssql.' OR exampleid '.$esql,
-                                           array_merge($sparams, $eparams));
+                $DB->delete_records_select('checkmark_checks', 'submissionid ' . $ssql . ' OR exampleid ' . $esql,
+                        array_merge($sparams, $eparams));
 
                 $status[] = array('component' => $componentstr,
-                                  'item'      => get_string('deleteallsubmissions', 'checkmark'),
-                                  'error'     => false);
+                        'item' => get_string('deleteallsubmissions', 'checkmark'),
+                        'error' => false);
 
                 if (empty($data->reset_gradebook_grades)) {
                     // Remove all grades from gradebook!
@@ -3679,19 +3678,19 @@ class checkmark {
                 $DB->delete_records_select('checkmark_overrides', 'checkmarkid ' . $checkmarksql, $params);
 
                 $status[] = array('component' => $componentstr,
-                                  'item'      => get_string('deletealloverrides', 'checkmark'),
-                                  'error'     => false);
+                        'item' => get_string('deletealloverrides', 'checkmark'),
+                        'error' => false);
             }
         }
 
         // Updating dates - shift may be negative too!
         if ($data->timeshift) {
             shift_course_mod_dates('checkmark', array('timedue', 'timeavailable', 'cutoffdate'),
-                                   $data->timeshift, $data->course);
+                    $data->timeshift, $data->course);
 
             $status[] = array('component' => $componentstr,
-                              'item'      => get_string('datechanged'),
-                              'error'     => false);
+                    'item' => get_string('datechanged'),
+                    'error' => false);
         }
 
         return $status;
@@ -3699,8 +3698,8 @@ class checkmark {
 
     private function split_by_user(array $checks) {
         $split_check_array = [];
-        foreach($checks as $check => $value) {
-            $check_fragments = explode('_',$check);
+        foreach ($checks as $check => $value) {
+            $check_fragments = explode('_', $check);
             $split_check_array[$check_fragments[0]][$check_fragments[1]] = $value;
         }
         return $split_check_array;

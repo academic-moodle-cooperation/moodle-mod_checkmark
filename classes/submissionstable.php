@@ -1687,15 +1687,21 @@ class submissionstable extends \table_sql {
             }
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return $example->get_examplestate_for_export();
-            }
-            else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
-                $attributes = ['class' => 'examplecheck checkline' . $values->id . ' $' . $example->grade, 'id' => 'ex'.$values->id.'_'.$match[1]];
-                $cb_hidden = \html_writer::tag('input','',['type'=>'hidden', 'name'=>'ex['.$values->id.'_'.$match[1].']','value'=>'0']);
-                $cb = $cb_hidden . \html_writer::checkbox('ex['.$values->id.'_'.$match[1].']', $values->id, $example->is_checked(),null, $attributes);
-                if($example->is_forced()) {
-                    return $cb . \html_writer::tag('div', '' ,['id' => 'ex'.$values->id.'_'.$match[1], 'class' => 'excontainer exborder']);
+            } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+                $attributes = ['class' => 'examplecheck checkline' . $values->id . ' $' . $example->grade,
+                        'id' => 'ex'.$values->id.'_'.$match[1]];
+                $cbhidden = \html_writer::tag('input' , '', ['type' => 'hidden',
+                        'name' => 'ex['.$values->id.'_'.$match[1].']', 'value' => '0']);
+                $cb = $cbhidden . \html_writer::checkbox('ex['.$values->id.'_'.$match[1].']',
+                                $values->id, $example->is_checked(), null, $attributes);
+                $oldcb = \html_writer::tag('input', '', ['type' => 'hidden',
+                        'name' => 'oldex['.$values->id.'_'.$match[1].']', 'value' => $example->is_checked()]);
+                if ($example->is_forced()) {
+                    return $oldcb . $cb . \html_writer::tag('div', '',
+                                    ['id' => 'ex'.$values->id.'_'.$match[1], 'class' => 'excontainer exborder']);
                 } else {
-                    return $cb . \html_writer::tag('div', '', ['id' => 'ex'.$values->id.'_'.$match[1], 'class' => 'excontainer']);
+                    return $oldcb . $cb . \html_writer::tag('div', '',
+                                    ['id' => 'ex'.$values->id.'_'.$match[1], 'class' => 'excontainer']);
                 }
             } else {
                 return \html_writer::tag('div', $example->print_examplestate(), ['id' => 'ex'.$values->id.'_'.$match[1]]);
