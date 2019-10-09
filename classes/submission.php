@@ -174,6 +174,19 @@ class submission {
     }
 
     /**
+     * Gets all examples from the present submission or unchecked examples if there are no examples present in the submission yet
+     *
+     * @return example[]
+     * @throws \dml_exception
+     */
+    public function get_examples_or_example_template() {
+        if (empty($this->examples)) {
+            return \checkmark::get_examples_static($this->checkmarkid);
+        }
+        return $this->examples;
+    }
+
+    /**
      * Gets the most recent modification time of the present example
      *
      * @return int
@@ -198,6 +211,15 @@ class submission {
      */
     public function get_userid() {
         return $this->userid;
+    }
+
+    /**
+     * Returns the Id of the respective Checkmark exercise
+     *
+     * @return int Id of the respective Checkmark exercise
+     */
+    public function get_checkmarkid() {
+        return $this->checkmarkid;
     }
 
     /**
