@@ -9,11 +9,12 @@ define(['jquery', 'core/str'], function ($, str) {
         this.originalState = originalstate;
     };
 
-    Grading.prototype.toogleOverwiteHint = function (event) {
-        if($('.' + event.target.id).hasClass('d-none')) {
-            $('.' + event.target.id).removeClass("d-none");
+    Grading.prototype.toggleOverwiteHint = function (event) {
+        var curHint = $('.' + event.target.id);
+        if(curHint.hasClass('d-none')) {
+            curHint.removeClass("d-none");
         } else {
-            $('.' + event.target.id).addClass("d-none");
+            curHint.addClass("d-none");
         }
     };
     Grading.prototype.calculateSum = function () {
@@ -56,7 +57,7 @@ define(['jquery', 'core/str'], function ($, str) {
             var grading = new Grading(originalState);
             $(document).ready(function () {
                 $('input.examplecheck').change(function (event) {
-                    grading.toogleOverwiteHint(event);
+                    grading.toggleOverwiteHint(event);
                     grading.setPoints(grading.calculateSum());
                 });
                 $('#id_xgrade').change(grading.resetFeedback);
