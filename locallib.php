@@ -1626,13 +1626,13 @@ class checkmark {
                 }
                 if ($formdata = data_submitted() && confirm_sesskey() && $checks !== $oldchecks) {
 
-                    $checksPerUser = $this->split_by_user($checks);
-                    $oldChecksPerUser = $this->split_by_user($oldchecks);
+                    $checksperuser = $this->split_by_user($checks);
+                    $oldchecksperuser = $this->split_by_user($oldchecks);
 
-                    foreach ($checksPerUser as $userid => $userchecks) {
+                    foreach ($checksperuser as $userid => $userchecks) {
                         $submission = $this->get_submission($userid, true);
 
-                        if ($submission && $userchecks !== $oldChecksPerUser[$userid]) {
+                        if ($submission && $userchecks !== $oldchecksperuser[$userid]) {
                             foreach ($submission->get_examples() as $key => $example) {
                                 $name = $key;
                                 if (isset($userchecks[$name]) && ($userchecks[$name] != 0)) {
@@ -1660,7 +1660,7 @@ class checkmark {
                     $feedback = $this->get_feedback($id); // Don't write a feedback in the DB right now!
 
                     // For fast grade, we need to check if any changes take place!
-                    //todo Check if the checks changed method fits in here somehow
+                    // todo Check if the checks changed method fits in here somehow.
                     $updatedb = false;
 
                     if (!array_key_exists($id, $oldgrades)) {
@@ -1784,7 +1784,7 @@ class checkmark {
                  * first we save the current changes!
                  */
                 $this->process_feedback();
-            // Now we continue straight to with the next one!
+                // Now we continue straight to with the next one!
             case 'next':
                 /*
                  * We are currently in pop up, but we want to skip to next one without saving.
@@ -1803,7 +1803,7 @@ class checkmark {
                  * first we save the current changes!
                  */
                 $this->process_feedback();
-            // Now we continue straight to with the next one!
+                // Now we continue straight to with the next one!
             case 'previous':
                 /*
                  * We are currently in pop up, but we want to skip to next one without saving.
@@ -3703,12 +3703,12 @@ class checkmark {
      * @return array Three-dimensional array split by users
      */
     private function split_by_user(array $checks) {
-        $split_check_array = [];
+        $splitcheckarray = [];
         foreach ($checks as $check => $value) {
-            $check_fragments = explode('_', $check);
-            $split_check_array[$check_fragments[0]][$check_fragments[1]] = $value;
+            $checkfragments = explode('_', $check);
+            $splitcheckarray[$checkfragments[0]][$checkfragments[1]] = $value;
         }
-        return $split_check_array;
+        return $splitcheckarray;
     }
 
 }

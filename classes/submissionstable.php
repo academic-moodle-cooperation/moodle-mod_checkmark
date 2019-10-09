@@ -885,7 +885,7 @@ class submissionstable extends \table_sql {
             $PAGE->requires->js_call_amd('mod_checkmark/overrides', 'initializer', [$params]);
         }
         if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
-            $PAGE->requires->js_call_amd('mod_checkmark/quickgrade','init');
+            $PAGE->requires->js_call_amd('mod_checkmark/quickgrade', 'init');
         }
 
         parent::start_html();
