@@ -187,10 +187,20 @@ class example {
      * @throws \coding_exception
      */
     public function set_state($state) {
-        if ($state != self::UNCHECKED && $state != self::CHECKED && $state != self::UNCHECKED_OVERWRITTEN && $state != self::CHECKED_OVERWRITTEN) {
+        if ($state != self::UNCHECKED && $state != self::CHECKED && $state != self::UNCHECKED_OVERWRITTEN &&
+                $state != self::CHECKED_OVERWRITTEN) {
             throw new \coding_exception('State can only be UNCHECKED, CHECKED, UNCHECKED_OVERWRITTEN or CHECKED_OVERWRITTEN');
         }
         $this->state = $state;
+    }
+
+    /**
+     * Returns the id of the present example
+     *
+     * @return int Id of the example
+     */
+    public function get_id() {
+        return $this->id;
     }
 
     /**
@@ -237,9 +247,19 @@ class example {
      */
     public function get_forcedstring() {
         if ($this->is_forced()) {
-            return '[' . get_string('forced', 'checkmark') . ']';
+            return $this->get_forcedstring_unconditionally();
         }
         return '';
+    }
+
+    /**
+     * Always returns forcedstring regardless of state
+     *
+     * @return string String indicating an overwrite
+     * @throws \coding_exception
+     */
+    public function get_forcedstring_unconditionally() {
+        return '[' . get_string('forced', 'checkmark') . ']';
     }
 
     /**
@@ -297,6 +317,35 @@ class example {
         global $OUTPUT;
 
         return $OUTPUT->render_from_template('mod_checkmark/example', $this);
+    }
+
+    /**
+     * Returns the html indication for an overwrite used in student view
+     *
+     * @return string HTML string indicating an overwrite
+     */
+    public function render_forced_hint() {
+        global $OUTPUT;
+
+        return $OUTPUT->render_from_template('mod_checkmark/overwriteinfo', $this);
+    }
+
+    /**
+     * Method used for overwriting an example. It ensures that state is valid after overwrite
+     *
+     * @param int $overwrittenexamplestate State the example should be overwritten to
+     */
+    public function overwrite_example($overwrittenexamplestate) {
+        if ($this->state == self::CHECKED && $overwrittenexamplestate == self::UNCHECKED) {
+            $this->state = self::CHECKED_OVERWRITTEN;
+        } else if ($this->state == self::UNCHECKED && $overwrittenexamplestate == self::CHECKED) {
+            $this->state = self::UNCHECKED_OVERWRITTEN;
+        } else if ( $this->state == self::CHECKED_OVERWRITTEN && $overwrittenexamplestate == self::CHECKED) {
+            $this->state = self::CHECKED;
+        } else if ($this->state == self::UNCHECKED_OVERWRITTEN && $overwrittenexamplestate == self::UNCHECKED) {
+            $this->state = self::UNCHECKED;
+        }
+        return;
     }
 
     /**
@@ -396,10 +445,11 @@ class example {
     /**
      * Returns the appropriate expression for 'points' (singular or plural)
      *
+     * @param float $grade Amount of points for determining weather to use singular or plural
      * @return string
      * @throws \coding_exception
      */
-    public static function get_static_pointstring() {
+    public static function get_static_pointstring($grade) {
         switch ($grade) {
             case '1':
                 return get_string('strpoint', 'checkmark');

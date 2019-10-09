@@ -71,7 +71,6 @@ class checkmark_submission_form extends moodleform {
             if (array_key_exists('example'.$key, $this->_customdata)) {
                 $mform->setDefault($key, $this->_customdata->{'example'.$key});
             }
-
         }
 
         // Here come the hidden params!
@@ -93,8 +92,7 @@ class checkmark_submission_form extends moodleform {
         $PAGE->requires->js_call_amd('mod_checkmark/submission', 'initializer');
 
         // Set data from last submission and hidden fields!
-        $stdexamples = array();
-        $this->_customdata->examples = $stdexamples;
+        $this->_customdata->examples = [];
         $this->set_data($this->_customdata);
     }
 }
