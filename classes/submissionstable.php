@@ -884,6 +884,9 @@ class submissionstable extends \table_sql {
             $params->id = $this->attributes['id'];
             $PAGE->requires->js_call_amd('mod_checkmark/overrides', 'initializer', [$params]);
         }
+        if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+            $PAGE->requires->js_call_amd('mod_checkmark/quickgrade', 'init');
+        }
 
         parent::start_html();
         if (!empty($this->colgroups)) {
@@ -1536,6 +1539,7 @@ class submissionstable extends \table_sql {
      * @param object $values Contains object with all the values of record.
      * @return string Return user's grade.
      * @throws coding_exception
+     * @throws dml_exception
      */
     public function col_presentationgrade($values) {
         if (!$this->checkmark->checkmark->presentationgrading || !$this->checkmark->checkmark->presentationgrade) {
@@ -1670,6 +1674,7 @@ class submissionstable extends \table_sql {
      * @param string $colname Name of current column
      * @param stdClass $values Values of the current row
      * @return string return processed value. Return NULL if no change has been made.
+     * @throws dml_exception
      */
     public function other_cols($colname, $values) {
         // Process examples!
@@ -1678,10 +1683,27 @@ class submissionstable extends \table_sql {
                 $submission = $this->checkmark->get_submission($values->id);
                 $example = $submission->get_example($match[1]);
             } else {
-                $example = new example('', 1, '', example::UNCHECKED);
+                $mockexample = $this->checkmark->get_examples()[$match[1]];
+                $example = new example('', 1, $mockexample->grade, example::UNCHECKED);
             }
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return $example->get_examplestate_for_export();
+            } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+                $attributes = ['class' => 'examplecheck checkline' . $values->id . ' $' . $example->grade,
+                        'id' => 'ex'.$values->id.'_'.$match[1]];
+                $cbhidden = \html_writer::tag('input' , '', ['type' => 'hidden',
+                        'name' => 'ex['.$values->id.'_'.$match[1].']', 'value' => '0']);
+                $cb = $cbhidden . \html_writer::checkbox('ex['.$values->id.'_'.$match[1].']',
+                                $values->id, $example->is_checked(), null, $attributes);
+                $oldcb = \html_writer::tag('input', '', ['type' => 'hidden',
+                        'name' => 'oldex['.$values->id.'_'.$match[1].']', 'value' => $example->is_checked()]);
+                if ($example->is_forced()) {
+                    return $oldcb . $cb . \html_writer::tag('div', '',
+                                    ['id' => 'ex'.$values->id.'_'.$match[1], 'class' => 'excontainer exborder']);
+                } else {
+                    return $oldcb . $cb . \html_writer::tag('div', '',
+                                    ['id' => 'ex'.$values->id.'_'.$match[1], 'class' => 'excontainer']);
+                }
             } else {
                 return \html_writer::tag('div', $example->print_examplestate(), ['id' => 'ex'.$values->id.'_'.$match[1]]);
             }
