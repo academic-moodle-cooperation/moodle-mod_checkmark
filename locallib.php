@@ -251,7 +251,7 @@ class checkmark {
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    public function print_example_preview() {
+    public function print_example_preview($editbutton) {
         global $USER;
         $context = context_module::instance($this->cm->id);
         require_capability('mod/checkmark:view_preview', $context, $USER);
@@ -261,7 +261,9 @@ class checkmark {
 
         $mform->addElement('header', 'heading', get_string('example_preview_title', 'checkmark'));
         $mform->addHelpButton('heading', 'example_preview_title', 'checkmark');
-
+        if (isset($editbutton)) {
+            $mform->addElement('html',html_writer::tag('div', $editbutton, array('class' => 'centered')));
+        }
         $examples = $this->get_examples();
 
         $data = new stdClass();
@@ -447,6 +449,17 @@ class checkmark {
         $this->view_attendancehint();
         echo "\n";
 
+        $editbutton = null;
+        if (!$editmode && $editable && has_capability('mod/checkmark:submit', $context, $USER, false)) {
+            if (!empty($submission)) {
+                $submitbutton = 'editmysubmission';
+            } else {
+                $submitbutton = 'addsubmission';
+            }
+            $url = new moodle_url('view.php',
+                    array('id' => $this->cm->id, 'edit' => '1'));
+            $editbutton = $OUTPUT->single_button($url, get_string($submitbutton, 'checkmark'), 'post', array('primary' => true));
+        }
         if ($editmode && !empty($mform)) {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'checkmarkform');
             echo $this->print_summary();
@@ -467,9 +480,9 @@ class checkmark {
             } else if (has_capability('mod/checkmark:submit', $context, $USER, false)) {
                 // No submission present!
                 echo html_writer::tag('div', get_string('nosubmission', 'checkmark'));
-                $this->print_example_preview();
+                $this->print_example_preview($editbutton);
             } else if (has_capability('mod/checkmark:view_preview', $context)) {
-                $this->print_example_preview();
+                $this->print_example_preview($editbutton);
             } else {
                 /*
                  * If he isn't allowed to view the preview and has no submission
@@ -481,16 +494,8 @@ class checkmark {
             echo "\n";
         }
 
-        if (!$editmode && $editable && has_capability('mod/checkmark:submit', $context, $USER, false)) {
-            if (!empty($submission)) {
-                $submitbutton = 'editmysubmission';
-            } else {
-                $submitbutton = 'addsubmission';
-            }
-            $url = new moodle_url('view.php',
-                    array('id' => $this->cm->id, 'edit' => '1'));
-            $button = $OUTPUT->single_button($url, get_string($submitbutton, 'checkmark'), 'post', array('primary' => true));
-            echo html_writer::tag('div', $button, array('class' => 'centered'));
+        if (isset($editbutton)) {
+            echo html_writer::tag('div', $editbutton, array('class' => 'centered'));
             echo "\n";
         }
 
@@ -498,6 +503,10 @@ class checkmark {
         echo "\n";
         $this->view_footer();
         echo "\n";
+    }
+
+    public function print_submission_button() {
+
     }
 
     /**
