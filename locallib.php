@@ -447,6 +447,17 @@ class checkmark {
         $this->view_attendancehint();
         echo "\n";
 
+        $editbutton = null;
+        if (!$editmode && $editable && has_capability('mod/checkmark:submit', $context, $USER, false)) {
+            if (!empty($submission)) {
+                $submitbutton = 'editmysubmission';
+            } else {
+                $submitbutton = 'addsubmission';
+            }
+            $url = new moodle_url('view.php',
+                    array('id' => $this->cm->id, 'edit' => '1'));
+            $editbutton = $OUTPUT->single_button($url, get_string($submitbutton, 'checkmark'), 'post', array('primary' => true));
+        }
         if ($editmode && !empty($mform)) {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'checkmarkform');
             echo $this->print_summary();
@@ -467,8 +478,14 @@ class checkmark {
             } else if (has_capability('mod/checkmark:submit', $context, $USER, false)) {
                 // No submission present!
                 echo html_writer::tag('div', get_string('nosubmission', 'checkmark'));
+                if (isset($editbutton)) {
+                    echo html_writer::tag('div', $editbutton, array('class' => 'centered'));
+                }
                 $this->print_example_preview();
             } else if (has_capability('mod/checkmark:view_preview', $context)) {
+                if (isset($editbutton)) {
+                    echo html_writer::tag('div', $editbutton, array('class' => 'centered'));
+                }
                 $this->print_example_preview();
             } else {
                 /*
@@ -481,16 +498,8 @@ class checkmark {
             echo "\n";
         }
 
-        if (!$editmode && $editable && has_capability('mod/checkmark:submit', $context, $USER, false)) {
-            if (!empty($submission)) {
-                $submitbutton = 'editmysubmission';
-            } else {
-                $submitbutton = 'addsubmission';
-            }
-            $url = new moodle_url('view.php',
-                    array('id' => $this->cm->id, 'edit' => '1'));
-            $button = $OUTPUT->single_button($url, get_string($submitbutton, 'checkmark'), 'post', array('primary' => true));
-            echo html_writer::tag('div', $button, array('class' => 'centered'));
+        if (isset($editbutton)) {
+            echo html_writer::tag('div', $editbutton, array('class' => 'centered'));
             echo "\n";
         }
 
