@@ -247,11 +247,12 @@ class checkmark {
      *
      * TODO use a function to get an empty submission and use checkmark::add_submission_elements() instead!
      *
+     * @param $editbutton Button used for enabling editing of checks. It will not be displayed if empty
      * @throws coding_exception
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    public function print_example_preview($editbutton) {
+    public function print_example_preview() {
         global $USER;
         $context = context_module::instance($this->cm->id);
         require_capability('mod/checkmark:view_preview', $context, $USER);
@@ -261,9 +262,7 @@ class checkmark {
 
         $mform->addElement('header', 'heading', get_string('example_preview_title', 'checkmark'));
         $mform->addHelpButton('heading', 'example_preview_title', 'checkmark');
-        if (isset($editbutton)) {
-            $mform->addElement('html',html_writer::tag('div', $editbutton, array('class' => 'centered')));
-        }
+
         $examples = $this->get_examples();
 
         $data = new stdClass();
@@ -480,9 +479,15 @@ class checkmark {
             } else if (has_capability('mod/checkmark:submit', $context, $USER, false)) {
                 // No submission present!
                 echo html_writer::tag('div', get_string('nosubmission', 'checkmark'));
-                $this->print_example_preview($editbutton);
+                if (isset($editbutton)) {
+                    echo html_writer::tag('div', $editbutton, array('class' => 'centered'));
+                }
+                $this->print_example_preview();
             } else if (has_capability('mod/checkmark:view_preview', $context)) {
-                $this->print_example_preview($editbutton);
+                if (isset($editbutton)) {
+                    echo html_writer::tag('div', $editbutton, array('class' => 'centered'));
+                }
+                $this->print_example_preview();
             } else {
                 /*
                  * If he isn't allowed to view the preview and has no submission
@@ -503,10 +508,6 @@ class checkmark {
         echo "\n";
         $this->view_footer();
         echo "\n";
-    }
-
-    public function print_submission_button() {
-
     }
 
     /**
