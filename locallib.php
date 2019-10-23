@@ -247,7 +247,6 @@ class checkmark {
      *
      * TODO use a function to get an empty submission and use checkmark::add_submission_elements() instead!
      *
-     * @param $editbutton Button used for enabling editing of checks. It will not be displayed if empty
      * @throws coding_exception
      * @throws dml_exception
      * @throws required_capability_exception
