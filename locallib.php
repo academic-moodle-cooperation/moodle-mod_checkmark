@@ -368,9 +368,6 @@ class checkmark {
             $editable = false;
         } else {
             $editable = $this->isopen() && (!$submission || $this->checkmark->resubmit || ($feedback === false));
-            if (groups_get_activity_groupmode($this->cm, $this->course) != NOGROUPS) {
-                $editable = $editable && groups_has_membership($this->cm);
-            }
         }
         $editmode = ($editable and $edit);
 
