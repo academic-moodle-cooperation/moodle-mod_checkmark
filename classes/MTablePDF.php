@@ -676,6 +676,7 @@ class MTablePDF extends \pdf {
             $debug = false;
 
             foreach ($row as $key => $value) {
+                $value['data'] = strip_tags($value['data']);
                 $cf = $this->columnformat[$key];
                 $cf = $cf[$rownum % count($cf)];
                 if ($value['rowspan'] > 0) {
@@ -884,7 +885,7 @@ class MTablePDF extends \pdf {
                     } else if (is_numeric($cell['data']) && !isset($textonlyid[$i])) {
                         $worksheet->write_number($line, $i, $cell['data'], $text);
                     } else {
-                        $worksheet->write_string($line, $i, $cell['data'], $text);
+                        $worksheet->write_string(strip_tags($line), $i, strip_tags($cell['data']), $text);
                     }
                 }
 
