@@ -368,10 +368,7 @@ class checkmark {
         if (!is_enrolled($this->context, $USER, 'mod/checkmark:submit')) {
             $editable = false;
         } else {
-            $editable = $this->isopen() && (!$submission || $this->checkmark->resubmit || ($feedback === false) );
-            if (groups_get_activity_groupmode($this->cm, $this->course) != NOGROUPS) {
-                $editable = $editable && groups_has_membership($this->cm);
-            }
+            $editable = $this->isopen() && (!$submission || $this->checkmark->resubmit || ($feedback === false));
         }
         $editmode = ($editable and $edit);
 
