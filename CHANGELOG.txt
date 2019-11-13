@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.7.1 (2019-11-13)
+* [FEATURE] #6276 Display a second submit button on top of the checkmark preview
+* [FIXED] #6222 Fix not possible submission when submitting student is not part of a group in a course with group mode on
+* [FIXED] #5890 Remove html tags showing in pdf, xls and odt exports
+* [FIXED] #6260 Fix notifications send to users with grading privilege who where not part of a course where the notification originated from
+
 3.7.0 (2019-07-10)
 ------------------
 * [FEATURE] #6146 Improve layout of checks for easier readability
