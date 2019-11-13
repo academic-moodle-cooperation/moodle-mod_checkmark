@@ -3343,6 +3343,7 @@ class checkmark {
         $potgraders = get_users_by_capability($this->context, 'mod/checkmark:grade', '', '', '',
                                               '', '', '', false, false);
 
+
         $graders = array();
         if (groups_get_activity_groupmode($this->cm) == SEPARATEGROUPS) {
             // Separate groups are being used!
@@ -3370,9 +3371,11 @@ class checkmark {
                 }
             }
         } else {
+            $context = context_course::instance($this->course->id);
             foreach ($potgraders as $t) {
-                if ($t->id == $user->id) {
-                    continue; // Do not send to one self!
+
+                if ($t->id == $user->id || !is_enrolled($context, $t->id,'',true)) {
+                    continue; // Do not send to one self or to graders not part of the course!
                 }
                 $graders[$t->id] = $t;
             }
