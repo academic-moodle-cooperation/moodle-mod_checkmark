@@ -1580,7 +1580,7 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
     $a->total_grade = $maxcheckedgrades;
     $a->name = $checkmark->name;
 
-    if (getType($submission) === 'boolean' || $submission->get_userid()) {
+    if (gettype($submission) === 'boolean' || $submission->get_userid()) {
         $feedback = false;
         $userid = $USER->id;
     } else {

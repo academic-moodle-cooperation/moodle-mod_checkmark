@@ -114,6 +114,8 @@ class export {
     }
 
     /**
+     * Set general data.
+     *
      * @param int $groupmode either VISIBLEGROUPS, SEPARATEGROUPS or NOGROUPS
      * @param int $groupid groupid the export is limited to
      * @param int[] $selected selected users to export
@@ -137,6 +139,8 @@ class export {
     }
 
     /**
+     * Set pdf-data.
+     *
      * @param string $orientation either \mod_checkmark\MTablePDF::LANDSCAPE or \mod_checkmark\MTablePDF::PORTRAIT
      * @param bool $headerfooter
      * @param int $fontsize one of the constants: \\mod_checkmark\\MTablePDF::FONTSIZE\_(SMALL|MEDIUM|LARGE)
@@ -152,6 +156,8 @@ class export {
     }
 
     /**
+     * Set used template.
+     *
      * @param string $template
      */
     public function set_used_template($template) {
@@ -159,6 +165,8 @@ class export {
     }
 
     /**
+     * Get event data.
+     *
      * @return mixed[] The settings ready to be used for an export event!
      */
     public function get_event_data() {
