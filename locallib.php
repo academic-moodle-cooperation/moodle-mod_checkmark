@@ -243,10 +243,10 @@ class checkmark {
     }
 
     /**
-     * print_example_preview() prints a preview of the set examples
-     *
+     * print_example_preview() prints a preview of the set examples     *
      * TODO use a function to get an empty submission and use checkmark::add_submission_elements() instead!
      *
+     * @param $editbutton Html button element used for editing the checks
      * @throws coding_exception
      * @throws dml_exception
      * @throws required_capability_exception
@@ -509,11 +509,6 @@ class checkmark {
         $this->view_footer();
         echo "\n";
     }
-
-    public function print_submission_button() {
-
-    }
-
     /**
      * Display the header and top of a page
      *
