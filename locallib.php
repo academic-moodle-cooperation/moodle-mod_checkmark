@@ -3397,7 +3397,6 @@ class checkmark {
         $potgraders = get_users_by_capability($this->context, 'mod/checkmark:grade', '', '', '',
                 '', '', '', false, false);
 
-
         $graders = array();
         if (groups_get_activity_groupmode($this->cm) == SEPARATEGROUPS) {
             // Separate groups are being used!
