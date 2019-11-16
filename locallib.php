@@ -262,7 +262,7 @@ class checkmark {
         $mform->addElement('header', 'heading', get_string('example_preview_title', 'checkmark'));
         $mform->addHelpButton('heading', 'example_preview_title', 'checkmark');
         if (isset($editbutton)) {
-            $mform->addElement('html',html_writer::tag('div', $editbutton, array('class' => 'centered')));
+            $mform->addElement('html', html_writer::tag('div', $editbutton, array('class' => 'centered')));
         }
         $examples = $this->get_examples();
 
