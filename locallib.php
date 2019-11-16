@@ -245,14 +245,13 @@ class checkmark {
     /**
      * print_example_preview() prints a preview of the set examples
      *
-     * TODO use a function to get an empty submission and use checkmark::add_submission_elements() instead!
-     *
-     * @param $editbutton Html button element used for editing the checks
+     * @param string $editbutton Html button element used for editing the checks
      * @throws coding_exception
      * @throws dml_exception
      * @throws required_capability_exception
      */
     public function print_example_preview($editbutton) {
+        // TODO use a function to get an empty submission and use checkmark::add_submission_elements() instead!
         global $USER;
         $context = context_module::instance($this->cm->id);
         require_capability('mod/checkmark:view_preview', $context, $USER);
