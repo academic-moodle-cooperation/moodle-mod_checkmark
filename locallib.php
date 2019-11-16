@@ -3369,7 +3369,7 @@ class checkmark {
             $context = context_course::instance($this->course->id);
             foreach ($potgraders as $t) {
 
-                if ($t->id == $user->id || !is_enrolled($context, $t->id,'',true)) {
+                if ($t->id == $user->id || !is_enrolled($context, $t->id, '', true)) {
                     continue; // Do not send to one self or to graders not part of the course!
                 }
                 $graders[$t->id] = $t;
