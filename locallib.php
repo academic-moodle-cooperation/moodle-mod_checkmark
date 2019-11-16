@@ -509,11 +509,6 @@ class checkmark {
         $this->view_footer();
         echo "\n";
     }
-
-    public function print_submission_button() {
-
-    }
-
     /**
      * Display the header and top of a page
      *
