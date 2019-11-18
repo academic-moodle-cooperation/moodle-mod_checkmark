@@ -18,8 +18,8 @@
  * Version information
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Daniel Binder, Philipp Hager
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,5 +29,5 @@ $plugin->version   = 2019071001;
 $plugin->requires  = 2019052000;
 $plugin->component = 'mod_checkmark';
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = "v3.7.0";
+$plugin->release   = "v3.7.1";
 

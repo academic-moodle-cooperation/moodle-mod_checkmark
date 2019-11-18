@@ -243,15 +243,15 @@ class checkmark {
     }
 
     /**
-     * print_example_preview() prints a preview of the set examples
+     * print_example_preview() prints a preview of the set examples     *
      *
-     * TODO use a function to get an empty submission and use checkmark::add_submission_elements() instead!
-     *
+     * @param string $editbutton Html button element used for editing the checks
      * @throws coding_exception
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    public function print_example_preview() {
+    public function print_example_preview($editbutton) {
+        // TODO use a function to get an empty submission and use checkmark::add_submission_elements() instead!
         global $USER;
         $context = context_module::instance($this->cm->id);
         require_capability('mod/checkmark:view_preview', $context, $USER);
@@ -261,7 +261,9 @@ class checkmark {
 
         $mform->addElement('header', 'heading', get_string('example_preview_title', 'checkmark'));
         $mform->addHelpButton('heading', 'example_preview_title', 'checkmark');
-
+        if (isset($editbutton)) {
+            $mform->addElement('html', html_writer::tag('div', $editbutton, array('class' => 'centered')));
+        }
         $examples = $this->get_examples();
 
         $data = new stdClass();
@@ -505,7 +507,6 @@ class checkmark {
         $this->view_footer();
         echo "\n";
     }
-
     /**
      * Display the header and top of a page
      *
