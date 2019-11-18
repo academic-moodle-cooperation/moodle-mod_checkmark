@@ -243,7 +243,7 @@ class checkmark {
     }
 
     /**
-     * print_example_preview() prints a preview of the set examples     *
+     * print_example_preview() prints a preview of the set examples
      *
      * @param string $editbutton Html button element used for editing the checks
      * @throws coding_exception
@@ -3424,9 +3424,11 @@ class checkmark {
                 }
             }
         } else {
+            $context = context_course::instance($this->course->id);
             foreach ($potgraders as $t) {
-                if ($t->id == $user->id) {
-                    continue; // Do not send to one self!
+
+                if ($t->id == $user->id || !is_enrolled($context, $t->id, '', true)) {
+                    continue; // Do not send to one self or to graders not part of the course!
                 }
                 $graders[$t->id] = $t;
             }
