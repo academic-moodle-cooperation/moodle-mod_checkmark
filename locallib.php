@@ -477,15 +477,9 @@ class checkmark {
             } else if (has_capability('mod/checkmark:submit', $context, $USER, false)) {
                 // No submission present!
                 echo html_writer::tag('div', get_string('nosubmission', 'checkmark'));
-                if (isset($editbutton)) {
-                    echo html_writer::tag('div', $editbutton, array('class' => 'centered'));
-                }
-                $this->print_example_preview();
+                $this->print_example_preview($editbutton);
             } else if (has_capability('mod/checkmark:view_preview', $context)) {
-                if (isset($editbutton)) {
-                    echo html_writer::tag('div', $editbutton, array('class' => 'centered'));
-                }
-                $this->print_example_preview();
+                $this->print_example_preview($editbutton);
             } else {
                 /*
                  * If he isn't allowed to view the preview and has no submission
@@ -1637,17 +1631,18 @@ class checkmark {
                     $oldchecksperuser = $this->split_by_user($oldchecks);
 
                     foreach ($checksperuser as $userid => $userchecks) {
-                        $submission = $this->get_submission($userid, true);
-
-                        if ($submission && $userchecks !== $oldchecksperuser[$userid]) {
-                            foreach ($submission->get_examples() as $key => $example) {
-                                $name = $key;
-                                if (isset($userchecks[$name]) && ($userchecks[$name] != 0)) {
-                                    $submission->get_example($key)->overwrite_example(\mod_checkmark\example::CHECKED);
-                                } else {
-                                    $submission->get_example($key)->overwrite_example(\mod_checkmark\example::UNCHECKED);
+                        if ($userchecks !== $oldchecksperuser[$userid]) {
+                            $submission = $this->get_submission($userid, true);
+                            if ($submission) {
+                                foreach ($submission->get_examples() as $key => $example) {
+                                    $name = $key;
+                                    if (isset($userchecks[$name]) && ($userchecks[$name] != 0)) {
+                                        $submission->get_example($key)->overwrite_example(\mod_checkmark\example::CHECKED);
+                                    } else {
+                                        $submission->get_example($key)->overwrite_example(\mod_checkmark\example::UNCHECKED);
+                                    }
+                                    $this->update_submission($submission, true);
                                 }
-                                $this->update_submission($submission, true);
                             }
                         }
                     }
