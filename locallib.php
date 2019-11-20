@@ -448,11 +448,7 @@ class checkmark {
 
         $editbutton = null;
         if (!$editmode && $editable && has_capability('mod/checkmark:submit', $context, $USER, false)) {
-            if (!empty($submission)) {
-                $submitbutton = 'editmysubmission';
-            } else {
-                $submitbutton = 'addsubmission';
-            }
+            $submitbutton = 'editmysubmission';
             $url = new moodle_url('view.php',
                     array('id' => $this->cm->id, 'edit' => '1'));
             $editbutton = $OUTPUT->single_button($url, get_string($submitbutton, 'checkmark'), 'post', array('primary' => true));
@@ -470,7 +466,9 @@ class checkmark {
                 echo $this->print_summary();
                 echo html_writer::start_tag('div', array('class' => 'mform'));
                 echo html_writer::start_tag('div', array('class' => 'clearfix'));
-                echo $this->print_user_submission($USER->id, true);
+                if(isset($editbutton))
+                    echo html_writer::tag('div', $editbutton, array('class' => 'centered'));
+                echo $this->print_user_submission($USER->id);
                 echo html_writer::end_tag('div');
                 echo html_writer::end_tag('div');
 
@@ -491,16 +489,8 @@ class checkmark {
             echo "\n";
         }
 
-        if (!$editmode && $editable && has_capability('mod/checkmark:submit', $context, $USER, false)) {
-            if (!empty($submission)) {
-                $submitbutton = 'editmysubmission';
-            } else {
-                $submitbutton = 'addsubmission';
-            }
-            $url = new moodle_url('view.php',
-                                 array('id' => $this->cm->id, 'edit' => '1'));
-            $button = $OUTPUT->single_button($url, get_string($submitbutton, 'checkmark'), 'post', array('primary' => true));
-            echo html_writer::tag('div', $button, array('class' => 'centered'));
+        if (isset($editbutton)) {
+            echo html_writer::tag('div', $editbutton, array('class' => 'centered'));
             echo "\n";
         }
 
@@ -3426,7 +3416,7 @@ class checkmark {
      * @return string|bool HTML snippet if $return is true or true if $return is anything else
      * @throws dml_exception
      */
-    public function print_user_submission($userid=0, $return=false) {
+    public function print_user_submission($userid=0) {
         global $USER;
 
         if (!$userid) {
