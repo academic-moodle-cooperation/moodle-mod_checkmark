@@ -2262,10 +2262,9 @@ function mod_checkmark_core_calendar_provide_event_action(calendar_event $event,
             'edit' => 1
         ]);
         $itemcount = 1;
-        //todo have a look into that
         if (!$usersubmission) {
             // The user has not yet submitted anything. Show the addsubmission link.
-            $name = get_string('addsubmission', 'checkmark');
+            $name = get_string('editmysubmission', 'checkmark');
             $actionable = $isopen;
         } else {
             // The user has not yet submitted anything. Show the editmysubmission link (if he's allowed to resubmit).
