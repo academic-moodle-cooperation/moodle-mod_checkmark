@@ -125,10 +125,12 @@ class submission {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public static function get_mock_submission($checkmarkid, $userid) {
+    public static function get_mock_submission($checkmarkid, $userid = NULL) {
         $submission = new Submission(0, 0);
         $submission->checkmarkid            = $checkmarkid;
-        $submission->userid                 = $userid;
+        if (isset($userid)) {
+            $submission->userid                 = $userid;
+        }
         $submission->timecreated            = time();
         $submission->timemodified           = $submission->timecreated;
         return $submission;
@@ -227,12 +229,13 @@ class submission {
      * Returns html output for displaying all examples of the present submission
      *
      * @return string
+     * @throws \dml_exception
      */
     public function render() {
         global $OUTPUT;
 
         $context = clone $this;
-        $context->examples = array_values($context->examples);
+        $context->examples = array_values($this->get_examples_or_example_template());
 
         return $OUTPUT->render_from_template('mod_checkmark/submission', $context);
     }

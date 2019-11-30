@@ -245,18 +245,18 @@ class checkmark {
     /**
      * print_example_preview() prints a preview of the set examples
      *
-     * @param string $editbutton Html button element used for editing the checks
      * @throws coding_exception
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    public function print_example_preview($editbutton) {
+    public function print_example_preview() {
         // TODO use a function to get an empty submission and use checkmark::add_submission_elements() instead!
         global $USER;
         $context = context_module::instance($this->cm->id);
         require_capability('mod/checkmark:view_preview', $context, $USER);
 
         // TODO we use a form here for now, but plan to use a better template in the future!
+
         $mform = new MoodleQuickForm('submission', 'get', '', '');
 
         $mform->addElement('header', 'heading', get_string('example_preview_title', 'checkmark'));
@@ -266,6 +266,7 @@ class checkmark {
         }
         $examples = $this->get_examples();
 
+        //todo Delete $data
         $data = new stdClass();
         $data->examples = [];
         foreach ($examples as $example) {
@@ -466,7 +467,7 @@ class checkmark {
         } else {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'checkmark');
             // Display overview!
-            if (!empty($submission) && has_capability('mod/checkmark:submit', $context, $USER, false)) {
+            if (has_capability('mod/checkmark:submit', $context, $USER, false) || has_capability('mod/checkmark:view_preview', $context)) {
                 echo $this->print_summary();
                 echo html_writer::start_tag('div', array('class' => 'mform'));
                 echo html_writer::start_tag('div', array('class' => 'clearfix'));
@@ -3484,6 +3485,7 @@ class checkmark {
      * @param bool $return (optional) defaults to false. If true the html snippet is returned
      * @return string|bool HTML snippet if $return is true or true if $return is anything else
      * @throws dml_exception
+     * @throws coding_exception
      */
     public function print_user_submission($userid = 0, $return = false) {
         global $USER;
@@ -3499,7 +3501,7 @@ class checkmark {
 
         $submission = $this->get_submission($userid);
         if (!$submission) {
-            return $output;
+            $submission = \mod_checkmark\submission::get_mock_submission($this->checkmark->id);
         }
 
         // TODO we use a form here for now, but plan to use a better template in the future!
