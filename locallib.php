@@ -359,40 +359,37 @@ class checkmark {
 
         $mform = new checkmark_submission_form(null, $data);
 
-        if (true) {
-            // Prepare form and process submitted data!
-
-            if ($mform->is_cancelled()) {
-                redirect(new moodle_url($PAGE->url, array('id' => $this->cm->id)));
-            }
-
-            if ($formdata = $mform->get_data()) {
-
-                // Create the submission if needed & return its id!
-                $submission = $this->get_submission($USER->id, true);
-                $formarray = json_decode(json_encode($formdata), true);
-
-                foreach ($submission->get_examples() as $key => $example) {
-                    $name = $key;
-
-                    if (isset($formarray[$name]) && ($formarray[$name] != 0)) {
-                        $submission->get_example($key)->set_state(\mod_checkmark\example::CHECKED);
-                    } else {
-                        $submission->get_example($key)->set_state(\mod_checkmark\example::UNCHECKED);
-                    }
-                }
-
-                $this->update_submission($submission);
-                $this->email_teachers($submission);
-
-                // Trigger the event!
-                \mod_checkmark\event\submission_updated::create_from_object($this->cm, $submission)->trigger();
-
-                // Redirect to get updated submission date!
-                redirect(new moodle_url($PAGE->url, array('id' => $this->cm->id, 'saved' => 1)));
-            }
+        // Prepare form and process submitted data!
+        if ($mform->is_cancelled()) {
+            redirect(new moodle_url($PAGE->url, array('id' => $this->cm->id)));
         }
-            $this->view_header();
+
+        if ($formdata = $mform->get_data()) {
+
+            // Create the submission if needed & return its id!
+            $submission = $this->get_submission($USER->id, true);
+            $formarray = json_decode(json_encode($formdata), true);
+
+            foreach ($submission->get_examples() as $key => $example) {
+                $name = $key;
+
+                if (isset($formarray[$name]) && ($formarray[$name] != 0)) {
+                    $submission->get_example($key)->set_state(\mod_checkmark\example::CHECKED);
+                } else {
+                    $submission->get_example($key)->set_state(\mod_checkmark\example::UNCHECKED);
+                }
+            }
+
+            $this->update_submission($submission);
+            $this->email_teachers($submission);
+
+            // Trigger the event!
+            \mod_checkmark\event\submission_updated::create_from_object($this->cm, $submission)->trigger();
+
+            // Redirect to get updated submission date!
+            redirect(new moodle_url($PAGE->url, array('id' => $this->cm->id, 'saved' => 1)));
+        }
+        $this->view_header();
 
         if ($saved) {
             echo $OUTPUT->box_start('generalbox', 'notification');
