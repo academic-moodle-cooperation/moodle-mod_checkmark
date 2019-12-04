@@ -393,7 +393,7 @@ class checkmark {
 
         $mform = new checkmark_submission_form(null, $data);
 
-        if ($editmode) {
+        if (true) {
             // Prepare form and process submitted data!
 
             if ($mform->is_cancelled()) {
@@ -427,12 +427,9 @@ class checkmark {
             }
         }
 
-        // Print header, etc. and display form if needed!
-        if ($editmode) {
-            $this->view_header(get_string('editmysubmission', 'checkmark'));
-        } else {
+
             $this->view_header();
-        }
+
 
         if ($saved) {
             echo $OUTPUT->box_start('generalbox', 'notification');
@@ -447,18 +444,7 @@ class checkmark {
         $this->view_attendancehint();
         echo "\n";
 
-        $editbutton = null;
-        if (!$editmode && $editable && has_capability('mod/checkmark:submit', $context, $USER, false)) {
-            if (!empty($submission)) {
-                $submitbutton = 'editmysubmission';
-            } else {
-                $submitbutton = 'addsubmission';
-            }
-            $url = new moodle_url('view.php',
-                    array('id' => $this->cm->id, 'edit' => '1'));
-            $editbutton = $OUTPUT->single_button($url, get_string($submitbutton, 'checkmark'), 'post', array('primary' => true));
-        }
-        if ($editmode && !empty($mform)) {
+        if ($editable && has_capability('mod/checkmark:submit', $context, $USER, false) && !empty($mform)) {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'checkmarkform');
             echo $this->print_summary();
             $mform->display();
@@ -467,7 +453,7 @@ class checkmark {
         } else {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'checkmark');
             // Display overview!
-            if (has_capability('mod/checkmark:submit', $context, $USER, false) || has_capability('mod/checkmark:view_preview', $context)) {
+            if (has_capability('mod/checkmark:view_preview', $context) || has_capability('mod/checkmark:submit', $context, $USER, false)) {
                 echo $this->print_summary();
                 echo html_writer::start_tag('div', array('class' => 'mform'));
                 echo html_writer::start_tag('div', array('class' => 'clearfix'));
@@ -475,31 +461,8 @@ class checkmark {
                 echo html_writer::end_tag('div');
                 echo html_writer::end_tag('div');
 
-            } else if (has_capability('mod/checkmark:submit', $context, $USER, false)) {
-                // No submission present!
-                echo html_writer::tag('div', get_string('nosubmission', 'checkmark'));
-                if (isset($editbutton)) {
-                    echo html_writer::tag('div', $editbutton, array('class' => 'centered'));
-                }
-                $this->print_example_preview();
-            } else if (has_capability('mod/checkmark:view_preview', $context)) {
-                if (isset($editbutton)) {
-                    echo html_writer::tag('div', $editbutton, array('class' => 'centered'));
-                }
-                $this->print_example_preview();
-            } else {
-                /*
-                 * If he isn't allowed to view the preview and has no submission
-                 * tell him he has no submission!
-                 */
-                echo html_writer::tag('div', get_string('nosubmission', 'checkmark'));
             }
             echo $OUTPUT->box_end();
-            echo "\n";
-        }
-
-        if (isset($editbutton)) {
-            echo html_writer::tag('div', $editbutton, array('class' => 'centered'));
             echo "\n";
         }
 
