@@ -1565,17 +1565,18 @@ class checkmark {
                     $oldchecksperuser = $this->split_by_user($oldchecks);
 
                     foreach ($checksperuser as $userid => $userchecks) {
-                        $submission = $this->get_submission($userid, true);
-
-                        if ($submission && $userchecks !== $oldchecksperuser[$userid]) {
-                            foreach ($submission->get_examples() as $key => $example) {
-                                $name = $key;
-                                if (isset($userchecks[$name]) && ($userchecks[$name] != 0)) {
-                                    $submission->get_example($key)->overwrite_example(\mod_checkmark\example::CHECKED);
-                                } else {
-                                    $submission->get_example($key)->overwrite_example(\mod_checkmark\example::UNCHECKED);
+                        if ($userchecks !== $oldchecksperuser[$userid]) {
+                            $submission = $this->get_submission($userid, true);
+                            if ($submission) {
+                                foreach ($submission->get_examples() as $key => $example) {
+                                    $name = $key;
+                                    if (isset($userchecks[$name]) && ($userchecks[$name] != 0)) {
+                                        $submission->get_example($key)->overwrite_example(\mod_checkmark\example::CHECKED);
+                                    } else {
+                                        $submission->get_example($key)->overwrite_example(\mod_checkmark\example::UNCHECKED);
+                                    }
+                                    $this->update_submission($submission, true);
                                 }
-                                $this->update_submission($submission, true);
                             }
                         }
                     }
