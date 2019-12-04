@@ -125,7 +125,7 @@ class submission {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public static function get_mock_submission($checkmarkid, $userid = NULL) {
+    public static function get_mock_submission($checkmarkid, $userid = null) {
         $submission = new Submission(0, 0);
         $submission->checkmarkid            = $checkmarkid;
         if (isset($userid)) {

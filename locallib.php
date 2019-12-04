@@ -392,10 +392,7 @@ class checkmark {
                 redirect(new moodle_url($PAGE->url, array('id' => $this->cm->id, 'saved' => 1)));
             }
         }
-
-
             $this->view_header();
-
 
         if ($saved) {
             echo $OUTPUT->box_start('generalbox', 'notification');
@@ -419,7 +416,8 @@ class checkmark {
         } else {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'checkmark');
             // Display overview!
-            if (has_capability('mod/checkmark:view_preview', $context) || has_capability('mod/checkmark:submit', $context, $USER, false)) {
+            if (has_capability('mod/checkmark:view_preview', $context) ||
+                    has_capability('mod/checkmark:submit', $context, $USER, false)) {
                 echo $this->print_summary();
                 echo html_writer::start_tag('div', array('class' => 'mform'));
                 echo html_writer::start_tag('div', array('class' => 'clearfix'));
