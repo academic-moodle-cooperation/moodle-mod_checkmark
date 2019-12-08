@@ -127,12 +127,12 @@ class submission {
      */
     public static function get_mock_submission($checkmarkid, $userid = null) {
         $submission = new Submission(0, 0);
-        $submission->checkmarkid            = $checkmarkid;
+        $submission->checkmarkid = $checkmarkid;
         if (isset($userid)) {
-            $submission->userid                 = $userid;
+            $submission->userid = $userid;
         }
-        $submission->timecreated            = time();
-        $submission->timemodified           = $submission->timecreated;
+        $submission->timecreated = time();
+        $submission->timemodified = $submission->timecreated;
         return $submission;
     }
 
