@@ -243,39 +243,6 @@ class checkmark {
     }
 
     /**
-     * print_example_preview() prints a preview of the set examples
-     *
-     * @param string $editbutton Html button element used for editing the checks
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws required_capability_exception
-     */
-    public function print_example_preview($editbutton) {
-        // TODO use a function to get an empty submission and use checkmark::add_submission_elements() instead!
-        global $USER;
-        $context = context_module::instance($this->cm->id);
-        require_capability('mod/checkmark:view_preview', $context, $USER);
-
-        // TODO we use a form here for now, but plan to use a better template in the future!
-        $mform = new MoodleQuickForm('submission', 'get', '', '');
-
-        $mform->addElement('header', 'heading', get_string('example_preview_title', 'checkmark'));
-        $mform->addHelpButton('heading', 'example_preview_title', 'checkmark');
-        if (isset($editbutton)) {
-            $mform->addElement('html', html_writer::tag('div', $editbutton, array('class' => 'centered')));
-        }
-        $examples = $this->get_examples();
-
-        $data = new stdClass();
-        $data->examples = [];
-        foreach ($examples as $example) {
-            $mform->addElement('static', $example->shortname, '', $example->print_example());
-            $mform->freeze($example->shortname);
-        }
-        $mform->display();
-    }
-
-    /**
      * print_summary() returns a short statistic over the actual checked examples in this checkmark
      * You've checked out X from a maximum of Y examples. (A out of B points)
      *
@@ -392,46 +359,37 @@ class checkmark {
 
         $mform = new checkmark_submission_form(null, $data);
 
-        if ($editmode) {
-            // Prepare form and process submitted data!
+        // Prepare form and process submitted data!
+        if ($mform->is_cancelled()) {
+            redirect(new moodle_url($PAGE->url, array('id' => $this->cm->id)));
+        }
 
-            if ($mform->is_cancelled()) {
-                redirect(new moodle_url($PAGE->url, array('id' => $this->cm->id)));
-            }
+        if ($formdata = $mform->get_data()) {
 
-            if ($formdata = $mform->get_data()) {
+            // Create the submission if needed & return its id!
+            $submission = $this->get_submission($USER->id, true);
+            $formarray = json_decode(json_encode($formdata), true);
 
-                // Create the submission if needed & return its id!
-                $submission = $this->get_submission($USER->id, true);
-                $formarray = json_decode(json_encode($formdata), true);
+            foreach ($submission->get_examples() as $key => $example) {
+                $name = $key;
 
-                foreach ($submission->get_examples() as $key => $example) {
-                    $name = $key;
-
-                    if (isset($formarray[$name]) && ($formarray[$name] != 0)) {
-                        $submission->get_example($key)->set_state(\mod_checkmark\example::CHECKED);
-                    } else {
-                        $submission->get_example($key)->set_state(\mod_checkmark\example::UNCHECKED);
-                    }
+                if (isset($formarray[$name]) && ($formarray[$name] != 0)) {
+                    $submission->get_example($key)->set_state(\mod_checkmark\example::CHECKED);
+                } else {
+                    $submission->get_example($key)->set_state(\mod_checkmark\example::UNCHECKED);
                 }
-
-                $this->update_submission($submission);
-                $this->email_teachers($submission);
-
-                // Trigger the event!
-                \mod_checkmark\event\submission_updated::create_from_object($this->cm, $submission)->trigger();
-
-                // Redirect to get updated submission date!
-                redirect(new moodle_url($PAGE->url, array('id' => $this->cm->id, 'saved' => 1)));
             }
-        }
 
-        // Print header, etc. and display form if needed!
-        if ($editmode) {
-            $this->view_header(get_string('editmysubmission', 'checkmark'));
-        } else {
-            $this->view_header();
+            $this->update_submission($submission);
+            $this->email_teachers($submission);
+
+            // Trigger the event!
+            \mod_checkmark\event\submission_updated::create_from_object($this->cm, $submission)->trigger();
+
+            // Redirect to get updated submission date!
+            redirect(new moodle_url($PAGE->url, array('id' => $this->cm->id, 'saved' => 1)));
         }
+        $this->view_header();
 
         if ($saved) {
             echo $OUTPUT->box_start('generalbox', 'notification');
@@ -446,18 +404,7 @@ class checkmark {
         $this->view_attendancehint();
         echo "\n";
 
-        $editbutton = null;
-        if (!$editmode && $editable && has_capability('mod/checkmark:submit', $context, $USER, false)) {
-            if (!empty($submission)) {
-                $submitbutton = 'editmysubmission';
-            } else {
-                $submitbutton = 'addsubmission';
-            }
-            $url = new moodle_url('view.php',
-                    array('id' => $this->cm->id, 'edit' => '1'));
-            $editbutton = $OUTPUT->single_button($url, get_string($submitbutton, 'checkmark'), 'post', array('primary' => true));
-        }
-        if ($editmode && !empty($mform)) {
+        if ($editable && has_capability('mod/checkmark:submit', $context, $USER, false) && !empty($mform)) {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'checkmarkform');
             echo $this->print_summary();
             $mform->display();
@@ -466,7 +413,8 @@ class checkmark {
         } else {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'checkmark');
             // Display overview!
-            if (!empty($submission) && has_capability('mod/checkmark:submit', $context, $USER, false)) {
+            if (has_capability('mod/checkmark:view_preview', $context) ||
+                    has_capability('mod/checkmark:submit', $context, $USER, false)) {
                 echo $this->print_summary();
                 echo html_writer::start_tag('div', array('class' => 'mform'));
                 echo html_writer::start_tag('div', array('class' => 'clearfix'));
@@ -474,25 +422,8 @@ class checkmark {
                 echo html_writer::end_tag('div');
                 echo html_writer::end_tag('div');
 
-            } else if (has_capability('mod/checkmark:submit', $context, $USER, false)) {
-                // No submission present!
-                echo html_writer::tag('div', get_string('nosubmission', 'checkmark'));
-                $this->print_example_preview($editbutton);
-            } else if (has_capability('mod/checkmark:view_preview', $context)) {
-                $this->print_example_preview($editbutton);
-            } else {
-                /*
-                 * If he isn't allowed to view the preview and has no submission
-                 * tell him he has no submission!
-                 */
-                echo html_writer::tag('div', get_string('nosubmission', 'checkmark'));
             }
             echo $OUTPUT->box_end();
-            echo "\n";
-        }
-
-        if (isset($editbutton)) {
-            echo html_writer::tag('div', $editbutton, array('class' => 'centered'));
             echo "\n";
         }
 
@@ -3479,6 +3410,7 @@ class checkmark {
      * @param bool $return (optional) defaults to false. If true the html snippet is returned
      * @return string|bool HTML snippet if $return is true or true if $return is anything else
      * @throws dml_exception
+     * @throws coding_exception
      */
     public function print_user_submission($userid = 0, $return = false) {
         global $USER;
@@ -3494,7 +3426,7 @@ class checkmark {
 
         $submission = $this->get_submission($userid);
         if (!$submission) {
-            return $output;
+            $submission = \mod_checkmark\submission::get_mock_submission($this->checkmark->id);
         }
 
         // TODO we use a form here for now, but plan to use a better template in the future!

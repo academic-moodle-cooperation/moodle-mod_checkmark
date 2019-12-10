@@ -1564,7 +1564,7 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
             $maxcheckedgrades += $example->grade;
         }
     } else {
-        $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $checkmark->id));
+        $examples = \checkmark::get_examples_static($checkmark->id);
         $maxcheckedexamples = count($examples);
         foreach ($examples as $example) {
             $maxcheckedgrades += $example->grade;
