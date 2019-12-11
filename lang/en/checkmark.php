@@ -295,7 +295,6 @@ $string['duedateno'] = 'No due date';
 $string['early'] = '{$a} early';
 $string['editmysubmission'] = 'Edit my submission';
 $string['extended_until'] = 'Extended until {$a}';
-$string['addsubmission'] = 'Add submission';
 $string['emailstudents'] = 'Email alerts to students';
 $string['emailteachermail'] = '{$a->username} has updated the checkmark submission
 for \'{$a->checkmark}\' on {$a->dayupdated} at {$a->timeupdated}.
