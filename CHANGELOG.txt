@@ -1,7 +1,8 @@
 CHANGELOG
 =========
 
-3.8 (2019-12-11)
+3.8.0 (2019-12-11) WIP
+------------------
 * [FEATURE] #5271 Enable teachers to overwrite checks after submissions. This can be done in fastgrade and normal grade mode
 * [FEATURE] #6147 Show overwritten checks differently than normal ones in all views
 * [FEATURE] #6364 Enable editing of checked examples without an additional button click. The checkmark preview is only displayed when no submission edit is possible
