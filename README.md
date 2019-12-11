@@ -33,7 +33,7 @@ session there is the option of automatic grading on the basis of the assignments
 Requirements
 ------------
 
-The plugin is available for Moodle 2.5+. This version is for Moodle 3.7.
+The plugin is available for Moodle 2.5+. This version is for Moodle 3.8.
 
 
 Installation
@@ -58,7 +58,15 @@ administrators in the checkmark module:
 * individual names (text field)
 * default grades (text field)
 * expiration date for messages (text field)
+* Show recent submissions
+* Amount of examples to display a warning for PDF export
 
+Default checkmark settings
+* Always show description
+* Allow submission from
+* Due date
+* Cut-off date
+* Remind me to grade by
 
 Documentation
 -------------
