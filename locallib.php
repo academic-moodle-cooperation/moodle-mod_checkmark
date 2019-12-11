@@ -2072,10 +2072,9 @@ class checkmark {
                 $DB->update_record('checkmark_checks', $stateupdate);
             }
         }
-        if($isoverwrite) {
+        if ($isoverwrite) {
             \mod_checkmark\event\submission_overwritten::create_from_object($this->cm, $submission)->trigger();
-        }
-        else {
+        } else {
             \mod_checkmark\event\submission_updated::create_from_object($this->cm, $submission)->trigger();
         }
         $this->update_grade($submission);
