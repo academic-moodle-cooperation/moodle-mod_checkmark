@@ -383,9 +383,6 @@ class checkmark {
             $this->update_submission($submission);
             $this->email_teachers($submission);
 
-            // Trigger the event!
-            \mod_checkmark\event\submission_updated::create_from_object($this->cm, $submission)->trigger();
-
             // Redirect to get updated submission date!
             redirect(new moodle_url($PAGE->url, array('id' => $this->cm->id, 'saved' => 1)));
         }
@@ -1572,8 +1569,9 @@ class checkmark {
                                     } else {
                                         $submission->get_example($key)->overwrite_example(\mod_checkmark\example::UNCHECKED);
                                     }
-                                    $this->update_submission($submission, true);
+
                                 }
+                                $this->update_submission($submission, true);
                             }
                         }
                     }
@@ -2073,6 +2071,12 @@ class checkmark {
                 $stateupdate->state = $example->state;
                 $DB->update_record('checkmark_checks', $stateupdate);
             }
+        }
+        if($isoverwrite) {
+            \mod_checkmark\event\submission_overwritten::create_from_object($this->cm, $submission)->trigger();
+        }
+        else {
+            \mod_checkmark\event\submission_updated::create_from_object($this->cm, $submission)->trigger();
         }
         $this->update_grade($submission);
     }

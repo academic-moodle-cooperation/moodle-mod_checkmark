@@ -15,25 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_checkmark_submission_updated event.
+ * The mod_checkmark_submission_overwrutten event.
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Daniel Binder
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_checkmark\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Event for when the submission has been updated by the student.
+ * Event for when the submission has been overwritten by the teacher.
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Daniel Binder
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class submission_updated extends \core\event\base {
+class submission_overwritten extends \core\event\base {
     /**
      * Init method.
      *
@@ -43,7 +43,7 @@ class submission_updated extends \core\event\base {
      */
     protected function init() {
         $this->data['crud'] = 'u';
-        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
+        $this->data['edulevel'] = self::LEVEL_TEACHING;
         $this->data['objecttable'] = 'checkmark_submissions';
     }
 
@@ -57,9 +57,9 @@ class submission_updated extends \core\event\base {
     public static function create_from_object(\stdClass $cm, \mod_checkmark\submission $submission) {
         // Trigger overview event.
         $event = self::create(array(
-            'objectid'      => $submission->get_id(),
-            'context'       => \context_module::instance($cm->id),
-            'relateduserid' => $submission->get_userid(),
+                'objectid'      => $submission->get_id(),
+                'context'       => \context_module::instance($cm->id),
+                'relateduserid' => $submission->get_userid(),
         ));
         $event->add_record_snapshot('checkmark_submissions', $submission->export_for_snapshot());
         return $event;
@@ -71,8 +71,8 @@ class submission_updated extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '".$this->userid."' updated the submission for user with id '".$this->relateduserid.
-               "' in ".$this->objecttable." with course module id '$this->contextinstanceid'.";
+        return "The user with id '".$this->userid."' has overwritten the submission for user with id '".$this->relateduserid.
+                "' in ".$this->objecttable." with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -81,7 +81,7 @@ class submission_updated extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventsubmissionupdated', 'checkmark');
+        return get_string('eventsubmissionoverwritten', 'checkmark');
     }
 
     /**
@@ -91,7 +91,7 @@ class submission_updated extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url("/mod/checkmark/submissions.php", array('id'  => $this->contextinstanceid,
-                                                                       'tab' => 'submissions'));
+                'tab' => 'submissions'));
     }
 
     /**
@@ -102,7 +102,7 @@ class submission_updated extends \core\event\base {
     protected function get_legacy_logdata() {
         $submission = $this->get_record_snapshot('checkmark_submissions', $this->objectid);
         return array($this->courseid, 'checkmark', 'update submission', $this->get_url(),
-                     $submission->checkmarkid, $this->contextinstanceid);
+                $submission->checkmarkid, $this->contextinstanceid);
     }
 
     /**
