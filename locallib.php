@@ -361,7 +361,7 @@ class checkmark {
 
         // Prepare form and process submitted data!
         if ($mform->is_cancelled()) {
-            $url = new moodle_url('/course/view.php', array('id' => $PAGE->course->id),"section-" . $PAGE->cm->sectionnum);
+            $url = new moodle_url('/course/view.php', array('id' => $PAGE->course->id), "section-" . $PAGE->cm->sectionnum);
             redirect($url);
         }
 
@@ -452,7 +452,6 @@ class checkmark {
 
         $pagetitle = strip_tags($this->course->shortname . ': ' . get_string('modulename', 'checkmark') .
                 ': ' . format_string($this->checkmark->name, true));
-        //$PAGE->set_title($pagetitle);
         $PAGE->set_heading($this->course->fullname);
 
         echo $OUTPUT->header();
