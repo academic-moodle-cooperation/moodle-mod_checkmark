@@ -71,7 +71,7 @@ define(['core/log'], function(log) {
     Submission.prototype.resetSubmissionForm = function(e) {
         e.preventDefault();
 
-        document.getElementById('mform1').reset();
+        document.getElementsByClassName('submissionform')[0].reset();
         Submission.prototype.updateSummary();
 
         return true;
@@ -99,7 +99,7 @@ define(['core/log'], function(log) {
         document.getElementById('id_resetbutton').addEventListener('click', this.resetSubmissionForm);
 
         // Reset the formular after init to ensure correct checkbox-states after page-reload!
-        document.getElementById('mform1').reset();
+        document.getElementsByClassName('submissionform')[0].reset();
 
         // Update summary to display correct data after form-reset!
         this.updateSummary();
