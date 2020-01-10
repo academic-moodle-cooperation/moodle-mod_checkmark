@@ -1,7 +1,15 @@
 CHANGELOG
 =========
 
+3.8.0 (2019-12-11) WIP
+------------------
+* [FEATURE] #5271 Enable teachers to overwrite checks after submissions. This can be done in fastgrade and normal grade mode
+* [FEATURE] #6147 Show overwritten checks differently than normal ones in all views
+* [FEATURE] #6364 Enable editing of checked examples without an additional button click. The checkmark preview is only displayed when no submission edit is possible
+* [FIXED] #6386 Remove deprecated function leading to integration issues with block_course_overview_campus
+
 3.7.1 (2019-11-13)
+------------------
 * [FEATURE] #6276 Display a second submit button on top of the checkmark preview
 * [FIXED] #6222 Fix not possible submission when submitting student is not part of a group in a course with group mode on
 * [FIXED] #5890 Remove html tags showing in pdf, xls and odt exports

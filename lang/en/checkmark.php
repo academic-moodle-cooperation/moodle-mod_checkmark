@@ -137,6 +137,7 @@ $string['eventexampleupdated'] = 'Example updated';
 $string['eventgradeupdated'] = 'Grade updated';
 $string['eventsubmissionsexported'] = 'Submission exported';
 $string['eventsubmissionupdated'] = 'Submission updated';
+$string['eventsubmissionoverwritten'] = 'Submission overwritten';
 $string['eventviewprintpreview'] = 'Viewed print preview';
 $string['eventviewsubmissions'] = 'Viewed submissions';
 $string['examplecount_changed_after_submission'] = 'The amount of examples can\'t be changed, as soon as a submission is present.';

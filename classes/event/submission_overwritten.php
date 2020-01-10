@@ -15,25 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_checkmark_submission_updated event.
+ * The mod_checkmark_submission_overwrutten event.
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Daniel Binder
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_checkmark\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Event for when the submission has been updated by the student.
+ * Event for when the submission has been overwritten by the teacher.
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Daniel Binder
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class submission_updated extends submission_edited {
+class submission_overwritten extends submission_edited {
     /**
      * Init method.
      *
@@ -43,7 +43,7 @@ class submission_updated extends submission_edited {
      */
     protected function init() {
         $this->data['crud'] = 'u';
-        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
+        $this->data['edulevel'] = self::LEVEL_TEACHING;
         $this->data['objecttable'] = 'checkmark_submissions';
     }
 
@@ -53,8 +53,8 @@ class submission_updated extends submission_edited {
      * @return string
      */
     public function get_description() {
-        return "The user with id '" . $this->userid . "' updated the submission for user with id '" . $this->relateduserid .
-                "' in " . $this->objecttable . " with course module id '$this->contextinstanceid'.";
+        return "The user with id '".$this->userid."' has overwritten the submission for user with id '".$this->relateduserid.
+                "' in ".$this->objecttable." with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -63,6 +63,7 @@ class submission_updated extends submission_edited {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventsubmissionupdated', 'checkmark');
+        return get_string('eventsubmissionoverwritten', 'checkmark');
     }
+
 }
