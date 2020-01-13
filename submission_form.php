@@ -46,6 +46,9 @@ class checkmark_submission_form extends moodleform {
         global $PAGE;
 
         $mform =& $this->_form; // Don't forget the underscore!
+        $attr = $mform->getAttributes();
+        $attr['class'] = 'mform submissionform';
+        $mform->setAttributes($attr);
 
         foreach ($this->_customdata->examples as $key => $example) {
             switch ($example->grade) {
@@ -83,6 +86,8 @@ class checkmark_submission_form extends moodleform {
         $buttonarray = array();
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton',
                                                 get_string('savechanges'));
+        $buttonarray[] = &$mform->createElement('reset', 'resetbutton', get_string('revert'),
+                                                array('class' => 'btn btn-secondary mr-1'));
         $buttonarray[] = &$mform->createElement('cancel');
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');
