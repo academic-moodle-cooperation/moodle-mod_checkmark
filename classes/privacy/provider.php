@@ -302,7 +302,7 @@ LEFT JOIN {checkmark_overrides} o ON c.id = o.checkmarkid
 
             static::export_user_preferences($user->id);
             if ($submission = $checkmark->get_submission($user->id)) {
-                static::export_submission($context, $submission);
+                static::export_submission($context, $submission->export_for_snapshot());
             }
             if ($feedback = $checkmark->get_feedback($user->id)) {
                 static::export_feedback($context, $checkmark, $feedback);
