@@ -1692,7 +1692,7 @@ class submissionstable extends \table_sql {
                 $attributes = ['class' => 'examplecheck checkline' . $values->id . ' $' . $example->grade,
                         'id' => 'ex'.$values->id.'_'.$match[1]];
                 if ($example->is_forced()) {
-                    $attributes['title'] = get_string('forced','checkmark');
+                    $attributes['title'] = get_string('forced', 'checkmark');
                 }
                 $cbhidden = \html_writer::tag('input' , '', ['type' => 'hidden',
                         'name' => 'ex['.$values->id.'_'.$match[1].']', 'value' => '0']);
