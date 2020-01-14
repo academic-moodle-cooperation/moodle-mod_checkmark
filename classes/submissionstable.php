@@ -1691,6 +1691,9 @@ class submissionstable extends \table_sql {
             } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
                 $attributes = ['class' => 'examplecheck checkline' . $values->id . ' $' . $example->grade,
                         'id' => 'ex'.$values->id.'_'.$match[1]];
+                if ($example->is_forced()) {
+                    $attributes['title'] = get_string('forced', 'checkmark');
+                }
                 $cbhidden = \html_writer::tag('input' , '', ['type' => 'hidden',
                         'name' => 'ex['.$values->id.'_'.$match[1].']', 'value' => '0']);
                 $cb = $cbhidden . \html_writer::checkbox('ex['.$values->id.'_'.$match[1].']',

@@ -247,7 +247,7 @@ class example {
      */
     public function get_forcedstring() {
         if ($this->is_forced()) {
-            return $this->get_forcedstring_unconditionally();
+            return self::get_forcedstring_unconditionally();
         }
         return '';
     }
@@ -258,8 +258,8 @@ class example {
      * @return string String indicating an overwrite
      * @throws \coding_exception
      */
-    public function get_forcedstring_unconditionally() {
-        return '[' . get_string('forced', 'checkmark') . ']';
+    public static function get_forcedstring_unconditionally() {
+        return get_string('forced', 'checkmark');
     }
 
     /**
