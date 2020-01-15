@@ -2969,8 +2969,8 @@ class checkmark {
             }
 
             // Get data!
-            if($format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLSX || $format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_ODS) {
-                $printdata = $this->get_print_data($filter, $usrlst, true,submissionstable::FORMAT_COLORS);
+            if ($format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLSX || $format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_ODS) {
+                $printdata = $this->get_print_data($filter, $usrlst, true, submissionstable::FORMAT_COLORS);
             } else {
                 $printdata = $this->get_print_data($filter, $usrlst, true);
             }

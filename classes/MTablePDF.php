@@ -877,9 +877,9 @@ class MTablePDF extends \pdf {
                 }
 
                 $indtext = $text;
-                if (self::startsWith($cell['data'],'<colorred>')) {
+                if (self::starts_with($cell['data'], '<colorred>')) {
                     $params = [];
-                    if($workbook instanceof \MoodleExcelWorkbook) {
+                    if ($workbook instanceof \MoodleExcelWorkbook) {
                         $params = $text->get_format_array();
                     } else if ($workbook instanceof \MoodleODSWorkbook) {
                         $params = $text->properties;
@@ -1015,12 +1015,11 @@ class MTablePDF extends \pdf {
      * Checks if a given string starts with another given string
      *
      * @param string $string String that should be checked
-     * @param string $startString String $string's beginning schould be checked for
+     * @param string $startstring String $string's beginning schould be checked for
      * @return bool True if $string starts with $startString, False if not
      */
-    public static function startsWith ($string, $startString)
-    {
-        $len = strlen($startString);
-        return (substr($string, 0, $len) === $startString);
+    public static function starts_with ($string, $startstring) {
+        $len = strlen($startstring);
+        return (substr($string, 0, $len) === $startstring);
     }
 }
