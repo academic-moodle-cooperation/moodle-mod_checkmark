@@ -47,6 +47,8 @@ require_once($CFG->libdir.'/gradelib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class submissionstable extends \table_sql {
+    /** formated cells contain tags for colors */
+    const FORMAT_COLORS = 2;
     /** formated cells contain HTML */
     const FORMAT_HTML = 1;
     /** formated cells won't contain HTML */
@@ -243,11 +245,12 @@ class submissionstable extends \table_sql {
      * Convenience method to call a number of methods for you to get the
      * table data. TODO: replace array-using methods with streaming download (like dataformat).
      *
+     * @param int $type Type (with or without color information) that should be used for print
      * @return array[] array of arrays containing data in legacy format (compatible with mtablepdf class)
-     * @throws coding_exception;
+     * @throws coding_exception ;
      * @throws dml_exception
      */
-    public function get_data() {
+    public function get_data($type = self::FORMAT_DOWNLOAD) {
         global $SESSION;
 
         if (!$this->setup) {
@@ -297,7 +300,7 @@ class submissionstable extends \table_sql {
         }
 
         $returndata = [];
-        $this->format = self::FORMAT_DOWNLOAD;
+        $this->format = $type;
         foreach ($this->rawdata as $key => $row) {
             $returndata[$key] = $this->format_row($row);
         }
@@ -1686,7 +1689,9 @@ class submissionstable extends \table_sql {
                 $mockexample = $this->checkmark->get_examples()[$match[1]];
                 $example = new example('', 1, $mockexample->grade, example::UNCHECKED);
             }
-            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+            if ($this->is_downloading() == 'xlsx' || $this->is_downloading() == 'ods' || $this->format == self::FORMAT_COLORS) {
+                return $example->get_examplestate_for_export_with_colors();
+            } else if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                 return $example->get_examplestate_for_export();
             } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
                 $attributes = ['class' => 'examplecheck checkline' . $values->id . ' $' . $example->grade,

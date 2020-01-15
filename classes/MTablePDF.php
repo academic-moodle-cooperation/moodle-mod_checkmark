@@ -876,6 +876,21 @@ class MTablePDF extends \pdf {
                     $cell['data'] = $prev[$idx]['data'];
                 }
 
+                $indtext = $text;
+                if (self::startsWith($cell['data'],'<colorred>')) {
+                    $params = [];
+                    if($workbook instanceof \MoodleExcelWorkbook) {
+                        $params = $text->get_format_array();
+                    } else if ($workbook instanceof \MoodleODSWorkbook) {
+                        $params = $text->properties;
+                    } else {
+                        throw new \coding_exception('Workbook is neither xslx nor ods');
+                    }
+                    $params['bg_color'] = '#e6b8b7';
+                    $indtext = $workbook->add_format($params);
+                }
+                $cell['data'] = strip_tags($cell['data']);
+
                 if (array_key_exists('format', $cell)) {
                     $worksheet->write_string($line, $i, $cell['data'], $workbook->add_format($cell['format']));
                 } else {
@@ -883,9 +898,9 @@ class MTablePDF extends \pdf {
                         $worksheet->write_string($line, $i, $cell['data'], $textfirst);
                         $first = false;
                     } else if (is_numeric($cell['data']) && !isset($textonlyid[$i])) {
-                        $worksheet->write_number($line, $i, $cell['data'], $text);
+                        $worksheet->write_number($line, $i, $cell['data'], $indtext);
                     } else {
-                        $worksheet->write_string(strip_tags($line), $i, strip_tags($cell['data']), $text);
+                        $worksheet->write_string(strip_tags($line), $i, strip_tags($cell['data']), $indtext);
                     }
                 }
 
@@ -994,5 +1009,18 @@ class MTablePDF extends \pdf {
         header('Content-Encoding: utf-8');
         echo $filecontent;
         die();
+    }
+
+    /**
+     * Checks if a given string starts with another given string
+     *
+     * @param string $string String that should be checked
+     * @param string $startString String $string's beginning schould be checked for
+     * @return bool True if $string starts with $startString, False if not
+     */
+    public static function startsWith ($string, $startString)
+    {
+        $len = strlen($startString);
+        return (substr($string, 0, $len) === $startString);
     }
 }

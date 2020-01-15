@@ -207,7 +207,7 @@ abstract class basetemplate extends submissionstable {
      *
      * @return array[] array of arrays containing data in legacy format (compatible with mtablepdf class)
      */
-    public function get_data() {
+    public function get_data($type = self::FORMAT_DOWNLOAD) {
         if (!$this->setup) {
             $this->setup();
         }
