@@ -374,6 +374,10 @@ class example {
         }
     }
 
+    /**
+     * Returns the appropriate string with colors instead of brackets used in export for the present example
+     * @return string
+     */
     public function get_examplestate_for_export_with_colors() {
         if ($this->is_forced_checked()) {
             return self::FORCED_CHECKEDBOX_COLORED;
