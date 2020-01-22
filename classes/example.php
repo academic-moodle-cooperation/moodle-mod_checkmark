@@ -66,6 +66,16 @@ class example {
     const FORCED_CHECKEDBOX = '(X)';
 
     /**
+     * Forced Checked checkbox value
+     */
+    const FORCED_CHECKEDBOX_COLORED = '<colorred>X';
+
+    /**
+     * Forced Checked checkbox value
+     */
+    const FORCED_EMPTYBOX_COLORED = '<colorred>';
+
+    /**
      * Equals: 0b000000000000000
      */
     const UNCHECKED = 0x0000;
@@ -357,6 +367,22 @@ class example {
             return self::FORCED_CHECKEDBOX;
         } else if ($this->is_forced_unchecked()) {
             return self::FORCED_EMPTYBOX;
+        } else if ($this->is_checked()) {
+            return self::CHECKEDBOX;
+        } else {
+            return self::EMPTYBOX;
+        }
+    }
+
+    /**
+     * Returns the appropriate string with colors instead of brackets used in export for the present example
+     * @return string
+     */
+    public function get_examplestate_for_export_with_colors() {
+        if ($this->is_forced_checked()) {
+            return self::FORCED_CHECKEDBOX_COLORED;
+        } else if ($this->is_forced_unchecked()) {
+            return self::FORCED_EMPTYBOX_COLORED;
         } else if ($this->is_checked()) {
             return self::CHECKEDBOX;
         } else {

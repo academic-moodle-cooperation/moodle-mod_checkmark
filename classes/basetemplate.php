@@ -205,9 +205,11 @@ abstract class basetemplate extends submissionstable {
      * Convenience method to call a number of methods for you to get the
      * table data. TODO: replace array-using methods with streaming download (like dataformat).
      *
+     * @param int $type Format that should be exported (currently with color or without)
      * @return array[] array of arrays containing data in legacy format (compatible with mtablepdf class)
+     * @throws \dml_exception
      */
-    public function get_data() {
+    public function get_data($type = self::FORMAT_DOWNLOAD) {
         if (!$this->setup) {
             $this->setup();
         }

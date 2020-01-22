@@ -24,6 +24,7 @@
  */
 
 use mod_checkmark\submission;
+use mod_checkmark\submissionstable;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -1922,7 +1923,7 @@ class checkmark {
         global $CFG, $DB, $PAGE, $OUTPUT, $SESSION;
 
         $filter = get_user_preferences('checkmark_filter', self::FILTER_ALL);
-        $table = \mod_checkmark\submissionstable::create_submissions_table($this->cm->id, $filter);
+        $table = submissionstable::create_submissions_table($this->cm->id, $filter);
 
         if (!$user = $DB->get_record('user', array('id' => $userid))) {
             print_error('nousers');
@@ -2182,7 +2183,7 @@ class checkmark {
         $mform->addElement('hidden', 'page');
         $mform->setDefault('page', $page);
 
-        $table = \mod_checkmark\submissionstable::create_submissions_table($this->cm->id, $filter);
+        $table = submissionstable::create_submissions_table($this->cm->id, $filter);
         if ($total = $DB->count_records_sql($table->countsql, $table->countparams)) {
             ob_start();
             $table->out($total < $perpage ? $total : $perpage, true);
@@ -2338,18 +2339,19 @@ class checkmark {
      * @param int $filter Filter to apply (checkmark::FILTER_ALL, checkmark::FILTER_REQUIRE_GRADING, ...)
      * @param int[] $ids (optional) User-IDs to filter for
      * @param bool $dataonly (optional) return raw data-object or HTML table
-     * @return array|\mod_checkmark\submissionstable
+     * @param int $type Type (with or without color information) that should be used for print
+     * @return array|submissionstable
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function get_print_data($filter, $ids = array(), $dataonly = false) {
+    public function get_print_data($filter, $ids = array(), $dataonly = false, $type = submissionstable::FORMAT_DOWNLOAD) {
         global $DB, $OUTPUT;
 
-        $table = \mod_checkmark\submissionstable::create_export_table($this->cm->id, $filter, $ids);
+        $table = submissionstable::create_export_table($this->cm->id, $filter, $ids);
         if ($DB->count_records_sql($table->countsql, $table->countparams)) {
             if ($dataonly) {
-                return $table->get_data();
+                return $table->get_data($type);
             } else {
                 echo html_writer::start_tag('div', array('class' => 'fcontainer scroll_forced',
                         'id' => 'table_begin'));
@@ -2967,8 +2969,11 @@ class checkmark {
             }
 
             // Get data!
-            $printdata = $this->get_print_data($filter, $usrlst, true);
-
+            if ($format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLSX || $format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_ODS) {
+                $printdata = $this->get_print_data($filter, $usrlst, true, submissionstable::FORMAT_COLORS);
+            } else {
+                $printdata = $this->get_print_data($filter, $usrlst, true);
+            }
             $this->exportpdf($printdata);
         }
     }
