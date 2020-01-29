@@ -2684,10 +2684,15 @@ class checkmark {
 
         $table = $classname::create_export_table($this->cm->id, $filter, $usrlst);
 
+
         if ($zipped === \mod_checkmark\MTablePDF::ZIPPED) {
             $this->export_zipped_group_pdfs($template);
         } else {
-            $this->exportpdf($table->get_data(), $template);
+            if ($format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLSX || $format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_ODS) {
+                $this->exportpdf($table->get_data(submissionstable::FORMAT_COLORS), $template);
+            } else {
+                $this->exportpdf($table->get_data(), $template);
+            }
         }
     }
 
@@ -2699,7 +2704,8 @@ class checkmark {
      * @throws coding_exception
      * @throws moodle_exception
      */
-    protected function exportpdf($exportdata, $template = '') {
+    protected function 
+       exportpdf($exportdata, $template = '') {
         global $PAGE;
 
         $filters = $this->get_filters();
