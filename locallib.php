@@ -2684,7 +2684,6 @@ class checkmark {
 
         $table = $classname::create_export_table($this->cm->id, $filter, $usrlst);
 
-
         if ($zipped === \mod_checkmark\MTablePDF::ZIPPED) {
             $this->export_zipped_group_pdfs($template);
         } else {
@@ -2704,7 +2703,7 @@ class checkmark {
      * @throws coding_exception
      * @throws moodle_exception
      */
-    protected function 
+    protected function
        exportpdf($exportdata, $template = '') {
         global $PAGE;
 
