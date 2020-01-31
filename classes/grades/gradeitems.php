@@ -22,9 +22,6 @@
  * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-declare(strict_types = 1);
-
 namespace mod_checkmark\grades;
 
 use \core_grades\local\gradeitem\itemnumber_mapping;

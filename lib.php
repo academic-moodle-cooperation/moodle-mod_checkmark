@@ -887,8 +887,7 @@ function checkmark_grade_item_category_update($checkmark) {
             'itemmodule'    => 'checkmark',
             'iteminstance'  => $checkmark->id,
             'courseid'      => $checkmark->course));
-
-
+    
     if (!empty($gradeitems)) {
         foreach ($gradeitems as $gradeitem) {
             if ($gradeitem->itemnumber == 0) {
