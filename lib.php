@@ -245,6 +245,7 @@ function checkmark_add_instance($checkmark) {
     if (!empty($checkmark->presentationgrading) && !empty($checkmark->presentationgradebook)) {
         checkmark_presentation_item_update($checkmark);
     }
+    checkmark_grade_item_category_update($checkmark);
 
     return $returnid;
 }
@@ -869,6 +870,49 @@ function checkmark_presentation_item_update($checkmark, $grades=null) {
     }
 
     return $gradeupdate;
+}
+
+/**
+ * Update the grade items categories if they are changed via mod_form.php
+ *
+ * We must do it manually here in the checkmark module because modedit supports only
+ * single grade item while we use one, two or three.
+ *
+ * @param stdClass $checkmark An object from the form in mod_form.php
+ */
+function checkmark_grade_item_category_update($checkmark) {
+
+    $gradeitems = grade_item::fetch_all(array(
+            'itemtype'      => 'mod',
+            'itemmodule'    => 'checkmark',
+            'iteminstance'  => $checkmark->id,
+            'courseid'      => $checkmark->course));
+
+
+    if (!empty($gradeitems)) {
+        foreach ($gradeitems as $gradeitem) {
+            if ($gradeitem->itemnumber == 0) {
+                if (isset($checkmark->gradepass) &&
+                        $gradeitem->gradepass != $checkmark->gradepass) {
+                    $gradeitem->gradepass = $checkmark->gradepass;
+                    $gradeitem->update();
+                }
+                if ($gradeitem->categoryid != $checkmark->gradecat) {
+                    $gradeitem->set_parent($checkmark->gradecat);
+                }
+            } else if ($gradeitem->itemnumber == 1) {
+
+                if ($gradeitem->categoryid != $checkmark->gradecat) {
+                    $gradeitem->set_parent($checkmark->gradecat);
+                }
+            } else if ($gradeitem->itemnumber == 2) {
+
+                if ($gradeitem->categoryid != $checkmark->gradecat) {
+                    $gradeitem->set_parent($checkmark->gradecat);
+                }
+            }
+        }
+    }
 }
 
 /**
