@@ -2703,8 +2703,7 @@ class checkmark {
      * @throws coding_exception
      * @throws moodle_exception
      */
-    protected function
-       exportpdf($exportdata, $template = '') {
+    protected function exportpdf($exportdata, $template = '') {
         global $PAGE;
 
         $filters = $this->get_filters();
