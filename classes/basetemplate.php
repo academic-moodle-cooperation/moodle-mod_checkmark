@@ -229,7 +229,7 @@ abstract class basetemplate extends submissionstable {
         }
 
         $returndata = array();
-        $this->format = self::FORMAT_DOWNLOAD;
+        $this->format = $type;
         foreach ($this->rawdata as $key => $row) {
             $returndata[$key] = $this->format_row($row);
         }

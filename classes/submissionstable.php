@@ -1689,6 +1689,7 @@ class submissionstable extends \table_sql {
                 $mockexample = $this->checkmark->get_examples()[$match[1]];
                 $example = new example('', 1, $mockexample->grade, example::UNCHECKED);
             }
+            $test = $this->is_downloading();
             if ($this->is_downloading() == 'xlsx' || $this->is_downloading() == 'ods' || $this->format == self::FORMAT_COLORS) {
                 return $example->get_examplestate_for_export_with_colors();
             } else if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {

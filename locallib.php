@@ -2687,7 +2687,11 @@ class checkmark {
         if ($zipped === \mod_checkmark\MTablePDF::ZIPPED) {
             $this->export_zipped_group_pdfs($template);
         } else {
-            $this->exportpdf($table->get_data(), $template);
+            if ($format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_XLSX || $format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_ODS) {
+                $this->exportpdf($table->get_data(submissionstable::FORMAT_COLORS), $template);
+            } else {
+                $this->exportpdf($table->get_data(), $template);
+            }
         }
     }
 
