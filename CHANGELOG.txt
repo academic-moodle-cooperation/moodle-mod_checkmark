@@ -6,7 +6,7 @@ CHANGELOG
 * [FEATURE] #5271 Enable teachers to overwrite checks after submissions. This can be done in fastgrade and normal grade mode
 * [FEATURE] #6147 Show overwritten checks differently than normal ones in all views
 * [FEATURE] #6150 Include overwritten examples in activity log
-* [FEATURE] #6436 Display overwritten checks using colors in .xslx and .ods and brackets in add other formats
+* [FEATURE] #6436 Display overwritten checks using colors in .xslx and .ods and brackets in all other formats
 * [FEATURE] #6364 Enable editing of checked examples without an additional button click. The checkmark preview is only displayed when no submission edit is possible
 * [FIXED] #6386 Remove deprecated function leading to integration issues with block_course_overview_campus
 * [FIXED] #6497 Change generation of attendance and presentation grading gradebook items to enable compatibility with new grading api
