@@ -3,6 +3,7 @@ CHANGELOG
 
 3.8.1 (2020-03-11)
 ------------------
+* [FIXED] #6591 Fixed a bug preventing grading submissions with 0 points in fastgrade if you previous grading was set
 * [FIXED] #6604 Fixed a bug enabling submission of checks after the cut-off date
 
 3.8.0 (2020-02-05)

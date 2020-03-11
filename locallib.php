@@ -1602,7 +1602,7 @@ class checkmark {
                     $updatedb = false;
 
                     if (!array_key_exists($id, $oldgrades)) {
-                        $oldgrades[$id] = null;
+                        $oldgrades[$id] = -1;
                     }
                     if (!array_key_exists($id, $oldfeedbacks)) {
                         $oldfeedbacks[$id] = null;
@@ -1611,7 +1611,7 @@ class checkmark {
                         $oldattendances[$id] = null;
                     }
                     if (!array_key_exists($id, $oldpresgrades)) {
-                        $oldpresgrades[$id] = null;
+                        $oldpresgrades[$id] = -1;
                     }
                     if (!array_key_exists($id, $oldpresfeedbacks)) {
                         $oldpresfeedbacks[$id] = null;
