@@ -396,16 +396,10 @@ class checkmark {
 
         if ($saved) {
             \core\notification::success(get_string('submissionsaved', 'checkmark'));
-            //echo $OUTPUT->box_start('generalbox', 'notification');
-            //echo $OUTPUT->notification(get_string('latesubmissionwarning', 'checkmark'), 'notifysuccess');
-            //echo $OUTPUT->box_end();
         }
 
         if ($late) {
             \core\notification::error(get_string('latesubmissionwarning', 'checkmark'));
-            //echo $OUTPUT->box_start('generalbox', 'error');
-            //echo $OUTPUT->notification(get_string('submissionsaved', 'checkmark'), 'notifysuccess');
-            //echo $OUTPUT->box_end();
         }
 
         $this->view_intro();
