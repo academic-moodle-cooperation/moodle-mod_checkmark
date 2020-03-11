@@ -1,6 +1,9 @@
 CHANGELOG
 =========
 
+3.7.2 (2020-03-11)
+* [FIXED] #6591 Fixed a bug preventing grading submissions with 0 points in fastgrade if you previous grading was set
+
 3.7.1 (2019-11-13)
 * [FEATURE] #6276 Display a second submit button on top of the checkmark preview
 * [FIXED] #6222 Fix not possible submission when submitting student is not part of a group in a course with group mode on
