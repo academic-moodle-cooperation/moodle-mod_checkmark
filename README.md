@@ -33,7 +33,7 @@ session there is the option of automatic grading on the basis of the assignments
 Requirements
 ------------
 
-The plugin is available for Moodle 2.5+. This version is for Moodle 3.8.
+The plugin is available for Moodle 2.5+. This version is for Moodle 3.8.1
 
 
 Installation

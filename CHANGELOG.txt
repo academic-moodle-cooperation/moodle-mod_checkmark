@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+3.8.1 (2020-03-11)
+------------------
+* [FIXED] #6591 Fixed a bug preventing grading submissions with 0 points in fastgrade if you previous grading was set
+
 3.8.0 (2020-02-05)
 ------------------
 * [FEATURE] #5271 Enable teachers to overwrite checks after submissions. This can be done in fastgrade and normal grade mode
