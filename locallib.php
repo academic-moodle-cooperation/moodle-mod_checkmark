@@ -312,6 +312,7 @@ class checkmark {
 
         $edit = optional_param('edit', 0, PARAM_BOOL);
         $saved = optional_param('saved', 0, PARAM_BOOL);
+        $late = optional_param('late', 0, PARAM_BOOL);
 
         $context = context_module::instance($this->cm->id);
         require_capability('mod/checkmark:view', $context);
@@ -366,7 +367,7 @@ class checkmark {
             redirect($url);
         }
 
-        if ($formdata = $mform->get_data()) {
+        if (($formdata = $mform->get_data()) && $editable) {
 
             // Create the submission if needed & return its id!
             $submission = $this->get_submission($USER->id, true);
@@ -387,13 +388,18 @@ class checkmark {
 
             // Redirect to get updated submission date!
             redirect(new moodle_url($PAGE->url, array('id' => $this->cm->id, 'saved' => 1)));
+        } else if ($formdata && !$editable) {
+            // Redirect to get error message!
+            redirect(new moodle_url($PAGE->url, array('id' => $this->cm->id, 'late' => 1)));
         }
         $this->view_header();
 
         if ($saved) {
-            echo $OUTPUT->box_start('generalbox', 'notification');
-            echo $OUTPUT->notification(get_string('submissionsaved', 'checkmark'), 'notifysuccess');
-            echo $OUTPUT->box_end();
+            \core\notification::success(get_string('submissionsaved', 'checkmark'));
+        }
+
+        if ($late) {
+            \core\notification::error(get_string('latesubmissionwarning', 'checkmark'));
         }
 
         $this->view_intro();

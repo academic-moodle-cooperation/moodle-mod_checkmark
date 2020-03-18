@@ -169,6 +169,7 @@ $string['gradingdue_help'] = 'The expected date that marking of the submissions 
 $string['hideexamples'] = 'Hide examples in submissions table';
 $string['informstudents'] = 'Send notifications';
 $string['informstudents_help'] = 'If activated, the participant receives a notification about his/her attendance status.';
+$string['latesubmissionwarning'] = 'Submission was rejected as it was made after the deadline';
 $string['nostudents'] = 'There are no users to be displayed!';
 $string['nostudentsmatching'] = 'There are no users matching the current settings!';
 $string['nosubmission'] = 'No checkmarks have been submitted';
