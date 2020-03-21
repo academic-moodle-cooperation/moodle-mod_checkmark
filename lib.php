@@ -1873,6 +1873,12 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
                 new moodle_url($url, ['type' => \mod_checkmark\overrideform::USER]),
                 $type, $shorttext, $key, $icon);
         $checkmarknode->add_node($usernode, 'extendgroups');
+
+        $shorttext = "Avalibility Users Test";
+        $key = 'extenduserstest';
+        $icon = null;
+        $usertestnode = \navigation_node::create($shorttext, new moodle_url('/mod/checkmark/overrides.php', array('cmid' => $PAGE->cm->id)),$type,$shorttext,$key,$icon);
+        $checkmarknode->add_node($usertestnode,'extendusers');
     }
 
     // Add checkmark submission information!
