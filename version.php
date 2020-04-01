@@ -29,5 +29,5 @@ $plugin->version   = 2019071002;
 $plugin->requires  = 2019052000;
 $plugin->component = 'mod_checkmark';
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = "v3.7.1";
+$plugin->release   = "v3.7.2";
 
