@@ -30,11 +30,11 @@ require_once($CFG->dirroot.'/mod/assign/locallib.php');
 require_once($CFG->dirroot.'/mod/assign/override_form.php');
 
 
-$cmid = required_param('cmid', PARAM_INT);
+$cmid = required_param('id', PARAM_INT);
 $mode = optional_param('mode', '', PARAM_ALPHA); // One of 'user' or 'group', default is 'group'.
 
 $action   = optional_param('action', '', PARAM_ALPHA);
-$redirect = $CFG->wwwroot.'/mod/checkmark/overrides.php?cmid=' . $cmid . '&amp;mode=group';
+$redirect = $CFG->wwwroot.'/mod/checkmark/overrides.php?id=' . $cmid . '&amp;mode=group';
 
 list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'checkmark');
 $checkmark = $DB->get_record('checkmark', array('id' => $cm->instance), '*', MUST_EXIST);
@@ -49,7 +49,7 @@ require_capability('mod/checkmark:manageoverrides', $context);
 $cmgroupmode = groups_get_activity_groupmode($cm);
 $accessallgroups = ($cmgroupmode == NOGROUPS) || has_capability('moodle/site:accessallgroups', $context);
 
-$overridecountgroup = $DB->count_records('checkmark_overrides', array('userid' => null, 'checkmarkid' => $assign->id));
+$overridecountgroup = $DB->count_records('checkmark_overrides', array('userid' => null, 'checkmarkid' => $cm->id));
 
 // Get the course groups that the current user can access.
 $groups = $accessallgroups ? groups_get_all_groups($cm->course) : groups_get_activity_allowed_groups($cm);
@@ -64,7 +64,7 @@ if ($mode != "user" and $mode != "group") {
 }
 $groupmode = ($mode == "group");
 
-$url = new moodle_url('/mod/assign/overrides.php', array('cmid' => $cm->id, 'mode' => $mode));
+$url = new moodle_url('/mod/checkmark/overrides.php', array('id' => $cm->id, 'mode' => $mode));
 
 $PAGE->set_url($url);
 
@@ -73,7 +73,7 @@ if ($action == 'movegroupoverride') {
     $dir = required_param('dir', PARAM_ALPHA);
 
     if (confirm_sesskey()) {
-        move_group_override($id, $dir, $assign->id);
+        move_group_override($id, $dir, $cm->id);
     }
     redirect($redirect);
 }
@@ -83,21 +83,22 @@ $PAGE->set_pagelayout('admin');
 $PAGE->set_title(get_string('overrides', 'assign'));
 $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($assign->name, true, array('context' => $context)));
+echo $OUTPUT->heading(format_string($cm->name, true, array('context' => $context)));
 
 // Delete orphaned group overrides.
+/*
 $sql = 'SELECT o.id
-          FROM {assign_overrides} o
+          FROM {checkmark_overrides} o
      LEFT JOIN {groups} g ON o.groupid = g.id
          WHERE o.groupid IS NOT NULL
                AND g.id IS NULL
-               AND o.assignid = ?';
-$params = array($assign->id);
+               AND o.checkmarkid = ?';
+$params = array($cm->id);
 $orphaned = $DB->get_records_sql($sql, $params);
 if (!empty($orphaned)) {
-    $DB->delete_records_list('assign_overrides', 'id', array_keys($orphaned));
+    $DB->delete_records_list('checkmark_overrides', 'id', array_keys($orphaned));
 }
-
+*/
 $overrides = [];
 
 // Fetch all overrides.
@@ -105,14 +106,14 @@ if ($groupmode) {
     $colname = get_string('group');
     // To filter the result by the list of groups that the current user has access to.
     if ($groups) {
-        $params = ['assignid' => $assign->id];
+        $params = ['checkmarkid' => $cm->id];
         list($insql, $inparams) = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
         $params += $inparams;
 
         $sql = "SELECT o.*, g.name
-                  FROM {assign_overrides} o
+                  FROM {checkmark_overrides} o
                   JOIN {groups} g ON o.groupid = g.id
-                 WHERE o.assignid = :assignid AND g.id $insql
+                 WHERE o.checkmarkid = :checkmarkid AND g.id $insql
               ORDER BY o.sortorder";
 
         $overrides = $DB->get_records_sql($sql, $params);
@@ -120,13 +121,13 @@ if ($groupmode) {
 } else {
     $colname = get_string('user');
     list($sort, $params) = users_order_by_sql('u');
-    $params['assignid'] = $assign->id;
+    $params['checkmarkid'] = $cm->instance;
 
     if ($accessallgroups) {
         $sql = 'SELECT o.*, ' . get_all_user_name_fields(true, 'u') . '
-                  FROM {assign_overrides} o
+                  FROM {checkmark_overrides} o
                   JOIN {user} u ON o.userid = u.id
-                 WHERE o.assignid = :assignid
+                 WHERE o.checkmarkid = :checkmarkid
               ORDER BY ' . $sort;
 
         $overrides = $DB->get_records_sql($sql, $params);
@@ -135,10 +136,10 @@ if ($groupmode) {
         $params += $inparams;
 
         $sql = 'SELECT o.*, ' . get_all_user_name_fields(true, 'u') . '
-                  FROM {assign_overrides} o
+                  FROM {checkmark_overrides} o
                   JOIN {user} u ON o.userid = u.id
                   JOIN {groups_members} gm ON u.id = gm.userid
-                 WHERE o.assignid = :assignid AND gm.groupid ' . $insql . '
+                 WHERE o.checkmarkid = :checkmarkid AND gm.groupid ' . $insql . '
               ORDER BY ' . $sort;
 
         $overrides = $DB->get_records_sql($sql, $params);
@@ -181,20 +182,20 @@ foreach ($overrides as $override) {
     }
 
     // Format allowsubmissionsfromdate.
-    if (isset($override->allowsubmissionsfromdate)) {
+    if (isset($override->timeavaliable) && $override->timeavaliable != $checkmark->timeavaliable) {
         $fields[] = get_string('open', 'assign');
-        $values[] = $override->allowsubmissionsfromdate > 0 ? userdate($override->allowsubmissionsfromdate) : get_string('noopen',
+        $values[] = $override->timeavaliable > 0 ? userdate($override->timeavaliable) : get_string('noopen',
                 'assign');
     }
 
     // Format duedate.
-    if (isset($override->duedate)) {
+    if (isset($override->timedue) && $override->timedue != $checkmark->timedue) {
         $fields[] = get_string('duedate', 'assign');
-        $values[] = $override->duedate > 0 ? userdate($override->duedate) : get_string('noclose', 'assign');
+        $values[] = $override->timedue > 0 ? userdate($override->timedue) : get_string('noclose', 'assign');
     }
 
     // Format cutoffdate.
-    if (isset($override->cutoffdate)) {
+    if (isset($override->cutoffdate) && $override->cutoffdate != $checkmark->cutoffdate) {
         $fields[] = get_string('cutoffdate', 'assign');
         $values[] = $override->cutoffdate > 0 ? userdate($override->cutoffdate) : get_string('noclose', 'assign');
     }
@@ -282,7 +283,7 @@ foreach ($overrides as $override) {
 }
 
 // Output the table and button.
-echo html_writer::start_tag('div', array('id' => 'assignoverrides'));
+echo html_writer::start_tag('div', array('id' => 'checkmarkoverrides'));
 if (count($table->data)) {
     echo html_writer::table($table);
 }

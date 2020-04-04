@@ -1877,7 +1877,7 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
         $shorttext = "Avalibility Users Test";
         $key = 'extenduserstest';
         $icon = null;
-        $usertestnode = \navigation_node::create($shorttext, new moodle_url('/mod/checkmark/overrides.php', array('cmid' => $PAGE->cm->id)),$type,$shorttext,$key,$icon);
+        $usertestnode = \navigation_node::create($shorttext, new moodle_url('/mod/checkmark/overrides.php', array('id' => $PAGE->cm->id)),$type,$shorttext,$key,$icon);
         $checkmarknode->add_node($usertestnode,'extendusers');
     }
 
