@@ -182,9 +182,9 @@ foreach ($overrides as $override) {
     }
 
     // Format allowsubmissionsfromdate.
-    if (isset($override->timeavaliable) && $override->timeavaliable != $checkmark->timeavaliable) {
+    if (isset($override->timeavailable) && $override->timeavailable != $checkmark->timeavailable) {
         $fields[] = get_string('open', 'assign');
-        $values[] = $override->timeavaliable > 0 ? userdate($override->timeavaliable) : get_string('noopen',
+        $values[] = $override->timeavailable > 0 ? userdate($override->timeavailable) : get_string('noopen',
                 'assign');
     }
 
