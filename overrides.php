@@ -160,7 +160,7 @@ $userurl = new moodle_url('/user/view.php', array());
 $groupurl = new moodle_url('/group/overview.php', array('id' => $cm->course));
 
 $overridedeleteurl = new moodle_url('/mod/assign/overridedelete.php');
-$overrideediturl = new moodle_url('/mod/assign/overrideedit.php');
+$overrideediturl = new moodle_url('/mod/checkmark/extend.php');
 
 $hasinactive = false; // Whether there are any inactive overrides.
 
@@ -333,7 +333,7 @@ if ($groupmode) {
         $options['disabled'] = true;
     }
     echo $OUTPUT->single_button($overrideediturl->out(true,
-            array('action' => 'adduser', 'cmid' => $cm->id)),
+            array('type' => '1', 'id' => $cm->id)),
             get_string('addnewuseroverride', 'assign'), 'get', $options);
 }
 echo html_writer::end_tag('div');

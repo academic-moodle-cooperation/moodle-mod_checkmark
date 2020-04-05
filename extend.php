@@ -32,7 +32,7 @@ require_login();
 $id = required_param('id', PARAM_INT);
 $type = required_param('type', PARAM_INT);
 $return = optional_param('return', false, PARAM_RAW);
-$return = !empty($return) ? urldecode($return) : (new moodle_url('/mod/checkmark/submissions.php', ['id' => $id]))->out();
+$return = !empty($return) ? urldecode($return) : (new moodle_url('/mod/checkmark/overrides.php', ['id' => $id]))->out();
 $users = optional_param('users', false, PARAM_RAW);
 
 try {
