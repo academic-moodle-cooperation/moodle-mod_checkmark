@@ -52,10 +52,11 @@ define(['jquery', 'core/log'], function($, log) {
 
         log.info('Update checkboxes (type = ' + type + ')');
 
+        // The .checkboxgroup1 selector is needed so only selection checkboxes are checked or unchecked.
         if (type == 'all') {
-            $(e.data.inst.table + ' input[type="checkbox"]').prop('checked', true);
+            $(e.data.inst.table + ' input[type="checkbox"].checkboxgroup1').prop('checked', true);
         } else if (type == 'none') {
-            $(e.data.inst.table + ' input[type="checkbox"]').prop('checked', false);
+            $(e.data.inst.table + ' input[type="checkbox"].checkboxgroup1').prop('checked', false);
         } else {
             var checkboxes = $(e.data.inst.table + ' input[type="checkbox"]');
 
