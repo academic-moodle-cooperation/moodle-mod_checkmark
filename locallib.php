@@ -877,6 +877,10 @@ class checkmark {
         }
     }
 
+    public function delete_override_dates(int $user) {
+
+    }
+
     /**
      * Calculate the grade corresponding to the users checks
      *

@@ -31,6 +31,7 @@ require_login();
 
 $id = required_param('id', PARAM_INT);
 $type = required_param('type', PARAM_INT);
+$mode = optional_param('mode', 'ADD', PARAM_TEXT);
 $return = optional_param('return', false, PARAM_RAW);
 $return = !empty($return) ? urldecode($return) : (new moodle_url('/mod/checkmark/overrides.php', ['id' => $id]))->out();
 $users = optional_param('users', false, PARAM_RAW);
@@ -52,7 +53,8 @@ try {
         'cm' => $cm,
         'context' => $context,
         'checkmark' => $checkmark,
-        'return' => $return
+        'return' => $return,
+        'mode' => $mode
     ];
 
     $form = new \mod_checkmark\overrideform($type, $url, $customdata);
@@ -86,7 +88,18 @@ try {
     } else {
         if (!empty($users) && $type === \mod_checkmark\overrideform::USER) {
             $users = json_decode(urldecode(required_param('users', PARAM_RAW)));
-            $form->set_data(['userids' => $users]);
+            $data = array();
+            if($mode == 'EDIT' || $mode == 'DUPLICATE') {
+
+                $dates = checkmark_get_overridden_dates($checkmark->id, is_int($users) ? $users : $users[0]);
+                if ($dates) {
+                    $data = array('timeavailable' => $dates->timeavailable, 'timedue' => $dates->timedue, 'cutoffdate' => $dates->cutoffdate);
+                }
+            }
+            if($mode != 'DUPLICATE') {
+                $data['userids'] = $users;
+            }
+            $form->set_data($data);
         }
     }
 
@@ -104,3 +117,4 @@ try {
     redirect($return, $e->getFile().'#'.$e->getLine().': '.$e->getMessage().html_writer::empty_tag('br').
                       nl2br($e->getTraceAsString()), null, \core\output\notification::NOTIFY_ERROR);
 }
+
