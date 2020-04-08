@@ -877,6 +877,12 @@ class checkmark {
         }
     }
 
+    /**
+     * Delete override for a given users
+     *
+     * @param int[] $users Userids of overrides to delete
+     * @throws dml_exception
+     */
     public function delete_override($users) {
         global $DB;
         if (empty($users)) {
@@ -886,8 +892,7 @@ class checkmark {
             $users = array($users);
         }
         $users = array_unique($users);
-        $val = $DB->delete_records_list('checkmark_overrides','userid',$users);
-        $i = 1;
+        $DB->delete_records_list('checkmark_overrides','userid',$users);
     }
 
 
