@@ -866,11 +866,12 @@ class checkmark {
         $record->modifierid = $USER->id;
         $record->checkmarkid = $this->cm->instance;
         foreach ($users as $cur) {
-            //TODO: Add logging event and log every insert or update!
+            // TODO: Add logging event and log every insert or update!
             $record->userid = $cur;
-            if ($existing_record = $DB->get_record('checkmark_overrides',array('userid' => $cur, 'checkmarkid' => $this->cm->instance))) {
-                $record->id = $existing_record->id;
-                $DB->update_record('checkmark_overrides',$record);
+            if ($existingrecord = $DB->get_record('checkmark_overrides', array('userid' => $cur,
+                    'checkmarkid' => $this->cm->instance))) {
+                $record->id = $existingrecord->id;
+                $DB->update_record('checkmark_overrides', $record);
             } else {
                 $DB->insert_record('checkmark_overrides', $record);
             }
@@ -888,11 +889,11 @@ class checkmark {
         if (empty($users)) {
             return;
         }
-        if(!is_array($users)) {
+        if (!is_array($users)) {
             $users = array($users);
         }
         $users = array_unique($users);
-        $DB->delete_records_list('checkmark_overrides','userid',$users);
+        $DB->delete_records_list('checkmark_overrides', 'userid', $users);
     }
 
 

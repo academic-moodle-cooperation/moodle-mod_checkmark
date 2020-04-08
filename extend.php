@@ -32,7 +32,7 @@ require_login();
 $id = required_param('id', PARAM_INT);
 $type = required_param('type', PARAM_INT);
 $mode = optional_param('mode', \mod_checkmark\overrideform::ADD, PARAM_TEXT);
-$confirm = optional_param('confirm',0,PARAM_INT);
+$confirm = optional_param('confirm', 0, PARAM_INT);
 $return = optional_param('return', false, PARAM_RAW);
 $return = !empty($return) ? urldecode($return) : (new moodle_url('/mod/checkmark/overrides.php', ['id' => $id]))->out();
 $users = optional_param('users', false, PARAM_RAW);
@@ -107,14 +107,14 @@ try {
         if (!empty($users) && $type === \mod_checkmark\overrideform::USER) {
             $users = json_decode(urldecode(required_param('users', PARAM_RAW)));
             $data = array();
-            if($mode == \mod_checkmark\overrideform::EDIT || $mode == \mod_checkmark\overrideform::COPY) {
-
-                $dates = checkmark_get_overridden_dates($checkmark->id, is_int($users) ? $users : $users[0]);
+            if ($mode == \mod_checkmark\overrideform::EDIT || $mode == \mod_checkmark\overrideform::COPY) {
+                $dates = checkmark_get_overridden_dates($checkmark->id,
+                        is_int($users) ? $users : $users[0]);
                 if ($dates) {
                     $data = array('timeavailable' => $dates->timeavailable, 'timedue' => $dates->timedue, 'cutoffdate' => $dates->cutoffdate);
                 }
             }
-            if($mode != \mod_checkmark\overrideform::COPY) {
+            if ($mode != \mod_checkmark\overrideform::COPY) {
                 $data['userids'] = $users;
             }
             $form->set_data($data);
@@ -124,10 +124,11 @@ try {
     echo $OUTPUT->header();
     echo $OUTPUT->heading(format_string($checkmark->name, true, array('context' => $context)));
 
-    if($mode != \mod_checkmark\overrideform::DELETE) {
+    if ($mode != \mod_checkmark\overrideform::DELETE) {
         $form->display();
     } else {
-        $confirmurl = new moodle_url($url, array('id' => $id, 'type' => $type, 'users' => $users, 'mode' => \mod_checkmark\overrideform::DELETE, 'confirm' => 1));
+        $confirmurl = new moodle_url($url, array('id' => $id, 'type' => $type, 'users' => $users,
+                'mode' => \mod_checkmark\overrideform::DELETE, 'confirm' => 1));
         $cancelurl = new moodle_url('/mod/checkmark/overrides.php', array('id' => $id));
         $namefields = get_all_user_name_fields(true);
         $user = $DB->get_record('user', array('id' => $users),

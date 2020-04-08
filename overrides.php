@@ -77,28 +77,13 @@ if ($action == 'movegroupoverride') {
 
 // Display a list of overrides.
 $PAGE->set_pagelayout('admin');
-$PAGE->set_title(get_string('overrides', 'assign'));
-$PAGE->navbar->add(get_string('useroverrides', 'assign'));
+$PAGE->set_title(get_string('overrides', 'checkmark'));
+$PAGE->navbar->add(get_string('useroverrides', 'checkmark'));
 $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($cm->name, true, array('context' => $context)));
 
-// Delete orphaned group overrides.
-/*
-$sql = 'SELECT o.id
-          FROM {checkmark_overrides} o
-     LEFT JOIN {groups} g ON o.groupid = g.id
-         WHERE o.groupid IS NOT NULL
-               AND g.id IS NULL
-               AND o.checkmarkid = ?';
-$params = array($cm->id);
-$orphaned = $DB->get_records_sql($sql, $params);
-if (!empty($orphaned)) {
-    $DB->delete_records_list('checkmark_overrides', 'id', array_keys($orphaned));
-}
-*/
 $overrides = [];
-
 // Fetch all overrides.
 if ($groupmode) {
     $colname = get_string('group');
@@ -150,7 +135,7 @@ $table->headspan = array(1, 2, 1);
 $table->colclasses = array('colname', 'colsetting', 'colvalue', 'colaction');
 $table->head = array(
         $colname,
-        get_string('overrides', 'assign'),
+        get_string('overrides', 'checkmark'),
         get_string('action'),
 );
 
