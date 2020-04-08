@@ -72,7 +72,9 @@ class exportform extends \moodleform {
         $filters = [
             \checkmark::FILTER_ALL             => get_string('all'),
             \checkmark::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
-            \checkmark::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark')
+            \checkmark::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'),
+            \checkmark::FILTER_EXTENSION => get_string('filtergrantedextension','checkmark')
+
         ];
         if ($this->_customdata['tracksattendance']) {
             $filters[\checkmark::FILTER_ATTENDANT] = get_string('all_attendant', 'checkmark');
