@@ -2118,7 +2118,7 @@ class checkmark {
         $filters = array(self::FILTER_ALL => get_string('all'),
                 self::FILTER_SUBMITTED => get_string('submitted', 'checkmark'),
                 self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'),
-                self::FILTER_EXTENSION => get_string('filtergrantedextension','checkmark'));
+                self::FILTER_EXTENSION => get_string('filtergrantedextension', 'checkmark'));
 
         if ($this->checkmark->trackattendance) {
             $filters[self::FILTER_ATTENDANT] = get_string('all_attendant', 'checkmark');
@@ -2637,7 +2637,7 @@ class checkmark {
                 self::FILTER_ALL => get_string('all'),
                 self::FILTER_SUBMITTED => get_string('submitted', 'checkmark'),
                 self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'),
-                self::FILTER_EXTENSION => get_string('filtergrantedextension','checkmark')
+                self::FILTER_EXTENSION => get_string('filtergrantedextension', 'checkmark')
         ];
 
         if ($trackattendance) {
