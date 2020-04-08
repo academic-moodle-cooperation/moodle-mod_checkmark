@@ -31,7 +31,8 @@ require_login();
 
 $id = required_param('id', PARAM_INT);
 $type = required_param('type', PARAM_INT);
-$mode = optional_param('mode', 'ADD', PARAM_TEXT);
+$mode = optional_param('mode', \mod_checkmark\overrideform::ADD, PARAM_TEXT);
+$confirm = optional_param('confirm',0,PARAM_INT);
 $return = optional_param('return', false, PARAM_RAW);
 $return = !empty($return) ? urldecode($return) : (new moodle_url('/mod/checkmark/overrides.php', ['id' => $id]))->out();
 $users = optional_param('users', false, PARAM_RAW);
@@ -57,13 +58,30 @@ try {
         'mode' => $mode
     ];
 
+    $stroverride = get_string('override', 'checkmark');
+    if ($mode === \mod_checkmark\overrideform::DELETE) {
+        $title = get_string('deletecheck', null, $stroverride);
+    } else {
+        $title = get_string('editoverride', 'checkmark');
+    }
+
+    $PAGE->set_url($url);
+    $PAGE->set_pagelayout('admin');
+    $PAGE->navbar->add($title);
+    $PAGE->set_title($title);
+    $PAGE->set_heading($course->fullname);
+
+
     $form = new \mod_checkmark\overrideform($type, $url, $customdata);
 
     if ($form->is_cancelled()) {
         redirect($return);
+    } else if ($mode === \mod_checkmark\overrideform::DELETE && $confirm) {
+        $instance = new checkmark($cm->id, $checkmark, $cm, $course);
+        $instance->delete_override($users);
+        redirect($return, "Entry deleted", null, \core\output\notification::NOTIFY_SUCCESS);
     } else if ($data = $form->get_data()) {
         $instance = new checkmark($cm->id, $checkmark, $cm, $course);
-
         if ($type === \mod_checkmark\overrideform::GROUP) {
             // Get all group(s) users to extend for!
             $data->userids = [];
@@ -89,14 +107,14 @@ try {
         if (!empty($users) && $type === \mod_checkmark\overrideform::USER) {
             $users = json_decode(urldecode(required_param('users', PARAM_RAW)));
             $data = array();
-            if($mode == 'EDIT' || $mode == 'DUPLICATE') {
+            if($mode == \mod_checkmark\overrideform::EDIT || $mode == \mod_checkmark\overrideform::COPY) {
 
                 $dates = checkmark_get_overridden_dates($checkmark->id, is_int($users) ? $users : $users[0]);
                 if ($dates) {
                     $data = array('timeavailable' => $dates->timeavailable, 'timedue' => $dates->timedue, 'cutoffdate' => $dates->cutoffdate);
                 }
             }
-            if($mode != 'DUPLICATE') {
+            if($mode != \mod_checkmark\overrideform::COPY) {
                 $data['userids'] = $users;
             }
             $form->set_data($data);
@@ -104,8 +122,19 @@ try {
     }
 
     echo $OUTPUT->header();
+    echo $OUTPUT->heading(format_string($checkmark->name, true, array('context' => $context)));
 
-    $form->display();
+    if($mode != \mod_checkmark\overrideform::DELETE) {
+        $form->display();
+    } else {
+        $confirmurl = new moodle_url($url, array('id' => $id, 'type' => $type, 'users' => $users, 'mode' => \mod_checkmark\overrideform::DELETE, 'confirm' => 1));
+        $cancelurl = new moodle_url('/mod/checkmark/overrides.php', array('id' => $id));
+        $namefields = get_all_user_name_fields(true);
+        $user = $DB->get_record('user', array('id' => $users),
+                'id, ' . $namefields);
+        $confirmstr = get_string("overridedeleteusersure", "checkmark", fullname($user));
+        echo $OUTPUT->confirm($confirmstr, $confirmurl, $cancelurl);
+    }
 
     echo $OUTPUT->footer();
 } catch (dml_exception $d) {

@@ -25,9 +25,6 @@
 
 
 require_once(dirname(__FILE__) . '/../../config.php');
-require_once($CFG->dirroot.'/mod/assign/lib.php');
-require_once($CFG->dirroot.'/mod/assign/locallib.php');
-require_once($CFG->dirroot.'/mod/assign/override_form.php');
 
 
 $cmid = required_param('id', PARAM_INT);
@@ -81,6 +78,7 @@ if ($action == 'movegroupoverride') {
 // Display a list of overrides.
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title(get_string('overrides', 'assign'));
+$PAGE->navbar->add(get_string('useroverrides', 'assign'));
 $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($cm->name, true, array('context' => $context)));
@@ -159,7 +157,6 @@ $table->head = array(
 $userurl = new moodle_url('/user/view.php', array());
 $groupurl = new moodle_url('/group/overview.php', array('id' => $cm->course));
 
-$overridedeleteurl = new moodle_url('/mod/assign/overridedelete.php');
 $overrideediturl = new moodle_url('/mod/checkmark/extend.php');
 
 $hasinactive = false; // Whether there are any inactive overrides.
@@ -183,21 +180,21 @@ foreach ($overrides as $override) {
 
     // Format allowsubmissionsfromdate.
     if (isset($override->timeavailable) && $override->timeavailable != $checkmark->timeavailable) {
-        $fields[] = get_string('open', 'assign');
+        $fields[] = get_string('open', 'checkmark');
         $values[] = $override->timeavailable > 0 ? userdate($override->timeavailable) : get_string('noopen',
-                'assign');
+                'checkmark');
     }
 
     // Format duedate.
     if (isset($override->timedue) && $override->timedue != $checkmark->timedue) {
-        $fields[] = get_string('duedate', 'assign');
-        $values[] = $override->timedue > 0 ? userdate($override->timedue) : get_string('noclose', 'assign');
+        $fields[] = get_string('duedate', 'checkmark');
+        $values[] = $override->timedue > 0 ? userdate($override->timedue) : get_string('noclose', 'checkmark');
     }
 
     // Format cutoffdate.
     if (isset($override->cutoffdate) && $override->cutoffdate != $checkmark->cutoffdate) {
-        $fields[] = get_string('cutoffdate', 'assign');
-        $values[] = $override->cutoffdate > 0 ? userdate($override->cutoffdate) : get_string('noclose', 'assign');
+        $fields[] = get_string('cutoffdate', 'checkmark');
+        $values[] = $override->cutoffdate > 0 ? userdate($override->cutoffdate) : get_string('noclose', 'checkmark');
     }
 
     // Icons.
@@ -205,18 +202,19 @@ foreach ($overrides as $override) {
 
     if ($active) {
         // Edit.
-        $editurlstr = $overrideediturl->out(true, array('id' => $override->id));
+        $editurlstr = $overrideediturl->out(true, array('id' => $cmid, 'type' => \mod_checkmark\overrideform::USER,
+                'mode' => \mod_checkmark\overrideform::EDIT, 'users' => $override->userid));
         $iconstr = '<a title="' . get_string('edit') . '" href="'. $editurlstr . '">' .
                 $OUTPUT->pix_icon('t/edit', get_string('edit')) . '</a> ';
         // Duplicate.
-        $copyurlstr = $overrideediturl->out(true,
-                array('id' => $override->id, 'action' => 'duplicate'));
+        $copyurlstr = $overrideediturl->out(true, array('id' => $cmid, 'type' => \mod_checkmark\overrideform::USER,
+                'mode' => \mod_checkmark\overrideform::COPY, 'users' => $override->userid));
         $iconstr .= '<a title="' . get_string('copy') . '" href="' . $copyurlstr . '">' .
                 $OUTPUT->pix_icon('t/copy', get_string('copy')) . '</a> ';
     }
     // Delete.
-    $deleteurlstr = $overridedeleteurl->out(true,
-            array('id' => $override->id, 'sesskey' => sesskey()));
+    $deleteurlstr = $overrideediturl->out(true, array('id' => $cmid, 'type' => \mod_checkmark\overrideform::USER,
+            'mode' => \mod_checkmark\overrideform::DELETE, 'users' => $override->userid));
     $iconstr .= '<a title="' . get_string('delete') . '" href="' . $deleteurlstr . '">' .
             $OUTPUT->pix_icon('t/delete', get_string('delete')) . '</a> ';
 
@@ -288,7 +286,7 @@ if (count($table->data)) {
     echo html_writer::table($table);
 }
 if ($hasinactive) {
-    echo $OUTPUT->notification(get_string('inactiveoverridehelp', 'assign'), 'dimmed_text');
+    echo $OUTPUT->notification(get_string('inactiveoverridehelp', 'checkmark'), 'dimmed_text');
 }
 
 echo html_writer::start_tag('div', array('class' => 'buttons'));
@@ -296,18 +294,18 @@ $options = array();
 if ($groupmode) {
     if (empty($groups)) {
         // There are no groups.
-        echo $OUTPUT->notification(get_string('groupsnone', 'assign'), 'error');
+        echo $OUTPUT->notification(get_string('groupsnone', 'checkmark'), 'error');
         $options['disabled'] = true;
     }
     echo $OUTPUT->single_button($overrideediturl->out(true,
             array('action' => 'addgroup', 'cmid' => $cm->id)),
-            get_string('addnewgroupoverride', 'assign'), 'post', $options);
+            get_string('addnewgroupoverride', 'checkmark'), 'post', $options);
 } else {
     $users = array();
-    // See if there are any users in the assign.
+    // See if there are any users in the checkmark.
     if ($accessallgroups) {
         $users = get_enrolled_users($context, '', 0, 'u.id');
-        $nousermessage = get_string('usersnone', 'assign');
+        $nousermessage = get_string('usersnone', 'checkmark');
     } else if ($groups) {
         $enrolledjoin = get_enrolled_join($context, 'u.id');
         list($ingroupsql, $ingroupparams) = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
@@ -320,9 +318,9 @@ if ($groupmode) {
                        AND {$enrolledjoin->wheres}
               ORDER BY $sort";
         $users = $DB->get_records_sql($sql, $params);
-        $nousermessage = get_string('usersnone', 'assign');
+        $nousermessage = get_string('usersnone', 'checkmark');
     } else {
-        $nousermessage = get_string('groupsnone', 'assign');
+        $nousermessage = get_string('groupsnone', 'checkmark');
     }
     $info = new \core_availability\info_module($cm);
     $users = $info->filter_user_list($users);
@@ -334,7 +332,7 @@ if ($groupmode) {
     }
     echo $OUTPUT->single_button($overrideediturl->out(true,
             array('type' => '1', 'id' => $cm->id)),
-            get_string('addnewuseroverride', 'assign'), 'get', $options);
+            get_string('addnewuseroverride', 'checkmark'), 'get', $options);
 }
 echo html_writer::end_tag('div');
 echo html_writer::end_tag('div');

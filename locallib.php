@@ -877,9 +877,19 @@ class checkmark {
         }
     }
 
-    public function delete_override_dates(int $user) {
-
+    public function delete_override($users) {
+        global $DB;
+        if (empty($users)) {
+            return;
+        }
+        if(!is_array($users)) {
+            $users = array($users);
+        }
+        $users = array_unique($users);
+        $val = $DB->delete_records_list('checkmark_overrides','userid',$users);
+        $i = 1;
     }
+
 
     /**
      * Calculate the grade corresponding to the users checks
