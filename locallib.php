@@ -505,8 +505,7 @@ class checkmark {
             if ($this->checkmark->timeavailable) {
                 $timeavailable = userdate($this->checkmark->timeavailable);
                 if ($this->overrides && $this->overrides->timeavailable) {
-                    $row[0]->rowspan = 2;
-                    $timeavailable = html_writer::tag('del', $timeavailable);
+                    $timeavailable = userdate($this->overrides->timeavailable);
                 }
                 $row[1] = new html_table_cell($timeavailable);
             } else {
@@ -514,11 +513,6 @@ class checkmark {
                 $row[1]->attributes['class'] = 'alert-info';
             }
             $rows[] = new html_table_row($row);
-            if ($this->checkmark->timeavailable && $this->overrides && $this->overrides->timeavailable) {
-                $row = [new html_table_cell(userdate($this->overrides->timeavailable))];
-                $row[0]->attributes['class'] = 'alert-info';
-                $rows[] = new html_table_row($row);
-            }
         }
         if ($this->checkmark->timedue
                 || ($this->overrides && $this->overrides->timedue && ($this->overrides->timedue !== $this->checkmark->timedue))) {
@@ -527,8 +521,7 @@ class checkmark {
             if ($this->checkmark->timedue) {
                 $due = userdate($this->checkmark->timedue);
                 if ($this->overrides && $this->overrides->timedue) {
-                    $row[0]->rowspan = 2;
-                    $due = html_writer::tag('del', $due);
+                    $due = userdate($this->overrides->timedue);
                 }
                 $row[1] = new html_table_cell($due);
             } else {
@@ -536,11 +529,6 @@ class checkmark {
                 $row[1]->attributes['class'] = 'alert-info align-left';
             }
             $rows[] = new html_table_row($row);
-            if ($this->checkmark->timedue && $this->overrides && $this->overrides->timedue) {
-                $row = [new html_table_cell(userdate($this->overrides->timedue))];
-                $row[0]->attributes['class'] = 'alert-info align-left';
-                $rows[] = new html_table_row($row);
-            }
         }
         $table->data = $rows;
         echo html_writer::table($table);
