@@ -1870,7 +1870,7 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
         $key = 'extendusers';
         $icon = null;
         $usernode = \navigation_node::create($shorttext, new moodle_url('/mod/checkmark/overrides.php',
-                array('id' => $PAGE->cm->id)), $type, $shorttext, $key, $icon);
+                array('id' => $PAGE->cm->id, 'mode' => 'user')), $type, $shorttext, $key, $icon);
         $checkmarknode->add_node($usernode, 'extendgroups');
     }
 

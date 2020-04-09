@@ -34,7 +34,8 @@ $type = required_param('type', PARAM_INT);
 $mode = optional_param('mode', \mod_checkmark\overrideform::ADD, PARAM_TEXT);
 $confirm = optional_param('confirm', 0, PARAM_INT);
 $return = optional_param('return', false, PARAM_RAW);
-$return = !empty($return) ? urldecode($return) : (new moodle_url('/mod/checkmark/overrides.php', ['id' => $id]))->out();
+$return = !empty($return) ? urldecode($return) : (new moodle_url('/mod/checkmark/overrides.php',
+        ['id' => $id, 'mode' => $type === \mod_checkmark\overrideform::USER ? 'user' : 'group']))->out();
 $users = optional_param('users', false, PARAM_RAW);
 
 try {
