@@ -823,22 +823,23 @@ class checkmark {
     }
 
     /**
-     * Override available from date, due date or cut off date for certain users!
+     * Override available from date, due date or cut off date for certain users or groups!
      *
-     * @param int[] $users
+     * @param int[] $entities Array of userids or groupids to override dates for
      * @param int $timeavailable
      * @param int $timedue
      * @param int $cutoffdate
+     * @param int $mode \mod_checkmark\overrideform::USER for using userids or \mod_checkmark\overrideform::GROUP for using group ids
      * @throws dml_exception
      */
-    public function override_dates(array $users, int $timeavailable, int $timedue, int $cutoffdate) {
+    public function override_dates(array $entities, int $timeavailable, int $timedue, int $cutoffdate, int $mode = \mod_checkmark\overrideform::USER) {
         global $DB, $USER;
 
-        if (empty($users) || !is_array($users)) {
+        if (empty($entities) || !is_array($entities)) {
             return;
         }
 
-        $users = array_unique($users);
+        $entities = array_unique($entities);
 
         $record = new stdClass();
         if (!empty($timeavailable)) {
@@ -853,11 +854,19 @@ class checkmark {
         $record->timecreated = time();
         $record->modifierid = $USER->id;
         $record->checkmarkid = $this->cm->instance;
-        foreach ($users as $cur) {
+        foreach ($entities as $cur) {
             // TODO: Add logging event and log every insert or update!
-            $record->userid = $cur;
-            if ($existingrecord = $DB->get_record('checkmark_overrides', array('userid' => $cur,
-                    'checkmarkid' => $this->cm->instance))) {
+            $existingrecord = null;
+            if ($mode == \mod_checkmark\overrideform::GROUP) {
+                $record->groupid = $cur;
+                $existingrecord = $DB->get_record('checkmark_overrides',
+                        array('groupid' => $cur, 'checkmarkid' => $this->cm->instance));
+            } else {
+                $record->userid = $cur;
+                $existingrecord = $DB->get_record('checkmark_overrides', array('userid' => $cur,
+                        'checkmarkid' => $this->cm->instance));
+            }
+            if ($existingrecord) {
                 $record->id = $existingrecord->id;
                 $DB->update_record('checkmark_overrides', $record);
             } else {
@@ -867,21 +876,26 @@ class checkmark {
     }
 
     /**
-     * Delete override for a given users
+     * Delete override for given userids or groupids
      *
-     * @param int[] $users Userids of overrides to delete
+     * @param int[] $entities Array of userids or groupids for which override dates are deleted
+     * @param int $mode \mod_checkmark\overrideform::USER for using userids or \mod_checkmark\overrideform::GROUP for using group ids
      * @throws dml_exception
      */
-    public function delete_override($users) {
+    public function delete_override($entities, $mode = \mod_checkmark\overrideform::USER) {
         global $DB;
-        if (empty($users)) {
+        if (empty($entities)) {
             return;
         }
-        if (!is_array($users)) {
-            $users = array($users);
+        if (!is_array($entities)) {
+            $entities = array($entities);
         }
-        $users = array_unique($users);
-        $DB->delete_records_list('checkmark_overrides', 'userid', $users);
+        $entities = array_unique($entities);
+        if ($mode == \mod_checkmark\overrideform::GROUP) {
+            $DB->delete_records_list('checkmark_overrides', 'groupid', $entities);
+        } else {
+            $DB->delete_records_list('checkmark_overrides', 'userid', $entities);
+        }
     }
 
 

@@ -87,15 +87,16 @@ try {
             // Get all group(s) users to extend for!
             $data->userids = [];
             if (!empty($data->groups)) {
+                $instance->override_dates($data->groups, $data->timeavailable, $data->timedue, $data->cutoffdate,\mod_checkmark\overrideform::GROUP);
+                /*
                 foreach ($data->groups as $cur) {
                     if ($userids = groups_get_members($cur)) {
                         $data->userids = array_merge($data->userids, array_keys($userids));
                     }
                 }
+                */
             }
-        }
-
-        if (!empty($data->userids)) {
+        } else if (!empty($data->userids)) {
             $instance->override_dates($data->userids, $data->timeavailable, $data->timedue, $data->cutoffdate);
         }
 
