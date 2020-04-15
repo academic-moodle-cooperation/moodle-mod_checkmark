@@ -1113,6 +1113,66 @@ function xmldb_checkmark_upgrade($oldversion) {
         // Checkmark savepoint reached.
         upgrade_mod_savepoint(true, 2019012000, 'checkmark');
     }
+    if ($oldversion < 2020041402) {
+
+        // Define key userid (foreign) to be dropped form checkmark_overrides.
+        $table = new xmldb_table('checkmark_overrides');
+        $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+
+        // Launch drop key userid.
+        $dbman->drop_key($table, $key);
+
+        // Define index checkmarkid-userid (not unique) to be dropped form checkmark_overrides.
+        $table = new xmldb_table('checkmark_overrides');
+        $index = new xmldb_index('checkmarkid-userid', XMLDB_INDEX_NOTUNIQUE, ['checkmarkid', 'userid']);
+
+        // Conditionally launch drop index checkmarkid-userid.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Changing nullability of field userid on table checkmark_overrides to null.
+        $table = new xmldb_table('checkmark_overrides');
+        $field = new xmldb_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'checkmarkid');
+
+        // Launch change of nullability for field userid.
+        $dbman->change_field_notnull($table, $field);
+
+        // Define index checkmarkid-userid (not unique) to be added to checkmark_overrides.
+        $table = new xmldb_table('checkmark_overrides');
+        $index = new xmldb_index('checkmarkid-userid', XMLDB_INDEX_NOTUNIQUE, ['checkmarkid', 'userid']);
+
+        // Conditionally launch add index checkmarkid-userid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Define key userid (foreign) to be added to checkmark_overrides.
+        $table = new xmldb_table('checkmark_overrides');
+        $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+
+        // Launch add key userid.
+        $dbman->add_key($table, $key);
+
+        // Define field groupid to be added to checkmark_overrides.
+        $table = new xmldb_table('checkmark_overrides');
+        $field = new xmldb_field('groupid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'userid');
+
+        // Conditionally launch add field groupid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define key groupid (foreign) to be added to checkmark_overrides.
+        $table = new xmldb_table('checkmark_overrides');
+        $key = new xmldb_key('groupid', XMLDB_KEY_FOREIGN, ['groupid'], 'groups', ['id']);
+
+        // Launch add key groupid.
+        $dbman->add_key($table, $key);
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2020041402, 'checkmark');
+    }
 
     return true;
 }
