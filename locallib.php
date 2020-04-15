@@ -135,7 +135,7 @@ class checkmark {
         }
 
         // Check for overridden dates!
-        if ($overridden = checkmark_get_overridden_dates($this->checkmark->id, $USER->id)) {
+        if ($overridden = checkmark_get_overridden_dates($this->checkmark->id, $USER->id, $this->checkmark->course)) {
             $this->overrides = $overridden;
         }
 
@@ -3575,7 +3575,7 @@ class checkmark {
      */
     public function display_lateness($timesubmitted, $userid = 0) {
         if (!empty($userid)) {
-            $overrides = checkmark_get_overridden_dates($this->checkmark->id, $userid);
+            $overrides = checkmark_get_overridden_dates($this->checkmark->id, $userid, $this->checkmark->course);
         } else {
             $overrides = $this->overrides;
         }

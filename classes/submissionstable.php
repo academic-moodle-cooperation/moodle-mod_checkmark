@@ -1290,7 +1290,7 @@ class submissionstable extends \table_sql {
         if ($values->timesubmitted > 0) {
             $content = userdate($values->timesubmitted, $timeformat);
 
-            $overrides = checkmark_get_overridden_dates($this->checkmark->checkmark->id, $values->id);
+            $overrides = checkmark_get_overridden_dates($this->checkmark->checkmark->id, $values->id, $this->checkmark->course->id);
             if ($overrides && $overrides->timedue) {
                 $timedue = $overrides->timedue;
             } else {
@@ -1376,7 +1376,7 @@ class submissionstable extends \table_sql {
             $button = $OUTPUT->action_link($popupurl, $text);
 
             // If overridden dates are present for this user, we display an icon with popup!
-            if ($this->hasoverrides && $overrides = checkmark_get_overridden_dates($this->checkmark->cm->instance, $values->id)) {
+            if ($this->hasoverrides && $overrides = checkmark_get_overridden_dates($this->checkmark->cm->instance, $values->id, $this->checkmark->course->id)) {
                 $context = new stdClass();
                 if ($overrides->timeavailable) {
                     $context->timeavailable = userdate($overrides->timeavailable, get_string('strftimerecentfull'));

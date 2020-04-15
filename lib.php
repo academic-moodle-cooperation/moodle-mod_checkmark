@@ -431,7 +431,7 @@ function checkmark_get_coursemodule_info($coursemodule) {
         return false;
     }
 
-    if ($overridden = checkmark_get_overridden_dates($checkmark->id, $USER->id)) {
+    if ($overridden = checkmark_get_overridden_dates($checkmark->id, $USER->id, $coursemodule->course)) {
         if ($overridden->timeavailable) {
             $checkmark->timeavailable = $overridden->timeavailable;
         }
@@ -460,7 +460,7 @@ function checkmark_get_coursemodule_info($coursemodule) {
  * @param int $userid (optional) 0 to get all user's overrides or a specific user's ID
  * @return bool
  */
-function checkmark_get_overridden_dates($checkmarkid, $userid = 0) {
+function checkmark_get_overridden_dates($checkmarkid, $userid = 0, $courseid = 0) {
     global $USER, $DB;
 
     static $cached = [];
@@ -473,8 +473,33 @@ function checkmark_get_overridden_dates($checkmarkid, $userid = 0) {
         return $cached[$userid][$checkmarkid];
     }
 
-    $records = $DB->get_records("checkmark_overrides", ['checkmarkid' => $checkmarkid, 'userid' => $userid], "timecreated DESC",
+    // Retrieves all groupings and groups a user is part of.
+    $groups = groups_get_user_groups($courseid,$userid);
+    // Flattens groupings/groups array to one dimension.
+    $groups = call_user_func_array('array_merge', $groups);
+
+    $records = array();
+    if (!empty($groups) && is_array($groups)) {
+
+        //list($select, $params) = $this->where_clause_list($field, $values);
+        //return $this->get_records_select($table, $select, $params, $sort, $fields, $limitfrom, $limitnum);
+        list($insql, $params) = $DB->get_in_or_equal($groups);
+        array_push($params, $checkmarkid);
+        $sql = "SELECT id, timeavailable, timedue, cutoffdate FROM {checkmark_overrides}
+            WHERE groupid $insql AND checkmarkid = ? ORDER BY timecreated DESC";
+        $records = $DB->get_records_sql($sql, $params, 0, 1);
+
+        //$records = $DB->get_records_list('checkmark_overrides','groupid', $groups, "timecreated DESC",
+        //        "id, timeavailable, timedue, cutoffdate",0,1);
+        $i = 1;
+    }
+
+    $userrecords = $DB->get_records('checkmark_overrides', ['checkmarkid' => $checkmarkid, 'userid' => $userid], "timecreated DESC",
             "id, timeavailable, timedue, cutoffdate", 0, 1);
+
+    if (count($userrecords)) {
+        $records = $userrecords;
+    }
 
     if (!key_exists($userid, $cached)) {
         $cached[$userid] = [];
