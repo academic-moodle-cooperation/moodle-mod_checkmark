@@ -89,7 +89,7 @@ if ($groupmode) {
     $colname = get_string('group');
     // To filter the result by the list of groups that the current user has access to.
     if ($groups) {
-        $params = ['checkmarkid' => $cm->id];
+        $params = ['checkmarkid' => $cm->instance];
         list($insql, $inparams) = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
         $params += $inparams;
 
@@ -97,7 +97,7 @@ if ($groupmode) {
                   FROM {checkmark_overrides} o
                   JOIN {groups} g ON o.groupid = g.id
                  WHERE o.checkmarkid = :checkmarkid AND g.id $insql
-              ORDER BY o.sortorder";
+                ORDER BY o.timecreated";
 
         $overrides = $DB->get_records_sql($sql, $params);
     }
@@ -143,6 +143,8 @@ $userurl = new moodle_url('/user/view.php', array());
 $groupurl = new moodle_url('/group/overview.php', array('id' => $cm->course));
 
 $overrideediturl = new moodle_url('/mod/checkmark/extend.php');
+$type = $groupmode ? \mod_checkmark\overrideform::GROUP : \mod_checkmark\overrideform::USER;
+
 
 $hasinactive = false; // Whether there are any inactive overrides.
 
@@ -151,7 +153,7 @@ foreach ($overrides as $override) {
     $fields = array();
     $values = array();
     $active = true;
-
+    $id = $groupmode ? $override->groupid : $override->userid;
     // Check for inactive overrides.
     if (!$groupmode) {
         if (!is_enrolled($context, $override->userid)) {
@@ -184,22 +186,21 @@ foreach ($overrides as $override) {
 
     // Icons.
     $iconstr = '';
-
     if ($active) {
         // Edit.
-        $editurlstr = $overrideediturl->out(true, array('id' => $cmid, 'type' => \mod_checkmark\overrideform::USER,
-                'mode' => \mod_checkmark\overrideform::EDIT, 'users' => $override->userid));
+        $editurlstr = $overrideediturl->out(true, array('id' => $cmid, 'type' => $type,
+                'mode' => \mod_checkmark\overrideform::EDIT, 'users' => $id));
         $iconstr = '<a title="' . get_string('edit') . '" href="'. $editurlstr . '">' .
                 $OUTPUT->pix_icon('t/edit', get_string('edit')) . '</a> ';
         // Duplicate.
-        $copyurlstr = $overrideediturl->out(true, array('id' => $cmid, 'type' => \mod_checkmark\overrideform::USER,
-                'mode' => \mod_checkmark\overrideform::COPY, 'users' => $override->userid));
+        $copyurlstr = $overrideediturl->out(true, array('id' => $cmid, 'type' => $type,
+                'mode' => \mod_checkmark\overrideform::COPY, 'users' => $id));
         $iconstr .= '<a title="' . get_string('copy') . '" href="' . $copyurlstr . '">' .
                 $OUTPUT->pix_icon('t/copy', get_string('copy')) . '</a> ';
     }
     // Delete.
-    $deleteurlstr = $overrideediturl->out(true, array('id' => $cmid, 'type' => \mod_checkmark\overrideform::USER,
-            'mode' => \mod_checkmark\overrideform::DELETE, 'users' => $override->userid));
+    $deleteurlstr = $overrideediturl->out(true, array('id' => $cmid, 'type' => $type,
+            'mode' => \mod_checkmark\overrideform::DELETE, 'users' => $id));
     $iconstr .= '<a title="' . get_string('delete') . '" href="' . $deleteurlstr . '">' .
             $OUTPUT->pix_icon('t/delete', get_string('delete')) . '</a> ';
 
@@ -283,8 +284,8 @@ if ($groupmode) {
         $options['disabled'] = true;
     }
     echo $OUTPUT->single_button($overrideediturl->out(true,
-            array('action' => 'addgroup', 'cmid' => $cm->id)),
-            get_string('addnewgroupoverride', 'checkmark'), 'post', $options);
+            array('type' => $type, 'id' => $cm->id)),
+            get_string('addnewgroupoverride', 'checkmark'), 'get', $options);
 } else {
     $users = array();
     // See if there are any users in the checkmark.
@@ -316,7 +317,7 @@ if ($groupmode) {
         $options['disabled'] = true;
     }
     echo $OUTPUT->single_button($overrideediturl->out(true,
-            array('type' => '1', 'id' => $cm->id)),
+            array('type' => $type, 'id' => $cm->id)),
             get_string('addnewuseroverride', 'checkmark'), 'get', $options);
 }
 echo html_writer::end_tag('div');

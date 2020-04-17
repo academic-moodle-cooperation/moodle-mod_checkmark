@@ -451,6 +451,7 @@ function checkmark_get_coursemodule_info($coursemodule) {
     return $result;
 }
 
+
 /**
  * This function returns the overridden values for timeavailable, timedue and cutoffdate or false!
  *
@@ -474,7 +475,7 @@ function checkmark_get_overridden_dates($checkmarkid, $userid = 0, $courseid = 0
     }
 
     // Retrieves all groupings and groups a user is part of.
-    $groups = groups_get_user_groups($courseid,$userid);
+    $groups = groups_get_user_groups($courseid, $userid);
     // Flattens groupings/groups array to one dimension.
     $groups = call_user_func_array('array_merge', $groups);
 
@@ -512,6 +513,22 @@ function checkmark_get_overridden_dates($checkmarkid, $userid = 0, $courseid = 0
     }
 
     return $cached[$userid][$checkmarkid];
+}
+
+/**
+ * @param $checkmarkid
+ * @param $groupid
+ * @return array|void
+ * @throws dml_exception
+ */
+function checkmark_get_override_dates_for_group($checkmarkid, $groupid) {
+    global $DB;
+    if (empty($groupid)) {
+        return;
+    }
+    $records = $DB->get_records('checkmark_overrides', ['checkmarkid' => $checkmarkid, 'groupid' => $groupid],
+            'timecreated DESC', 'id, timeavailable, timedue, cutoffdate', 0, 1);
+    return array_values($records)[0];
 }
 
 /**
@@ -1883,12 +1900,11 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
                 'return' => urlencode($PAGE->url->out())
         ]);
         $type = \navigation_node::TYPE_CUSTOM;
-        $shorttext = get_string('override_groups_dates', 'checkmark');
+        $shorttext = get_string('groupoverrides', 'checkmark');
         $key = 'extendgroups';
         $icon = null;
-        $groupnode = \navigation_node::create(get_string('override_groups_dates', 'checkmark'),
-                new moodle_url($url, ['type' => \mod_checkmark\overrideform::GROUP]),
-                $type, $shorttext, $key, $icon);
+        $groupnode = \navigation_node::create($shorttext, new moodle_url('/mod/checkmark/overrides.php',
+                array('id' => $PAGE->cm->id, 'mode' => 'group')), $type, $shorttext, $key, $icon);
         $checkmarknode->add_node($groupnode, $keys[1]);
 
         $shorttext = get_string('useroverrides', 'checkmark');
