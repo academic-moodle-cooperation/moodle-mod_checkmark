@@ -487,7 +487,7 @@ function checkmark_get_overridden_dates($checkmarkid, $userid = 0, $courseid = 0
         list($insql, $params) = $DB->get_in_or_equal($groups);
         array_push($params, $checkmarkid);
         $sql = "SELECT id, timeavailable, timedue, cutoffdate FROM {checkmark_overrides}
-            WHERE groupid $insql AND checkmarkid = ? ORDER BY timecreated DESC";
+            WHERE groupid $insql AND checkmarkid = ? ORDER BY grouppriority DESC";
         $records = $DB->get_records_sql($sql, $params, 0, 1);
 
         //$records = $DB->get_records_list('checkmark_overrides','groupid', $groups, "timecreated DESC",
@@ -527,7 +527,7 @@ function checkmark_get_override_dates_for_group($checkmarkid, $groupid) {
         return;
     }
     $records = $DB->get_records('checkmark_overrides', ['checkmarkid' => $checkmarkid, 'groupid' => $groupid],
-            'timecreated DESC', 'id, timeavailable, timedue, cutoffdate', 0, 1);
+            'grouppriority DESC', 'id, timeavailable, timedue, cutoffdate', 0, 1);
     return array_values($records)[0];
 }
 

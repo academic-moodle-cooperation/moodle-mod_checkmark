@@ -37,17 +37,21 @@ defined('MOODLE_INTERNAL') || die();
  */
 class overrideform extends \moodleform {
     /** user type overrideform */
-    const USER = 1;
+    const USER = 'USER';
     /** group type overrideform */
-    const GROUP = 2;
+    const GROUP = 'GROUP';
     /** add mode extend */
     const ADD = 'ADD';
     /** edit mode extend */
     const EDIT = 'EDIT';
-    /** duplicate mode extend */
+    /** copy mode extend */
     const COPY = 'COPY';
-    /** duplicate mode extend */
+    /** delete mode extend */
     const DELETE = 'DELETE';
+    /** move up mode extend */
+    const UP = 'UP';
+    /** move down mode extend */
+    const DOWN = 'DOWN';
 
     /** @var  \stdClass course module object */
     protected $cm;

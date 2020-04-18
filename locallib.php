@@ -832,7 +832,7 @@ class checkmark {
      * @param int $mode \mod_checkmark\overrideform::USER for using userids or \mod_checkmark\overrideform::GROUP for using group ids
      * @throws dml_exception
      */
-    public function override_dates(array $entities, int $timeavailable, int $timedue, int $cutoffdate, int $mode = \mod_checkmark\overrideform::USER) {
+    public function override_dates(array $entities, int $timeavailable, int $timedue, int $cutoffdate, string $mode = \mod_checkmark\overrideform::USER) {
         global $DB, $USER;
 
         if (empty($entities) || !is_array($entities)) {
@@ -851,9 +851,9 @@ class checkmark {
         if (!empty($cutoffdate)) {
             $record->cutoffdate = $cutoffdate;
         }
-        $record->timecreated = time();
         $record->modifierid = $USER->id;
         $record->checkmarkid = $this->cm->instance;
+        $record->timecreated = time();
         foreach ($entities as $cur) {
             // TODO: Add logging event and log every insert or update!
             $existingrecord = null;
@@ -870,6 +870,12 @@ class checkmark {
                 $record->id = $existingrecord->id;
                 $DB->update_record('checkmark_overrides', $record);
             } else {
+                if ($mode == \mod_checkmark\overrideform::GROUP) {
+                    $sql = "SELECT MAX(grouppriority) AS max FROM {checkmark_overrides} WHERE checkmarkid = ? AND groupid IS NOT NULL";
+                    $params = [$this->cm->instance];
+                    $highestpriority = $DB->get_record_sql($sql, $params);
+                    $record->grouppriority = $highestpriority->max + 1;
+                }
                 $DB->insert_record('checkmark_overrides', $record);
             }
         }
@@ -895,6 +901,48 @@ class checkmark {
             $DB->delete_records_list('checkmark_overrides', 'groupid', $entities);
         } else {
             $DB->delete_records_list('checkmark_overrides', 'userid', $entities);
+        }
+    }
+
+    public function reorder_group_overrides(int $groupidfrom, bool $decrease = false) {
+        global $DB;
+        $sign = '<';
+        $minmax = 'MIN';
+        if ($decrease) {
+            $sign = '>';
+            $minmax = 'MAX';
+        }
+        $sql = "SELECT groupid AS groupidto, grouppriority
+                  FROM {checkmark_overrides} o
+                  JOIN (
+                        SELECT $minmax(grouppriority) priority
+                          FROM {checkmark_overrides}
+                         WHERE (
+                                SELECT grouppriority
+                                  FROM {checkmark_overrides}
+                                 WHERE groupid = :groupid AND checkmarkid = :checkmarkid
+                            ) $sign grouppriority AND groupid IS NOT NULL 
+                        ) o1 ON o1.priority = o.grouppriority
+                WHERE checkmarkid = :checkmarkid2;";
+
+        $params = ['groupid' => $groupidfrom, 'checkmarkid' =>$this->cm->instance, 'checkmarkid2' =>$this->cm->instance];
+        $groupto = $DB->get_record_sql($sql, $params, MUST_EXIST);
+            $this->swap_group_overrides($groupidfrom, $groupto->groupidto);
+    }
+
+    private function swap_group_overrides(int $groupidfrom, int $groupidto) {
+        global $DB;
+        $from = $DB->get_record('checkmark_overrides',
+                ['checkmarkid' => $this->cm->instance, 'groupid' => $groupidfrom], '*', MUST_EXIST);
+        $to = $DB->get_record('checkmark_overrides',
+                ['checkmarkid' => $this->cm->instance, 'groupid' => $groupidto], '*', MUST_EXIST);
+
+        if (isset($from) && isset($to)) {
+            $oldfrompriority = $from->grouppriority;
+            $from->grouppriority = $to->grouppriority;
+            $to->grouppriority = $oldfrompriority;
+            $DB->update_record('checkmark_overrides', $from);
+            $DB->update_record('checkmark_overrides', $to);
         }
     }
 

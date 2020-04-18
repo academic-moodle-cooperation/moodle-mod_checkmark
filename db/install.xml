@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/checkmark/db" VERSION="20200414" COMMENT="XMLDB file for Moodle mod/checkmark"
+<XMLDB PATH="mod/checkmark/db" VERSION="20200417" COMMENT="XMLDB file for Moodle mod/checkmark"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -114,6 +114,7 @@
         <FIELD NAME="cutoffdate" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="modifierid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="grouppriority" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Indicated which override is valid for a user if a user is part of multiple groups"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

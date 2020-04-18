@@ -46,7 +46,9 @@ require_capability('mod/checkmark:manageoverrides', $context);
 $cmgroupmode = groups_get_activity_groupmode($cm);
 $accessallgroups = ($cmgroupmode == NOGROUPS) || has_capability('moodle/site:accessallgroups', $context);
 
-$overridecountgroup = $DB->count_records('checkmark_overrides', array('userid' => null, 'checkmarkid' => $cm->id));
+$sql = "SELECT MAX(grouppriority) AS max FROM {checkmark_overrides} WHERE checkmarkid = ? AND groupid IS NOT NULL";
+$params = [$cm->instance];
+$highestgrouppriority = $DB->get_record_sql($sql, $params)->max;
 
 // Get the course groups that the current user can access.
 $groups = $accessallgroups ? groups_get_all_groups($cm->course) : groups_get_activity_allowed_groups($cm);
@@ -78,7 +80,6 @@ if ($action == 'movegroupoverride') {
 // Display a list of overrides.
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title(get_string('overrides', 'checkmark'));
-$PAGE->navbar->add(get_string('useroverrides', 'checkmark'));
 $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($cm->name, true, array('context' => $context)));
@@ -97,7 +98,7 @@ if ($groupmode) {
                   FROM {checkmark_overrides} o
                   JOIN {groups} g ON o.groupid = g.id
                  WHERE o.checkmarkid = :checkmarkid AND g.id $insql
-                ORDER BY o.timecreated";
+                ORDER BY o.grouppriority DESC";
 
         $overrides = $DB->get_records_sql($sql, $params);
     }
@@ -209,18 +210,20 @@ foreach ($overrides as $override) {
                         array('group' => $override->groupid)) . '" >' . $override->name . '</a>';
 
         // Move up.
-        if ($override->sortorder > 1) {
-            $iconstr .= '<a title="'.get_string('moveup').'" href="overrides.php?cmid=' . $cmid .
-                    '&amp;id=' . $override->id .'&amp;action=movegroupoverride&amp;dir=up&amp;sesskey='.sesskey().'">' .
+        if ($override->grouppriority < $highestgrouppriority) {
+            $moveupstr = $overrideediturl->out(true, array('id' => $cmid, 'type' => $type,
+                    'mode' => \mod_checkmark\overrideform::UP, 'users' => $id));
+            $iconstr .= '<a title="'.get_string('moveup').'" href="' . $moveupstr . '">' .
                     $OUTPUT->pix_icon('t/up', get_string('moveup')) . '</a> ';
         } else {
             $iconstr .= $OUTPUT->spacer() . ' ';
         }
 
         // Move down.
-        if ($override->sortorder < $overridecountgroup) {
-            $iconstr .= '<a title="'.get_string('movedown').'" href="overrides.php?cmid='.$cmid.
-                    '&amp;id=' . $override->id . '&amp;action=movegroupoverride&amp;dir=down&amp;sesskey='.sesskey().'">' .
+        if ($override->grouppriority > 1) {
+            $movedownstr = $overrideediturl->out(true, array('id' => $cmid, 'type' => $type,
+                    'mode' => \mod_checkmark\overrideform::DOWN, 'users' => $id));
+            $iconstr .= '<a title="'.get_string('movedown').'" href="' . $movedownstr . '">' .
                     $OUTPUT->pix_icon('t/down', get_string('movedown')) . '</a> ';
         } else {
             $iconstr .= $OUTPUT->spacer() . ' ';

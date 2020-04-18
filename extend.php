@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 require_login();
 
 $id = required_param('id', PARAM_INT);
-$type = required_param('type', PARAM_INT);
+$type = required_param('type', PARAM_TEXT);
 $mode = optional_param('mode', \mod_checkmark\overrideform::ADD, PARAM_TEXT);
 $confirm = optional_param('confirm', 0, PARAM_INT);
 $return = optional_param('return', false, PARAM_RAW);
@@ -81,6 +81,12 @@ try {
         $instance = new checkmark($cm->id, $checkmark, $cm, $course);
         $instance->delete_override($users, $type);
         redirect($return, "Entry deleted", null, \core\output\notification::NOTIFY_SUCCESS);
+    } else if ($mode === \mod_checkmark\overrideform::UP || $mode === \mod_checkmark\overrideform::DOWN) {
+        $instance = new checkmark($cm->id, $checkmark, $cm, $course);
+        $groups = json_decode(urldecode(required_param('users', PARAM_RAW)));
+        $groupidfrom = is_int($groups) ? $groups : $groups[0];
+        $instance->reorder_group_overrides($groupidfrom,$mode === \mod_checkmark\overrideform::DOWN);
+        redirect($return, "Entry swapped", null, \core\output\notification::NOTIFY_SUCCESS);
     } else if ($data = $form->get_data()) {
         $instance = new checkmark($cm->id, $checkmark, $cm, $course);
         if ($type === \mod_checkmark\overrideform::GROUP) {
