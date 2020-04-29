@@ -803,7 +803,7 @@ class checkmark {
                 if ($submission = $this->get_submission($USER->id)) {
                     if ($submission->get_timemodified()) {
                         $date = userdate($submission->get_timemodified());
-                        if ($this->overrides && $this->overrides->timedue != null) {
+                        if ($this->overrides && $this->overrides->timedue !== null) {
                             $timedue = $this->overrides->timedue;
                         } else {
                             $timedue = $this->checkmark->timedue;
@@ -883,18 +883,26 @@ class checkmark {
             }
             if ($existingrecord) {
                 $record->id = $existingrecord->id;
+                // Delete Override if all values are reset to the course dates.
+                if ($record->timeavailable === null && $record->timedue === null && $record->cutoffdate === null) {
+                    $this->delete_override($entities, $mode);
+                }
                 $DB->update_record('checkmark_overrides', $record);
                 // Null values are ignored by update_record so they need to be updated manually.
-                if ($record->timeavailable == null && $record->timeavailable != $existingrecord->timeavailable) {
+                if ($record->timeavailable === null && $record->timeavailable != $existingrecord->timeavailable) {
                     $DB->set_field('checkmark_overrides', 'timeavailable', null, $cond);
                 }
-                if ($record->timedue == null && $record->timedue != $existingrecord->timedue) {
+                if ($record->timedue === null && $record->timedue != $existingrecord->timedue) {
                     $DB->set_field('checkmark_overrides', 'timedue', null, $cond);
                 }
-                if ($record->cutoffdate == null && $record->cutoffdate != $existingrecord->cutoffdate) {
+                if ($record->cutoffdate === null && $record->cutoffdate != $existingrecord->cutoffdate) {
                     $DB->set_field('checkmark_overrides', 'cutoffdate', null, $cond);
                 }
             } else {
+                // Don't insert override if all values are identical with the course dates.
+                if ($record->timeavailable === null && $record->timedue === null && $record->cutoffdate === null) {
+                    return;
+                }
                 if ($mode == \mod_checkmark\overrideform::GROUP) {
                     $sql = "SELECT MAX(grouppriority) AS max FROM {checkmark_overrides} WHERE checkmarkid = ? AND groupid IS NOT NULL";
                     $params = [$this->cm->instance];
@@ -3561,10 +3569,10 @@ class checkmark {
         $timeavailable = $this->checkmark->timeavailable;
         $cutoffdate = $this->checkmark->cutoffdate;
         if ($this->overrides) {
-            if ($this->overrides->timeavailable != null) {
+            if ($this->overrides->timeavailable !== null) {
                 $timeavailable = $this->overrides->timeavailable;
             }
-            if ($this->overrides->cutoffdate != null) {
+            if ($this->overrides->cutoffdate !== null) {
                 $cutoffdate = $this->overrides->cutoffdate;
             }
         }
@@ -3653,7 +3661,7 @@ class checkmark {
             $overrides = $this->overrides;
         }
 
-        if ($overrides && $overrides->timedue != null) {
+        if ($overrides && $overrides->timedue !== null) {
             return checkmark_display_lateness($timesubmitted, $overrides->timedue);
         }
 

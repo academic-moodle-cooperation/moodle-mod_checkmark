@@ -46,9 +46,19 @@ require_capability('mod/checkmark:manageoverrides', $context);
 $cmgroupmode = groups_get_activity_groupmode($cm);
 $accessallgroups = ($cmgroupmode == NOGROUPS) || has_capability('moodle/site:accessallgroups', $context);
 
-$sql = "SELECT MAX(grouppriority) AS max FROM {checkmark_overrides} WHERE checkmarkid = ? AND groupid IS NOT NULL";
+$sql = "SELECT MAX(grouppriority) AS max 
+          FROM {checkmark_overrides}
+         WHERE checkmarkid = ? AND groupid IS NOT NULL AND 
+            (timeavailable IS NOT NULL OR timedue IS NOT NULL OR cutoffdate IS NOT NULL)";
 $params = [$cm->instance];
 $highestgrouppriority = $DB->get_record_sql($sql, $params)->max;
+
+$sql = "SELECT MIN(grouppriority) AS max 
+          FROM {checkmark_overrides}
+         WHERE checkmarkid = ? AND groupid IS NOT NULL AND 
+            (timeavailable IS NOT NULL OR timedue IS NOT NULL OR cutoffdate IS NOT NULL)";
+$params = [$cm->instance];
+$lowestgrouppriority = $DB->get_record_sql($sql, $params)->max;
 
 // Get the course groups that the current user can access.
 $groups = $accessallgroups ? groups_get_all_groups($cm->course) : groups_get_activity_allowed_groups($cm);
@@ -220,7 +230,7 @@ foreach ($overrides as $override) {
         }
 
         // Move down.
-        if ($override->grouppriority > 1) {
+        if ($override->grouppriority > $lowestgrouppriority) {
             $movedownstr = $overrideediturl->out(true, array('id' => $cmid, 'type' => $type,
                     'mode' => \mod_checkmark\overrideform::DOWN, 'users' => $id));
             $iconstr .= '<a title="'.get_string('movedown').'" href="' . $movedownstr . '">' .

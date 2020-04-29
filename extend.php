@@ -118,13 +118,13 @@ try {
                 }
 
                 // Insert date of checkmark if no override is present (indicated by null in table).
-                if ($dates->timeavailable == null) {
+                if ($dates->timeavailable === null) {
                     $dates->timeavailable = $checkmark->timeavailable;
                 }
-                if ($dates->timedue == null) {
+                if ($dates->timedue === null) {
                     $dates->timedue = $checkmark->timedue;
                 }
-                if ($dates->cutoffdate == null) {
+                if ($dates->cutoffdate === null) {
                     $dates->cutoffdate = $checkmark->cutoffdate;
                 }
 
