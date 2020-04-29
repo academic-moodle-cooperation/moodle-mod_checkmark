@@ -432,7 +432,7 @@ function checkmark_get_coursemodule_info($coursemodule) {
     }
 
     if ($overridden = checkmark_get_overridden_dates($checkmark->id, $USER->id, $coursemodule->course)) {
-        if ($overridden->timeavailable) {
+        if ($overridden->timeavailable != null) {
             $checkmark->timeavailable = $overridden->timeavailable;
         }
     }

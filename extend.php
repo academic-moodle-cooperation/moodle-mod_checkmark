@@ -116,6 +116,18 @@ try {
                 } else {
                     $dates = checkmark_get_override_dates_for_group($checkmark->id, $entities);
                 }
+
+                // Insert date of checkmark if no override is present (indicated by null in table).
+                if ($dates->timeavailable == null) {
+                    $dates->timeavailable = $checkmark->timeavailable;
+                }
+                if ($dates->timedue == null) {
+                    $dates->timedue = $checkmark->timedue;
+                }
+                if ($dates->cutoffdate == null) {
+                    $dates->cutoffdate = $checkmark->cutoffdate;
+                }
+
                 if ($dates) {
                     $data = array('timeavailable' => $dates->timeavailable, 'timedue' => $dates->timedue,
                             'cutoffdate' => $dates->cutoffdate);

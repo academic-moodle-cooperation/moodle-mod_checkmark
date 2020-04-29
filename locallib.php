@@ -842,15 +842,30 @@ class checkmark {
         $entities = array_unique($entities);
 
         $record = new stdClass();
-        if (!empty($timeavailable)) {
+        if ($timeavailable == $this->checkmark->timeavailable) {
+            $record->timeavaliable = null;
+        } else if (empty($timeavailable)) {
+            $record->timeavailable = 0;
+        } else {
             $record->timeavailable = $timeavailable;
         }
-        if (!empty($timedue)) {
+
+        if ($timedue == $this->checkmark->timedue) {
+            $record->timedue = null;
+        } else if (empty($timedue)) {
+            $record->timedue = 0;
+        } else {
             $record->timedue = $timedue;
         }
-        if (!empty($cutoffdate)) {
+
+        if ($cutoffdate == $this->checkmark->cutoffdate) {
+            $record->cutoffdate = null;
+        } else if (empty($cutoffdate)) {
+            $record->cutoffdate = 0;
+        } else {
             $record->cutoffdate = $cutoffdate;
         }
+
         $record->modifierid = $USER->id;
         $record->checkmarkid = $this->cm->instance;
         $record->timecreated = time();
