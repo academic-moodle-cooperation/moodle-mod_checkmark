@@ -497,9 +497,9 @@ class checkmark {
         $table = new html_table();
         $table->attributes['class'] = 'table-condensed';
         $rows = [];
-        if ($this->checkmark->timeavailable
-                || ($this->overrides && $this->overrides->timeavailable &&
-                        ($this->overrides->timeavailable !== $this->checkmark->timeavailable))) {
+        if (($this->checkmark->timeavailable || ($this->overrides && $this->overrides->timeavailable &&
+                                ($this->overrides->timeavailable !== $this->checkmark->timeavailable))) &&
+                                (!$this->overrides || $this->overrides->timeavailable != 0)) {
             $row = [new html_table_cell(get_string('availabledate', 'checkmark') . ':')];
             $row[0]->attributes['class'] = 'title';
             if ($this->checkmark->timeavailable) {
@@ -510,12 +510,12 @@ class checkmark {
                 $row[1] = new html_table_cell($timeavailable);
             } else {
                 $row[1] = new html_table_cell(userdate($this->overrides->timeavailable));
-                $row[1]->attributes['class'] = 'alert-info';
             }
             $rows[] = new html_table_row($row);
         }
-        if ($this->checkmark->timedue
-                || ($this->overrides && $this->overrides->timedue && ($this->overrides->timedue !== $this->checkmark->timedue))) {
+        if (($this->checkmark->timedue || ($this->overrides && $this->overrides->timedue &&
+                        ($this->overrides->timedue !== $this->checkmark->timedue))) &&
+                        (!$this->overrides || $this->overrides->timedue != 0)) {
             $row = [new html_table_cell(get_string('duedate', 'checkmark') . ':')];
             $row[0]->attributes['class'] = 'title';
             if ($this->checkmark->timedue) {
@@ -526,7 +526,6 @@ class checkmark {
                 $row[1] = new html_table_cell($due);
             } else {
                 $row[1] = new html_table_cell(userdate($this->overrides->timedue));
-                $row[1]->attributes['class'] = 'alert-info align-left';
             }
             $rows[] = new html_table_row($row);
         }
@@ -804,7 +803,7 @@ class checkmark {
                 if ($submission = $this->get_submission($USER->id)) {
                     if ($submission->get_timemodified()) {
                         $date = userdate($submission->get_timemodified());
-                        if ($this->overrides && $this->overrides->timedue) {
+                        if ($this->overrides && $this->overrides->timedue != null) {
                             $timedue = $this->overrides->timedue;
                         } else {
                             $timedue = $this->checkmark->timedue;
@@ -843,7 +842,7 @@ class checkmark {
 
         $record = new stdClass();
         if ($timeavailable == $this->checkmark->timeavailable) {
-            $record->timeavaliable = null;
+            $record->timeavailable = null;
         } else if (empty($timeavailable)) {
             $record->timeavailable = 0;
         } else {
@@ -872,6 +871,7 @@ class checkmark {
         foreach ($entities as $cur) {
             // TODO: Add logging event and log every insert or update!
             $existingrecord = null;
+            $cond = array('userid' => $cur, 'checkmarkid' => $this->cm->instance);
             if ($mode == \mod_checkmark\overrideform::GROUP) {
                 $record->groupid = $cur;
                 $existingrecord = $DB->get_record('checkmark_overrides',
@@ -884,6 +884,7 @@ class checkmark {
             if ($existingrecord) {
                 $record->id = $existingrecord->id;
                 $DB->update_record('checkmark_overrides', $record);
+                // Null values are ignored by update_record so they need to be updated manually.
                 if ($record->timeavailable == null && $record->timeavailable != $existingrecord->timeavailable) {
                     $DB->set_field('checkmark_overrides', 'timeavailable', null, $cond);
                 }
@@ -3560,10 +3561,10 @@ class checkmark {
         $timeavailable = $this->checkmark->timeavailable;
         $cutoffdate = $this->checkmark->cutoffdate;
         if ($this->overrides) {
-            if ($this->overrides->timeavailable) {
+            if ($this->overrides->timeavailable != null) {
                 $timeavailable = $this->overrides->timeavailable;
             }
-            if ($this->overrides->cutoffdate) {
+            if ($this->overrides->cutoffdate != null) {
                 $cutoffdate = $this->overrides->cutoffdate;
             }
         }
@@ -3652,7 +3653,7 @@ class checkmark {
             $overrides = $this->overrides;
         }
 
-        if ($overrides && $overrides->timedue) {
+        if ($overrides && $overrides->timedue != null) {
             return checkmark_display_lateness($timesubmitted, $overrides->timedue);
         }
 
