@@ -40,6 +40,14 @@ class overrideform extends \moodleform {
     const USER = 1;
     /** group type overrideform */
     const GROUP = 2;
+    /** add mode extend */
+    const ADD = 'ADD';
+    /** edit mode extend */
+    const EDIT = 'EDIT';
+    /** duplicate mode extend */
+    const COPY = 'COPY';
+    /** duplicate mode extend */
+    const DELETE = 'DELETE';
 
     /** @var  \stdClass course module object */
     protected $cm;

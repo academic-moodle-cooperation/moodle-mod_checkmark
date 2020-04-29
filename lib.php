@@ -1866,12 +1866,11 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
                 $type, $shorttext, $key, $icon);
         $checkmarknode->add_node($groupnode, $keys[1]);
 
-        $shorttext = get_string('override_users_dates', 'checkmark');
+        $shorttext = get_string('useroverrides', 'checkmark');
         $key = 'extendusers';
         $icon = null;
-        $usernode = \navigation_node::create(get_string('override_users_dates', 'checkmark'),
-                new moodle_url($url, ['type' => \mod_checkmark\overrideform::USER]),
-                $type, $shorttext, $key, $icon);
+        $usernode = \navigation_node::create($shorttext, new moodle_url('/mod/checkmark/overrides.php',
+                array('id' => $PAGE->cm->id, 'mode' => 'user')), $type, $shorttext, $key, $icon);
         $checkmarknode->add_node($usernode, 'extendgroups');
     }
 

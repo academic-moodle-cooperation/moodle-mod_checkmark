@@ -248,6 +248,8 @@ $string['unknown'] = 'Unknown';
 /*
  * Block with standard-checkmark-strings (adopted to checkmark)
  */
+$string['addnewgroupoverride'] = 'Add group override';
+$string['addnewuseroverride'] = 'Add user override';
 $string['allowresubmit'] = 'Allow resubmitting';
 $string['allowresubmit_help'] = 'If enabled, students will be allowed to resubmit checkmarks after they have been graded (to be regraded).';
 $string['alreadygraded'] = 'Your submission has already been graded and resubmission is not allowed.';
@@ -301,6 +303,7 @@ $string['early'] = '{$a} early';
 $string['editmysubmission'] = 'Edit my submission';
 $string['extended_until'] = 'Extended until {$a}';
 $string['addsubmission'] = 'Add submission';
+$string['editoverride'] = 'Edit override';
 $string['emailstudents'] = 'Email alerts to students';
 $string['emailteachermail'] = '{$a->username} has updated the checkmark submission
 for \'{$a->checkmark}\' on {$a->dayupdated} at {$a->timeupdated}.
@@ -351,11 +354,13 @@ $string['forcesinglelinenames_help'] = '<p>Enforces the name to be written to th
 <p><i>Beware:</i> if there are too many columns or the name is too long it will be distorted and can become unreadable. Hide some unimportant columns to have more room for the name if this happens.</p>';
 $string['graded'] = 'Graded';
 $string['grant_extension'] = 'Grant extension';
+$string['groupsnone'] = 'No groups you can access.';
 $string['guestnosubmit'] = 'Sorry, guests are not allowed to submit a checkmark. You have to log in/ register before you can submit your answer.';
 $string['guestnoupload'] = 'Sorry, guests are not allowed to upload';
 $string['hidealltoggle'] = 'Hide all examples';
 $string['hideintro'] = 'Hide description until "Available from" date';
 $string['hideintro_help'] = 'If enabled, the checkmark description is hidden before the "Available from" date. Only the checkmark name is displayed.';
+$string['inactiveoverridehelp'] = '* Student does not have the correct group or role to attempt the assignment';
 $string['invalidcheckmark'] = 'Incorrect checkmark';
 $string['invalidid'] = 'Checkmark ID was incorrect';
 $string['invaliduserid'] = 'Invalid user ID';
@@ -370,18 +375,23 @@ $string['modulename_help'] = 'Checkmarks enable the teacher to specify an assign
 $string['modulenameplural'] = 'Checkmarks';
 $string['newsubmissions'] = 'Checkmarks submitted';
 $string['nocheckmarks'] = 'There are no checkmarks yet';
+$string['noclose'] = 'No close date';
 $string['noattempts'] = 'No attempts have been made on this checkmark';
 $string['nomoresubmissions'] = 'No further submissions are allowed.';
 $string['nonnegativeintrequired'] = 'Needs to be greater or equal zero (>= 0) and integral!';
+$string['noopen'] = 'No open date';
 $string['notavailableyet'] = 'Sorry, this checkmark is not yet available.<br />Checkmark instructions will be displayed here on the date given below.';
 $string['notgradedyet'] = 'Not graded yet';
 $string['norequiregrading'] = 'There are no checkmarks that require grading';
 $string['nosubmisson'] = 'No checkmarks have been submitted';
 $string['notsubmittedyet'] = 'Not submitted yet';
 $string['notactive'] = 'Not active';
+$string['open'] = 'Open';
 $string['operation'] = 'Operation';
 $string['optionalsettings'] = 'Optional settings';
 $string['override'] = 'Override';
+$string['overrides'] = 'Overrides';
+$string['overridedeleteusersure'] = 'Are you sure you want to delete the override for user {$a}?';
 $string['overridden'] = 'Overridden';
 $string['override_and_next'] = 'Override and create a new override';
 $string['override_groups_dates'] = 'Override groups dates';
@@ -417,6 +427,8 @@ $string['submitted'] = 'Submitted';
 $string['submitted_entries'] = 'Submitted';
 $string['usermisconf'] = 'User is miss-configured';
 $string['usernosubmit'] = 'Sorry, you are not allowed to submit a checkmark.';
+$string['useroverrides'] = 'User overrides';
+$string['usersnone'] = 'No students have access to this assignment.';
 $string['viewfeedback'] = 'View checkmark grades and feedback';
 $string['summary_abs'] = 'x/y examples checked';
 $string['summary_rel'] = '% examples checked';
