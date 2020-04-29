@@ -524,8 +524,9 @@ class submissionstable extends \table_sql {
         $params = array_merge_recursive($params, $userparams);
 
         $from = "{user} u ".
-                "LEFT JOIN {checkmark_submissions} s ON u.id = s.userid AND s.checkmarkid = :checkmarkid
-                 LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid2 ".
+                "LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid) AND s.checkmarkid = :checkmarkid
+                 LEFT JOIN {checkmark_feedbacks} f ON (u.id = f.userid) AND f.checkmarkid = :checkmarkid2
+                 ".
                 $groupssql;
 
         $where = '';
@@ -952,13 +953,17 @@ class submissionstable extends \table_sql {
                 $wherefilter = " AND s.timemodified > 0";
             } else if ($filter == \checkmark::FILTER_REQUIRE_GRADING) {
                 $wherefilter = " AND COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0) ";
+            } else if ($filter == \checkmark::FILTER_EXTENSION) {
+                $wherefilter = " AND o.id IS NOT NULL";
             }
             $params['checkmarkid'] = $this->checkmark->checkmark->id;
             $params['checkmarkid2'] = $this->checkmark->checkmark->id;
+            $params['checkmarkid3'] = $this->checkmark->checkmark->id;
             $sql = "SELECT u.id FROM {user} u
                  LEFT JOIN (".$esql.") eu ON eu.id=u.id
                  LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid) AND s.checkmarkid = :checkmarkid
                  LEFT JOIN {checkmark_feedbacks} f ON (u.id = f.userid) AND f.checkmarkid = :checkmarkid2
+                 RIGHT OUTER JOIN {checkmark_overrides} o ON (u.id = o.userid) AND o.checkmarkid = :checkmarkid3
                      WHERE u.deleted = 0
                            AND eu.id = u.id ".$sqluserids."
                            ".$wherefilter;
