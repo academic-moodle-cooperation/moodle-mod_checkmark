@@ -884,6 +884,15 @@ class checkmark {
             if ($existingrecord) {
                 $record->id = $existingrecord->id;
                 $DB->update_record('checkmark_overrides', $record);
+                if ($record->timeavailable == null && $record->timeavailable != $existingrecord->timeavailable) {
+                    $DB->set_field('checkmark_overrides', 'timeavailable', null, $cond);
+                }
+                if ($record->timedue == null && $record->timedue != $existingrecord->timedue) {
+                    $DB->set_field('checkmark_overrides', 'timedue', null, $cond);
+                }
+                if ($record->cutoffdate == null && $record->cutoffdate != $existingrecord->cutoffdate) {
+                    $DB->set_field('checkmark_overrides', 'cutoffdate', null, $cond);
+                }
             } else {
                 if ($mode == \mod_checkmark\overrideform::GROUP) {
                     $sql = "SELECT MAX(grouppriority) AS max FROM {checkmark_overrides} WHERE checkmarkid = ? AND groupid IS NOT NULL";
