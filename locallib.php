@@ -828,7 +828,7 @@ class checkmark {
      * @param int $timeavailable
      * @param int $timedue
      * @param int $cutoffdate
-     * @param int $mode \mod_checkmark\overrideform::USER for using userids or \mod_checkmark\overrideform::GROUP for using group ids
+     * @param string $mode \mod_checkmark\overrideform::USER for using userids or \mod_checkmark\overrideform::GROUP for using group ids
      * @throws dml_exception
      */
     public function override_dates(array $entities, int $timeavailable, int $timedue, int $cutoffdate, string $mode = \mod_checkmark\overrideform::USER) {
@@ -937,6 +937,13 @@ class checkmark {
         }
     }
 
+    /**
+     * Changes the priority of a group override with the one above or below it
+     *
+     * @param int $groupidfrom Id of the group override that should be changed
+     * @param bool $decrease True if priortiy should be lowered, false if it should be raised
+     * @throws dml_exception
+     */
     public function reorder_group_overrides(int $groupidfrom, bool $decrease = false) {
         global $DB;
         $sign = '<';
@@ -963,6 +970,13 @@ class checkmark {
             $this->swap_group_overrides($groupidfrom, $groupto->groupidto);
     }
 
+    /**
+     * Exchange the priorities of two group overrides
+     *
+     * @param int $groupidfrom
+     * @param int $groupidto
+     * @throws dml_exception
+     */
     private function swap_group_overrides(int $groupidfrom, int $groupidto) {
         global $DB;
         $from = $DB->get_record('checkmark_overrides',

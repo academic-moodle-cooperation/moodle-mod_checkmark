@@ -451,15 +451,18 @@ function checkmark_get_coursemodule_info($coursemodule) {
     return $result;
 }
 
-
 /**
  * This function returns the overridden values for timeavailable, timedue and cutoffdate or false!
- *
+ * It checks for user and group overrides. A user override has priority over a group override.
+ * Otherwise, the override of the group with the highest priority is considered.
  * It uses a static variable to cache the results and possibly lessen DB queries! TODO: examine if we need some other cache for it!
  *
  * @param int $checkmarkid The checkmark-ID to get the overridden dates for.
  * @param int $userid (optional) 0 to get all user's overrides or a specific user's ID
- * @return bool
+ * @param int $courseid If of the course the checkmark activity is located in. Required when group overrides should be considered
+ * @return stdClass|bool
+ * @throws coding_exception
+ * @throws dml_exception
  */
 function checkmark_get_overridden_dates($checkmarkid, $userid = 0, $courseid = 0) {
     global $USER, $DB;
@@ -516,9 +519,11 @@ function checkmark_get_overridden_dates($checkmarkid, $userid = 0, $courseid = 0
 }
 
 /**
- * @param $checkmarkid
- * @param $groupid
- * @return array|void
+ * Return overridden dates for a given group in a given checkmark activity
+ *
+ * @param int $checkmarkid Id of the checkmark activity to be checked
+ * @param int $groupid Id of the group to be checked for
+ * @return stdClass|void Overridden dates if there are any. Empty object otherwise
  * @throws dml_exception
  */
 function checkmark_get_override_dates_for_group($checkmarkid, $groupid) {
