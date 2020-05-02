@@ -63,7 +63,7 @@ class overrideform extends \moodleform {
     /**
      * overrideform constructor.
      *
-     * @param int $type either self::USER or self::GROUP!
+     * @param string $type either self::USER or self::GROUP!
      * @param string|\moodle_url|null $action
      * @param \stdClass|mixed[]|null $customdata
      * @param string $method
@@ -110,7 +110,7 @@ class overrideform extends \moodleform {
         $mform->setType('id', PARAM_INT);
 
         $mform->addElement('hidden', 'type', $this->type);
-        $mform->setType('type', PARAM_INT);
+        $mform->setType('type', PARAM_TEXT);
 
         $mform->addElement('hidden', 'return', $this->_customdata['return']);
         $mform->setType('return', PARAM_URL);
@@ -193,6 +193,13 @@ class overrideform extends \moodleform {
         if ($data['timeavailable'] && !$data['cutoffdate'] && $data['orig_cutoffdate']) {
             if ($data['timeavailable'] > $data['orig_cutoffdate']) {
                 $errors['cutoffdate'] = get_string('cutoffdatefromdatevalidation', 'assign');
+            }
+        }
+        if ($this->_customdata['checkmark']) {
+            $checkmark = $this->_customdata['checkmark'];
+            if ($data['timeavailable'] == $checkmark->timeavailable &&
+                    $data['timedue'] == $checkmark->timedue && $data['cutoffdate'] == $checkmark->cutoffdate) {
+                $errors['timeavailable'] = get_string('nochangeviolation', 'checkmark');
             }
         }
 

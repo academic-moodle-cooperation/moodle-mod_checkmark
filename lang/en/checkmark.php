@@ -377,6 +377,7 @@ $string['newsubmissions'] = 'Checkmarks submitted';
 $string['nocheckmarks'] = 'There are no checkmarks yet';
 $string['noclose'] = 'No close date';
 $string['noattempts'] = 'No attempts have been made on this checkmark';
+$string['nochangeviolation'] = 'You must override at least one of the checkmark settings.';
 $string['nomoresubmissions'] = 'No further submissions are allowed.';
 $string['nonnegativeintrequired'] = 'Needs to be greater or equal zero (>= 0) and integral!';
 $string['noopen'] = 'No open date';
