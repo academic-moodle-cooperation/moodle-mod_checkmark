@@ -905,8 +905,8 @@ class checkmark {
                     return;
                 }
                 if ($mode == \mod_checkmark\overrideform::GROUP) {
-                    $sql = "SELECT MAX(grouppriority) AS max 
-                              FROM {checkmark_overrides} 
+                    $sql = "SELECT MAX(grouppriority) AS max
+                              FROM {checkmark_overrides}
                              WHERE checkmarkid = ? AND groupid IS NOT NULL";
                     $params = [$this->cm->instance];
                     $highestpriority = $DB->get_record_sql($sql, $params);
