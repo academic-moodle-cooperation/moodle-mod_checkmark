@@ -828,10 +828,11 @@ class checkmark {
      * @param int $timeavailable
      * @param int $timedue
      * @param int $cutoffdate
-     * @param string $mode \mod_checkmark\overrideform::USER for using userids or \mod_checkmark\overrideform::GROUP for using group ids
+     * @param string $mode \overrideform::USER for using userids or \overrideform::GROUP for using group ids
      * @throws dml_exception
      */
-    public function override_dates(array $entities, int $timeavailable, int $timedue, int $cutoffdate, string $mode = \mod_checkmark\overrideform::USER) {
+    public function override_dates(array $entities, int $timeavailable, int $timedue, int $cutoffdate,
+            string $mode = \mod_checkmark\overrideform::USER) {
         global $DB, $USER;
 
         if (empty($entities) || !is_array($entities)) {
@@ -904,7 +905,9 @@ class checkmark {
                     return;
                 }
                 if ($mode == \mod_checkmark\overrideform::GROUP) {
-                    $sql = "SELECT MAX(grouppriority) AS max FROM {checkmark_overrides} WHERE checkmarkid = ? AND groupid IS NOT NULL";
+                    $sql = "SELECT MAX(grouppriority) AS max 
+                              FROM {checkmark_overrides} 
+                             WHERE checkmarkid = ? AND groupid IS NOT NULL";
                     $params = [$this->cm->instance];
                     $highestpriority = $DB->get_record_sql($sql, $params);
                     $record->grouppriority = $highestpriority->max + 1;
@@ -918,7 +921,7 @@ class checkmark {
      * Delete override for given userids or groupids
      *
      * @param int[] $entities Array of userids or groupids for which override dates are deleted
-     * @param int $mode \mod_checkmark\overrideform::USER for using userids or \mod_checkmark\overrideform::GROUP for using group ids
+     * @param int $mode \overrideform::USER for using userids or \overrideform::GROUP for using group ids
      * @throws dml_exception
      */
     public function delete_override($entities, $mode = \mod_checkmark\overrideform::USER) {
@@ -961,11 +964,11 @@ class checkmark {
                                 SELECT grouppriority
                                   FROM {checkmark_overrides}
                                  WHERE groupid = :groupid AND checkmarkid = :checkmarkid
-                            ) $sign grouppriority AND groupid IS NOT NULL 
+                            ) $sign grouppriority AND groupid IS NOT NULL
                         ) o1 ON o1.priority = o.grouppriority
                 WHERE checkmarkid = :checkmarkid2;";
 
-        $params = ['groupid' => $groupidfrom, 'checkmarkid' =>$this->cm->instance, 'checkmarkid2' =>$this->cm->instance];
+        $params = ['groupid' => $groupidfrom, 'checkmarkid' => $this->cm->instance, 'checkmarkid2' => $this->cm->instance];
         $groupto = $DB->get_record_sql($sql, $params, MUST_EXIST);
             $this->swap_group_overrides($groupidfrom, $groupto->groupidto);
     }

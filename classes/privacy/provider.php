@@ -422,7 +422,7 @@ LEFT JOIN {checkmark_overrides} o ON c.id = o.checkmarkid
      * @throws \coding_exception
      */
     public static function export_extensions(\context $context, \checkmark $c, \stdClass $user) {
-        $ext = checkmark_get_overridden_dates($c->checkmark->id, $user->id,$c->checkmark->course);
+        $ext = checkmark_get_overridden_dates($c->checkmark->id, $user->id, $c->checkmark->course);
 
         if ($ext !== false) {
             $data = [];

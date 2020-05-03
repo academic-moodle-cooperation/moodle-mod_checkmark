@@ -1376,7 +1376,8 @@ class submissionstable extends \table_sql {
             $button = $OUTPUT->action_link($popupurl, $text);
 
             // If overridden dates are present for this user, we display an icon with popup!
-            if ($this->hasoverrides && $overrides = checkmark_get_overridden_dates($this->checkmark->cm->instance, $values->id, $this->checkmark->course->id)) {
+            if ($this->hasoverrides && $overrides = checkmark_get_overridden_dates($this->checkmark->cm->instance,
+                            $values->id, $this->checkmark->course->id)) {
                 $context = new stdClass();
 
                 if ($overrides->timeavailable === null) {

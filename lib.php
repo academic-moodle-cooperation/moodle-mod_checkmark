@@ -484,18 +484,11 @@ function checkmark_get_overridden_dates($checkmarkid, $userid = 0, $courseid = 0
 
     $records = array();
     if (!empty($groups) && is_array($groups)) {
-
-        //list($select, $params) = $this->where_clause_list($field, $values);
-        //return $this->get_records_select($table, $select, $params, $sort, $fields, $limitfrom, $limitnum);
         list($insql, $params) = $DB->get_in_or_equal($groups);
         array_push($params, $checkmarkid);
         $sql = "SELECT id, timeavailable, timedue, cutoffdate FROM {checkmark_overrides}
             WHERE groupid $insql AND checkmarkid = ? ORDER BY grouppriority DESC";
         $records = $DB->get_records_sql($sql, $params, 0, 1);
-
-        //$records = $DB->get_records_list('checkmark_overrides','groupid', $groups, "timecreated DESC",
-        //        "id, timeavailable, timedue, cutoffdate",0,1);
-        $i = 1;
     }
 
     $userrecords = $DB->get_records('checkmark_overrides', ['checkmarkid' => $checkmarkid, 'userid' => $userid], "timecreated DESC",

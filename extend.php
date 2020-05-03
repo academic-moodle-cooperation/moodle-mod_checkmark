@@ -85,14 +85,15 @@ try {
         $instance = new checkmark($cm->id, $checkmark, $cm, $course);
         $groups = json_decode(urldecode(required_param('users', PARAM_RAW)));
         $groupidfrom = is_int($groups) ? $groups : $groups[0];
-        $instance->reorder_group_overrides($groupidfrom,$mode === \mod_checkmark\overrideform::DOWN);
+        $instance->reorder_group_overrides($groupidfrom, $mode === \mod_checkmark\overrideform::DOWN);
         redirect($return, "Entry swapped", null, \core\output\notification::NOTIFY_SUCCESS);
     } else if ($data = $form->get_data()) {
         $instance = new checkmark($cm->id, $checkmark, $cm, $course);
         if ($type === \mod_checkmark\overrideform::GROUP) {
             $data->userids = [];
             if (!empty($data->groups)) {
-                $instance->override_dates($data->groups, $data->timeavailable, $data->timedue, $data->cutoffdate,\mod_checkmark\overrideform::GROUP);
+                $instance->override_dates($data->groups, $data->timeavailable, $data->timedue,
+                        $data->cutoffdate, \mod_checkmark\overrideform::GROUP);
             }
         } else if (!empty($data->userids)) {
             $instance->override_dates($data->userids, $data->timeavailable, $data->timedue, $data->cutoffdate);

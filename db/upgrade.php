@@ -1173,7 +1173,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         // Checkmark savepoint reached.
         upgrade_mod_savepoint(true, 2020041402, 'checkmark');
     }
-    //TODO Merge with above when finalizing version
+
     if ($oldversion < 2020041403) {
         // Define field grouppriority to be added to checkmark_overrides.
         $table = new xmldb_table('checkmark_overrides');
