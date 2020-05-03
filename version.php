@@ -19,15 +19,15 @@
  *
  * @package   mod_checkmark
  * @author    Daniel Binder, Philipp Hager
- * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2020041403;
+$plugin->version   = 2020050300;
 $plugin->requires  = 2019111800;
 $plugin->component = 'mod_checkmark';
 $plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = "v3.8.1";
+$plugin->release   = "v3.9";
 
