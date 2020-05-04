@@ -29,8 +29,8 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * The parent class for mod_checkmark_group_override events.
  *
- *  * @property-read array $other {
- *      Extra information about event.
+ * @property-read array $other {
+ *  Extra information about event.
  *
  *      - int checkmarkid: the id of the checkmark.
  *      - int groupid: the id of the group.

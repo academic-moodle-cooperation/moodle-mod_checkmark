@@ -30,8 +30,8 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Event for when a user date override has been updated by a teacher.
  *
- *  * @property-read array $other {
- *      Extra information about event.
+ * @property-read array $other {
+ *  Extra information about event.
  *
  *      - int checkmarkid: the id of the checkmark.
  * }
@@ -42,6 +42,10 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user_override_updated extends user_override {
+
+    /**
+     *  Initializes the event
+     */
     protected function init() {
         $this->data['objecttable'] = 'checkmark_overrides';
         $this->data['crud'] = 'u';

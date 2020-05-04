@@ -30,8 +30,8 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Event for when a group date override has been created by a teacher.
  *
- *  * @property-read array $other {
- *      Extra information about event.
+ * @property-read array $other {
+ *  Extra information about event.
  *
  *      - int checkmarkid: the id of the checkmark.
  *      - int groupid: the id of the group.
@@ -44,6 +44,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 class group_override_created extends group_override {
 
+    /**
+     *  Initializes the event
+     */
     protected function init() {
         $this->data['objecttable'] = 'checkmark_overrides';
         $this->data['crud'] = 'c';

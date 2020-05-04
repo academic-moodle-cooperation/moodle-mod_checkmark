@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Event for when a group date override has been deleted by a teacher.
  *
- *  * @property-read array $other {
+ * @property-read array $other {
  *      Extra information about event.
  *
  *      - int checkmarkid: the id of the checkmark.

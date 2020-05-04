@@ -30,8 +30,8 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Event for when a user date override has been created by a teacher.
  *
- *  * @property-read array $other {
- *      Extra information about event.
+ * @property-read array $other {
+ *  Extra information about event.
  *
  *      - int checkmarkid: the id of the checkmark.
  * }
