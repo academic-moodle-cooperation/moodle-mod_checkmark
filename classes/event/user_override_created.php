@@ -43,6 +43,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 class user_override_created extends user_override {
 
+    /**
+     *  Initializes the event
+     */
     protected function init() {
         $this->data['objecttable'] = 'checkmark_overrides';
         $this->data['crud'] = 'c';
