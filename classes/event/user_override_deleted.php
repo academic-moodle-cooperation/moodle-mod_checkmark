@@ -76,6 +76,7 @@ class user_override_deleted extends user_override {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/checkmark/overrides.php', array('id' => $this->contextinstanceid, 'mode' => overrideform::USER));
+        return new \moodle_url('/mod/checkmark/overrides.php', array('id' => $this->contextinstanceid,
+                'mode' => overrideform::USER));
     }
 }
