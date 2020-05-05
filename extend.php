@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 require_login();
 
 $id = required_param('id', PARAM_INT);
-$type = required_param('type', PARAM_TEXT);
+$type = required_param('type', PARAM_ALPHA);
 $mode = optional_param('mode', \mod_checkmark\overrideform::ADD, PARAM_TEXT);
 $confirm = optional_param('confirm', 0, PARAM_INT);
 $return = optional_param('return', false, PARAM_RAW);
@@ -107,15 +107,15 @@ try {
     } else {
         if (!empty($users)) {
             $entities = json_decode(urldecode(required_param('users', PARAM_RAW)));
-            $entities = is_int($entities) ? $entities : $entities[0];
+            $firstentity = is_int($entities) ? $entities : $entities[0];
             $data = array();
             if ($mode == \mod_checkmark\overrideform::EDIT || $mode == \mod_checkmark\overrideform::COPY) {
                 $dates = array();
                 if ($type === \mod_checkmark\overrideform::USER) {
                     $dates = checkmark_get_overridden_dates($checkmark->id,
-                            $entities);
+                            $firstentity);
                 } else {
-                    $dates = checkmark_get_override_dates_for_group($checkmark->id, $entities);
+                    $dates = checkmark_get_override_dates_for_group($checkmark->id, $firstentity);
                 }
 
                 // Insert date of checkmark if no override is present (indicated by null in table).

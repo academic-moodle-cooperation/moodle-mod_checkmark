@@ -110,7 +110,7 @@ class overrideform extends \moodleform {
         $mform->setType('id', PARAM_INT);
 
         $mform->addElement('hidden', 'type', $this->type);
-        $mform->setType('type', PARAM_TEXT);
+        $mform->setType('type', PARAM_ALPHA);
 
         $mform->addElement('hidden', 'return', $this->_customdata['return']);
         $mform->setType('return', PARAM_URL);
