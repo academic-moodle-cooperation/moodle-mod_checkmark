@@ -431,8 +431,8 @@ function checkmark_get_coursemodule_info($coursemodule) {
         return false;
     }
 
-    if ($overridden = checkmark_get_overridden_dates($checkmark->id, $USER->id)) {
-        if ($overridden->timeavailable) {
+    if ($overridden = checkmark_get_overridden_dates($checkmark->id, $USER->id, $coursemodule->course)) {
+        if ($overridden->timeavailable !== null) {
             $checkmark->timeavailable = $overridden->timeavailable;
         }
     }
@@ -453,14 +453,18 @@ function checkmark_get_coursemodule_info($coursemodule) {
 
 /**
  * This function returns the overridden values for timeavailable, timedue and cutoffdate or false!
- *
+ * It checks for user and group overrides. A user override has priority over a group override.
+ * Otherwise, the override of the group with the highest priority is considered.
  * It uses a static variable to cache the results and possibly lessen DB queries! TODO: examine if we need some other cache for it!
  *
  * @param int $checkmarkid The checkmark-ID to get the overridden dates for.
  * @param int $userid (optional) 0 to get all user's overrides or a specific user's ID
- * @return bool
+ * @param int $courseid If of the course the checkmark activity is located in. Required when group overrides should be considered
+ * @return stdClass|bool
+ * @throws coding_exception
+ * @throws dml_exception
  */
-function checkmark_get_overridden_dates($checkmarkid, $userid = 0) {
+function checkmark_get_overridden_dates($checkmarkid, $userid = 0, $courseid = 0) {
     global $USER, $DB;
 
     static $cached = [];
@@ -473,8 +477,26 @@ function checkmark_get_overridden_dates($checkmarkid, $userid = 0) {
         return $cached[$userid][$checkmarkid];
     }
 
-    $records = $DB->get_records("checkmark_overrides", ['checkmarkid' => $checkmarkid, 'userid' => $userid], "timecreated DESC",
+    // Retrieves all groupings and groups a user is part of.
+    $groups = groups_get_user_groups($courseid, $userid);
+    // Flattens groupings/groups array to one dimension.
+    $groups = call_user_func_array('array_merge', $groups);
+
+    $records = array();
+    if (!empty($groups) && is_array($groups)) {
+        list($insql, $params) = $DB->get_in_or_equal($groups);
+        array_push($params, $checkmarkid);
+        $sql = "SELECT id, timeavailable, timedue, cutoffdate FROM {checkmark_overrides}
+            WHERE groupid $insql AND checkmarkid = ? ORDER BY grouppriority DESC";
+        $records = $DB->get_records_sql($sql, $params, 0, 1);
+    }
+
+    $userrecords = $DB->get_records('checkmark_overrides', ['checkmarkid' => $checkmarkid, 'userid' => $userid], "timecreated DESC",
             "id, timeavailable, timedue, cutoffdate", 0, 1);
+
+    if (count($userrecords)) {
+        $records = $userrecords;
+    }
 
     if (!key_exists($userid, $cached)) {
         $cached[$userid] = [];
@@ -487,6 +509,24 @@ function checkmark_get_overridden_dates($checkmarkid, $userid = 0) {
     }
 
     return $cached[$userid][$checkmarkid];
+}
+
+/**
+ * Return overridden dates for a given group in a given checkmark activity
+ *
+ * @param int $checkmarkid Id of the checkmark activity to be checked
+ * @param int $groupid Id of the group to be checked for
+ * @return stdClass|void Overridden dates if there are any. Empty object otherwise
+ * @throws dml_exception
+ */
+function checkmark_get_override_dates_for_group($checkmarkid, $groupid) {
+    global $DB;
+    if (empty($groupid)) {
+        return;
+    }
+    $records = $DB->get_records('checkmark_overrides', ['checkmarkid' => $checkmarkid, 'groupid' => $groupid],
+            'grouppriority DESC', 'id, timeavailable, timedue, cutoffdate', 0, 1);
+    return array_values($records)[0];
 }
 
 /**
@@ -1858,12 +1898,11 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
                 'return' => urlencode($PAGE->url->out())
         ]);
         $type = \navigation_node::TYPE_CUSTOM;
-        $shorttext = get_string('override_groups_dates', 'checkmark');
+        $shorttext = get_string('groupoverrides', 'checkmark');
         $key = 'extendgroups';
         $icon = null;
-        $groupnode = \navigation_node::create(get_string('override_groups_dates', 'checkmark'),
-                new moodle_url($url, ['type' => \mod_checkmark\overrideform::GROUP]),
-                $type, $shorttext, $key, $icon);
+        $groupnode = \navigation_node::create($shorttext, new moodle_url('/mod/checkmark/overrides.php',
+                array('id' => $PAGE->cm->id, 'mode' => 'group')), $type, $shorttext, $key, $icon);
         $checkmarknode->add_node($groupnode, $keys[1]);
 
         $shorttext = get_string('useroverrides', 'checkmark');

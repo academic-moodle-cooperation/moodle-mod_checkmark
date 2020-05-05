@@ -138,7 +138,7 @@ class checkmark {
         }
 
         // Check for overridden dates!
-        if ($overridden = checkmark_get_overridden_dates($this->checkmark->id, $USER->id)) {
+        if ($overridden = checkmark_get_overridden_dates($this->checkmark->id, $USER->id, $this->checkmark->course)) {
             $this->overrides = $overridden;
         }
 
@@ -506,9 +506,9 @@ class checkmark {
         $table = new html_table();
         $table->attributes['class'] = 'table-condensed';
         $rows = [];
-        if ($this->checkmark->timeavailable
-                || ($this->overrides && $this->overrides->timeavailable &&
-                        ($this->overrides->timeavailable !== $this->checkmark->timeavailable))) {
+        if (($this->checkmark->timeavailable || ($this->overrides && $this->overrides->timeavailable &&
+                                ($this->overrides->timeavailable !== $this->checkmark->timeavailable))) &&
+                                (!$this->overrides || $this->overrides->timeavailable != 0)) {
             $row = [new html_table_cell(get_string('availabledate', 'checkmark') . ':')];
             $row[0]->attributes['class'] = 'title';
             if ($this->checkmark->timeavailable) {
@@ -519,12 +519,12 @@ class checkmark {
                 $row[1] = new html_table_cell($timeavailable);
             } else {
                 $row[1] = new html_table_cell(userdate($this->overrides->timeavailable));
-                $row[1]->attributes['class'] = 'alert-info';
             }
             $rows[] = new html_table_row($row);
         }
-        if ($this->checkmark->timedue
-                || ($this->overrides && $this->overrides->timedue && ($this->overrides->timedue !== $this->checkmark->timedue))) {
+        if (($this->checkmark->timedue || ($this->overrides && $this->overrides->timedue &&
+                        ($this->overrides->timedue !== $this->checkmark->timedue))) &&
+                        (!$this->overrides || $this->overrides->timedue != 0)) {
             $row = [new html_table_cell(get_string('duedate', 'checkmark') . ':')];
             $row[0]->attributes['class'] = 'title';
             if ($this->checkmark->timedue) {
@@ -535,7 +535,6 @@ class checkmark {
                 $row[1] = new html_table_cell($due);
             } else {
                 $row[1] = new html_table_cell(userdate($this->overrides->timedue));
-                $row[1]->attributes['class'] = 'alert-info align-left';
             }
             $rows[] = new html_table_row($row);
         }
@@ -813,7 +812,7 @@ class checkmark {
                 if ($submission = $this->get_submission($USER->id)) {
                     if ($submission->get_timemodified()) {
                         $date = userdate($submission->get_timemodified());
-                        if ($this->overrides && $this->overrides->timedue) {
+                        if ($this->overrides && $this->overrides->timedue !== null) {
                             $timedue = $this->overrides->timedue;
                         } else {
                             $timedue = $this->checkmark->timedue;
@@ -832,65 +831,178 @@ class checkmark {
     }
 
     /**
-     * Override available from date, due date or cut off date for certain users!
+     * Override available from date, due date or cut off date for certain users or groups!
      *
-     * @param int[] $users
+     * @param int[] $entities Array of userids or groupids to override dates for
      * @param int $timeavailable
      * @param int $timedue
      * @param int $cutoffdate
+     * @param string $mode \overrideform::USER for using userids or \overrideform::GROUP for using group ids
      * @throws dml_exception
      */
-    public function override_dates(array $users, int $timeavailable, int $timedue, int $cutoffdate) {
+    public function override_dates(array $entities, int $timeavailable, int $timedue, int $cutoffdate,
+            string $mode = \mod_checkmark\overrideform::USER) {
         global $DB, $USER;
 
-        if (empty($users) || !is_array($users)) {
+        if (empty($entities) || !is_array($entities)) {
             return;
         }
 
-        $users = array_unique($users);
+        $entities = array_unique($entities);
 
         $record = new stdClass();
-        if (!empty($timeavailable)) {
+        if ($timeavailable == $this->checkmark->timeavailable) {
+            $record->timeavailable = null;
+        } else if (empty($timeavailable)) {
+            $record->timeavailable = 0;
+        } else {
             $record->timeavailable = $timeavailable;
         }
-        if (!empty($timedue)) {
+
+        if ($timedue == $this->checkmark->timedue) {
+            $record->timedue = null;
+        } else if (empty($timedue)) {
+            $record->timedue = 0;
+        } else {
             $record->timedue = $timedue;
         }
-        if (!empty($cutoffdate)) {
+
+        if ($cutoffdate == $this->checkmark->cutoffdate) {
+            $record->cutoffdate = null;
+        } else if (empty($cutoffdate)) {
+            $record->cutoffdate = 0;
+        } else {
             $record->cutoffdate = $cutoffdate;
         }
-        $record->timecreated = time();
+
         $record->modifierid = $USER->id;
         $record->checkmarkid = $this->cm->instance;
-        foreach ($users as $cur) {
+        $record->timecreated = time();
+        foreach ($entities as $cur) {
             // TODO: Add logging event and log every insert or update!
-            $record->userid = $cur;
-            if ($existingrecord = $DB->get_record('checkmark_overrides', array('userid' => $cur,
-                    'checkmarkid' => $this->cm->instance))) {
-                $record->id = $existingrecord->id;
-                $DB->update_record('checkmark_overrides', $record);
+            $existingrecord = null;
+            $cond = array('userid' => $cur, 'checkmarkid' => $this->cm->instance);
+            if ($mode == \mod_checkmark\overrideform::GROUP) {
+                $record->groupid = $cur;
+                $existingrecord = $DB->get_record('checkmark_overrides',
+                        array('groupid' => $cur, 'checkmarkid' => $this->cm->instance));
             } else {
+                $record->userid = $cur;
+                $existingrecord = $DB->get_record('checkmark_overrides', array('userid' => $cur,
+                        'checkmarkid' => $this->cm->instance));
+            }
+            if ($existingrecord) {
+                $record->id = $existingrecord->id;
+                // Delete Override if all values are reset to the course dates.
+                if ($record->timeavailable === null && $record->timedue === null && $record->cutoffdate === null) {
+                    $this->delete_override($entities, $mode);
+                }
+                $DB->update_record('checkmark_overrides', $record);
+                // Null values are ignored by update_record so they need to be updated manually.
+                if ($record->timeavailable === null && $record->timeavailable != $existingrecord->timeavailable) {
+                    $DB->set_field('checkmark_overrides', 'timeavailable', null, $cond);
+                }
+                if ($record->timedue === null && $record->timedue != $existingrecord->timedue) {
+                    $DB->set_field('checkmark_overrides', 'timedue', null, $cond);
+                }
+                if ($record->cutoffdate === null && $record->cutoffdate != $existingrecord->cutoffdate) {
+                    $DB->set_field('checkmark_overrides', 'cutoffdate', null, $cond);
+                }
+            } else {
+                // Don't insert override if all values are identical with the course dates.
+                if ($record->timeavailable === null && $record->timedue === null && $record->cutoffdate === null) {
+                    return;
+                }
+                if ($mode == \mod_checkmark\overrideform::GROUP) {
+                    $sql = "SELECT MAX(grouppriority) AS max
+                              FROM {checkmark_overrides}
+                             WHERE checkmarkid = ? AND groupid IS NOT NULL";
+                    $params = [$this->cm->instance];
+                    $highestpriority = $DB->get_record_sql($sql, $params);
+                    $record->grouppriority = $highestpriority->max + 1;
+                }
                 $DB->insert_record('checkmark_overrides', $record);
             }
         }
     }
 
     /**
-     * Delete override for a given users
+     * Delete override for given userids or groupids
      *
-     * @param int[] $users Userids of overrides to delete
+     * @param int[] $entities Array of userids or groupids for which override dates are deleted
+     * @param int $mode \overrideform::USER for using userids or \overrideform::GROUP for using group ids
      * @throws dml_exception
      */
-    public function delete_override($users) {
+    public function delete_override($entities, $mode = \mod_checkmark\overrideform::USER) {
         global $DB;
-        if (empty($users)) {
+        if (empty($entities)) {
             return;
         }
-        if (!is_array($users)) {
-            $users = array($users);
+        if (!is_array($entities)) {
+            $entities = array($entities);
         }
-        $users = array_unique($users);
-        $DB->delete_records_list('checkmark_overrides', 'userid', $users);
+        $entities = array_unique($entities);
+        if ($mode == \mod_checkmark\overrideform::GROUP) {
+            $DB->delete_records_list('checkmark_overrides', 'groupid', $entities);
+        } else {
+            $DB->delete_records_list('checkmark_overrides', 'userid', $entities);
+        }
+    }
+
+    /**
+     * Changes the priority of a group override with the one above or below it
+     *
+     * @param int $groupidfrom Id of the group override that should be changed
+     * @param bool $decrease True if priortiy should be lowered, false if it should be raised
+     * @throws dml_exception
+     */
+    public function reorder_group_overrides(int $groupidfrom, bool $decrease = false) {
+        global $DB;
+        $sign = '<';
+        $minmax = 'MIN';
+        if ($decrease) {
+            $sign = '>';
+            $minmax = 'MAX';
+        }
+        $sql = "SELECT groupid AS groupidto, grouppriority
+                  FROM {checkmark_overrides} o
+                  JOIN (
+                        SELECT $minmax(grouppriority) priority
+                          FROM {checkmark_overrides}
+                         WHERE (
+                                SELECT grouppriority
+                                  FROM {checkmark_overrides}
+                                 WHERE groupid = :groupid AND checkmarkid = :checkmarkid
+                            ) $sign grouppriority AND groupid IS NOT NULL
+                        ) o1 ON o1.priority = o.grouppriority
+                WHERE checkmarkid = :checkmarkid2;";
+
+        $params = ['groupid' => $groupidfrom, 'checkmarkid' => $this->cm->instance, 'checkmarkid2' => $this->cm->instance];
+        $groupto = $DB->get_record_sql($sql, $params, MUST_EXIST);
+            $this->swap_group_overrides($groupidfrom, $groupto->groupidto);
+    }
+
+    /**
+     * Exchange the priorities of two group overrides
+     *
+     * @param int $groupidfrom
+     * @param int $groupidto
+     * @throws dml_exception
+     */
+    private function swap_group_overrides(int $groupidfrom, int $groupidto) {
+        global $DB;
+        $from = $DB->get_record('checkmark_overrides',
+                ['checkmarkid' => $this->cm->instance, 'groupid' => $groupidfrom], '*', MUST_EXIST);
+        $to = $DB->get_record('checkmark_overrides',
+                ['checkmarkid' => $this->cm->instance, 'groupid' => $groupidto], '*', MUST_EXIST);
+
+        if (isset($from) && isset($to)) {
+            $oldfrompriority = $from->grouppriority;
+            $from->grouppriority = $to->grouppriority;
+            $to->grouppriority = $oldfrompriority;
+            $DB->update_record('checkmark_overrides', $from);
+            $DB->update_record('checkmark_overrides', $to);
+        }
     }
 
 
@@ -3485,10 +3597,10 @@ class checkmark {
         $timeavailable = $this->checkmark->timeavailable;
         $cutoffdate = $this->checkmark->cutoffdate;
         if ($this->overrides) {
-            if ($this->overrides->timeavailable) {
+            if ($this->overrides->timeavailable !== null) {
                 $timeavailable = $this->overrides->timeavailable;
             }
-            if ($this->overrides->cutoffdate) {
+            if ($this->overrides->cutoffdate !== null) {
                 $cutoffdate = $this->overrides->cutoffdate;
             }
         }
@@ -3572,12 +3684,12 @@ class checkmark {
      */
     public function display_lateness($timesubmitted, $userid = 0) {
         if (!empty($userid)) {
-            $overrides = checkmark_get_overridden_dates($this->checkmark->id, $userid);
+            $overrides = checkmark_get_overridden_dates($this->checkmark->id, $userid, $this->checkmark->course);
         } else {
             $overrides = $this->overrides;
         }
 
-        if ($overrides && $overrides->timedue) {
+        if ($overrides && $overrides->timedue !== null) {
             return checkmark_display_lateness($timesubmitted, $overrides->timedue);
         }
 

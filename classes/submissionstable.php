@@ -1295,8 +1295,8 @@ class submissionstable extends \table_sql {
         if ($values->timesubmitted > 0) {
             $content = userdate($values->timesubmitted, $timeformat);
 
-            $overrides = checkmark_get_overridden_dates($this->checkmark->checkmark->id, $values->id);
-            if ($overrides && $overrides->timedue) {
+            $overrides = checkmark_get_overridden_dates($this->checkmark->checkmark->id, $values->id, $this->checkmark->course->id);
+            if ($overrides && $overrides->timedue !== null) {
                 $timedue = $overrides->timedue;
             } else {
                 $timedue = $this->checkmark->checkmark->timedue;
@@ -1381,22 +1381,32 @@ class submissionstable extends \table_sql {
             $button = $OUTPUT->action_link($popupurl, $text);
 
             // If overridden dates are present for this user, we display an icon with popup!
-            if ($this->hasoverrides && $overrides = checkmark_get_overridden_dates($this->checkmark->cm->instance, $values->id)) {
+            if ($this->hasoverrides && $overrides = checkmark_get_overridden_dates($this->checkmark->cm->instance,
+                            $values->id, $this->checkmark->course->id)) {
                 $context = new stdClass();
-                if ($overrides->timeavailable) {
-                    $context->timeavailable = userdate($overrides->timeavailable, get_string('strftimerecentfull'));
-                } else {
+
+                if ($overrides->timeavailable === null) {
                     $context->timeavailable = false;
-                }
-                if ($overrides->timedue) {
-                    $context->timedue = userdate($overrides->timedue, get_string('strftimerecentfull'));
+                } else if ($overrides->timeavailable == 0) {
+                    $context->timeavailable = get_string('noopen', 'checkmark');
                 } else {
+                    $context->timeavailable = userdate($overrides->timeavailable, get_string('strftimerecentfull'));
+                }
+
+                if ($overrides->timedue === null) {
                     $context->timedue = false;
-                }
-                if ($overrides->cutoffdate) {
-                    $context->cutoffdate = userdate($overrides->cutoffdate, get_string('strftimerecentfull'));
+                } else if ($overrides->timedue == 0) {
+                    $context->timedue = get_string('noclose', 'checkmark');
                 } else {
+                    $context->timedue = userdate($overrides->timedue, get_string('strftimerecentfull'));
+                }
+
+                if ($overrides->cutoffdate === null) {
                     $context->cutoffdate = false;
+                } else if ($overrides->cutoffdate == 0) {
+                    $context->cutoffdate = get_string('noclose', 'checkmark');
+                } else {
+                    $context->cutoffdate = userdate($overrides->cutoffdate, get_string('strftimerecentfull'));
                 }
                 $button .= $OUTPUT->render_from_template('mod_checkmark/overridetooltip', $context);
             }
