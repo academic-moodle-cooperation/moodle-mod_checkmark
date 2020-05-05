@@ -1125,6 +1125,15 @@ function xmldb_checkmark_upgrade($oldversion) {
 
         // Define index checkmarkid-userid (not unique) to be dropped form checkmark_overrides.
         $table = new xmldb_table('checkmark_overrides');
+        $index = new xmldb_index('checkmarkid-userid', XMLDB_INDEX_NOTUNIQUE, ['checkmarkid', 'userid', 'timecreated']);
+
+        // Conditionally launch drop index checkmarkid-userid.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Define index checkmarkid-userid (not unique) to be dropped form checkmark_overrides.
+        $table = new xmldb_table('checkmark_overrides');
         $index = new xmldb_index('checkmarkid-userid', XMLDB_INDEX_NOTUNIQUE, ['checkmarkid', 'userid']);
 
         // Conditionally launch drop index checkmarkid-userid.
@@ -1141,7 +1150,7 @@ function xmldb_checkmark_upgrade($oldversion) {
 
         // Define index checkmarkid-userid (not unique) to be added to checkmark_overrides.
         $table = new xmldb_table('checkmark_overrides');
-        $index = new xmldb_index('checkmarkid-userid', XMLDB_INDEX_NOTUNIQUE, ['checkmarkid', 'userid']);
+        $index = new xmldb_index('checkmarkid-userid', XMLDB_INDEX_NOTUNIQUE, ['checkmarkid', 'userid', 'timecreated']);
 
         // Conditionally launch add index checkmarkid-userid.
         if (!$dbman->index_exists($table, $index)) {

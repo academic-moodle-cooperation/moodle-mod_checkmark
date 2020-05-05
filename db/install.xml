@@ -124,8 +124,7 @@
         <KEY NAME="modifierid" TYPE="foreign" FIELDS="modifierid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="checkmarkid-userid" UNIQUE="false" FIELDS="checkmarkid, userid"/>
-        <INDEX NAME="timecreated" UNIQUE="false" FIELDS="timecreated"/>
+        <INDEX NAME="checkmarkid-userid" UNIQUE="false" FIELDS="checkmarkid, userid, timecreated"/>
       </INDEXES>
     </TABLE>
   </TABLES>
