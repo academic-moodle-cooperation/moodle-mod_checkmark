@@ -882,6 +882,14 @@ class checkmark {
             // TODO: Add logging event and log every insert or update!
             $existingrecord = null;
             $cond = array('userid' => $cur, 'checkmarkid' => $this->cm->instance);
+
+            // Init eventparams and add general event params.
+            $eventparams = array(
+                    'context' => context_module::instance($this->cm->id),
+                    'other' => array(
+                            'checkmarkid' => $this->cm->instance
+                    )
+            );
             if ($mode == \mod_checkmark\overrideform::GROUP) {
                 $record->groupid = $cur;
                 $existingrecord = $DB->get_record('checkmark_overrides',
@@ -908,6 +916,18 @@ class checkmark {
                 if ($record->cutoffdate === null && $record->cutoffdate != $existingrecord->cutoffdate) {
                     $DB->set_field('checkmark_overrides', 'cutoffdate', null, $cond);
                 }
+
+                // Add event params for override_updated events and fire them.
+                $eventparams['objectid'] = $record->id;
+                if ($mode == \mod_checkmark\overrideform::GROUP) {
+                    $eventparams['other']['groupid'] = $record->groupid;
+                    $event = \mod_checkmark\event\group_override_updated::create($eventparams);
+                } else {
+                    $eventparams['relateduserid'] = $record->userid;
+                    $event = \mod_checkmark\event\user_override_updated::create($eventparams);
+                }
+                $event->trigger();
+
             } else {
                 // Don't insert override if all values are identical with the course dates.
                 if ($record->timeavailable === null && $record->timedue === null && $record->cutoffdate === null) {
@@ -921,7 +941,18 @@ class checkmark {
                     $highestpriority = $DB->get_record_sql($sql, $params);
                     $record->grouppriority = $highestpriority->max + 1;
                 }
-                $DB->insert_record('checkmark_overrides', $record);
+                $record->id = $DB->insert_record('checkmark_overrides', $record);
+
+                // Add event params for override_created events and fire them.
+                $eventparams['objectid'] = $record->id;
+                if ($mode == \mod_checkmark\overrideform::GROUP) {
+                    $eventparams['other']['groupid'] = $record->groupid;
+                    $event = \mod_checkmark\event\group_override_created::create($eventparams);
+                } else {
+                    $eventparams['relateduserid'] = $record->userid;
+                    $event = \mod_checkmark\event\user_override_created::create($eventparams);
+                }
+                $event->trigger();
             }
         }
     }
@@ -942,10 +973,31 @@ class checkmark {
             $entities = array($entities);
         }
         $entities = array_unique($entities);
-        if ($mode == \mod_checkmark\overrideform::GROUP) {
-            $DB->delete_records_list('checkmark_overrides', 'groupid', $entities);
-        } else {
-            $DB->delete_records_list('checkmark_overrides', 'userid', $entities);
+        // Init eventparams and add general event params.
+        $eventparams = array(
+                'context' => context_module::instance($this->cm->id),
+                'other' => array(
+                        'checkmarkid' => $this->cm->instance
+                )
+        );
+        foreach ($entities as $cur) {
+            if ($mode == \mod_checkmark\overrideform::GROUP) {
+                $existingrecord = $DB->get_record('checkmark_overrides',
+                        array('groupid' => $cur, 'checkmarkid' => $this->cm->instance));
+                $eventparams['objectid'] = $existingrecord->id;
+                $eventparams['other']['groupid'] = $cur;
+                $DB->delete_records('checkmark_overrides', array('groupid' => $cur));
+                $event = \mod_checkmark\event\group_override_deleted::create($eventparams);
+
+            } else {
+                $existingrecord = $DB->get_record('checkmark_overrides', array('userid' => $cur,
+                        'checkmarkid' => $this->cm->instance));
+                $eventparams['objectid'] = $existingrecord->id;
+                $eventparams['relateduserid'] = $cur;
+                $DB->delete_records('checkmark_overrides', array('userid' => $cur));
+                $event = \mod_checkmark\event\user_override_deleted::create($eventparams);
+            }
+            $event->trigger();
         }
     }
 
