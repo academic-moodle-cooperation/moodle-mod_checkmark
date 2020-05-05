@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 require_login();
 
 $id = required_param('id', PARAM_INT);
-$type = required_param('type', PARAM_TEXT);
+$type = required_param('type', PARAM_ALPHA);
 $mode = optional_param('mode', \mod_checkmark\overrideform::ADD, PARAM_TEXT);
 $confirm = optional_param('confirm', 0, PARAM_INT);
 $return = optional_param('return', false, PARAM_RAW);
