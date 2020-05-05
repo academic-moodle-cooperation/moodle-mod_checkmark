@@ -1124,6 +1124,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         $dbman->drop_key($table, $key);
 
         // Define index checkmarkid-userid (not unique) to be dropped form checkmark_overrides.
+        // This index will be present if moodle was installed before version 2017081300.
         $table = new xmldb_table('checkmark_overrides');
         $index = new xmldb_index('checkmarkid-userid', XMLDB_INDEX_NOTUNIQUE, ['checkmarkid', 'userid', 'timecreated']);
 
@@ -1133,6 +1134,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         }
 
         // Define index checkmarkid-userid (not unique) to be dropped form checkmark_overrides.
+        // This index will be present if moodle was installed after version 2017081300
         $table = new xmldb_table('checkmark_overrides');
         $index = new xmldb_index('checkmarkid-userid', XMLDB_INDEX_NOTUNIQUE, ['checkmarkid', 'userid']);
 
