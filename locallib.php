@@ -508,7 +508,7 @@ class checkmark {
         $rows = [];
         if (($this->checkmark->timeavailable || ($this->overrides && $this->overrides->timeavailable &&
                                 ($this->overrides->timeavailable !== $this->checkmark->timeavailable))) &&
-                                (!$this->overrides || $this->overrides->timeavailable != 0)) {
+                                (!$this->overrides || $this->overrides->timeavailable !== 0)) {
             $row = [new html_table_cell(get_string('availabledate', 'checkmark') . ':')];
             $row[0]->attributes['class'] = 'title';
             if ($this->checkmark->timeavailable) {
@@ -524,7 +524,7 @@ class checkmark {
         }
         if (($this->checkmark->timedue || ($this->overrides && $this->overrides->timedue &&
                         ($this->overrides->timedue !== $this->checkmark->timedue))) &&
-                        (!$this->overrides || $this->overrides->timedue != 0)) {
+                        (!$this->overrides || $this->overrides->timedue !== 0)) {
             $row = [new html_table_cell(get_string('duedate', 'checkmark') . ':')];
             $row[0]->attributes['class'] = 'title';
             if ($this->checkmark->timedue) {
