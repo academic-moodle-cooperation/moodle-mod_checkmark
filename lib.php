@@ -1973,7 +1973,7 @@ function mod_checkmark_core_calendar_is_event_visible(calendar_event $event) {
     if ($event->eventtype == CHECKMARK_EVENT_TYPE_GRADINGDUE) {
         return has_capability('mod/checkmark:grade', $context);
     } else if ($event->eventtype == CHECKMARK_EVENT_TYPE_DUE) {
-        return has_capability('mod/checkmark:submit', $context) && $checkmark->isopen();
+        return has_capability('mod/checkmark:submit', $context) && $checkmark->isopen(true);
     }
 
     return false;
@@ -2002,7 +2002,6 @@ function mod_checkmark_core_calendar_provide_event_action(calendar_event $event,
     $notoverridden = (!$checkmark->overrides || $checkmark->overrides->timeavailable === null);
     $cmptime = $notoverridden ? $checkmark->checkmark->timeavailable : $checkmark->overrides->timeavailable;
     $started = time() >= $cmptime;
-    $isopen = $checkmark->isopen();
 
     if ($event->eventtype == CHECKMARK_EVENT_TYPE_GRADINGDUE) {
         $name = get_string('grade');
@@ -2014,7 +2013,7 @@ function mod_checkmark_core_calendar_provide_event_action(calendar_event $event,
     } else {
         $usersubmission = $checkmark->get_submission($USER->id, false);
         $feedback = $checkmark->get_feedback($USER->id);
-        if (!$isopen || ($feedback && !$checkmark->checkmark->resubmit)) {
+        if ((!$checkmark->isopen(true) && $started) || ($feedback && !$checkmark->checkmark->resubmit)) {
             // The user has already been graded, nothing more to do here!
             return null;
         }
@@ -2028,12 +2027,11 @@ function mod_checkmark_core_calendar_provide_event_action(calendar_event $event,
         if (!$usersubmission) {
             // The user has not yet submitted anything. Show the addsubmission link.
             $name = get_string('addsubmission', 'checkmark');
-            $actionable = $isopen;
         } else {
             // The user has not yet submitted anything. Show the editmysubmission link (if he's allowed to resubmit).
             $name = get_string('editmysubmission', 'checkmark');
-            $actionable = $isopen && (!$feedback || $checkmark->checkmark->resubmit);
         }
+        $actionable = true;
     }
 
     return $factory->create_instance(

@@ -3639,11 +3639,12 @@ class checkmark {
      * Returns true if the student is allowed to submit
      *
      * Checks that the checkmark has started and, cut-off-date or duedate hasn't
-     * passed already.
+     * passed already. If $closeOnly is true only the cut-off-date is considered
      *
+     * @param bool $closeOnly If true only the cut-off-date is considered
      * @return bool
      */
-    public function isopen() {
+    public function isopen(bool $closeOnly = false) {
         $time = time();
 
         $timeavailable = $this->checkmark->timeavailable;
@@ -3657,7 +3658,7 @@ class checkmark {
             }
         }
 
-        if (empty($timeavailable)) {
+        if (empty($timeavailable) || $closeOnly) {
             if (empty($cutoffdate)) {
                 return true;
             } else {
