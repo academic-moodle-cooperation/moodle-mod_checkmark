@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/mod/checkmark/submission_form.php');
 require_once($CFG->dirroot . '/mod/checkmark/grading_form.php');
 
 /**
- * This class provides all the basic functionality for an checkmark-module
+ * This class provides all the basic functionality for a checkmark-module
  *
  * @package   mod_checkmark
  * @author    Philipp Hager, extended and maintained by Daniel Binder
@@ -954,6 +954,7 @@ class checkmark {
                 }
                 $event->trigger();
             }
+            checkmark_refresh_override_events($this);
         }
     }
 
