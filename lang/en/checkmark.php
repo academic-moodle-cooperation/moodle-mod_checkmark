@@ -137,6 +137,7 @@ $string['eventexampleupdated'] = 'Example updated';
 $string['eventgradeupdated'] = 'Grade updated';
 $string['eventoverridecreated'] = 'Checkmark override created';
 $string['eventoverridedeleted'] = 'Checkmark override deleted';
+$string['eventoverrideprioritychanged'] = 'Checkmark override priority swapped';
 $string['eventoverrideupdated'] = 'Checkmark override updated';
 $string['eventsubmissionsexported'] = 'Submission exported';
 $string['eventsubmissionupdated'] = 'Submission updated';

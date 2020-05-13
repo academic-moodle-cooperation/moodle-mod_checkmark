@@ -1052,7 +1052,7 @@ class checkmark {
         $to = $DB->get_record('checkmark_overrides',
                 ['checkmarkid' => $this->cm->instance, 'groupid' => $groupidto], '*', MUST_EXIST);
 
-        if (isset($from) && isset($to)) {
+        if (isset($from) && isset($to) && $from != $to) {
             $oldfrompriority = $from->grouppriority;
             $from->grouppriority = $to->grouppriority;
             $to->grouppriority = $oldfrompriority;
@@ -1060,6 +1060,20 @@ class checkmark {
             $DB->update_record('checkmark_overrides', $to);
             checkmark_refresh_override_events($this,$from);
             checkmark_refresh_override_events($this,$to);
+
+
+            // Log the priority change.
+            $eventparams = array(
+                    'context' => context_module::instance($this->cm->id),
+                    'objectid' => $from->id,
+                    'other' => array(
+                            'checkmarkid' => $this->cm->instance,
+                            'groupid' => $from->groupid,
+                            'groupidswap' => $to->groupid,
+                            'objectidswap' => $to->id
+                    )
+            );
+            \mod_checkmark\event\group_override_priority_changed::create($eventparams)->trigger();
         }
     }
 
