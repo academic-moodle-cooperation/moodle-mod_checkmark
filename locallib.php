@@ -879,7 +879,6 @@ class checkmark {
         $record->checkmarkid = $this->cm->instance;
         $record->timecreated = time();
         foreach ($entities as $cur) {
-            // TODO: Add logging event and log every insert or update!
             $existingrecord = null;
             $cond = array('userid' => $cur, 'checkmarkid' => $this->cm->instance);
 
@@ -954,7 +953,7 @@ class checkmark {
                 }
                 $event->trigger();
             }
-            checkmark_refresh_override_events($this);
+            checkmark_refresh_override_events($this, $record);
         }
     }
 
@@ -982,6 +981,7 @@ class checkmark {
                 )
         );
         foreach ($entities as $cur) {
+            $existingrecord = null;
             if ($mode == \mod_checkmark\overrideform::GROUP) {
                 $existingrecord = $DB->get_record('checkmark_overrides',
                         array('groupid' => $cur, 'checkmarkid' => $this->cm->instance));
@@ -999,6 +999,9 @@ class checkmark {
                 $event = \mod_checkmark\event\user_override_deleted::create($eventparams);
             }
             $event->trigger();
+
+            $existingrecord->timedue = null;
+            checkmark_refresh_override_events($this, $existingrecord);
         }
     }
 
@@ -1055,6 +1058,8 @@ class checkmark {
             $to->grouppriority = $oldfrompriority;
             $DB->update_record('checkmark_overrides', $from);
             $DB->update_record('checkmark_overrides', $to);
+            checkmark_refresh_override_events($this,$from);
+            checkmark_refresh_override_events($this,$to);
         }
     }
 

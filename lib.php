@@ -1119,9 +1119,9 @@ function checkmark_refresh_override_events($checkmark, $override = null) {
                 continue;
             }
             $eventname = get_string('overridegroupeventname', 'assign', $params);
-            // Set group override priority.
-            if (isset($current->sortorder)) {
-                $event->priority = $current->sortorder;
+            // Flip checkmark grouppriority and set group override priority.
+            if (isset($current->grouppriority)) {
+                $event->priority = 10000 - $current->grouppriority;
             }
         } else if ($userid) {
             // User override event.
@@ -1141,7 +1141,8 @@ function checkmark_refresh_override_events($checkmark, $override = null) {
             } else {
                 unset($event->id);
             }
-            $event->name      = $eventname.' ('.get_string('duedate', 'checkmark').')';
+            //$event->name      = $eventname.' ('.get_string('duedate', 'checkmark').')';
+            $event->name = $checkmarkinstance->name;
             calendar_event::create($event, false);
         }
     }
@@ -1234,21 +1235,12 @@ function checkmark_refresh_events($courseid = 0, $instance = null, $cm = null) {
             }
 
             $eventtype = CHECKMARK_EVENT_TYPE_DUE;
-            // Only set event values if a duedate is present or overridden and if it is not overridden to 0.
-            if (($checkmark->timedue || ($checkmark->overrides && $checkmark->overrides->timedue))
-                    && !($checkmark->overrides && $checkmark->overrides->timedue === 0)) {
-
+            if ($checkmark->timedue) {
                 $event->eventtype = $eventtype;
                 $event->name = $checkmark->name;
 
-                // Use overridden value if timedue (duedate) was overridden.
-                if ($checkmark->overrides && $checkmark->overrides->timedue) {
-                    $event->timestart = $checkmark->overrides->timedue;
-                    $event->timesort = $checkmark->overrides->timedue;
-                } else {
-                    $event->timestart = $checkmark->timedue;
-                    $event->timesort = $checkmark->timedue;
-                }
+                $event->timestart = $checkmark->timedue;
+                $event->timesort = $checkmark->timedue;
                 $select = "modulename = :modulename
                            AND instance = :instance
                            AND eventtype = :eventtype
