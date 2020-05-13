@@ -1059,9 +1059,8 @@ class checkmark {
             $to->grouppriority = $oldfrompriority;
             $DB->update_record('checkmark_overrides', $from);
             $DB->update_record('checkmark_overrides', $to);
-            checkmark_refresh_override_events($this,$from);
-            checkmark_refresh_override_events($this,$to);
-
+            checkmark_refresh_override_events($this, $from);
+            checkmark_refresh_override_events($this, $to);
 
             // Log the priority change.
             $eventparams = array(

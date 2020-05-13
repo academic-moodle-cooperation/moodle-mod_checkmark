@@ -1196,7 +1196,7 @@ function checkmark_refresh_events($courseid = 0, $instance = null, $cm = null) {
 
             if ($cm) {
                 $context = context_course::instance($courseid);
-                $users = get_enrolled_users($context,'mod/checkmark:submit');
+                $users = get_enrolled_users($context, 'mod/checkmark:submit');
             }
 
             // Start with creating the event.
@@ -1251,9 +1251,6 @@ function checkmark_refresh_events($courseid = 0, $instance = null, $cm = null) {
                     calendar_event::create($event, false);
                 }
             } else {
-                $sql = 'modulename = :modulename AND instance = :instance AND eventtype = :eventtype AND priority IS NULL';
-                //$DB->delete_records_select('event', $sql, array('modulename' => 'checkmark', 'instance' => $checkmark->id,
-                //        'eventtype' => $eventtype));
                 $DB->delete_records('event', array('modulename' => 'checkmark', 'instance' => $checkmark->id,
                         'eventtype' => $eventtype, 'priority' => null));
             }

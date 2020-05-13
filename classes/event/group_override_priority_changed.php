@@ -102,8 +102,8 @@ class group_override_priority_changed extends group_override {
     public function get_description() {
         return "The user with id '$this->userid' swapped the priorities of overrides for the checkmark with
                 course module id '$this->contextinstanceid'. The override with the id '$this->objectid' for group
-                 '{$this->other['groupid']}' has swapped priority with the override with the id '{$this->other['objectidswap']}' for 
-                 group '{$this->other['groupidswap']}'.";
+                 '{$this->other['groupid']}' has swapped priority with the override with the id '{$this->other['objectidswap']}'
+                  for  group '{$this->other['groupidswap']}'.";
     }
 
     /**
