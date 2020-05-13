@@ -1087,10 +1087,10 @@ function checkmark_refresh_override_events($checkmark, $override = null) {
     foreach ($overrides as $current) {
         $groupid   = isset($current->groupid) ? $current->groupid : 0;
         $userid    = isset($current->userid) ? $current->userid : 0;
-        $duedate = isset($current->timedue) ? $current->timedue : $checkmarkinstance->timedue;
+        $duedate = $current->timedue !== null ? $current->timedue : $checkmarkinstance->timedue;
 
         // Only add 'due' events for an override if they differ from the checkmark default.
-        $addclose = empty($current->id) || !empty($current->timedue);
+        $addclose = empty($current->id) || isset($current->timedue);
 
         $event = new stdClass();
         $event->type = CALENDAR_EVENT_TYPE_ACTION;
@@ -1118,7 +1118,6 @@ function checkmark_refresh_override_events($checkmark, $override = null) {
                 // Group doesn't exist, just skip it.
                 continue;
             }
-            $eventname = get_string('overridegroupeventname', 'assign', $params);
             // Flip checkmark grouppriority and set group override priority.
             if (isset($current->grouppriority)) {
                 $event->priority = 10000 - $current->grouppriority;
@@ -1127,21 +1126,16 @@ function checkmark_refresh_override_events($checkmark, $override = null) {
             // User override event.
             $params = new stdClass();
             $params->assign = $checkmarkinstance->name;
-            $eventname = get_string('overrideusereventname', 'assign', $params);
             // Set user override priority.
             $event->priority = CALENDAR_EVENT_USER_OVERRIDE_PRIORITY;
-        } else {
-            // The parent event.
-            $eventname = $checkmarkinstance->name;
         }
 
-        if ($duedate && $addclose) {
+        if ((isset($duedate) && $addclose)) {
             if ($oldevent = array_shift($oldevents)) {
                 $event->id = $oldevent->id;
             } else {
                 unset($event->id);
             }
-            //$event->name      = $eventname.' ('.get_string('duedate', 'checkmark').')';
             $event->name = $checkmarkinstance->name;
             calendar_event::create($event, false);
         }
@@ -1257,8 +1251,11 @@ function checkmark_refresh_events($courseid = 0, $instance = null, $cm = null) {
                     calendar_event::create($event, false);
                 }
             } else {
+                $sql = 'modulename = :modulename AND instance = :instance AND eventtype = :eventtype AND priority IS NULL';
+                //$DB->delete_records_select('event', $sql, array('modulename' => 'checkmark', 'instance' => $checkmark->id,
+                //        'eventtype' => $eventtype));
                 $DB->delete_records('event', array('modulename' => 'checkmark', 'instance' => $checkmark->id,
-                        'eventtype' => $eventtype));
+                        'eventtype' => $eventtype, 'priority' => null));
             }
 
             $eventtype = CHECKMARK_EVENT_TYPE_GRADINGDUE;

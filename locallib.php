@@ -900,6 +900,7 @@ class checkmark {
             }
             if ($existingrecord) {
                 $record->id = $existingrecord->id;
+                $record->grouppriority = $existingrecord->grouppriority;
                 // Delete Override if all values are reset to the course dates.
                 if ($record->timeavailable === null && $record->timedue === null && $record->cutoffdate === null) {
                     $this->delete_override($entities, $mode);
