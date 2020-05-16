@@ -963,7 +963,7 @@ class submissionstable extends \table_sql {
                  LEFT JOIN (".$esql.") eu ON eu.id=u.id
                  LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid) AND s.checkmarkid = :checkmarkid
                  LEFT JOIN {checkmark_feedbacks} f ON (u.id = f.userid) AND f.checkmarkid = :checkmarkid2
-                 RIGHT OUTER JOIN {checkmark_overrides} o ON (u.id = o.userid) AND o.checkmarkid = :checkmarkid3
+                 LEFT JOIN {checkmark_overrides} o ON (u.id = o.userid) AND o.checkmarkid = :checkmarkid3
                      WHERE u.deleted = 0
                            AND eu.id = u.id ".$sqluserids."
                            ".$wherefilter;
