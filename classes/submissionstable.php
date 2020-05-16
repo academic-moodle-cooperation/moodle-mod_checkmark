@@ -959,16 +959,16 @@ class submissionstable extends \table_sql {
             $params['checkmarkid'] = $this->checkmark->checkmark->id;
             $params['checkmarkid2'] = $this->checkmark->checkmark->id;
             $params['checkmarkid3'] = $this->checkmark->checkmark->id;
-            $sql = "SELECT u.id FROM {user} u
+            $sql = "SELECT DISTINCT u.id FROM {user} u
                  LEFT JOIN (".$esql.") eu ON eu.id=u.id
                  LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid) AND s.checkmarkid = :checkmarkid
                  LEFT JOIN {checkmark_feedbacks} f ON (u.id = f.userid) AND f.checkmarkid = :checkmarkid2
-                 LEFT JOIN {checkmark_overrides} o ON (u.id = o.userid) AND o.checkmarkid = :checkmarkid3
+                 LEFT JOIN {groups_members} g ON (g.userid = u.id)
+                 LEFT JOIN {checkmark_overrides} o ON (u.id = o.userid OR g.groupid = o.groupid) AND o.checkmarkid = :checkmarkid3
                      WHERE u.deleted = 0
                            AND eu.id = u.id ".$sqluserids."
                            ".$wherefilter;
         }
-
         $users = $DB->get_records_sql($sql, $params);
 
         if (!empty($users)) {
