@@ -1053,7 +1053,7 @@ class checkmark {
         $to = $DB->get_record('checkmark_overrides',
                 ['checkmarkid' => $this->cm->instance, 'groupid' => $groupidto], '*', MUST_EXIST);
 
-        if (isset($from) && isset($to) && $from != $to) {
+        if (!empty($from) && !empty($to) && $from->id != $to->id) {
             $oldfrompriority = $from->grouppriority;
             $from->grouppriority = $to->grouppriority;
             $to->grouppriority = $oldfrompriority;
