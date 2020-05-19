@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/mod/checkmark/submission_form.php');
 require_once($CFG->dirroot . '/mod/checkmark/grading_form.php');
 
 /**
- * This class provides all the basic functionality for an checkmark-module
+ * This class provides all the basic functionality for a checkmark-module
  *
  * @package   mod_checkmark
  * @author    Philipp Hager, extended and maintained by Daniel Binder
@@ -879,7 +879,6 @@ class checkmark {
         $record->checkmarkid = $this->cm->instance;
         $record->timecreated = time();
         foreach ($entities as $cur) {
-            // TODO: Add logging event and log every insert or update!
             $existingrecord = null;
             $cond = array('userid' => $cur, 'checkmarkid' => $this->cm->instance);
 
@@ -901,6 +900,7 @@ class checkmark {
             }
             if ($existingrecord) {
                 $record->id = $existingrecord->id;
+                $record->grouppriority = $existingrecord->grouppriority;
                 // Delete Override if all values are reset to the course dates.
                 if ($record->timeavailable === null && $record->timedue === null && $record->cutoffdate === null) {
                     $this->delete_override($entities, $mode);
@@ -954,6 +954,7 @@ class checkmark {
                 }
                 $event->trigger();
             }
+            checkmark_refresh_override_events($this, $record);
         }
     }
 
@@ -981,6 +982,7 @@ class checkmark {
                 )
         );
         foreach ($entities as $cur) {
+            $existingrecord = null;
             if ($mode == \mod_checkmark\overrideform::GROUP) {
                 $existingrecord = $DB->get_record('checkmark_overrides',
                         array('groupid' => $cur, 'checkmarkid' => $this->cm->instance));
@@ -998,6 +1000,9 @@ class checkmark {
                 $event = \mod_checkmark\event\user_override_deleted::create($eventparams);
             }
             $event->trigger();
+
+            $existingrecord->timedue = null;
+            checkmark_refresh_override_events($this, $existingrecord);
         }
     }
 
@@ -1048,12 +1053,27 @@ class checkmark {
         $to = $DB->get_record('checkmark_overrides',
                 ['checkmarkid' => $this->cm->instance, 'groupid' => $groupidto], '*', MUST_EXIST);
 
-        if (isset($from) && isset($to)) {
+        if (!empty($from) && !empty($to) && $from->id != $to->id) {
             $oldfrompriority = $from->grouppriority;
             $from->grouppriority = $to->grouppriority;
             $to->grouppriority = $oldfrompriority;
             $DB->update_record('checkmark_overrides', $from);
             $DB->update_record('checkmark_overrides', $to);
+            checkmark_refresh_override_events($this, $from);
+            checkmark_refresh_override_events($this, $to);
+
+            // Log the priority change.
+            $eventparams = array(
+                    'context' => context_module::instance($this->cm->id),
+                    'objectid' => $from->id,
+                    'other' => array(
+                            'checkmarkid' => $this->cm->instance,
+                            'groupid' => $from->groupid,
+                            'groupidswap' => $to->groupid,
+                            'objectidswap' => $to->id
+                    )
+            );
+            \mod_checkmark\event\group_override_priority_changed::create($eventparams)->trigger();
         }
     }
 

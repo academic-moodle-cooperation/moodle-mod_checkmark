@@ -1035,6 +1035,120 @@ function checkmark_scale_used_anywhere($scaleid) {
 }
 
 /**
+ * This function updates the events associated to the checkmark.
+ * If $override is non-zero, then it updates only the events
+ * associated with the specified override.
+ *
+ * @param checkmark $checkmark the checkmark object.
+ * @param object $override (optional) limit to a specific override
+ */
+function checkmark_refresh_override_events($checkmark, $override = null) {
+    global $CFG, $DB;
+
+    require_once($CFG->dirroot . '/calendar/lib.php');
+
+    $checkmarkinstance = $checkmark->checkmark;
+
+    // Load the old events relating to this checkmark.
+    $conds = array('modulename' => 'checkmark', 'instance' => $checkmarkinstance->id);
+    if (!empty($override)) {
+        // Only load events for this override.
+        if (isset($override->userid)) {
+            $conds['userid'] = $override->userid;
+        } else if (isset($override->groupid)) {
+            $conds['groupid'] = $override->groupid;
+        } else {
+            // This is not a valid override, it may have been left from a bad import or restore.
+            $conds['groupid'] = $conds['userid'] = 0;
+        }
+    }
+    $oldevents = $DB->get_records('event', $conds, 'id ASC');
+
+    // Now make a to-do list of all that needs to be updated.
+    if (empty($override)) {
+        // We are updating the primary settings for the assignment, so we need to add all the overrides.
+        $overrides = $DB->get_records('checkmark_overrides', array('checkmarkid' => $checkmarkinstance->id), 'id ASC');
+        // It is necessary to add an empty stdClass to the beginning of the array as the $oldevents
+        // list contains the original (non-override) event for the module. If this is not included
+        // the logic below will end up updating the wrong row when we try to reconcile this $overrides
+        // list against the $oldevents list.
+        array_unshift($overrides, new stdClass());
+    } else {
+        // Just do the one override.
+        $overrides = array($override);
+    }
+
+    if (!empty($checkmark->cm)) {
+        $cmid = $checkmark->cm->id;
+    } else {
+        $cmid = get_coursemodule_from_instance('checkmark', $checkmarkinstance->id, $checkmarkinstance->course)->id;
+    }
+
+    foreach ($overrides as $current) {
+        $groupid   = isset($current->groupid) ? $current->groupid : 0;
+        $userid    = isset($current->userid) ? $current->userid : 0;
+        $duedate = $current->timedue !== null ? $current->timedue : $checkmarkinstance->timedue;
+
+        // Only add 'due' events for an override if they differ from the checkmark default.
+        $addclose = empty($current->id) || isset($current->timedue);
+
+        $event = new stdClass();
+        $event->type = CALENDAR_EVENT_TYPE_ACTION;
+        $event->description = format_module_intro('checkmark', $checkmarkinstance, $cmid);
+        // Events module won't show user events when the courseid is nonzero.
+        $event->courseid    = ($userid) ? 0 : $checkmarkinstance->course;
+        $event->groupid     = $groupid;
+        $event->userid      = $userid;
+        $event->modulename  = 'checkmark';
+        $event->instance    = $checkmarkinstance->id;
+        $event->timestart   = $duedate;
+        $event->timeduration = 0;
+        $event->timesort    = $event->timestart + $event->timeduration;
+        $event->visible     = instance_is_visible('checkmark', $checkmarkinstance);
+        $event->eventtype   = CHECKMARK_EVENT_TYPE_DUE;
+        $event->priority    = null;
+
+        // Determine the event name and priority.
+        if ($groupid) {
+            // Group override event.
+            $params = new stdClass();
+            $params->assign = $checkmarkinstance->name;
+            $params->group = groups_get_group_name($groupid);
+            if ($params->group === false) {
+                // Group doesn't exist, just skip it.
+                continue;
+            }
+            // Flip checkmark grouppriority and set group override priority.
+            if (isset($current->grouppriority)) {
+                $event->priority = 10000 - $current->grouppriority;
+            }
+        } else if ($userid) {
+            // User override event.
+            $params = new stdClass();
+            $params->assign = $checkmarkinstance->name;
+            // Set user override priority.
+            $event->priority = CALENDAR_EVENT_USER_OVERRIDE_PRIORITY;
+        }
+
+        if ((isset($duedate) && $addclose)) {
+            if ($oldevent = array_shift($oldevents)) {
+                $event->id = $oldevent->id;
+            } else {
+                unset($event->id);
+            }
+            $event->name = $checkmarkinstance->name;
+            calendar_event::create($event, false);
+        }
+    }
+
+    // Delete any leftover events.
+    foreach ($oldevents as $badevent) {
+        $badevent = calendar_event::load($badevent);
+        $badevent->delete();
+    }
+}
+
+/**
  * Make sure up-to-date events are created for all checkmark instances
  *
  * This standard function will check all instances of this module
@@ -1078,6 +1192,11 @@ function checkmark_refresh_events($courseid = 0, $instance = null, $cm = null) {
         foreach ($checkmarks as $checkmark) {
             if (count($checkmarks) > 1 || !isset($cm) || !is_object($cm)) {
                 $cm = get_coursemodule_from_instance('checkmark', $checkmark->id);
+            }
+
+            if ($cm) {
+                $context = context_course::instance($courseid);
+                $users = get_enrolled_users($context, 'mod/checkmark:submit');
             }
 
             // Start with creating the event.
@@ -1133,7 +1252,7 @@ function checkmark_refresh_events($courseid = 0, $instance = null, $cm = null) {
                 }
             } else {
                 $DB->delete_records('event', array('modulename' => 'checkmark', 'instance' => $checkmark->id,
-                        'eventtype' => $eventtype));
+                        'eventtype' => $eventtype, 'priority' => null));
             }
 
             $eventtype = CHECKMARK_EVENT_TYPE_GRADINGDUE;
