@@ -334,11 +334,18 @@ function checkmark_update_examples($checkmark, $cmid = false) {
         reset($examples);
         foreach (array_keys($names) as $key) {
             if ($next = current($examples)) {
-                if (($next->name !== $names[$key]) || ($next->grade !== $grades[$key])) {
+                if (($next->name !== $names[$key]) || (empty($next->grade) && empty($grades[$key]))
+                        || ($next->grade !== $grades[$key])) {
                     $old = clone $next;
                     // If there's an old example to update, we reuse them!
                     $next->name = html_entity_decode($names[$key]);
-                    $next->grade = $grades[$key];
+                    $next->grade = null;
+                    if (!empty($grades[$key])) {
+                        $next->grade = $grades[$key];
+                    }
+                    if (empty($next->grade)) {
+                        $next->grade = 0;
+                    }
                     $DB->update_record('checkmark_examples', $next);
                     \mod_checkmark\event\example_updated::get($cmid, $old, $next)->trigger();
                 }
@@ -347,7 +354,13 @@ function checkmark_update_examples($checkmark, $cmid = false) {
                 $example = new stdClass();
                 $example->checkmarkid = $checkmark->instance;
                 $example->name = html_entity_decode($names[$key]);
-                $example->grade = $grades[$key];
+                $example->grade = null;
+                if (!empty($grades[$key])) {
+                    $example->grade = $grades[$key];
+                }
+                if (empty($example->grade)) {
+                    $example->grade = 0;
+                }
                 $example->id = $DB->insert_record('checkmark_examples', $example);
                 \mod_checkmark\event\example_created::get($cmid, $example)->trigger();
             }
@@ -935,7 +948,9 @@ function checkmark_grade_item_category_update($checkmark) {
                     $gradeitem->gradepass = $checkmark->gradepass;
                     $gradeitem->update();
                 }
-                if ($gradeitem->categoryid != $checkmark->gradecat) {
+                if (empty($checkmark->gradecat)) {
+                    $gradeitem->set_parent(null);
+                } else if ($gradeitem->categoryid != $checkmark->gradecat) {
                     $gradeitem->set_parent($checkmark->gradecat);
                 }
             } else if ($gradeitem->itemnumber == 1) {
