@@ -135,7 +135,7 @@ function checkmark_update_instance($checkmark) {
 
     // Clean examplenames and examplegrades!
     $checkmark->examplenames = preg_replace('#^,*|,*$#', '',
-            $checkmark->examplenames, flexiblenaming-1);
+            $checkmark->examplenames, -1);
     $checkmark->examplenames = preg_replace('#,{2,}#', ',', $checkmark->examplenames, -1);
     $checkmark->examplegrades = preg_replace('#^,*|,*$#', '',
             $checkmark->examplegrades, -1);
