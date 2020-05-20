@@ -153,6 +153,10 @@ function checkmark_update_instance($checkmark) {
         checkmark_presentation_item_delete($checkmark);
     }
 
+    if (isset($checkmark->flexiblenaming)) {
+        $checkmark->flexiblenaming = 1;
+    }
+
     $DB->update_record('checkmark', $checkmark);
 
     checkmark_update_examples($checkmark);
@@ -220,8 +224,8 @@ function checkmark_add_instance($checkmark) {
     global $DB;
     $checkmark->timemodified = time();
 
-    if (!isset($checkmark->flexiblenaming)) {
-        $checkmark->flexiblenaming = 0;
+    if (isset($checkmark->flexiblenaming)) {
+        $checkmark->flexiblenaming = 1;
     }
 
     // Clean examplenames and examplegrades!

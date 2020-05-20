@@ -1339,7 +1339,14 @@ class checkmark {
         if ($instanceid == 0) {
             return false;
         }
-
+        $instance = $DB->get_record('checkmark', array('id' => $instanceid));
+        if (!empty($instance->flexiblenaming)) {
+            if ($instance->flexiblenaming == 1) {
+                return true;
+            } else if ($instance->flexiblenaming == -1) {
+                return false;
+            }
+        }
         $examples = $DB->get_records('checkmark_examples', array('checkmarkid' => $instanceid), 'id ASC');
 
         $oldname = null;
