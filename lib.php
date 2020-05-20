@@ -294,7 +294,6 @@ function checkmark_update_examples($checkmark, $cmid = false) {
     }
 
     reset($examples);
-    // TODO: Probably also change something here
     if (empty($checkmark->flexiblenaming)) {
         // Standard-naming.
         $i = $checkmark->examplestart;
