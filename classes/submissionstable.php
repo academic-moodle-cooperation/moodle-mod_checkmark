@@ -951,6 +951,8 @@ class submissionstable extends \table_sql {
             $wherefilter = '';
             if ($filter == \checkmark::FILTER_SUBMITTED) {
                 $wherefilter = " AND s.timemodified > 0";
+            } else if ($filter == \checkmark::FILTER_NOT_SUBMITTED) {
+                $wherefilter = " AND (s.timemodified <= 0 OR s.timemodified IS NULL)";
             } else if ($filter == \checkmark::FILTER_REQUIRE_GRADING) {
                 $wherefilter = " AND COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0) ";
             } else if ($filter == \checkmark::FILTER_EXTENSION) {

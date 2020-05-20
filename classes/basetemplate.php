@@ -188,6 +188,8 @@ abstract class basetemplate extends submissionstable {
             $where .= ' AND attendance = 0';
         } else if ($filter == \checkmark::FILTER_UNKNOWN) {
             $where .= ' AND attendance IS NULL';
+        } else if ($filter == \checkmark::FILTER_NOT_SUBMITTED) {
+            $where = " AND (s.timemodified <= 0 OR s.timemodified IS NULL)";
         }
 
         $groupby = " u.id, s.id, f.id, ".$ufields.", u.idnumber, f.attendance";
