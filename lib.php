@@ -135,7 +135,7 @@ function checkmark_update_instance($checkmark) {
 
     // Clean examplenames and examplegrades!
     $checkmark->examplenames = preg_replace('#^,*|,*$#', '',
-            $checkmark->examplenames, -1);
+            $checkmark->examplenames, flexiblenaming-1);
     $checkmark->examplenames = preg_replace('#,{2,}#', ',', $checkmark->examplenames, -1);
     $checkmark->examplegrades = preg_replace('#^,*|,*$#', '',
             $checkmark->examplegrades, -1);
@@ -151,6 +151,10 @@ function checkmark_update_instance($checkmark) {
         $checkmark->presentationgrade = 0;
         $checkmark->presentationgradebook = 0;
         checkmark_presentation_item_delete($checkmark);
+    }
+
+    if (isset($checkmark->flexiblenaming)) {
+        $checkmark->flexiblenaming = 1;
     }
 
     $DB->update_record('checkmark', $checkmark);
@@ -220,8 +224,8 @@ function checkmark_add_instance($checkmark) {
     global $DB;
     $checkmark->timemodified = time();
 
-    if (!isset($checkmark->flexiblenaming)) {
-        $checkmark->flexiblenaming = 0;
+    if (isset($checkmark->flexiblenaming)) {
+        $checkmark->flexiblenaming = 1;
     }
 
     // Clean examplenames and examplegrades!
@@ -290,6 +294,7 @@ function checkmark_update_examples($checkmark, $cmid = false) {
     }
 
     reset($examples);
+    // TODO: Probably also change something here
     if (empty($checkmark->flexiblenaming)) {
         // Standard-naming.
         $i = $checkmark->examplestart;

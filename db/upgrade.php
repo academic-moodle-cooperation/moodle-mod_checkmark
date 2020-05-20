@@ -1114,7 +1114,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019012000, 'checkmark');
     }
     // Add columns to table checkmark_overrides for enabling dynamic group overrides.
-    if ($oldversion < 2020050300) {
+    if ($oldversion < 2020052001) {
 
         // Define key userid (foreign) to be dropped form checkmark_overrides.
         $table = new xmldb_table('checkmark_overrides');
@@ -1191,7 +1191,16 @@ function xmldb_checkmark_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
+        // Define field flexiblenaming to be added to checkmark.
+        $table = new xmldb_table('checkmark');
+        $field = new xmldb_field('flexiblenaming', XMLDB_TYPE_INTEGER, '4', null, null, null, null, 'timemodified');
+
+        // Conditionally launch add field flexiblenaming.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
         // Checkmark savepoint reached.
-        upgrade_mod_savepoint(true, 2020050300, 'checkmark');
+        upgrade_mod_savepoint(true, 2020052001, 'checkmark');
     }
 }
