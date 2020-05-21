@@ -60,6 +60,8 @@ class checkmark {
     const FILTER_UNKNOWN = 7;
     /** FILTER EXTENSION */
     const FILTER_EXTENSION = 8;
+    /** FILER NOT SUBMITTED */
+    const FILTER_NOT_SUBMITTED = 9;
 
     /** DELIMITER Used to connect example-names, example-grades, submission-examplenumbers! */
     const DELIMITER = ',';
@@ -72,7 +74,6 @@ class checkmark {
     const FORCED_EMPTYBOX = '()';
     /** FORCED_EMPTYBOX UTF-8 box with x-mark surrounded by parenthesis = &#x0028;&#x2612;&#x0029; = '(☒)'! */
     const FORCED_CHECKEDBOX = '(X)';
-
 
     /** @var object */
     public $cm;
@@ -2321,6 +2322,7 @@ class checkmark {
          */
 
         $filters = array(self::FILTER_ALL => get_string('all'),
+                self::FILTER_NOT_SUBMITTED => get_string('filternotsubmitted', 'checkmark'),
                 self::FILTER_SUBMITTED => get_string('submitted', 'checkmark'),
                 self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'),
                 self::FILTER_EXTENSION => get_string('filtergrantedextension', 'checkmark'));
@@ -2840,6 +2842,7 @@ class checkmark {
     public static function get_possible_filters($trackattendance = false) {
         $filters = [
                 self::FILTER_ALL => get_string('all'),
+                self::FILTER_NOT_SUBMITTED => get_string('filternotsubmitted', 'checkmark'),
                 self::FILTER_SUBMITTED => get_string('submitted', 'checkmark'),
                 self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'),
                 self::FILTER_EXTENSION => get_string('filtergrantedextension', 'checkmark')
