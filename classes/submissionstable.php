@@ -1390,14 +1390,14 @@ class submissionstable extends \table_sql {
                 $overrideediturl = new moodle_url('/mod/checkmark/extend.php');
                 $returnurl = new moodle_url('/mod/checkmark/submissions.php');
                 $returnurl = $returnurl->out(true, array('id' => $this->checkmark->cm->id));
-                if(!empty($overrides->userid)) {
+                if (!empty($overrides->userid)) {
                     $context->isgroupoverride = false;
                     $context->editurlstr = $overrideediturl->out(true, array('id' => $this->checkmark->cm->id,
                             'type' => \mod_checkmark\overrideform::USER, 'mode' => \mod_checkmark\overrideform::EDIT,
                             'users' => $overrides->userid, 'return' => $returnurl));
                 } else if (!empty($overrides->groupid)) {
                     $context->isgroupoverride = true;
-                    $context->groupname =  groups_get_group_name($overrides->groupid);
+                    $context->groupname = groups_get_group_name($overrides->groupid);
                     $context->addurlstr = $overrideediturl->out(true, array('id' => $this->checkmark->cm->id,
                             'type' => \mod_checkmark\overrideform::USER, 'mode' => \mod_checkmark\overrideform::ADD,
                             'users' => $values->id, 'return' => $returnurl));
