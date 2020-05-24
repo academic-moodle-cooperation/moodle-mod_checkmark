@@ -29,6 +29,7 @@ use coding_exception;
 use moodle_exception;
 use moodle_recordset;
 use core\dml\recordset_walk;
+use moodle_url;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -1386,6 +1387,24 @@ class submissionstable extends \table_sql {
             if ($this->hasoverrides && $overrides = checkmark_get_overridden_dates($this->checkmark->cm->instance,
                             $values->id, $this->checkmark->course->id)) {
                 $context = new stdClass();
+                $overrideediturl = new moodle_url('/mod/checkmark/extend.php');
+                $returnurl = new moodle_url('/mod/checkmark/submissions.php');
+                $returnurl = $returnurl->out(true, array('id' => $this->checkmark->cm->id));
+                if(!empty($overrides->userid)) {
+                    $context->isgroupoverride = false;
+                    $context->editurlstr = $overrideediturl->out(true, array('id' => $this->checkmark->cm->id,
+                            'type' => \mod_checkmark\overrideform::USER, 'mode' => \mod_checkmark\overrideform::EDIT,
+                            'users' => $overrides->userid, 'return' => $returnurl));
+                } else if (!empty($overrides->groupid)) {
+                    $context->isgroupoverride = true;
+                    $context->groupname =  groups_get_group_name($overrides->groupid);
+                    $context->addurlstr = $overrideediturl->out(true, array('id' => $this->checkmark->cm->id,
+                            'type' => \mod_checkmark\overrideform::USER, 'mode' => \mod_checkmark\overrideform::ADD,
+                            'users' => $values->id, 'return' => $returnurl));
+                    $context->editurlstr = $overrideediturl->out(true, array('id' => $this->checkmark->cm->id,
+                            'type' => \mod_checkmark\overrideform::GROUP, 'mode' => \mod_checkmark\overrideform::EDIT,
+                            'users' => $overrides->groupid, 'return' => $returnurl));
+                }
 
                 if ($overrides->timeavailable === null) {
                     $context->timeavailable = false;
