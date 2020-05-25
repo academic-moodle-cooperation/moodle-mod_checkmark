@@ -42,10 +42,18 @@
     <a class="btn btn-link p-a-0 m-a-0" role="button"
        data-container="body" data-toggle="popover"
        data-placement="{{#ltr}}right{{/ltr}}{{^ltr}}left{{/ltr}}" data-content="{{!
-            }}<div><strong>{{#str}}dates_overwritten, mod_checkmark{{/str}}</strong></div>{{!
+            }}<div><strong>{{!
+            }}{{#isgroupoverride}}{{#str}}group_dates_overridden, mod_checkmark, <i>{{groupname}}</i> {{/str}}{{/isgroupoverride}}{{!
+            }}{{^isgroupoverride}}{{#str}}user_dates_overridden, mod_checkmark{{/str}} {{/isgroupoverride}}{{!
+            }}</strong></div>{{!
             }}{{#timeavailable}}<div class='nowrap'>{{#str}}availabledate, mod_checkmark{{/str}}:&nbsp;{{.}}</div>{{/timeavailable}}{{!
             }}{{#timedue}}<div class='nowrap'>{{#str}}duedate, mod_checkmark{{/str}}:&nbsp;{{.}}</div>{{/timedue}}{{!
-            }}{{#cutoffdate}}<div class='nowrap'>{{#str}}cutoffdate, mod_checkmark{{/str}}:&nbsp;{{.}}</div>{{/cutoffdate}}"{{!
+            }}{{#cutoffdate}}<div class='nowrap'>{{#str}}cutoffdate, mod_checkmark{{/str}}:&nbsp;{{.}}</div>{{/cutoffdate}}{{!
+            }}{{^isgroupoverride}}<div><a href='{{editurlstr}}'>{{#str}}useroverride_edit, mod_checkmark{{/str}}</a></div>{{/isgroupoverride}}{{!
+            }}{{#isgroupoverride}}<div><a href='{{editurlstr}}'>{{#str}}groupoverride_edit, mod_checkmark, {{groupname}} {{/str}}</a></div>{{!
+            }}<div><a href='{{addurlstr}}'>{{#str}}addnewuseroverride, mod_checkmark{{/str}}</a></div>{{/isgroupoverride}}"{{!
+
+
        }} data-html="true" tabindex="0" data-trigger="focus">
        {{#pix}} overwrittendates, mod_checkmark,  {{#str}}dates_overwritten, mod_checkmark{{/str}} {{/pix}}
     </a>
