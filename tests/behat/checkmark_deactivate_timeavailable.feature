@@ -31,7 +31,6 @@ Feature: Deactivate Allow submissions from
     And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
     Then I should not see "Allow submission from"
-    And I press "Add submission"
     And I set the following fields to these values:
       | Example 1 | 1 |
       | Example 2 | 1 |
