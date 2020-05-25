@@ -96,10 +96,14 @@ define(['core/log'], function(log) {
         }
 
         // Register event-listener on reset-button to ensure proper data to be displayed on form-reset!
-        document.getElementById('id_resetbutton').addEventListener('click', this.resetSubmissionForm);
+        if (document.getElementById('id_resetbutton')) {
+            document.getElementById('id_resetbutton').addEventListener('click', this.resetSubmissionForm);
+        }
 
         // Reset the formular after init to ensure correct checkbox-states after page-reload!
-        document.getElementsByClassName('submissionform')[0].reset();
+        if (document.getElementsByClassName('submissionform')[0]) {
+            document.getElementsByClassName('submissionform')[0].reset();
+        }
 
         // Update summary to display correct data after form-reset!
         this.updateSummary();
