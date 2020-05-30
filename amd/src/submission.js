@@ -86,7 +86,11 @@ define(['core/log', 'jquery'], function(log, $) {
         $('#id_resetbutton').on('click', this.resetSubmissionForm);
 
         // Reset the formular after init to ensure correct checkbox-states after page-reload!
-        $('.submissionform')[0].reset();
+        const form = $('.submissionform')[0];
+        if (form) {
+            form.reset();
+        }
+
 
         // Update summary to display correct data after form-reset!
         this.updateSummary();
