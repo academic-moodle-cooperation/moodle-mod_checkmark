@@ -65,7 +65,7 @@ class mod_checkmark_generator extends testing_module_generator {
             'examplecount' => 10,
             'examplestart' => 1,
             'exampleprefix' => 'Example ',
-            'flexiblenaming' => 0,
+            'flexiblenaming' => null,
             'examplenames' => '1,2,3,4,5,6,7,8,9,10',
             'examplegrades' => '10,10,10,10,10,10,10,10,10,10',
             'grade' => 100,

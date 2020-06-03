@@ -25,13 +25,13 @@
  /**
   * @module mod_checkmark/submission
   */
-define(['core/log'], function(log) {
+define(['core/log', 'jquery'], function(log, $) {
 
     /**
      * @constructor
      * @alias module:mod_checkmark/submission
      */
-    var Submission = function() {
+    let Submission = function() {
     };
 
     /**
@@ -40,23 +40,18 @@ define(['core/log'], function(log) {
      * @return {boolean} true if everything's allright (no error handling by now)
      */
     Submission.prototype.updateSummary = function() {
-        var examplesNew = 0;
-        var gradeNew = 0;
+        let examplesNew = 0;
+        let gradeNew = 0;
 
-        var els = document.getElementsByTagName('input');
-        for(var i = 0; i < els.length; i++) {
-            if (els[i].attributes['data-example'] === undefined) {
-                continue;
-            }
-            if (els[i].checked) {
+        $('input[data-example]').each(function() {
+            if (this.checked) {
                 examplesNew++;
-                gradeNew += parseInt(els[i].dataset['grade']);
+                gradeNew += parseInt(this.dataset.grade);
             }
-        }
+        });
 
-        document.getElementById('examples').innerHTML = examplesNew.toString();
-        document.getElementById('grade').innerHTML = gradeNew.toString();
-
+        $('#examples').html(examplesNew.toString());
+        $('#grade').html(gradeNew.toString());
         return true;
     };
 
@@ -68,16 +63,14 @@ define(['core/log'], function(log) {
      * @param {Event} e event-object
      * @return {boolean} true if everything's allright (no error handling by now)
      */
-    Submission.prototype.resetSubmissionForm = function(e) {
-        e.preventDefault();
-
-        document.getElementsByClassName('submissionform')[0].reset();
+    Submission.prototype.resetSubmissionForm = function(event) {
+        event.preventDefault();
+        $('.submissionform')[0].reset();
         Submission.prototype.updateSummary();
-
         return true;
     };
 
-    var instance = new Submission();
+    let instance = new Submission();
 
     /**
      * Initializer prepares checkmark-data and registers event-listeners for each checkbox
@@ -87,19 +80,17 @@ define(['core/log'], function(log) {
     instance.initializer = function() {
         log.debug('Init checkmark submissions js!', 'checkmark');
 
-        var els = document.getElementsByTagName('input');
-        for(var i = 0; i < els.length; i++) {
-            if (els[i].attributes['data-example'] == undefined) {
-                continue;
-            }
-            els[i].addEventListener('click', instance.updateSummary);
-        }
+        $('input[data-example]').on('click', instance.updateSummary);
 
         // Register event-listener on reset-button to ensure proper data to be displayed on form-reset!
-        document.getElementById('id_resetbutton').addEventListener('click', this.resetSubmissionForm);
+        $('#id_resetbutton').on('click', this.resetSubmissionForm);
 
         // Reset the formular after init to ensure correct checkbox-states after page-reload!
-        document.getElementsByClassName('submissionform')[0].reset();
+        const form = $('.submissionform')[0];
+        if (form) {
+            form.reset();
+        }
+
 
         // Update summary to display correct data after form-reset!
         this.updateSummary();

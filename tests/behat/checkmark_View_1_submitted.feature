@@ -25,7 +25,6 @@ Feature: In checkmark, a teacher should be able to how many students have submit
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Kreuzerlübung"
-    And I press "Add submission"
     And I set the following fields to these values:
       | Example 1 | 1 |
       | Example 2 | 1 |

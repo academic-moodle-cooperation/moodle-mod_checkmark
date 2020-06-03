@@ -41,7 +41,6 @@ Feature: In a checkmark I want to grade selected submissions.
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
-    And I press "Add submission"
     And I set the following fields to these values:
       | Example 1 | 1 |
       | Example 2 | 1 |

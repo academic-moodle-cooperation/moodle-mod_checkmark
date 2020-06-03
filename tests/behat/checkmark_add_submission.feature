@@ -25,7 +25,6 @@ Feature: In a course, a student should be able to add a submission
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
-    And I press "Add submission"
     And I set the following fields to these values:
       | Example 1 | 1 |
       | Example 2 | 1 |

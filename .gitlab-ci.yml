@@ -41,7 +41,7 @@ variables:
     - moodle-plugin-ci codechecker
     - moodle-plugin-ci validate
     - moodle-plugin-ci phpunit
-    # - moodle-plugin-ci behat
+    - moodle-plugin-ci behat
 
 code_checker_pgsql:
   extends: .postgres
