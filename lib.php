@@ -153,7 +153,7 @@ function checkmark_update_instance($checkmark) {
         checkmark_presentation_item_delete($checkmark);
     }
 
-    if (isset($checkmark->flexiblenaming)) {
+    if (!empty($checkmark->flexiblenaming)) {
         $checkmark->flexiblenaming = 1;
     }
 
@@ -224,7 +224,7 @@ function checkmark_add_instance($checkmark) {
     global $DB;
     $checkmark->timemodified = time();
 
-    if (isset($checkmark->flexiblenaming)) {
+    if (!empty($checkmark->flexiblenaming)) {
         $checkmark->flexiblenaming = 1;
     }
 
