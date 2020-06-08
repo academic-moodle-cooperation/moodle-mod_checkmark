@@ -159,7 +159,7 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
     }
 
     /**
-     * Handles restoration of 1 checkmark submission
+     * Handles restoration of 1 checkmark override
      *
      * @param object $data Submission data to restore
      */
@@ -174,6 +174,7 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
 
         $data->userid = $this->get_mappingid('user', $data->userid);
         $data->modifierid = $this->get_mappingid('user', $data->modifierid);
+        $data->groupid = $this->get_mappingid('group', $data->groupid);
 
         $newitemid = $DB->insert_record('checkmark_overrides', $data);
         $this->set_mapping('checkmark_overrides', $oldid, $newitemid, true);

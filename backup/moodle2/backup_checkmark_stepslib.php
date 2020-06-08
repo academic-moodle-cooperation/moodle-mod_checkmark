@@ -51,8 +51,8 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
 
         $overrides = new backup_nested_element('overrides');
 
-        $override = new backup_nested_element('override', ['id'], ['checkmarkid', 'userid', 'timeavailable', 'timedue',
-            'cutoffdate', 'timecreated', 'modifierid']);
+        $override = new backup_nested_element('override', ['id'], ['checkmarkid', 'groupid', 'userid', 'timeavailable', 'timedue',
+            'cutoffdate', 'timecreated', 'modifierid', 'grouppriority']);
 
         $submissions = new backup_nested_element('submissions');
 
