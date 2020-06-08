@@ -1201,6 +1201,6 @@ function xmldb_checkmark_upgrade($oldversion) {
         }
 
         // Checkmark savepoint reached.
-        upgrade_mod_savepoint(true, 2020052001, 'checkmark');
+        upgrade_mod_savepoint(true, 2020060800, 'checkmark');
     }
 }
