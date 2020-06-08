@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+3.9.0 (2020-06-08)
+------------------
+* [FEATURE] #6360 Overhaul of user and group override feature to match the workings of the identical feature in mod_assign
+* [FEATURE] #6523 Add overview for user overrides and the possibility to edit, duplicate, delete each individual user override
+* [FEATURE] #6522 Add overview for group overrides and the possibility to edit, duplicate, delete and change the priority of each individual group override
+* [FEATURE] #6607 Implement logging for all insert, change and delete events concerning user/group overrides
+* [FEATURE] #6624 Improve override clock popover in Submissions to display the source of the override and a link to change the override
+* [FEATURE] #6533 Make "Grant extension" bulk function use the new interface for user overrides
+* [FEATURE] #6532 Add filter in Submissions/Export to only display users affected by a user/group override
+* [FEATURE] #6531 Add filter in Submissions/Export to only display users who haven't made a submission [github #49]
+* [FEATURE] #6328 Update behat tests to ensure compatibility with gitlab CI
+* [FIXED] #6608 Fixed due date overrides for users/groups not changing the due date indicated in the calender event of the activity
+* [FIXED] #6609 Fixed checkmark calender entries only showing when the activity is currently accepting sumissions
+* [FIXED] #6618 Fixed individual naming/grading to be unchecked names and grades that don't require individual naming/grading are used
+* [FIXED] #6619 Fixed a bug causing a database error when a grading type other than "Point" is used alongside with individual naming/grading
+
 3.8.1 (2020-03-11)
 ------------------
 * [FIXED] #6604 Fixed a bug checking/unchecking overwrite checkboxes when fast grading is set and a all/none bulk selectors are used
