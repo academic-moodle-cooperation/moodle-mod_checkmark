@@ -5,7 +5,7 @@ This file is part of the mod_checkmark plugin for Moodle - <http://moodle.org/>
 
 *Author:*    Daniel Binder, Philipp Hager, Katarzyna Potocka
 
-*Copyright:* 2019 [Academic Moodle Cooperation](http://www.academic-moodle-cooperation.org)
+*Copyright:* 2020 [Academic Moodle Cooperation](http://www.academic-moodle-cooperation.org)
 
 *License:*   [GNU GPL v3 or later](http://www.gnu.org/copyleft/gpl.html)
 
@@ -33,7 +33,7 @@ session there is the option of automatic grading on the basis of the assignments
 Requirements
 ------------
 
-The plugin is available for Moodle 2.5+. This version is for Moodle 3.8.1
+The plugin is available for Moodle 2.5+. This version is for Moodle 3.9.0.
 
 
 Installation

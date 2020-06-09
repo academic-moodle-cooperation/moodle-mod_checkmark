@@ -1114,7 +1114,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019012000, 'checkmark');
     }
     // Add columns to table checkmark_overrides for enabling dynamic group overrides.
-    if ($oldversion < 2020052001) {
+    if ($oldversion < 2020060800) {
 
         // Define key userid (foreign) to be dropped form checkmark_overrides.
         $table = new xmldb_table('checkmark_overrides');
@@ -1201,6 +1201,6 @@ function xmldb_checkmark_upgrade($oldversion) {
         }
 
         // Checkmark savepoint reached.
-        upgrade_mod_savepoint(true, 2020052001, 'checkmark');
+        upgrade_mod_savepoint(true, 2020060800, 'checkmark');
     }
 }
