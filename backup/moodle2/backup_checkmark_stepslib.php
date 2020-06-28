@@ -108,6 +108,7 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         $checkmark->annotate_ids('scale', 'presentationgrade');
         $override->annotate_ids('user', 'userid');
         $override->annotate_ids('user', 'modifierid');
+        $override->annotate_ids('group', 'groupid');
         $submission->annotate_ids('user', 'userid');
         $feedback->annotate_ids('user', 'userid');
         $feedback->annotate_ids('user', 'graderid');
