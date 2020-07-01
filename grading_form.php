@@ -288,6 +288,11 @@ class mod_checkmark_grading_form extends moodleform {
                 $mform->addElement('editor', 'presentationfeedback_editor', get_string('presentationfeedback', 'checkmark').':',
                                    null, $this->get_editor_options($this->_customdata->cm, 'presentationfeedback') );
                 $mform->setDefault('presentationfeedback_editor', $presentationfeedback);
+            } else if ($this->_customdata->instance_presentationgrade == 0) {
+                // Print only the presentationfeedback field in case grading is set to 'none'.
+                $mform->addElement('editor', 'presentationfeedback_editor', get_string('presentationfeedback', 'checkmark').':',
+                        null, $this->get_editor_options($this->_customdata->cm, 'presentationfeedback') );
+                $mform->setDefault('presentationfeedback_editor', $presentationfeedback);
             }
         }
     }
