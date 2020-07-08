@@ -1352,19 +1352,17 @@ class checkmark {
 
         $oldname = null;
         $oldgrade = null;
-        $flexiblenaming = false;
         foreach ($examples as $example) {
             if (($oldname != null) && ($oldgrade != null)) {
-                if ((intval($oldname + 1) != intval($example->name))
-                        || (intval($oldgrade) != intval($example->grade))) {
-                    $flexiblenaming = true;
+                if ((ord($oldname) + 1 != ord($example->name))
+                        || ((int) $oldgrade != (int) $example->grade)) {
+                    return true;
                 }
             }
             $oldname = $example->name;
             $oldgrade = $example->grade;
         }
-
-        return $flexiblenaming;
+        return false;
     }
 
     /**
