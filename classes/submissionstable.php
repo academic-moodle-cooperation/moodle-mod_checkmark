@@ -1234,7 +1234,7 @@ class submissionstable extends \table_sql {
                     return \html_writer::tag('div', $finalgrade->str_feedback, ['id' => 'com'.$values->id]);
                 }
             } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
-                $feedbackclean = strip_tags(trim(str_replace('<br />', '<br />\n', $values->feedback)));
+                $feedbackclean = self::convert_html_to_text($values->feedback);
                 $inputarr = ['type'  => 'hidden',
                              'name'  => 'oldfeedback['.$values->id.']',
                              'value' => $feedbackclean];
@@ -1668,16 +1668,17 @@ class submissionstable extends \table_sql {
                 return \html_writer::tag('div', $finalgrade->str_feedback, ['id' => 'pcom'.$values->id]);
             }
         } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+            $feedbackclean = self::convert_html_to_text($values->presentationfeedback);
             $inputarr = ['type'  => 'hidden',
                          'name'  => 'oldpresentationfeedback['.$values->id.']',
-                         'value' => trim(str_replace('<br />', '<br />\n', $values->presentationfeedback))];
+                         'value' => trim(str_replace('<br />', '<br />\n', $feedbackclean))];
             $oldfeedback = \html_writer::empty_tag('input', $inputarr);
             $attr = ['tabindex' => $this->tabindex++,
                      'name'     => 'presentationfeedback['.$values->id.']',
                      'id'       => 'presentationfeedback'.$values->id,
                      'rows'     => 2,
                      'cols'     => 20];
-            $content = \html_writer::tag('textarea', strip_tags(trim(str_replace('<br />', '<br />\n', $values->presentationfeedback))), $attr);
+            $content = \html_writer::tag('textarea', strip_tags(trim(str_replace('<br />', '<br />\n', $feedbackclean))), $attr);
             return \html_writer::tag('div', $content.$oldfeedback, ['id' => 'pcom'.$values->id]);
         } else {
             if ($values->feedbackid) {
@@ -1776,5 +1777,25 @@ class submissionstable extends \table_sql {
         }
 
         return '';
+    }
+
+    /**
+     * @param string | null $html
+     * @return string|null
+     */
+    public static function convert_html_to_text ($html) {
+        if (empty($html)) {
+            return null;
+        }
+        $text = str_replace(array('<br />', '<br>', '</p>'), "\n", $html);
+        return strip_tags(trim($text));
+    }
+
+    /**
+     * @param $text
+     * @return string|string[]
+     */
+    public static function convert_text_to_html ($text) {
+        return str_replace(array("\r\n","\n"), '<br>',$text);
     }
 }
