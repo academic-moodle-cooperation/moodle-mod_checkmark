@@ -1234,11 +1234,12 @@ class submissionstable extends \table_sql {
                     return \html_writer::tag('div', $finalgrade->str_feedback, ['id' => 'com'.$values->id]);
                 }
             } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+                $feedbackclean = strip_tags(trim(str_replace('<br />', '<br />\n', $values->feedback)));
                 $inputarr = ['type'  => 'hidden',
                              'name'  => 'oldfeedback['.$values->id.']',
-                             'value' => trim($values->feedback)];
+                             'value' => $feedbackclean];
                 $oldfeedback = \html_writer::empty_tag('input', $inputarr);
-                $content = \html_writer::tag('textarea', $values->feedback, ['tabindex' => $this->tabindex++,
+                $content = \html_writer::tag('textarea', $feedbackclean, ['tabindex' => $this->tabindex++,
                                                                              'name'     => 'feedback['.$values->id.']',
                                                                              'id'       => 'feedback'.$values->id,
                                                                              'rows'     => 2,
@@ -1676,7 +1677,7 @@ class submissionstable extends \table_sql {
                      'id'       => 'presentationfeedback'.$values->id,
                      'rows'     => 2,
                      'cols'     => 20];
-            $content = \html_writer::tag('textarea', trim(str_replace('<br />', '<br />\n', $values->presentationfeedback)), $attr);
+            $content = \html_writer::tag('textarea', strip_tags(trim(str_replace('<br />', '<br />\n', $values->presentationfeedback))), $attr);
             return \html_writer::tag('div', $content.$oldfeedback, ['id' => 'pcom'.$values->id]);
         } else {
             if ($values->feedbackid) {
