@@ -1803,6 +1803,6 @@ class submissionstable extends \table_sql {
         if (empty($text)) {
             return null;
         }
-        return str_replace(array("\r\n","\n"), '<br>',$text);
+        return str_replace(array("\r\n", "\n"), '<br>', $text);
     }
 }
