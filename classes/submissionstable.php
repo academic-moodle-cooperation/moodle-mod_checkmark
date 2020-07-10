@@ -1780,8 +1780,10 @@ class submissionstable extends \table_sql {
     }
 
     /**
-     * @param string | null $html
-     * @return string|null
+     * Converts <br> and </p> tags to line breaks and removes all other html tags
+     *
+     * @param string|null $html Text to convert
+     * @return string|null Converted text
      */
     public static function convert_html_to_text ($html) {
         if (empty($html)) {
@@ -1792,10 +1794,15 @@ class submissionstable extends \table_sql {
     }
 
     /**
-     * @param $text
-     * @return string|string[]
+     * Converts line breaks to <br> tags
+     *
+     * @param string|null $text Text to convert
+     * @return string|null Converted text
      */
     public static function convert_text_to_html ($text) {
+        if (empty($text)) {
+            return null;
+        }
         return str_replace(array("\r\n","\n"), '<br>',$text);
     }
 }
