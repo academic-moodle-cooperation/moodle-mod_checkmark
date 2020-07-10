@@ -72,6 +72,11 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         $this->standard_intro_elements(get_string('description', 'checkmark'));
 
+        $mform->addElement('filemanager', 'introattachments',
+                get_string('introattachments', 'checkmark'),
+                null, array('subdirs' => 0, 'maxbytes' => $COURSE->maxbytes) );
+        $mform->addHelpButton('introattachments', 'introattachments', 'checkmark');
+
         $this->add_availability_elements();
 
         $this->add_checkmark_elements();

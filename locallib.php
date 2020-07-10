@@ -484,6 +484,15 @@ class checkmark {
             if (!empty($this->checkmark->intro)) {
                 echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
                 echo format_module_intro('checkmark', $this->checkmark, $this->cm->id);
+
+                $fs = get_file_storage();
+                $files = $fs->get_area_files($this->checkmark->id, 'mod_checkmark', CHECKMARK_INTROATTACHMENT_FILEAREA, 0);
+                foreach ($files as $f) {
+                    // $f is an instance of stored_file
+                    echo $f->get_filename();
+                }
+
+
                 echo $OUTPUT->box_end();
             }
         }

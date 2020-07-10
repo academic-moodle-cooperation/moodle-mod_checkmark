@@ -37,6 +37,8 @@ define('CHECKMARK_EVENT_TYPE_DUE', 'due'); // Is backwards compatible to former 
 /** EVENT TYPE GRADINGDUE - reminder for teachers to grade */
 define('CHECKMARK_EVENT_TYPE_GRADINGDUE', 'gradingdue');
 
+define('CHECKMARK_INTROATTACHMENT_FILEAREA', 'introattachment');
+
 /**
  * Deletes a checkmark instance
  *
@@ -159,6 +161,8 @@ function checkmark_update_instance($checkmark) {
 
     $DB->update_record('checkmark', $checkmark);
 
+    save_intro_draft_files($checkmark, $checkmark->id);
+
     checkmark_update_examples($checkmark);
 
     checkmark_refresh_events($checkmark->course, $checkmark);
@@ -215,8 +219,6 @@ function checkmark_update_instance($checkmark) {
 /**
  * Adds a checkmark instance
  *
- * This is done by calling the add_instance() method
- *
  * @param object $checkmark Checkmark-data from form
  * @return int new checkmark id
  */
@@ -237,6 +239,8 @@ function checkmark_add_instance($checkmark) {
     $returnid = $DB->insert_record('checkmark', $checkmark);
     $checkmark->instance = $returnid;
 
+    save_intro_draft_files($checkmark, $returnid);
+
     checkmark_update_examples($checkmark, $checkmark->coursemodule);
 
     checkmark_refresh_events($checkmark->course, $returnid);
@@ -252,6 +256,18 @@ function checkmark_add_instance($checkmark) {
     checkmark_grade_item_category_update($checkmark);
 
     return $returnid;
+}
+
+/**
+ * Save the attachments in the draft areas.
+ *
+ * @param stdClass $formdata
+ */
+function save_intro_draft_files($formdata, $checkmarkid) {
+    if (isset($formdata->introattachments)) {
+        file_save_draft_area_files($formdata->introattachments, $checkmarkid,
+                'mod_checkmark', CHECKMARK_INTROATTACHMENT_FILEAREA, 0);
+    }
 }
 
 /**
