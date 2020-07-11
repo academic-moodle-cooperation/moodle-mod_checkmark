@@ -91,6 +91,8 @@ class checkmark {
     public $examples;
     /** @var object contains overridden dates (for current user only!) */
     public $overrides = false;
+    /** @var checkmark_renderer the custom renderer for this module */
+    private $output;
 
     /**
      * Constructor for the checkmark class
@@ -157,6 +159,20 @@ class checkmark {
 
         // We cache examples now...
         $this->get_examples();
+    }
+
+    /**
+     * Lazy load the page renderer and expose the renderer to plugins.
+     *
+     * @return assign_renderer
+     */
+    public function get_renderer() {
+        global $PAGE;
+        if ($this->output) {
+            return $this->output;
+        }
+        $this->output = $PAGE->get_renderer('mod_checkmark', null, RENDERER_TARGET_GENERAL);
+        return $this->output;
     }
 
     /**
@@ -408,6 +424,8 @@ class checkmark {
 
         $this->view_intro();
         echo "\n";
+        $this->view_introattachments();
+        echo "\n";
         $this->view_dates();
         echo "\n";
         $this->view_attendancehint();
@@ -485,17 +503,22 @@ class checkmark {
                 echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
                 echo format_module_intro('checkmark', $this->checkmark, $this->cm->id);
 
-                $fs = get_file_storage();
-                $files = $fs->get_area_files($this->checkmark->id, 'mod_checkmark', CHECKMARK_INTROATTACHMENT_FILEAREA, 0);
-                foreach ($files as $f) {
-                    // $f is an instance of stored_file
-                    echo $f->get_filename();
-                }
-
 
                 echo $OUTPUT->box_end();
             }
         }
+    }
+
+    public function view_introattachments() {
+        echo $this->get_renderer()->checkmark_files($this->context, 0, CHECKMARK_INTROATTACHMENT_FILEAREA, 'mod_checkmark');
+        /*
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($this->checkmark->id, 'mod_checkmark', CHECKMARK_INTROATTACHMENT_FILEAREA, 0);
+        foreach ($files as $f) {
+            // $f is an instance of stored_file
+            echo $f->get_filename();
+        }
+        */
     }
 
     /**
@@ -3885,6 +3908,5 @@ class checkmark {
         }
         return $splitcheckarray;
     }
-
 }
 
