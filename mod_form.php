@@ -472,6 +472,14 @@ class mod_checkmark_mod_form extends moodleform_mod {
                 $defaultvalues['examplecount'] = $examplecount;
             }
         }
+
+        if (!empty($this->current) && !empty($this->current->id)) {
+            $draftitemid = file_get_submitted_draft_itemid('introattachments');
+            file_prepare_draft_area($draftitemid, $this->current->id, 'mod_checkmark', CHECKMARK_INTROATTACHMENT_FILEAREA,
+                    0, array('subdirs' => 0));
+            $defaultvalues['introattachments'] = $draftitemid;
+        }
+
     }
 
     /**
