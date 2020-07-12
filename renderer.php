@@ -190,18 +190,8 @@ class checkmark_files implements renderable {
                     $file->get_timemodified(),
                     get_string('strftimedatetime', 'langconfig')
             );
-            $path = '/' .
-                    $this->context->id .
-                    '/' .
-                    $component .
-                    '/' .
-                    $filearea .
-                    '/' .
-                    $file->get_itemid() .
-                    $file->get_filepath() .
-                    $file->get_filename();
-            //$url = file_encode_url("$CFG->wwwroot/pluginfile.php", $path, true);
-            $url = moodle_url::make_pluginfile_url($this->context->id, $component, $filearea, $file->get_itemid(), $file->get_filepath(), $file->get_filename(), true);
+            $url = moodle_url::make_pluginfile_url($this->context->id, $component, $filearea, $file->get_itemid(),
+                    $file->get_filepath(), $file->get_filename(), true);
             $filename = $file->get_filename();
             $file->fileurl = html_writer::link($url, $filename, [
                     'target' => '_blank',

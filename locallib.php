@@ -503,7 +503,6 @@ class checkmark {
                 echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
                 echo format_module_intro('checkmark', $this->checkmark, $this->cm->id);
 
-
                 echo $OUTPUT->box_end();
             }
         }
@@ -513,7 +512,8 @@ class checkmark {
      * Print intro attachment files if there are any
      */
     public function view_introattachments() {
-        if ($files = $this->get_renderer()->checkmark_files($this->context, 0, CHECKMARK_INTROATTACHMENT_FILEAREA, 'mod_checkmark')) {
+        if ($files = $this->get_renderer()->checkmark_files($this->context, 0,
+                CHECKMARK_INTROATTACHMENT_FILEAREA, 'mod_checkmark')) {
             echo $files;
         }
     }
