@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,10 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains a renderer for the assignment class
+ * This file contains a renderer for the checkmark class
  *
- * @package   mod_assign
+ * @package   mod_checkmark
  * @copyright 2012 NetSpot {@link http://www.netspot.com.au}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/**
+ * renderer.php
+ * This file contains a renderer for the checkmark class
+ *
+ * @package   mod_checkmark
+ * @author    Daniel Binder (Based on the work of NetSpot {@link http://www.netspot.com.au})
+ * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,16 +38,17 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 
 
 /**
- * A custom renderer class that extends the plugin_renderer_base and is used by the assign module.
+ * A custom renderer class that extends the plugin_renderer_base and is used by the checkmark module.
  *
- * @package mod_assign
- * @copyright 2012 NetSpot {@link http://www.netspot.com.au}
+ * @package   mod_checkmark
+ * @author    Daniel Binder (Based on the work of NetSpot {@link http://www.netspot.com.au})
+ * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_checkmark_renderer extends plugin_renderer_base {
 
     /**
-     * Rendering assignment files
+     * Rendering checkmark files
      *
      * @param context $context
      * @param int $userid
@@ -51,13 +61,13 @@ class mod_checkmark_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Rendering assignment files
+     * Rendering checkmark files
      *
-     * @param assign_files $tree
+     * @param checkmark_files $tree
      * @return string
      */
     public function render_checkmark_files(checkmark_files $tree) {
-        $this->htmlid = html_writer::random_id('assign_files_tree');
+        $this->htmlid = html_writer::random_id('checkmark_files_tree');
         $this->page->requires->js_init_call('M.mod_assign.init_tree', array(true, $this->htmlid));
         $html = '<div id="' . $this->htmlid . '">';
         $html .= $this->htmllize_tree($tree, $tree->dir);
@@ -116,10 +126,11 @@ class mod_checkmark_renderer extends plugin_renderer_base {
     }
 }
 /**
- * An assign file class that extends rendererable class and is used by the assign module.
+ * A class that extends rendererable class and is used by the checkmark module.
  *
- * @package   mod_assign
- * @copyright 2012 NetSpot {@link http://www.netspot.com.au}
+ * @package   mod_checkmark
+ * @author    Daniel Binder (Based on the work of NetSpot {@link http://www.netspot.com.au})
+ * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class checkmark_files implements renderable {

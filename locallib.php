@@ -164,7 +164,7 @@ class checkmark {
     /**
      * Lazy load the page renderer and expose the renderer to plugins.
      *
-     * @return assign_renderer
+     * @return checkmark_renderer
      */
     public function get_renderer() {
         global $PAGE;

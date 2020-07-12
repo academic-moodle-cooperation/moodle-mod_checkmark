@@ -261,7 +261,8 @@ function checkmark_add_instance($checkmark) {
 /**
  * Save the attachments in the draft areas.
  *
- * @param stdClass $formdata
+ * @param stdClass $formdata Formdata containing the introattachments file manager
+ * @param $cmid Course module id of the checkmark
  */
 function save_intro_draft_files($formdata, $cmid) {
     if (isset($formdata->introattachments)) {
