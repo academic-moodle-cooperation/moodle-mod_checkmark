@@ -509,6 +509,9 @@ class checkmark {
         }
     }
 
+    /**
+     * Print intro attachment files if there are any
+     */
     public function view_introattachments() {
         if ($files = $this->get_renderer()->checkmark_files($this->context, 0, CHECKMARK_INTROATTACHMENT_FILEAREA, 'mod_checkmark')) {
             echo $files;
