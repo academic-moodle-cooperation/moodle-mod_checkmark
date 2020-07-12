@@ -510,15 +510,9 @@ class checkmark {
     }
 
     public function view_introattachments() {
-        echo $this->get_renderer()->checkmark_files($this->context, 0, CHECKMARK_INTROATTACHMENT_FILEAREA, 'mod_checkmark');
-        /*
-        $fs = get_file_storage();
-        $files = $fs->get_area_files($this->checkmark->id, 'mod_checkmark', CHECKMARK_INTROATTACHMENT_FILEAREA, 0);
-        foreach ($files as $f) {
-            // $f is an instance of stored_file
-            echo $f->get_filename();
+        if ($files = $this->get_renderer()->checkmark_files($this->context, 0, CHECKMARK_INTROATTACHMENT_FILEAREA, 'mod_checkmark')) {
+            echo $files;
         }
-        */
     }
 
     /**

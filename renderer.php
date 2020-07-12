@@ -63,9 +63,6 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         $html .= $this->htmllize_tree($tree, $tree->dir);
         $html .= '</div>';
 
-        if ($tree->portfolioform) {
-            $html .= $tree->portfolioform;
-        }
         return $html;
     }
 
@@ -99,15 +96,6 @@ class mod_checkmark_renderer extends plugin_renderer_base {
 
         foreach ($dir['files'] as $file) {
             $filename = $file->get_filename();
-            if ($CFG->enableplagiarism) {
-                require_once($CFG->libdir . '/plagiarismlib.php');
-                $plagiarismlinks = plagiarism_get_links(array('userid' => $file->get_userid(),
-                        'file' => $file,
-                        'cmid' => $tree->cm->id,
-                        'course' => $tree->course));
-            } else {
-                $plagiarismlinks = '';
-            }
             $image = $this->output->pix_icon(file_file_icon($file),
                     $filename,
                     'moodle',
@@ -116,8 +104,6 @@ class mod_checkmark_renderer extends plugin_renderer_base {
                     '<div>' .
                     '<div class="fileuploadsubmission">' . $image . ' ' .
                     $file->fileurl . ' ' .
-                    $plagiarismlinks . ' ' .
-                    $file->portfoliobutton . ' ' .
                     '</div>' .
                     '<div class="fileuploadsubmissiontime">' . $file->timemodified . '</div>' .
                     '</div>' .
@@ -141,8 +127,6 @@ class checkmark_files implements renderable {
     public $context;
     /** @var string $context */
     public $dir;
-    /** @var MoodleQuickForm $portfolioform */
-    public $portfolioform;
     /** @var stdClass $cm course module */
     public $cm;
     /** @var stdClass $course */
@@ -163,38 +147,20 @@ class checkmark_files implements renderable {
         $this->cm = $cm;
         $this->course = $course;
         $fs = get_file_storage();
-        $this->dir = $fs->get_area_tree($this->cm->instance, $component, $filearea, $sid);
+        $this->dir = $fs->get_area_tree($context->id, $component, $filearea, $sid);
 
-        $files = $fs->get_area_files($this->cm->instance,
+        $files = $fs->get_area_files($context->id,
                 $component,
                 $filearea,
                 $sid,
                 'timemodified',
                 false);
 
-        if (!empty($CFG->enableportfolios)) {
-            require_once($CFG->libdir . '/portfoliolib.php');
-            if (count($files) >= 1 && !empty($sid) &&
-                    has_capability('mod/assign:exportownsubmission', $this->context)) {
-                $button = new portfolio_add_button();
-                $callbackparams = array('cmid' => $this->cm->id,
-                        'sid' => $sid,
-                        'area' => $filearea,
-                        'component' => $component);
-                $button->set_callback_options('assign_portfolio_caller',
-                        $callbackparams,
-                        'mod_assign');
-                $button->reset_formats();
-                $this->portfolioform = $button->to_html(PORTFOLIO_ADD_TEXT_LINK);
-            }
-
-        }
-
         $this->preprocess($this->dir, $filearea, $component);
     }
 
     /**
-     * Preprocessing the file list to add the portfolio links if required.
+     * Preprocessing the file list
      *
      * @param array $dir
      * @param string $filearea
@@ -208,25 +174,11 @@ class checkmark_files implements renderable {
             $this->preprocess($subdir, $filearea, $component);
         }
         foreach ($dir['files'] as $file) {
-            $file->portfoliobutton = '';
 
             $file->timemodified = userdate(
                     $file->get_timemodified(),
                     get_string('strftimedatetime', 'langconfig')
             );
-
-            if (!empty($CFG->enableportfolios)) {
-                require_once($CFG->libdir . '/portfoliolib.php');
-                $button = new portfolio_add_button();
-                if (has_capability('mod/assign:exportownsubmission', $this->context)) {
-                    $portfolioparams = array('cmid' => $this->cm->id, 'fileid' => $file->get_id());
-                    $button->set_callback_options('assign_portfolio_caller',
-                            $portfolioparams,
-                            'mod_assign');
-                    $button->set_format_by_file($file);
-                    $file->portfoliobutton = $button->to_html(PORTFOLIO_ADD_ICON_LINK);
-                }
-            }
             $path = '/' .
                     $this->context->id .
                     '/' .
@@ -237,7 +189,8 @@ class checkmark_files implements renderable {
                     $file->get_itemid() .
                     $file->get_filepath() .
                     $file->get_filename();
-            $url = file_encode_url("$CFG->wwwroot/pluginfile.php", $path, true);
+            //$url = file_encode_url("$CFG->wwwroot/pluginfile.php", $path, true);
+            $url = moodle_url::make_pluginfile_url($this->context->id, $component, $filearea, $file->get_itemid(), $file->get_filepath(), $file->get_filename(), true);
             $filename = $file->get_filename();
             $file->fileurl = html_writer::link($url, $filename, [
                     'target' => '_blank',

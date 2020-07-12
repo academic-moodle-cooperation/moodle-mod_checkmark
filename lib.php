@@ -161,7 +161,7 @@ function checkmark_update_instance($checkmark) {
 
     $DB->update_record('checkmark', $checkmark);
 
-    save_intro_draft_files($checkmark, $checkmark->id);
+    save_intro_draft_files($checkmark, $checkmark->coursemodule);
 
     checkmark_update_examples($checkmark);
 
@@ -239,7 +239,7 @@ function checkmark_add_instance($checkmark) {
     $returnid = $DB->insert_record('checkmark', $checkmark);
     $checkmark->instance = $returnid;
 
-    save_intro_draft_files($checkmark, $returnid);
+    save_intro_draft_files($checkmark, $checkmark->coursemodule);
 
     checkmark_update_examples($checkmark, $checkmark->coursemodule);
 
@@ -263,11 +263,59 @@ function checkmark_add_instance($checkmark) {
  *
  * @param stdClass $formdata
  */
-function save_intro_draft_files($formdata, $checkmarkid) {
+function save_intro_draft_files($formdata, $cmid) {
     if (isset($formdata->introattachments)) {
-        file_save_draft_area_files($formdata->introattachments, $checkmarkid,
+        $context = context_module::instance($cmid);
+        file_save_draft_area_files($formdata->introattachments, $context->id,
                 'mod_checkmark', CHECKMARK_INTROATTACHMENT_FILEAREA, 0);
     }
+}
+
+/**
+ * Serves intro checkmark files.
+ *
+ * @param mixed $course course or id of the course
+ * @param mixed $cm course module or id of the course module
+ * @param context $context
+ * @param string $filearea
+ * @param array $args
+ * @param bool $forcedownload
+ * @param array $options additional options affecting the file serving
+ * @return bool false if file not found, does not return if found - just send the file
+ */
+function mod_checkmark_pluginfile($course,
+        $cm,
+        context $context,
+        $filearea,
+        $args,
+        $forcedownload,
+        array $options=array()) {
+    global $CFG;
+
+    require_login($course, false, $cm);
+    if (!has_capability('mod/checkmark:view', $context)) {
+        return false;
+    }
+
+    require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
+    $checkmark = new checkmark($cm->id);
+
+    if ($filearea !== CHECKMARK_INTROATTACHMENT_FILEAREA) {
+        return false;
+    }
+    $itemid = (int)array_shift($args);
+    if ($itemid != 0) {
+        return false;
+    }
+
+    $relativepath = implode('/', $args);
+    $fullpath = "/{$context->id}/mod_checkmark/$filearea/$itemid/$relativepath";
+
+    $fs = get_file_storage();
+    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
+        return false;
+    }
+    send_stored_file($file, 0, 0, $forcedownload, $options);
 }
 
 /**
