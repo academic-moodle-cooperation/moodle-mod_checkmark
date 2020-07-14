@@ -326,5 +326,6 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
     protected function after_execute() {
         // Add checkmark related files, no need to match by itemname (jst intern handled context)!
         $this->add_related_files('mod_checkmark', 'intro', null);
+        $this->add_related_files('mod_checkmark', 'introattachment', null);
     }
 }

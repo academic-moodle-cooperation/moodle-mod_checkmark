@@ -47,7 +47,8 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         $checkmark = new backup_nested_element('checkmark', array('id'), array(
             'name', 'intro', 'introformat', 'alwaysshowdescription', 'resubmit', 'timeavailable', 'timedue', 'cutoffdate',
             'gradingdue', 'emailteachers', 'exampleprefix', 'grade', 'trackattendance', 'attendancegradelink',
-            'attendancegradebook', 'presentationgrading', 'presentationgrade', 'presentationgradebook', 'timemodified', 'flexiblenaming'));
+            'attendancegradebook', 'presentationgrading', 'presentationgrade', 'presentationgradebook', 'timemodified',
+                'flexiblenaming'));
 
         $overrides = new backup_nested_element('overrides');
 
@@ -116,6 +117,7 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
 
         // Define file annotations!
         $checkmark->annotate_files('mod_checkmark', 'intro', null); // This file area has no itemid!
+        $checkmark->annotate_files('mod_checkmark', 'introattachment', null); // This file area has no itemid!
 
         // Return the root element (checkmark), wrapped into standard activity structure!
         return $this->prepare_activity_structure($checkmark);

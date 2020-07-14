@@ -220,6 +220,7 @@
 .path-mod-checkmark .clearfloat {
     clear: both;
 }
+
 .excontainer {
     width: fit-content;
     height: fit-content;
@@ -230,6 +231,16 @@
     height: 25px;
     pointer-events: none;
 }
+
 .exborder {
     border: 5px red solid;
+}
+
+.path-mod-checkmark div.fileuploadsubmission {
+    float: left;
+    min-width: 300px;
+}
+
+.path-mod-checkmark div.fileuploadsubmissiontime {
+    float: right;
 }

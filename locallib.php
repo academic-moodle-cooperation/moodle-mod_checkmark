@@ -91,6 +91,8 @@ class checkmark {
     public $examples;
     /** @var object contains overridden dates (for current user only!) */
     public $overrides = false;
+    /** @var checkmark_renderer the custom renderer for this module */
+    private $output;
 
     /**
      * Constructor for the checkmark class
@@ -157,6 +159,20 @@ class checkmark {
 
         // We cache examples now...
         $this->get_examples();
+    }
+
+    /**
+     * Lazy load the page renderer and expose the renderer to plugins.
+     *
+     * @return checkmark_renderer
+     */
+    public function get_renderer() {
+        global $PAGE;
+        if ($this->output) {
+            return $this->output;
+        }
+        $this->output = $PAGE->get_renderer('mod_checkmark', null, RENDERER_TARGET_GENERAL);
+        return $this->output;
     }
 
     /**
@@ -408,6 +424,8 @@ class checkmark {
 
         $this->view_intro();
         echo "\n";
+        $this->view_introattachments();
+        echo "\n";
         $this->view_dates();
         echo "\n";
         $this->view_attendancehint();
@@ -484,8 +502,19 @@ class checkmark {
             if (!empty($this->checkmark->intro)) {
                 echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
                 echo format_module_intro('checkmark', $this->checkmark, $this->cm->id);
+
                 echo $OUTPUT->box_end();
             }
+        }
+    }
+
+    /**
+     * Print intro attachment files if there are any
+     */
+    public function view_introattachments() {
+        if ($files = $this->get_renderer()->checkmark_files($this->context, 0,
+                CHECKMARK_INTROATTACHMENT_FILEAREA, 'mod_checkmark')) {
+            echo $files;
         }
     }
 
@@ -3876,6 +3905,5 @@ class checkmark {
         }
         return $splitcheckarray;
     }
-
 }
 
