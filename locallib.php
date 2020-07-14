@@ -1894,7 +1894,7 @@ class checkmark {
                         if ($feedback === false) {
                             $feedback = $this->prepare_new_feedback($id);
                         }
-                        $feedback->presentationfeedback = str_replace('\n', '<br />', $presfeedbackvalue);
+                        $feedback->presentationfeedback = submissionstable::convert_text_to_html($presfeedbackvalue);
                     } else {
                         unset($feedback->presentationfeedback);  // Don't need to update this.
                     }
@@ -1917,7 +1917,7 @@ class checkmark {
                         if ($feedback === false) {
                             $feedback = $this->prepare_new_feedback($id);
                         }
-                        $feedback->feedback = $feedbackvalue;
+                        $feedback->feedback = submissionstable::convert_text_to_html($feedbackvalue);
                     } else {
                         unset($feedback->feedback);  // Don't need to update this.
                     }
