@@ -1,11 +1,6 @@
 CHANGELOG
 =========
 
-3.9.1 (in development)
-------------------
-* [FEATURE] #6379 Add the possibility to upload additional files when creating a checkmark
-                  instance. These files are shown to the user beneath the description [gitlab #42]
-
 3.9.0 (2020-06-08)
 ------------------
 * [FEATURE] #6360 Overhaul of user and group override feature to match the workings of the
@@ -21,6 +16,8 @@ CHANGELOG
 * [FEATURE] #6533 Make "Grant extension" bulk function use the new interface for user overrides
 * [FEATURE] #6532 Add filter in Submissions/Export to only display users affected by
                   a user/group override
+* [FEATURE] #6379 Add the possibility to upload additional files when creating a checkmark
+                  instance. These files are shown to the user beneath the description [gitlab #42]
 * [FEATURE] #6531 Add filter in Submissions/Export to only display users who haven't made
                   a submission [github #49]
 * [FEATURE] #6328 Update behat tests to ensure compatibility with gitlab CI
