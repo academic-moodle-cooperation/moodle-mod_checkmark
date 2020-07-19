@@ -107,7 +107,7 @@ class checkmark_overridedates_test extends advanced_testcase {
         $this->assertEquals(1, $DB->count_records('checkmark_overrides'));
         $expect = ['timeavailable' => null, 'timedue' => $timedueoverride, 'cutoffdate' => null,
                 'userid' => null, 'grouppriority' => 1];
-        $result =  $DB->get_record('checkmark_overrides', ['groupid' => $this->testgroup->id],
+        $result = $DB->get_record('checkmark_overrides', ['groupid' => $this->testgroup->id],
                 'timeavailable,timedue,cutoffdate,userid,grouppriority');
         $result = ['timeavailable' => $result->timeavailable, 'timedue' => (int)($result->timedue),
                 'cutoffdate' => $result->cutoffdate, 'userid' => $result->userid, 'grouppriority' => (int)($result->grouppriority)];
@@ -132,7 +132,7 @@ class checkmark_overridedates_test extends advanced_testcase {
         }
         // We know that the indexes, but maybe not values, match.
         // Compare the values between the two arrays.
-        foreach($a as $k => $v) {
+        foreach ($a as $k => $v) {
             if ($v !== $b[$k]) {
                 return false;
             }
