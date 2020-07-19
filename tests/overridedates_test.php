@@ -65,7 +65,7 @@ class checkmark_overridedates_test extends advanced_testcase {
     public function setUp() {
         $this->resetAfterTest();
         $this->setAdminUser();
-        $this->testuser = $this->getDataGenerator()->create_user(['email' => 'test@example.com', 'username'=>'test']);
+        $this->testuser = $this->getDataGenerator()->create_user(['email' => 'test@example.com', 'username' => 'test']);
         $course1 = $this->getDataGenerator()->create_course();
         $this->getDataGenerator()->enrol_user($this->testuser->id, $course1->id);
         $checkmark = $this->getDataGenerator()->create_module('checkmark', array('course' => $course1->id));
@@ -81,16 +81,16 @@ class checkmark_overridedates_test extends advanced_testcase {
      */
     public function test_add_user_override() {
         global $DB;
-        $timedueoverride = time() + 1209600; //2 weeks after now
+        $timedueoverride = time() + 1209600; // 2 weeks after now.
         $this->checkmark->override_dates([$this->testuser->id], $this->checkmark->checkmark->timeavailable,
                 $timedueoverride, $this->checkmark->checkmark->cutoffdate);
-        $this->assertEquals(1,$DB->count_records('checkmark_overrides'));
+        $this->assertEquals(1, $DB->count_records('checkmark_overrides'));
         $expect = ['timeavailable' => null, 'timedue' => $timedueoverride, 'cutoffdate' => null, 'groupid' => null];
-        $result =  $DB->get_record('checkmark_overrides', ['userid' => $this->testuser->id],
+        $result = $DB->get_record('checkmark_overrides', ['userid' => $this->testuser->id],
                 'timeavailable,timedue,cutoffdate,groupid');
         $result = ['timeavailable' => $result->timeavailable, 'timedue' => (int)($result->timedue),
                 'cutoffdate' => $result->cutoffdate, 'groupid' => $result->groupid];
-        $this->assertTrue(self::arrays_are_similar($expect,$result));
+        $this->assertTrue(self::arrays_are_similar($expect, $result));
         // Add asserts for events.
     }
 
@@ -101,16 +101,17 @@ class checkmark_overridedates_test extends advanced_testcase {
      */
     public function test_add_group_override() {
         global $DB;
-        $timedueoverride = time() + 1209600; //2 weeks after now
+        $timedueoverride = time() + 1209600; // 2 weeks after now.
         $this->checkmark->override_dates([$this->testgroup->id], $this->checkmark->checkmark->timeavailable,
                 $timedueoverride, $this->checkmark->checkmark->cutoffdate, \mod_checkmark\overrideform::GROUP);
-        $this->assertEquals(1,$DB->count_records('checkmark_overrides'));
-        $expect = ['timeavailable'=>null, 'timedue'=>$timedueoverride, 'cutoffdate'=>null, 'userid' => null, 'grouppriority' => 1];
+        $this->assertEquals(1, $DB->count_records('checkmark_overrides'));
+        $expect = ['timeavailable' => null, 'timedue' => $timedueoverride, 'cutoffdate' => null,
+                'userid' => null, 'grouppriority' => 1];
         $result =  $DB->get_record('checkmark_overrides', ['groupid' => $this->testgroup->id],
                 'timeavailable,timedue,cutoffdate,userid,grouppriority');
-        $result = ['timeavailable'=>$result->timeavailable, 'timedue'=>(int)($result->timedue),
-                'cutoffdate'=>$result->cutoffdate, 'userid' => $result->userid, 'grouppriority' => (int)($result->grouppriority)];
-        $this->assertTrue(self::arrays_are_similar($expect,$result));
+        $result = ['timeavailable' => $result->timeavailable, 'timedue' => (int)($result->timedue),
+                'cutoffdate' => $result->cutoffdate, 'userid' => $result->userid, 'grouppriority' => (int)($result->grouppriority)];
+        $this->assertTrue(self::arrays_are_similar($expect, $result));
         // Add asserts for events.
     }
 
@@ -124,19 +125,19 @@ class checkmark_overridedates_test extends advanced_testcase {
      * @param array $b
      * @return bool
      */
-    static function arrays_are_similar($a, $b) {
-        // if the indexes don't match, return immediately
+    private static function arrays_are_similar($a, $b) {
+        // If the indexes don't match, return immediately.
         if (count(array_diff_assoc($a, $b))) {
             return false;
         }
-        // we know that the indexes, but maybe not values, match.
-        // compare the values between the two arrays
+        // We know that the indexes, but maybe not values, match.
+        // Compare the values between the two arrays.
         foreach($a as $k => $v) {
             if ($v !== $b[$k]) {
                 return false;
             }
         }
-        // we have identical indexes, and no unequal values
+        // We have identical indexes, and no unequal values.
         return true;
     }
 }
