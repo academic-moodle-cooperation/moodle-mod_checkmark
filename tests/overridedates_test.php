@@ -42,8 +42,17 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php'); // Include the code
  */
 class checkmark_overridedates_test extends advanced_testcase {
 
+    /**
+     * @var checkmark Checkmark object used for testing
+     */
     private $checkmark;
+    /**
+     * @var stdClass User object used for testing
+     */
     private $testuser;
+    /**
+     * @var stdClass Group object used for testing
+     */
     private $testgroup;
 
     /**
