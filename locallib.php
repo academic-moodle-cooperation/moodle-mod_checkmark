@@ -424,8 +424,6 @@ class checkmark {
 
         $this->view_intro();
         echo "\n";
-        $this->view_introattachments();
-        echo "\n";
         $this->view_dates();
         echo "\n";
         $this->view_attendancehint();
@@ -499,10 +497,11 @@ class checkmark {
         $notoverridden = (!$this->overrides || $this->overrides->timeavailable === null);
         $cmptime = $notoverridden ? $this->checkmark->timeavailable : $this->overrides->timeavailable;
         if ($this->checkmark->alwaysshowdescription || (time() > $cmptime)) {
-            if (!empty($this->checkmark->intro)) {
+            $introattachments = $this->get_introattachments();
+            if (!empty($this->checkmark->intro || !empty($introattachments))) {
                 echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
                 echo format_module_intro('checkmark', $this->checkmark, $this->cm->id);
-
+                echo $introattachments;
                 echo $OUTPUT->box_end();
             }
         }
@@ -511,11 +510,12 @@ class checkmark {
     /**
      * Print intro attachment files if there are any
      */
-    public function view_introattachments() {
+    public function get_introattachments() {
         if ($files = $this->get_renderer()->checkmark_files($this->context, 0,
                 CHECKMARK_INTROATTACHMENT_FILEAREA, 'mod_checkmark')) {
-            echo $files;
+            return $files;
         }
+        return '';
     }
 
     /**
