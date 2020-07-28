@@ -153,6 +153,19 @@ class checkmark_overridedates_test extends advanced_testcase {
     }
 
     /**
+     * Test if no overwrite is created if dates identical to the checkmark's dates are passed.
+     *
+     * @throws dml_exception
+     */
+    public function test_add_identical_overwrite() {
+        global $DB;
+        $this->checkmark->override_dates([$this->testgroup->id], $this->checkmark->checkmark->timeavailable,
+                $this->checkmark->checkmark->timedue, $this->checkmark->checkmark->cutoffdate,
+                \mod_checkmark\overrideform::GROUP);
+        $this->assertEquals(0, $DB->count_records('checkmark_overrides'));
+    }
+
+    /**
      * Determine if two associative arrays are similar
      *
      * Both arrays must have the same indexes with identical values
