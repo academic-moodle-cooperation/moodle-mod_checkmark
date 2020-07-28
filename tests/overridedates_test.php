@@ -82,6 +82,7 @@ class checkmark_overridedates_test extends advanced_testcase {
     public function test_add_user_override() {
         global $DB;
         $timedueoverride = time() + 1209600; // 2 weeks after now.
+        $sink = $this->redirectEvents();
         $this->checkmark->override_dates([$this->testuser->id], $this->checkmark->checkmark->timeavailable,
                 $timedueoverride, $this->checkmark->checkmark->cutoffdate);
         $this->assertEquals(1, $DB->count_records('checkmark_overrides'));
@@ -91,7 +92,25 @@ class checkmark_overridedates_test extends advanced_testcase {
         $result = ['timeavailable' => $result->timeavailable, 'timedue' => (int)($result->timedue),
                 'cutoffdate' => $result->cutoffdate, 'groupid' => $result->groupid];
         $this->assertTrue(self::arrays_are_similar($expect, $result));
-        // Add asserts for events.
+
+        // Assert calendar and log event
+        $events = $sink->get_events();
+        $calendareventreceived = false;
+        $logeventreceived = false;
+        $this->assertCount(2, $events);
+        foreach ($events as $event) {
+            if ($event instanceof \mod_checkmark\event\user_override_created && !$logeventreceived) {
+                $this->assertEquals($this->checkmark->context, $event->get_context());
+                $this->assertEquals($this->testuser->id, $event->relateduserid);
+                $logeventreceived = true;
+            } else if ($event instanceof core\event\calendar_event_created && !$calendareventreceived) {
+                $calendareventreceived = true;
+            } else {
+                // Let test fail if events contains not exactly one log and one calendar event
+                $this->assertTrue(false);
+            }
+        }
+        $sink->close();
     }
 
     /**
@@ -102,6 +121,7 @@ class checkmark_overridedates_test extends advanced_testcase {
     public function test_add_group_override() {
         global $DB;
         $timedueoverride = time() + 1209600; // 2 weeks after now.
+        $sink = $this->redirectEvents();
         $this->checkmark->override_dates([$this->testgroup->id], $this->checkmark->checkmark->timeavailable,
                 $timedueoverride, $this->checkmark->checkmark->cutoffdate, \mod_checkmark\overrideform::GROUP);
         $this->assertEquals(1, $DB->count_records('checkmark_overrides'));
@@ -112,7 +132,24 @@ class checkmark_overridedates_test extends advanced_testcase {
         $result = ['timeavailable' => $result->timeavailable, 'timedue' => (int)($result->timedue),
                 'cutoffdate' => $result->cutoffdate, 'userid' => $result->userid, 'grouppriority' => (int)($result->grouppriority)];
         $this->assertTrue(self::arrays_are_similar($expect, $result));
-        // Add asserts for events.
+
+        // Assert calendar and log event
+        $events = $sink->get_events();
+        $calendareventreceived = false;
+        $logeventreceived = false;
+        $this->assertCount(2, $events);
+        foreach ($events as $event) {
+            if ($event instanceof \mod_checkmark\event\group_override_created && !$logeventreceived) {
+                $this->assertEquals($this->checkmark->context, $event->get_context());
+                $this->assertEquals($this->testgroup->id, $event->other['groupid']);
+                $logeventreceived = true;
+            } else if ($event instanceof core\event\calendar_event_created && !$calendareventreceived) {
+                $calendareventreceived = true;
+            } else {
+                // Let test fail if events contains not exactly one log and one calendar event
+                $this->assertTrue(false);
+            }
+        }
     }
 
     /**
