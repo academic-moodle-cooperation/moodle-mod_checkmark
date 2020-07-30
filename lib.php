@@ -1278,11 +1278,6 @@ function checkmark_refresh_events($courseid = 0, $instance = null, $cm = null) {
                 $cm = get_coursemodule_from_instance('checkmark', $checkmark->id);
             }
 
-            if ($cm) {
-                $context = context_course::instance($courseid);
-                $users = get_enrolled_users($context, 'mod/checkmark:submit');
-            }
-
             // Start with creating the event.
             $event = new stdClass();
             $event->modulename = 'checkmark';
