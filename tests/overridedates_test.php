@@ -14,10 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 use core\event\calendar_event_created;
+use core\event\calendar_event_deleted;
 use core\event\calendar_event_updated;
+use mod_checkmark\event\group_override_deleted;
 use mod_checkmark\event\group_override_updated;
 use mod_checkmark\event\user_override_created;
 use mod_checkmark\event\group_override_created;
+use mod_checkmark\event\user_override_deleted;
 use mod_checkmark\event\user_override_updated;
 
 /**
@@ -103,24 +106,6 @@ class checkmark_overridedates_test extends advanced_testcase {
         // Assert calendar and log event
         $events = $sink->get_events();
         $this->check_events($events, user_override_created::class, calendar_event_created::class);
-        $sink->clear();
-
-        $timedueoverride = time() + 2419200; // 4 weeks after now
-        $timeavaliableoverride = time() + 1209600;
-        $cutoffoverride = time() + 2419200;
-        $this->checkmark->override_dates([$this->testuser->id], $timeavaliableoverride,
-                $timedueoverride, $cutoffoverride);
-        $expect = ['timeavailable' => $timeavaliableoverride, 'timedue' => $timedueoverride, 'cutoffdate' => $cutoffoverride,
-                'groupid' => null, 'grouppriority' => null];
-        $result = $DB->get_record('checkmark_overrides', ['userid' => $this->testuser->id],
-                'timeavailable,timedue,cutoffdate,groupid,grouppriority');
-        $result = ['timeavailable' => (int)$result->timeavailable, 'timedue' => (int)($result->timedue),
-                'cutoffdate' => (int)$result->cutoffdate, 'groupid' => $result->groupid, 'grouppriority' => $result->grouppriority];
-        $this->assertTrue(self::arrays_are_similar($expect, $result));
-
-        // Assert calendar and log event
-        $events = $sink->get_events();
-        $this->check_events($events, user_override_updated::class, calendar_event_updated::class);
         $sink->close();
     }
 
@@ -146,8 +131,47 @@ class checkmark_overridedates_test extends advanced_testcase {
 
         // Assert calendar and log event
         $this->check_events($sink->get_events(), group_override_created::class, calendar_event_created::class);
-        $sink->clear();
+        $sink->close();
+    }
 
+
+    public function test_update_user_override() {
+        global $DB;
+
+        // Create a user override as tested above.
+        $timedueoverride = time() + 1209600; // 2 weeks after now.
+        $this->checkmark->override_dates([$this->testuser->id], $this->checkmark->checkmark->timeavailable,
+                $timedueoverride, $this->checkmark->checkmark->cutoffdate);
+
+        $sink = $this->redirectEvents();
+        $timedueoverride = time() + 2419200; // 4 weeks after now
+        $timeavaliableoverride = time() + 1209600;
+        $cutoffoverride = time() + 2419200;
+        $this->checkmark->override_dates([$this->testuser->id], $timeavaliableoverride,
+                $timedueoverride, $cutoffoverride);
+        $expect = ['timeavailable' => $timeavaliableoverride, 'timedue' => $timedueoverride, 'cutoffdate' => $cutoffoverride,
+                'groupid' => null, 'grouppriority' => null];
+        $result = $DB->get_record('checkmark_overrides', ['userid' => $this->testuser->id],
+                'timeavailable,timedue,cutoffdate,groupid,grouppriority');
+        $result = ['timeavailable' => (int)$result->timeavailable, 'timedue' => (int)($result->timedue),
+                'cutoffdate' => (int)$result->cutoffdate, 'groupid' => $result->groupid, 'grouppriority' => $result->grouppriority];
+        $this->assertTrue(self::arrays_are_similar($expect, $result));
+
+        // Assert calendar and log event
+        $events = $sink->get_events();
+        $this->check_events($events, user_override_updated::class, calendar_event_updated::class);
+        $sink->close();
+    }
+
+    public function test_update_group_override() {
+        global $DB;
+
+        //Create a group override as tested above.
+        $timedueoverride = time() + 1209600; // 2 weeks after now.
+        $this->checkmark->override_dates([$this->testgroup->id], $this->checkmark->checkmark->timeavailable,
+                $timedueoverride, $this->checkmark->checkmark->cutoffdate, \mod_checkmark\overrideform::GROUP);
+
+        $sink = $this->redirectEvents();
         $timedueoverride = time() + 2419200; // 4 weeks after now
         $timeavaliableoverride = time() + 1209600;
         $cutoffoverride = time() + 2419200;
@@ -167,6 +191,54 @@ class checkmark_overridedates_test extends advanced_testcase {
         $sink->close();
     }
 
+
+
+    /**
+     * Test if no overwrite is created if dates identical to the checkmark's dates are passed.
+     *
+     * @throws dml_exception
+     */
+    public function test_add_identical_overwrite() {
+        global $DB;
+        $sink = $this->redirectEvents();
+        $this->checkmark->override_dates([$this->testgroup->id], $this->checkmark->checkmark->timeavailable,
+                $this->checkmark->checkmark->timedue, $this->checkmark->checkmark->cutoffdate,
+                \mod_checkmark\overrideform::GROUP);
+        $this->assertEquals(0, $DB->count_records('checkmark_overrides'));
+        $events = $sink->get_events();
+        $this->assertCount(0, $events);
+        $sink->close();
+    }
+
+    public function test_delete_user_override() {
+        global $DB;
+
+        // Create a user override as tested above.
+        $timedueoverride = time() + 1209600; // 2 weeks after now.
+        $this->checkmark->override_dates([$this->testuser->id], $this->checkmark->checkmark->timeavailable,
+                $timedueoverride, $this->checkmark->checkmark->cutoffdate);
+
+        $sink = $this->redirectEvents();
+        $this->checkmark->delete_override($this->testuser->id);
+        $this->assertEquals(0, $DB->count_records('checkmark_overrides'));
+        $this->check_events($sink->get_events(), user_override_deleted::class, calendar_event_deleted::class);
+
+    }
+
+    public function test_delete_group_override() {
+        global $DB;
+
+        //Create a group override as tested above.
+        $timedueoverride = time() + 1209600; // 2 weeks after now.
+        $this->checkmark->override_dates([$this->testgroup->id], $this->checkmark->checkmark->timeavailable,
+                $timedueoverride, $this->checkmark->checkmark->cutoffdate, \mod_checkmark\overrideform::GROUP);
+
+        $sink = $this->redirectEvents();
+        $this->checkmark->delete_override($this->testgroup->id, \mod_checkmark\overrideform::GROUP);
+        $this->assertEquals(0, $DB->count_records('checkmark_overrides'));
+        $this->check_events($sink->get_events(), group_override_deleted::class, calendar_event_deleted::class);
+    }
+
     /**
      * Helper function to check if all log and calendar events for an overwrite dates action have taken place
      *
@@ -174,7 +246,7 @@ class checkmark_overridedates_test extends advanced_testcase {
      * @param $logkind string Class the log event should be an instance of
      * @param $calendarkind string Class the calendar event should be an instance of
      */
-    public function check_events($events, $logkind, $calendarkind) {
+    private function check_events($events, $logkind, $calendarkind) {
         $this->assertCount(2, $events);
         $calendareventreceived = false;
         $logeventreceived = false;
@@ -200,25 +272,6 @@ class checkmark_overridedates_test extends advanced_testcase {
                 $this->assertTrue(false);
             }
         }
-    }
-
-
-
-    /**
-     * Test if no overwrite is created if dates identical to the checkmark's dates are passed.
-     *
-     * @throws dml_exception
-     */
-    public function test_add_identical_overwrite() {
-        global $DB;
-        $sink = $this->redirectEvents();
-        $this->checkmark->override_dates([$this->testgroup->id], $this->checkmark->checkmark->timeavailable,
-                $this->checkmark->checkmark->timedue, $this->checkmark->checkmark->cutoffdate,
-                \mod_checkmark\overrideform::GROUP);
-        $this->assertEquals(0, $DB->count_records('checkmark_overrides'));
-        $events = $sink->get_events();
-        $this->assertCount(0, $events);
-        $sink->close();
     }
 
     /**
