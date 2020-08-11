@@ -13,24 +13,24 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-use core\event\calendar_event_created;
-use core\event\calendar_event_deleted;
-use core\event\calendar_event_updated;
-use mod_checkmark\event\group_override_deleted;
-use mod_checkmark\event\group_override_updated;
-use mod_checkmark\event\user_override_created;
-use mod_checkmark\event\group_override_created;
-use mod_checkmark\event\user_override_deleted;
-use mod_checkmark\event\user_override_updated;
 
 /**
- * Unit tests for (some of) mod_checkmark's methods.
+ * Unit tests for methods related to override_dates in locallib.php
  *
  * @package   mod_checkmark
  * @author    Daniel Binder
  * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use core\event\{calendar_event_created, calendar_event_deleted, calendar_event_updated};
+use mod_checkmark\event\{group_override_deleted,
+        group_override_priority_changed,
+        group_override_updated,
+        user_override_created,
+        group_override_created,
+        user_override_deleted,
+        user_override_updated};
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page!
@@ -216,6 +216,9 @@ class checkmark_overridedates_test extends advanced_testcase {
         $sink->close();
     }
 
+    /**
+     * @throws dml_exception
+     */
     public function test_delete_user_override() {
         global $DB;
 
@@ -231,6 +234,9 @@ class checkmark_overridedates_test extends advanced_testcase {
 
     }
 
+    /**
+     * @throws dml_exception
+     */
     public function test_delete_group_override() {
         global $DB;
 
@@ -245,6 +251,11 @@ class checkmark_overridedates_test extends advanced_testcase {
         $this->check_events($sink->get_events(), group_override_deleted::class, calendar_event_deleted::class);
     }
 
+    /**
+     * Test the reordering of priorities of two groups in both directions
+     *
+     * @throws dml_exception
+     */
     public function test_reorder_grouppriority() {
         global $DB;
         $timedueoverride1 = time() + 1209600; // 2 weeks after now.
@@ -265,7 +276,12 @@ class checkmark_overridedates_test extends advanced_testcase {
         $this->assertEquals($expected1, $result1);
         $this->assertEquals($expected2, $result2);
 
+
+        $sink = $this->redirectEvents();
         $this->checkmark->reorder_group_overrides($this->testgroup1->id);
+        $this->check_events($sink->get_events(), group_override_priority_changed::class,
+                calendar_event_updated::class, calendar_event_updated::class);
+        $sink->clear();
 
         $expected1 = (object) ['groupid' => $this->testgroup1->id, 'grouppriority' => '2'];
         $expected2 = (object) ['groupid'=> $this->testgroup2->id, 'grouppriority' => '1'];
@@ -281,6 +297,10 @@ class checkmark_overridedates_test extends advanced_testcase {
 
         $this->checkmark->reorder_group_overrides($this->testgroup1->id, true);
 
+        $this->check_events($sink->get_events(), group_override_priority_changed::class,
+                calendar_event_updated::class, calendar_event_updated::class);
+        $sink->close();
+
         $expected1 = (object) ['groupid' => $this->testgroup1->id, 'grouppriority' => '1'];
         $expected2 = (object) ['groupid'=> $this->testgroup2->id, 'grouppriority' => '2'];
 
@@ -292,18 +312,27 @@ class checkmark_overridedates_test extends advanced_testcase {
         $this->assertEquals(2, $DB->count_records('checkmark_overrides'));
         $this->assertEquals($expected1, $result1);
         $this->assertEquals($expected2, $result2);
+
+
     }
 
     /**
      * Helper function to check if all log and calendar events for an overwrite dates action have taken place
      *
-     * @param $events array Events caught by $sink->getEvents()
-     * @param $logkind string Class the log event should be an instance of
-     * @param $calendarkind string Class the calendar event should be an instance of
+     * @param array $events Events caught by $sink->getEvents()
+     * @param string $logkind Class the log event should be an instance of
+     * @param string $calendarkind Class the calendar event should be an instance of
+     * @param null $calendarkind2 Class the second calendar event should be an instance of or null if there is none
      */
-    private function check_events($events, $logkind, $calendarkind) {
-        $this->assertCount(2, $events);
+    private function check_events($events, $logkind, $calendarkind = null, $calendarkind2 = null) {
+        //todo Eventually rewrite this method in a generic way so it can be used by other tests too
+        if ($calendarkind2) {
+            $this->assertCount(3, $events);
+        } else {
+            $this->assertCount(2, $events);
+        }
         $calendareventreceived = false;
+        $calendarevent2received = false;
         $logeventreceived = false;
         foreach ($events as $event) {
             if ($event instanceof $logkind && !$logeventreceived) {
@@ -313,12 +342,14 @@ class checkmark_overridedates_test extends advanced_testcase {
                 } else if (isset($event->relateduserid)) {
                     $this->assertEquals($this->testuser->id, $event->relateduserid);
                 } else {
-                    // Let test fail if no id or either a user or a group override is contained in event
+                    // Let test fail if no id of either a user or a group override is contained in event
                     $this->assertTrue(false);
                 }
                 $logeventreceived = true;
             } else if ($event instanceof $calendarkind && !$calendareventreceived) {
                 $calendareventreceived = true;
+            } else if ($calendarkind2 && $event instanceof $calendarkind2 && !$calendarevent2received) {
+                $calendarevent2received = true;
             } else {
                 // Let test fail if events contains not exactly one log and one calendar event
                 $this->assertTrue(false);
