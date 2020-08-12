@@ -217,6 +217,8 @@ class checkmark_overridedates_test extends advanced_testcase {
     }
 
     /**
+     * Test if delete_override deletes an existing user override from the database and fires the correct events
+     *
      * @throws dml_exception
      */
     public function test_delete_user_override() {
@@ -226,6 +228,7 @@ class checkmark_overridedates_test extends advanced_testcase {
         $timedueoverride = time() + 1209600; // 2 weeks after now.
         $this->checkmark->override_dates([$this->testuser->id], $this->checkmark->checkmark->timeavailable,
                 $timedueoverride, $this->checkmark->checkmark->cutoffdate);
+        $this->assertEquals(1, $DB->count_records('checkmark_overrides'));
 
         $sink = $this->redirectEvents();
         $this->checkmark->delete_override($this->testuser->id);
@@ -235,6 +238,8 @@ class checkmark_overridedates_test extends advanced_testcase {
     }
 
     /**
+     * Test if delete_override deletes an existing group override from the database and fires the correct events
+     *
      * @throws dml_exception
      */
     public function test_delete_group_override() {
@@ -244,6 +249,7 @@ class checkmark_overridedates_test extends advanced_testcase {
         $timedueoverride = time() + 1209600; // 2 weeks after now.
         $this->checkmark->override_dates([$this->testgroup1->id], $this->checkmark->checkmark->timeavailable,
                 $timedueoverride, $this->checkmark->checkmark->cutoffdate, \mod_checkmark\overrideform::GROUP);
+        $this->assertEquals(1, $DB->count_records('checkmark_overrides'));
 
         $sink = $this->redirectEvents();
         $this->checkmark->delete_override($this->testgroup1->id, \mod_checkmark\overrideform::GROUP);
