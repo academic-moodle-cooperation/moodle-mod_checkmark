@@ -48,11 +48,11 @@ code_checker_pgsql:
   <<: *job_definition
   image: amcdev/moodle-plugin-ci:7.3.node14
   variables:
-    MOODLE_BRANCH: "master"
+    MOODLE_BRANCH: "MOODLE_39_STABLE"
 
 code_checker_mariadb:
   extends: .mariadb
   <<: *job_definition
   image: amcdev/moodle-plugin-ci:7.3.node14
   variables:
-    MOODLE_BRANCH: "master"
+    MOODLE_BRANCH: "MOODLE_39_STABLE"
