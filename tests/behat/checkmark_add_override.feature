@@ -1,4 +1,4 @@
-@mod @mod_checkmark @amc @current_dev
+@mod @mod_checkmark @amc
 Feature: In a course, a teacher should be able to add overrides to general dates for a certain user
   In order to change the dates for a single user
   As a teacher
@@ -61,6 +61,46 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
     Then I should see "Saturday, 1 February 2020, 8:00"
+
+  @javascript @current_dev
+  Scenario: Allow a user to have a different allow submissions from date
+    Given I log in as "teacher1"
+    And I am on "Course 1" course homepage with editing mode on
+    When I follow "Checkmark 1"
+    And I navigate to "Edit settings" in current page administration
+    And I set the following fields to these values:
+      | id_timeavailable_enabled | 1 |
+      | timeavailable[day]       | 1 |
+      | timeavailable[month]     | January |
+      | timeavailable[year]      | 2020 |
+      | timeavailable[hour]      | 08 |
+      | timeavailable[minute]    | 00 |
+    And I press "Save and display"
+    When I navigate to "User overrides" in current page administration
+    And I press "Add user override"
+    And I open the autocomplete suggestions list
+    And I click on "Student 1" item in the autocomplete list
+    And I set the following fields to these values:
+      | id_timeavailable_enabled | 1 |
+      | timeavailable[day]       | 1 |
+      | timeavailable[month]     | February |
+      | timeavailable[year]      | 2050 |
+      | timeavailable[hour]      | 08 |
+      | timeavailable[minute]    | 00 |
+    And I press "id_override"
+    Then I should see "Tuesday, 1 February 2050, 8:00"
+    And I log out
+    When I log in as "student2"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 1"
+    Then I should see "Wednesday, 1 January 2020, 8:00"
+    And "Save changes" "button" should be visible
+    And I log out
+    When I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 1"
+    Then I should see "Tuesday, 1 February 2050, 8:00"
+    And "Save changes" "button" should not be visible
 
   @javascript
   Scenario: Add, edit and delete an user override
