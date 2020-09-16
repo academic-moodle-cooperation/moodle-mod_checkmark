@@ -59,6 +59,8 @@ class overrideform extends \moodleform {
     protected $context;
     /** @var  int type of overrideform (USER or GROUP) */
     protected $type;
+    /** @var  bool flag weather or not the current user is allowed to access all groups */
+    protected $accessallgroups;
 
     /**
      * overrideform constructor.
@@ -78,7 +80,6 @@ class overrideform extends \moodleform {
             throw new coding_exception('invalidformdata');
         }
         $this->type = $type;
-
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable, $ajaxformdata);
     }
 
@@ -86,6 +87,8 @@ class overrideform extends \moodleform {
      * Definition of the grading form.
      */
     public function definition() {
+        global $USER;
+
         $mform =& $this->_form;
 
         $formattr = $mform->getAttributes();
@@ -95,6 +98,13 @@ class overrideform extends \moodleform {
         $this->cm = $this->_customdata['cm'];
         $this->context = $this->_customdata['context'];
         $checkmark = $this->_customdata['checkmark'];
+
+        // Check the user has the required capabilities to list overrides.
+        require_capability('mod/checkmark:manageoverrides', $this->context);
+        $cmgroupmode = groups_get_activity_groupmode($this->cm);
+        $this->accessallgroups = ($cmgroupmode == NOGROUPS) ||
+                has_capability('moodle/site:accessallgroups', $this->context);
+        $mform =& $this->_form;
 
         $mform->addElement('hidden', 'orig_timeavailable', $checkmark->timeavailable);
         $mform->setType('orig_timeavailable', PARAM_INT);
@@ -117,7 +127,17 @@ class overrideform extends \moodleform {
 
         switch ($this->type) {
             case self::USER:
-                $users = get_enrolled_users($this->context, 'mod/checkmark:submit');
+                if ($this->accessallgroups) {
+                    $users = get_enrolled_users($this->context, 'mod/checkmark:submit');
+                } else {
+                    $users = [];
+                    foreach (groups_get_user_groups($this->cm->course) as $grouping) {
+                        foreach ($grouping as $group) {
+                            $users[] = groups_get_members($group);
+                        }
+                    }
+                    $users = array_merge([], ...$users);
+                }
                 foreach ($users as $userid => $cur) {
                     $users[$userid] = fullname($cur);
                 }
@@ -127,7 +147,11 @@ class overrideform extends \moodleform {
                 $mform->addRule('userids', null, 'required', null, 'client');
                 break;
             case self::GROUP:
-                $groups = groups_get_all_groups($this->cm->course);
+                if ($this->accessallgroups) {
+                    $groups = groups_get_all_groups($this->cm->course);
+                } else {
+                    $groups = groups_get_all_groups($this->cm->course, $USER->id);
+                }
                 foreach ($groups as $groupid => $cur) {
                     $groups[$groupid] = $cur->name;
                 }
