@@ -1082,27 +1082,43 @@ class checkmark {
      * @throws dml_exception
      */
     public function reorder_group_overrides(int $groupidfrom, bool $decrease = false) {
-        global $DB;
+        global $DB, $USER;
+
+        require_capability('mod/checkmark:manageoverrides', $this->context);
+
+        $cmgroupmode = groups_get_activity_groupmode($this->cm);
+        $accessallgroups = ($cmgroupmode == NOGROUPS) ||
+                has_capability('moodle/site:accessallgroups', $this->context);
+        //Groups the current user is part of for checking valid requests if !$accessallgroups.
+
         $sign = '<';
         $minmax = 'MIN';
         if ($decrease) {
             $sign = '>';
             $minmax = 'MAX';
         }
+        $joinstring = "";
+        $joinwhere = "";
+        if (!$accessallgroups) {
+            $joinstring = "JOIN {groups_members} gm ON (gm.groupid = ov.groupid)";
+            $joinwhere = "AND gm.userid = $USER->id ";
+        }
         $sql = "SELECT groupid AS groupidto, grouppriority
                   FROM {checkmark_overrides} o
                   JOIN (
                         SELECT $minmax(grouppriority) priority
-                          FROM {checkmark_overrides}
+                          FROM {checkmark_overrides} ov
+                          $joinstring
                          WHERE (
                                 SELECT grouppriority
                                   FROM {checkmark_overrides}
                                  WHERE groupid = :groupid AND checkmarkid = :checkmarkid
-                            ) $sign grouppriority AND groupid IS NOT NULL
+                            ) $sign grouppriority AND checkmarkid = :checkmarkid2 AND ov.groupid IS NOT NULL $joinwhere
                         ) o1 ON o1.priority = o.grouppriority
-                WHERE checkmarkid = :checkmarkid2;";
+                WHERE checkmarkid = :checkmarkid3;";
 
-        $params = ['groupid' => $groupidfrom, 'checkmarkid' => $this->cm->instance, 'checkmarkid2' => $this->cm->instance];
+        $params = ['groupid' => $groupidfrom, 'checkmarkid' => $this->cm->instance,
+                'checkmarkid2' => $this->cm->instance, 'checkmarkid3' => $this->cm->instance];
         $groupto = $DB->get_record_sql($sql, $params, MUST_EXIST);
             $this->swap_group_overrides($groupidfrom, $groupto->groupidto);
     }
