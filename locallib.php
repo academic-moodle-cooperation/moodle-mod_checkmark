@@ -876,9 +876,10 @@ class checkmark {
         require_capability('mod/checkmark:manageoverrides', $this->context);
 
         $cmgroupmode = groups_get_activity_groupmode($this->cm);
+        // Checks if current user is allowed to access all groups of the course
         $accessallgroups = ($cmgroupmode == NOGROUPS) ||
                 has_capability('moodle/site:accessallgroups', $this->context);
-        //Groups the current user is part of for checking valid requests if !$accessallgroups.
+        // Groups the current user is part of for checking valid requests if !$accessallgroups.
         $usergroups = groups_get_all_groups($this->cm->course, $USER->id);
 
         if (empty($entities) || !is_array($entities)) {
@@ -1022,10 +1023,11 @@ class checkmark {
 
         require_capability('mod/checkmark:manageoverrides', $this->context);
 
+        // Checks if current user is allowed to access all groups of the course.
         $cmgroupmode = groups_get_activity_groupmode($this->cm);
         $accessallgroups = ($cmgroupmode == NOGROUPS) ||
                 has_capability('moodle/site:accessallgroups', $this->context);
-        //Groups the current user is part of for checking valid requests if !$accessallgroups.
+        // Groups the current user is part of for checking valid requests if !$accessallgroups.
         $usergroups = groups_get_all_groups($this->cm->course, $USER->id);
 
         if (!is_array($entities)) {
@@ -1086,10 +1088,10 @@ class checkmark {
 
         require_capability('mod/checkmark:manageoverrides', $this->context);
 
+        // Checks if current user is allowed to access all groups of the course.
         $cmgroupmode = groups_get_activity_groupmode($this->cm);
         $accessallgroups = ($cmgroupmode == NOGROUPS) ||
                 has_capability('moodle/site:accessallgroups', $this->context);
-        //Groups the current user is part of for checking valid requests if !$accessallgroups.
 
         $sign = '<';
         $minmax = 'MIN';
