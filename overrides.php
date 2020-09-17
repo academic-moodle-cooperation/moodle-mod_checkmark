@@ -45,11 +45,18 @@ require_capability('mod/checkmark:manageoverrides', $context);
 
 $cmgroupmode = groups_get_activity_groupmode($cm);
 $accessallgroups = ($cmgroupmode == NOGROUPS) || has_capability('moodle/site:accessallgroups', $context);
+$joinstring = "";
+$joinwhere = "";
+if (!$accessallgroups) {
+    $joinstring = "JOIN {groups_members} gm ON (gm.groupid = ov.groupid)";
+    $joinwhere = "AND gm.userid = $USER->id ";
+}
 
 $sql = "SELECT MAX(grouppriority) AS max
-          FROM {checkmark_overrides}
-         WHERE checkmarkid = ? AND groupid IS NOT NULL AND
-            (timeavailable IS NOT NULL OR timedue IS NOT NULL OR cutoffdate IS NOT NULL)";
+          FROM {checkmark_overrides} ov
+          $joinstring
+         WHERE checkmarkid = ? AND ov.groupid IS NOT NULL AND
+            (timeavailable IS NOT NULL OR timedue IS NOT NULL OR cutoffdate IS NOT NULL) $joinwhere";
 $params = [$cm->instance];
 $highestgrouppriority = $DB->get_record_sql($sql, $params)->max;
 
