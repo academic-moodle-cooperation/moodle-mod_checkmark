@@ -1015,10 +1015,19 @@ class checkmark {
      * @throws dml_exception
      */
     public function delete_override($entities, $mode = \mod_checkmark\overrideform::USER) {
-        global $DB;
+        global $DB, $USER;
         if (empty($entities)) {
             return;
         }
+
+        require_capability('mod/checkmark:manageoverrides', $this->context);
+
+        $cmgroupmode = groups_get_activity_groupmode($this->cm);
+        $accessallgroups = ($cmgroupmode == NOGROUPS) ||
+                has_capability('moodle/site:accessallgroups', $this->context);
+        //Groups the current user is part of for checking valid requests if !$accessallgroups.
+        $usergroups = groups_get_all_groups($this->cm->course, $USER->id);
+
         if (!is_array($entities)) {
             $entities = array($entities);
         }
@@ -1033,6 +1042,10 @@ class checkmark {
         foreach ($entities as $cur) {
             $existingrecord = null;
             if ($mode == \mod_checkmark\overrideform::GROUP) {
+                if (!$accessallgroups && !array_key_exists($cur, $usergroups)) {
+                    // Will always throw an exception once we get here.
+                    require_capability('moodle/site:accessallgroups', $this->context);
+                }
                 $existingrecord = $DB->get_record('checkmark_overrides',
                         array('groupid' => $cur, 'checkmarkid' => $this->cm->instance));
                 $eventparams['objectid'] = $existingrecord->id;
@@ -1041,6 +1054,12 @@ class checkmark {
                 $event = \mod_checkmark\event\group_override_deleted::create($eventparams);
 
             } else {
+                $curgroups = groups_get_all_groups($this->cm->course, $cur);
+                // Checks if user to delete the override from has at least one group in common with the user performing the action.
+                if (empty(array_intersect(array_keys($usergroups), array_keys($curgroups)))) {
+                    // Will always throw an exception once we get here.
+                    require_capability('moodle/site:accessallgroups', $this->context);
+                }
                 $existingrecord = $DB->get_record('checkmark_overrides', array('userid' => $cur,
                         'checkmarkid' => $this->cm->instance));
                 $eventparams['objectid'] = $existingrecord->id;
