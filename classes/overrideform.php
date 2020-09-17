@@ -133,10 +133,9 @@ class overrideform extends \moodleform {
                     $users = [];
                     foreach (groups_get_user_groups($this->cm->course) as $grouping) {
                         foreach ($grouping as $group) {
-                            $users[] = groups_get_members($group);
+                            $users += groups_get_members($group);
                         }
                     }
-                    $users = array_merge([], ...$users);
                 }
                 foreach ($users as $userid => $cur) {
                     $users[$userid] = fullname($cur);

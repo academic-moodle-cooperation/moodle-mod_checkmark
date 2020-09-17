@@ -873,6 +873,13 @@ class checkmark {
     public function override_dates(array $entities, int $timeavailable, int $timedue, int $cutoffdate,
             string $mode = \mod_checkmark\overrideform::USER) {
         global $DB, $USER;
+        require_capability('mod/checkmark:manageoverrides', $this->context);
+
+        $cmgroupmode = groups_get_activity_groupmode($this->cm);
+        $accessallgroups = ($cmgroupmode == NOGROUPS) ||
+                has_capability('moodle/site:accessallgroups', $this->context);
+        //Groups the current user is part of for checking valid requests if !$accessallgroups.
+        $usergroups = groups_get_all_groups($this->cm->course, $USER->id);
 
         if (empty($entities) || !is_array($entities)) {
             return;
@@ -920,10 +927,22 @@ class checkmark {
                     )
             );
             if ($mode == \mod_checkmark\overrideform::GROUP) {
+                if (!$accessallgroups && !array_key_exists($cur, $usergroups)) {
+                    // Will always throw an exception once we get here.
+                    require_capability('moodle/site:accessallgroups', $this->context);
+                }
                 $record->groupid = $cur;
                 $existingrecord = $DB->get_record('checkmark_overrides',
                         array('groupid' => $cur, 'checkmarkid' => $this->cm->instance));
             } else {
+                if (!$accessallgroups) {
+                    $curgroups = groups_get_all_groups($this->cm->course, $cur);
+                    // Checks if user to override has at least one group in common with the user performing the action.
+                    if (empty(array_intersect(array_keys($usergroups), array_keys($curgroups)))) {
+                        // Will always throw an exception once we get here.
+                        require_capability('moodle/site:accessallgroups', $this->context);
+                    }
+                }
                 $record->userid = $cur;
                 $existingrecord = $DB->get_record('checkmark_overrides', array('userid' => $cur,
                         'checkmarkid' => $this->cm->instance));
