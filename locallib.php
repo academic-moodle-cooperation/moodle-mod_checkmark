@@ -1101,9 +1101,13 @@ class checkmark {
         }
         $joinstring = "";
         $joinwhere = "";
+        $params = ['groupid' => $groupidfrom, 'checkmarkid' => $this->cm->instance,
+                'checkmarkid2' => $this->cm->instance, 'checkmarkid3' => $this->cm->instance];
+
         if (!$accessallgroups) {
             $joinstring = "JOIN {groups_members} gm ON (gm.groupid = ov.groupid)";
-            $joinwhere = "AND gm.userid = $USER->id ";
+            $joinwhere = "AND gm.userid = :userid ";
+            $params['userid'] = $USER->id;
         }
         $sql = "SELECT groupid AS groupidto, grouppriority
                   FROM {checkmark_overrides} o
@@ -1119,8 +1123,6 @@ class checkmark {
                         ) o1 ON o1.priority = o.grouppriority
                 WHERE checkmarkid = :checkmarkid3;";
 
-        $params = ['groupid' => $groupidfrom, 'checkmarkid' => $this->cm->instance,
-                'checkmarkid2' => $this->cm->instance, 'checkmarkid3' => $this->cm->instance];
         $groupto = $DB->get_record_sql($sql, $params, MUST_EXIST);
             $this->swap_group_overrides($groupidfrom, $groupto->groupidto);
     }
