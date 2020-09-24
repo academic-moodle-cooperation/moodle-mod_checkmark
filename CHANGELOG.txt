@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.9.1 (2020-09-23)
+------------------
+* [FIXED]   #6703 Fixed user and group overrides not considering the moodle/site:accessallgroups
+                  permission in activities with group mode "Separate groups" set
+
 3.9.0 (2020-06-08)
 ------------------
 * [FEATURE] #6360 Overhaul of user and group override feature to match the workings of the
