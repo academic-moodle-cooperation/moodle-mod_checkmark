@@ -18,8 +18,6 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
       | student2 | C1     | student        |
-    # We do not need to manually create the checkmark instance again,
-    # this has been testet in checkmark_adding.feature, use generators!
     And the following "activities" exist:
       | activity  | course | idnumber | name        | intro         | timeavailable | timedue |
       | checkmark | C1     | CM1      | Checkmark 1 | Description 1 | 0             | 0       |

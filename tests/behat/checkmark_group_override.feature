@@ -1,4 +1,4 @@
-@mod @mod_checkmark @amc
+@mod @mod_checkmark @amc @currentdev
 Feature: In a course, a teacher should be able to add overrides to general dates for a certain group
   In order to change the dates for a single group or multiple groups
   As a teacher
@@ -50,12 +50,58 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | student7 | G2 |
       | student7 | G3 |
       | student7 | G4 |
-    # We do not need to manually create the checkmark instance again,
-    # this has been testet in checkmark_adding.feature, use generators!
     And the following "activities" exist:
       | activity  | course | idnumber | name        | intro         | timeavailable | timedue |
       | checkmark | C1     | CM1      | Checkmark 1 | Description 1 | 0             | 0       |
 
+  @javascript
+  Scenario: Add, edit and delete a group override
+    When I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 1"
+    And I navigate to "Group overrides" in current page administration
+    And I press "Add group override"
+    And I open the autocomplete suggestions list
+    And I click on "Group 1" item in the autocomplete list
+    And I set the following fields to these values:
+      | id_timedue_enabled | 1 |
+      | timedue[day]       | 1 |
+      | timedue[month]     | February |
+      | timedue[year]      | 2020 |
+      | timedue[hour]      | 08 |
+      | timedue[minute]    | 00 |
+    And I press "id_override"
+    Then I should see "Group 1"
+    And I should see "Due date"
+    And I should see "Saturday, 1 February 2020, 8:00"
+    When I follow "Edit"
+    And I set the following fields to these values:
+      | id_timedue_enabled | 1 |
+      | timedue[day]       | 15 |
+      | timedue[month]     | March |
+      | timedue[year]      | 2020 |
+      | timedue[hour]      | 08 |
+      | timedue[minute]    | 00 |
+      | id_timeavailable_enabled | 1 |
+      | timeavailable[day]       | 1 |
+      | timeavailable[month]     | March |
+      | timeavailable[year]      | 2020 |
+      | timeavailable[hour]      | 08 |
+      | timeavailable[minute]    | 00 |
+    And I press "id_override"
+    Then I should see "Group 1"
+    And I should see "Due date"
+    And I should see "Sunday, 15 March 2020, 8:00"
+    And I should see "Open"
+    And I should see "Sunday, 1 March 2020, 8:00"
+    When I follow "Delete"
+    And I press "Continue"
+    Then I should not see "Group 1"
+    And I should not see "Due date"
+    And I should not see "Sunday, 15 March 2020, 8:00"
+    And I should not see "Open"
+    And I should not see "Sunday, 1 March 2020, 8:00"
+    And I should see "Add group override"
 
 
 
