@@ -1,8 +1,8 @@
 @mod @mod_checkmark @amc
-Feature: In a course, a teacher should be able to add overrides to general dates for a certain user
-  In order to change the dates for a single user
+Feature: In a course, a teacher should be able to add overrides to general dates for a certain group
+  In order to change the dates for a single group or multiple groups
   As a teacher
-  I need to be able to create an user override and save it
+  I need to be able to create a group override and save it. Also I need to be capable of editing, duplicating and deleting the override
 
   Background:
     Given the following "courses" exist:
