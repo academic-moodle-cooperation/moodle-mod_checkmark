@@ -2539,11 +2539,11 @@ class checkmark {
         $mform->setDefault('filter', $filter);
 
         $mform->addElement('select', 'perpage', get_string('pagesize', 'checkmark'), [
-                0 => get_string('all'),
                 10 => 10,
                 20 => 20,
                 50 => 50,
-                100 => 100
+                100 => 100,
+                0 => get_string('all')
         ]);
         $mform->setDefault('perpage', $perpage);
 
