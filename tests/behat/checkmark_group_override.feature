@@ -1,4 +1,4 @@
-@mod @mod_checkmark @amc @currentdev
+@mod @mod_checkmark @amc
 Feature: In a course, a teacher should be able to add overrides to general dates for a certain group
   In order to change the dates for a single group or multiple groups
   As a teacher
@@ -102,6 +102,158 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I should not see "Open"
     And I should not see "Sunday, 1 March 2020, 8:00"
     And I should see "Add group override"
+
+    @javascript
+    Scenario: Add and duplicate a group override
+      When I log in as "teacher1"
+      And I am on "Course 1" course homepage
+      And I follow "Checkmark 1"
+      And I navigate to "Group overrides" in current page administration
+      And I press "Add group override"
+      And I open the autocomplete suggestions list
+      And I click on "Group 1" item in the autocomplete list
+      And I set the following fields to these values:
+        | id_timedue_enabled | 1 |
+        | timedue[day]       | 1 |
+        | timedue[month]     | February |
+        | timedue[year]      | 2020 |
+        | timedue[hour]      | 08 |
+        | timedue[minute]    | 00 |
+      And I press "id_override"
+      Then I should see "Group 1"
+      And I should see "Due date"
+      And I should see "Saturday, 1 February 2020, 8:00"
+      When I follow "copy"
+      And I open the autocomplete suggestions list
+      And I click on "Group 2" item in the autocomplete list
+      And I click on "Group 3" item in the autocomplete list
+      And I press "id_override"
+      Then I should see "Group 2"
+      And I should see "Group 3"
+
+  @javascript
+  Scenario: Allow users in a given group to have a different due date
+    Given I log in as "teacher1"
+    And I am on "Course 1" course homepage with editing mode on
+    When I follow "Checkmark 1"
+    And I navigate to "Edit settings" in current page administration
+    And I set the following fields to these values:
+      | id_timedue_enabled | 1 |
+      | timedue[day]       | 1 |
+      | timedue[month]     | January |
+      | timedue[year]      | 2020 |
+      | timedue[hour]      | 08 |
+      | timedue[minute]    | 00 |
+    And I press "Save and display"
+    And I navigate to "Group overrides" in current page administration
+    And I press "Add group override"
+    And I open the autocomplete suggestions list
+    And I click on "Group 1" item in the autocomplete list
+    And I set the following fields to these values:
+      | id_timedue_enabled | 1 |
+      | timedue[day]       | 1 |
+      | timedue[month]     | February |
+      | timedue[year]      | 2020 |
+      | timedue[hour]      | 08 |
+      | timedue[minute]    | 00 |
+    And I press "id_override"
+    Then I should see "Saturday, 1 February 2020, 8:00"
+    And I log out
+    When I log in as "student2"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 1"
+    Then I should see "Wednesday, 1 January 2020, 8:00"
+    And I log out
+    When I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 1"
+    Then I should see "Saturday, 1 February 2020, 8:00"
+
+  @javascript
+  Scenario: Allow a user to have a different allow submissions from date
+    Given I log in as "teacher1"
+    And I am on "Course 1" course homepage with editing mode on
+    When I follow "Checkmark 1"
+    And I navigate to "Edit settings" in current page administration
+    And I set the following fields to these values:
+      | id_timeavailable_enabled | 1 |
+      | timeavailable[day]       | 1 |
+      | timeavailable[month]     | January |
+      | timeavailable[year]      | 2020 |
+      | timeavailable[hour]      | 08 |
+      | timeavailable[minute]    | 00 |
+    And I press "Save and display"
+    And I navigate to "Group overrides" in current page administration
+    And I press "Add group override"
+    And I open the autocomplete suggestions list
+    And I click on "Group 1" item in the autocomplete list
+    And I set the following fields to these values:
+      | id_timeavailable_enabled | 1 |
+      | timeavailable[day]       | 1 |
+      | timeavailable[month]     | February |
+      | timeavailable[year]      | 2050 |
+      | timeavailable[hour]      | 08 |
+      | timeavailable[minute]    | 00 |
+    And I press "id_override"
+    Then I should see "Tuesday, 1 February 2050, 8:00"
+    And I log out
+    When I log in as "student2"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 1"
+    Then I should see "Wednesday, 1 January 2020, 8:00"
+    And "Save changes" "button" should be visible
+    And I log out
+    When I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 1"
+    Then I should see "Tuesday, 1 February 2050, 8:00"
+    And "Save changes" "button" should not be visible
+
+  @javascript
+  Scenario: Allow a user to have a different cut-off date
+    Given I log in as "teacher1"
+    And I am on "Course 1" course homepage with editing mode on
+    When I follow "Checkmark 1"
+    And I navigate to "Edit settings" in current page administration
+    And I set the following fields to these values:
+      | id_timedue_enabled | 1 |
+      | timedue[day]       | 1 |
+      | timedue[month]     | February |
+      | timedue[year]      | 2020 |
+      | timedue[hour]      | 08 |
+      | timedue[minute]    | 00 |
+      | id_cutoffdate_enabled | 1 |
+      | cutoffdate[day]       | 1 |
+      | cutoffdate[month]     | February |
+      | cutoffdate[year]      | 2050 |
+      | cutoffdate[hour]      | 08 |
+      | cutoffdate[minute]    | 00 |
+    And I press "Save and display"
+    And I navigate to "Group overrides" in current page administration
+    And I press "Add group override"
+    And I open the autocomplete suggestions list
+    And I click on "Group 1" item in the autocomplete list
+    And I set the following fields to these values:
+      | id_cutoffdate_enabled | 1 |
+      | cutoffdate[day]       | 2 |
+      | cutoffdate[month]     | February |
+      | cutoffdate[year]      | 2020 |
+      | cutoffdate[hour]      | 08 |
+      | cutoffdate[minute]    | 00 |
+    And I press "id_override"
+    Then I should see "Sunday, 2 February 2020, 8:00"
+    And I log out
+    When I log in as "student2"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 1"
+    Then I should see "Saturday, 1 February 2020, 8:00"
+    And "Save changes" "button" should be visible
+    And I log out
+    When I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 1"
+    Then I should see "Saturday, 1 February 2020, 8:00"
+    And "Save changes" "button" should not be visible
 
 
 
