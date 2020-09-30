@@ -277,7 +277,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       And I should see "Saturday, 1 February 2020, 8:00"
       When I press "Add group override"
       And I open the autocomplete suggestions list
-      And I click on "Group 1" item in the autocomplete list
+      And I click on "Group 2" item in the autocomplete list
       And I set the following fields to these values:
         | id_timedue_enabled | 1 |
         | timedue[day]       | 1 |
@@ -296,12 +296,12 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       When I log in as "student2"
       And I am on "Course 1" course homepage
       And I follow "Checkmark 1"
-      Then I should see "Saturday, 1 March 2020, 8:00"
+      Then I should see "Sunday, 1 March 2020, 8:00"
       And I log out
       When I log in as "student5"
       And I am on "Course 1" course homepage
       And I follow "Checkmark 1"
-      Then I should see "Saturday, 1 March 2020, 8:00"
+      Then I should see "Sunday, 1 March 2020, 8:00"
       And I log out
       When I log in as "teacher1"
       And I am on "Course 1" course homepage
@@ -323,7 +323,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       When I log in as "student5"
       And I am on "Course 1" course homepage
       And I follow "Checkmark 1"
-      Then I should see "Saturday, 1 March 2020, 8:00"
+      Then I should see "Sunday, 1 March 2020, 8:00"
       And I log out
 
 
