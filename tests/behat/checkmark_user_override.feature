@@ -62,7 +62,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I follow "Checkmark 1"
     Then I should see "Saturday, 1 February 2020, 8:00"
 
-  @javascript @currentdev
+  @javascript
   Scenario: Allow a user to have a different allow submissions from date
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
@@ -102,7 +102,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     Then I should see "## tomorrow ##l, j F Y, 8:00##"
     And "Save changes" "button" should not be visible
 
-  @javascript @currentdev
+  @javascript
   Scenario: Allow a user to have a different cut-off date
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
