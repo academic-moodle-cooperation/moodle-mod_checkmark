@@ -226,7 +226,6 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I should see "Student 2"
     And I should see "Student 3"
 
-    @currentdev
   Scenario: A teacher without accessallgroups permission should only be able to add user override for users that he/she shares groups with,
   when the activity's group mode is "separate groups"
     Given the following "permission overrides" exist:
@@ -251,6 +250,59 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I press "Add user override"
     Then the "Users" select box should contain "Student 1"
     And the "Users" select box should not contain "Student 2"
+
+  @javascript @currentdev
+  Scenario: A teacher without accessallgroups permission should only be able to see the user override for users that he/she shares groups with,
+  when the activity's group mode is "separate groups"
+    Given the following "permission overrides" exist:
+      | capability                  | permission | role           | contextlevel | reference |
+      | moodle/site:accessallgroups | Prevent    | editingteacher | Course       | C1        |
+    And the following "activities" exist:
+      | activity    | name        | intro                   | course | idnumber    | groupmode |
+      | checkmark   | Checkmark 2 | Checkmark 2 description | C1     | checkmark2  | 1         |
+    And the following "groups" exist:
+      | name    | course | idnumber |
+      | Group 1 | C1     | G1       |
+      | Group 2 | C1     | G2       |
+    And the following "group members" exist:
+      | user     | group |
+      | teacher1 | G1    |
+      | student1 | G1    |
+      | student2 | G2    |
+    And I log in as "admin"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 2"
+    And I navigate to "User overrides" in current page administration
+    And I press "Add user override"
+    And I open the autocomplete suggestions list
+    And I click on "Student 1" item in the autocomplete list
+    And I set the following fields to these values:
+      | id_timeavailable_enabled | 1       |
+      | timeavailable[day]       | 1       |
+      | timeavailable[month]     | January |
+      | timeavailable[year]      | 2015    |
+      | timeavailable[hour]      | 08      |
+      | timeavailable[minute]    | 00      |
+    And I press "Override and create a new override"
+    And I open the autocomplete suggestions list
+    And I click on "Student 2" item in the autocomplete list
+    And I set the following fields to these values:
+      | id_timeavailable_enabled | 1        |
+      | timeavailable[day]       | 1        |
+      | timeavailable[month]     | January  |
+      | timeavailable[year]      | 2015     |
+      | timeavailable[hour]      | 08       |
+      | timeavailable[minute]    | 00       |
+    And I press "id_override"
+    And I log out
+    When I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 2"
+    And I navigate to "User overrides" in current page administration
+    Then I should see "Student 1"
+    And I should not see "Student 2"
+
+
 
 
 

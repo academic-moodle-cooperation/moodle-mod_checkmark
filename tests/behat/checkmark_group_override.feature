@@ -371,6 +371,71 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I should see "Due date"
     And I should see "Sunday, 1 March 2020, 8:00"
 
+  @currentdev
+  Scenario: A teacher without accessallgroups permission should only be able to add group overrides for groups that he/she it in,
+  when the activity's group mode is "separate groups"
+    Given the following "permission overrides" exist:
+      | capability                  | permission | role           | contextlevel | reference |
+      | moodle/site:accessallgroups | Prevent    | editingteacher | Course       | C1        |
+    And the following "activities" exist:
+      | activity    | name        | intro                   | course | idnumber    | groupmode |
+      | checkmark   | Checkmark 2 | Checkmark 2 description | C1     | checkmark2  | 1         |
+    And the following "group members" exist:
+      | user     | group |
+      | teacher1 | G1    |
+    When I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 2"
+    And I navigate to "Group overrides" in current page administration
+    And I press "Add group override"
+    Then the "Groups" select box should contain "Group 1"
+    And the "Groups" select box should not contain "Group 2"
+
+  @javascript @currentdev
+  Scenario: A teacher without accessallgroups permission should only be able to see the group overrides for groups that he/she is in,
+  when the activity's group mode is "separate groups"
+    Given the following "permission overrides" exist:
+      | capability                  | permission | role           | contextlevel | reference |
+      | moodle/site:accessallgroups | Prevent    | editingteacher | Course       | C1        |
+    And the following "activities" exist:
+      | activity    | name        | intro                   | course | idnumber    | groupmode |
+      | checkmark   | Checkmark 2 | Checkmark 2 description | C1     | checkmark2  | 1         |
+    And the following "group members" exist:
+      | user     | group |
+      | teacher1 | G1    |
+    And I log in as "admin"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 2"
+    And I navigate to "Group overrides" in current page administration
+    And I press "Add group override"
+    And I open the autocomplete suggestions list
+    And I click on "Group 1" item in the autocomplete list
+    And I set the following fields to these values:
+      | id_timeavailable_enabled | 1       |
+      | timeavailable[day]       | 1       |
+      | timeavailable[month]     | January |
+      | timeavailable[year]      | 2015    |
+      | timeavailable[hour]      | 08      |
+      | timeavailable[minute]    | 00      |
+    And I press "Override and create a new override"
+    And I open the autocomplete suggestions list
+    And I click on "Group 2" item in the autocomplete list
+    And I set the following fields to these values:
+      | id_timeavailable_enabled | 1        |
+      | timeavailable[day]       | 1        |
+      | timeavailable[month]     | January  |
+      | timeavailable[year]      | 2015     |
+      | timeavailable[hour]      | 08       |
+      | timeavailable[minute]    | 00       |
+    And I press "id_override"
+    And I log out
+    When I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 2"
+    And I navigate to "Group overrides" in current page administration
+    Then I should see "Group 1"
+    And I should not see "Group 2"
+
 
 
 
