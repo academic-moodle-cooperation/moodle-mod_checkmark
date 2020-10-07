@@ -226,6 +226,32 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I should see "Student 2"
     And I should see "Student 3"
 
+    @currentdev
+  Scenario: A teacher without accessallgroups permission should only be able to add user override for users that he/she shares groups with,
+  when the activity's group mode is "separate groups"
+    Given the following "permission overrides" exist:
+      | capability                  | permission | role           | contextlevel | reference |
+      | moodle/site:accessallgroups | Prevent    | editingteacher | Course       | C1        |
+    And the following "activities" exist:
+      | activity    | name        | intro                   | course | idnumber    | groupmode |
+      | checkmark   | Checkmark 2 | Checkmark 2 description | C1     | checkmark2  | 1         |
+    And the following "groups" exist:
+      | name    | course | idnumber |
+      | Group 1 | C1     | G1       |
+      | Group 2 | C1     | G2       |
+    And the following "group members" exist:
+      | user     | group |
+      | teacher1 | G1    |
+      | student1 | G1    |
+      | student2 | G2    |
+    When I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 2"
+    And I navigate to "User overrides" in current page administration
+    And I press "Add user override"
+    Then the "Users" select box should contain "Student 1"
+    And the "Users" select box should not contain "Student 2"
+
 
 
 

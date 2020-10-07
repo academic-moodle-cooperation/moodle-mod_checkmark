@@ -255,7 +255,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     Then I should see "Saturday, 1 February 2020, 8:00"
     And "Save changes" "button" should not be visible
 
-    @javascript @currentdev
+    @javascript
     Scenario: Reorder group overrides and use the one with the highest priority for a given user
       When I log in as "teacher1"
       And I am on "Course 1" course homepage
@@ -325,6 +325,51 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       And I follow "Checkmark 1"
       Then I should see "Sunday, 1 March 2020, 8:00"
       And I log out
+
+  @javascript
+  Scenario: Create user and group overrides and check if user overrides are priorotized over group overrides
+    When I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 1"
+    And I navigate to "Group overrides" in current page administration
+    And I press "Add group override"
+    And I open the autocomplete suggestions list
+    And I click on "Group 1" item in the autocomplete list
+    And I set the following fields to these values:
+      | id_timedue_enabled | 1 |
+      | timedue[day]       | 1 |
+      | timedue[month]     | February |
+      | timedue[year]      | 2020 |
+      | timedue[hour]      | 08 |
+      | timedue[minute]    | 00 |
+    And I press "id_override"
+    Then I should see "Group 1"
+    And I should see "Due date"
+    And I should see "Saturday, 1 February 2020, 8:00"
+    And I log out
+    When I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 1"
+    Then I should see "Saturday, 1 February 2020, 8:00"
+    And I log out
+    When I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 1"
+    And I navigate to "User overrides" in current page administration
+    And I press "Add user override"
+    And I open the autocomplete suggestions list
+    And I click on "Student 1" item in the autocomplete list
+    And I set the following fields to these values:
+      | id_timedue_enabled | 1 |
+      | timedue[day]       | 1 |
+      | timedue[month]     | March |
+      | timedue[year]      | 2020 |
+      | timedue[hour]      | 08 |
+      | timedue[minute]    | 00 |
+    And I press "id_override"
+    Then I should see "Student 1"
+    And I should see "Due date"
+    And I should see "Sunday, 1 March 2020, 8:00"
 
 
 
