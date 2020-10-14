@@ -2701,6 +2701,8 @@ class checkmark {
             set_user_preference('checkmark_sumabs', $sumabs);
             $sumrel = optional_param('sumrel', 0, PARAM_INT);
             set_user_preference('checkmark_sumrel', $sumrel);
+            $seperatenamecolumns = optional_param('seperatenamecolumns', 0, PARAM_BOOL);
+            set_user_preference('checkmark_seperatenamecolumns', $seperatenamecolumns);
             if ($format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
                 $printperpage = optional_param('printperpage', 0, PARAM_INT);
                 $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
@@ -2723,6 +2725,7 @@ class checkmark {
             $filter = get_user_preferences('checkmark_filter_export', self::FILTER_ALL);
             $sumabs = get_user_preferences('checkmark_sumabs', 1);
             $sumrel = get_user_preferences('checkmark_sumrel', 1);
+            $seperatenamecolumns = get_user_preferences('checkmark_seperatenamecolumns', 0);
             $format = get_user_preferences('checkmark_format', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
         }
 
@@ -2752,6 +2755,7 @@ class checkmark {
                 $filter,
                 $sumabs,
                 $sumrel,
+                $seperatenamecolumns,
                 $format,
                 $printperpage,
                 $printoptimum,
@@ -2779,7 +2783,7 @@ class checkmark {
              * First we check to see if the form has just been submitted
              * to request user_preference updates!
              */
-            list($filter, $sumabs, $sumrel, $format, $printperpage, $printoptimum, $textsize, $pageorientation,
+            list($filter, $sumabs, $sumrel, $seperatenamecolumns, $format, $printperpage, $printoptimum, $textsize, $pageorientation,
                     $printheader, $forcesinglelinenames, $zipped) = $this->print_preferences();
 
             ob_start();
@@ -2807,6 +2811,7 @@ class checkmark {
                     'filter' => $filter,
                     'sumabs' => $sumabs,
                     'sumrel' => $sumrel,
+                    'seperatenamecolumns' => $seperatenamecolumns,
                     'format' => $format,
                     'printperpage' => $printperpage,
                     'printoptimum' => $printoptimum,
@@ -2977,7 +2982,7 @@ class checkmark {
          * First we check to see if the form has just been submitted
          * to request user_preference updates! We don't use $printoptimum here, it's implicit in $printperpage!
          */
-        list($filter, , , $format, , , , , , , $zipped) = $this->print_preferences();
+        list($filter, , , , $format, , , , , , , $zipped) = $this->print_preferences();
 
         $usrlst = optional_param_array('selected', [], PARAM_INT);
 
@@ -3018,7 +3023,7 @@ class checkmark {
         /*
          * Get all settings preferences, some will be overwritten if a template is used!
          */
-        list($filter, $sumabs, $sumrel, $format, $printperpage, ,
+        list($filter, $sumabs, $sumrel, $seperatenamecolumns, $format, $printperpage, ,
                 $textsize, $orientation, $printheader, $forcesinglelinenames) = $this->print_preferences();
 
         if (!empty($template)) {
@@ -3099,7 +3104,7 @@ class checkmark {
         $pdf->setoutputformat($format);
 
         $export = new \mod_checkmark\export();
-        $export->set_general_data($groupmode, $currentgroup, $usrlst, $filter, $format, $sumabs, $sumrel);
+        $export->set_general_data($groupmode, $currentgroup, $usrlst, $filter, $format, $sumabs, $sumrel, $seperatenamecolumns);
         if ($format === \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
             $export->set_pdf_data($orientation, $printheader, $textsize, $printperpage, $forcesinglelinenames);
         }
@@ -3144,7 +3149,7 @@ class checkmark {
         /*
          * Get all settings preferences, some will be overwritten if a template is used!
          */
-        list($filter, $sumabs, $sumrel, $format, $printperpage, ,
+        list($filter, $sumabs, $sumrel, $seperatenamecolumns, $format, $printperpage, ,
                 $textsize, $orientation, $printheader, $forcesinglelinenames) = $this->print_preferences();
 
         if (!empty($template)) {
@@ -3217,7 +3222,7 @@ class checkmark {
 
             $curexport = new \mod_checkmark\export();
             $groupid = $currentgroup ? $currentgroup->id : 0;
-            $curexport->set_general_data($groupmode, $groupid, $usrlst, $filter, $format, $sumabs, $sumrel);
+            $curexport->set_general_data($groupmode, $groupid, $usrlst, $filter, $format, $sumabs, $sumrel, $seperatenamecolumns);
             if ($format === \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
                 $curexport->set_pdf_data($orientation, $printheader, $textsize, $printperpage, $forcesinglelinenames);
             }
@@ -3264,7 +3269,7 @@ class checkmark {
          * First we check to see if the form has just been submitted
          * to request user_preference updates! We don't use $printoptimum here, it's implicit in $printperpage!
          */
-        list($filter, , , $format, , , , , , , $zipped) = $this->print_preferences();
+        list($filter, , , , $format, , , , , , , $zipped) = $this->print_preferences();
 
         if ($zipped === \mod_checkmark\MTablePDF::ZIPPED) {
             $this->export_zipped_group_pdfs();

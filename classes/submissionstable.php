@@ -635,6 +635,7 @@ class submissionstable extends \table_sql {
         $table->sumabs     = get_user_preferences('checkmark_sumabs', 1);
         $table->sumrel     = get_user_preferences('checkmark_sumrel', 1);
         $forcesinglelinenames = get_user_preferences('checkmark_forcesinglelinenames', 0);
+        $seperatenamecolumns = get_user_preferences('checkmark_seperatenamecolumns', 0);
         $table->quickgrade = 0;
         $table->filter = $filter;
         $table->defaultselectstate = true; // Select all checkboxes by default!
@@ -646,7 +647,7 @@ class submissionstable extends \table_sql {
         $table->cellwidth = [];
         $table->columnformat = [];
         $namefieldcount = 1;
-        if ($table->is_downloading()){
+        if (!$seperatenamecolumns){
             $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '25'];
             $table->columnformat['fullname'] = ['align' => 'L'];
             $tablecolumns[]= 'fullname';

@@ -88,6 +88,8 @@ class export {
     private $sumabs = null;
     /** @var $sumrel bool whether to export relative values */
     private $sumrel = null;
+    /** @var $seperatenamecolumns bool whether or not name fragments are exported in separate columns */
+    private $seperatenamecolumns = false;
 
     // Additional PDF export settings!
     /** @var $orientation string page orientation to use for PDF output */
@@ -100,6 +102,7 @@ class export {
     private $perpage = 0;
     /** @var $singlelinenames bool whether or not names should be restricted on a single line */
     private $singlelinenames = false;
+
 
     /** @var $template string Template used for the export */
     private $template = '';
@@ -126,7 +129,7 @@ class export {
      * @param bool $sumabs
      * @param bool $sumrel
      */
-    public function set_general_data($groupmode, $groupid, $selected, $filter, $format, $sumabs, $sumrel) {
+    public function set_general_data($groupmode, $groupid, $selected, $filter, $format, $sumabs, $sumrel, $seperatenamecolumns) {
         $this->groupmode = $groupmode;
         $this->groupid = $groupid;
         $this->usrlst = $selected;
@@ -136,6 +139,7 @@ class export {
         $this->formatreadable = $this->formats[$format];
         $this->sumabs = $sumabs;
         $this->sumrel = $sumrel;
+        $this->seperatenamecolumns = $seperatenamecolumns;
     }
 
     /**

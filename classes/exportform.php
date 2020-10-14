@@ -93,6 +93,9 @@ class exportform extends \moodleform {
 
         $this->add_groupselect();
 
+        $mform->addElement('checkbox', 'seperatenamecolumns', get_string('seperatenamecolumns', 'checkmark'));
+        $mform->addHelpButton('seperatenamecolumns', 'seperatenamecolumns', 'checkmark');
+
         $summarygrp = [
             $mform->createElement('advcheckbox', 'sumabs', '', get_string('summary_abs', 'checkmark'), ['group' => 3]),
             $mform->createElement('advcheckbox', 'sumrel', '', get_string('summary_rel', 'checkmark'), ['group' => 3])
