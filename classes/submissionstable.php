@@ -647,12 +647,12 @@ class submissionstable extends \table_sql {
         $table->cellwidth = [];
         $table->columnformat = [];
         $namefieldcount = 1;
-        if (!$seperatenamecolumns){
+        if (!$seperatenamecolumns) {
             $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '25'];
             $table->columnformat['fullname'] = ['align' => 'L'];
-            $tablecolumns[]= 'fullname';
-            $tableheaders[]= get_string('name');
-            $helpicons[] = NULL;
+            $tablecolumns[] = 'fullname';
+            $tableheaders[] = get_string('name');
+            $helpicons[] = null;
             $table->column_suppress('fullname');
             $table->column_class('fullname', 'fullname');
             if ($forcesinglelinenames) {
@@ -677,13 +677,13 @@ class submissionstable extends \table_sql {
                     $usednamefields[$position] = $name;
                 }
             }
-            // Sort names in the order stated in $nameformat
+            // Sort names in the order stated in $nameformat.
             ksort($usednamefields);
 
             foreach ($usednamefields as $name) {
-                $tablecolumns[]= $name;
-                $tableheaders[]= get_string($name);
-                $helpicons[] = NULL;
+                $tablecolumns[] = $name;
+                $tableheaders[] = get_string($name);
+                $helpicons[] = null;
                 $table->column_suppress($name);
                 $table->column_class($name, $name);
                 $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '25'];
@@ -797,14 +797,7 @@ class submissionstable extends \table_sql {
         $table->sortable(true, 'lastname'); // Sorted by lastname by default!
         $table->collapsible(true);
         $table->initialbars(true);
-        if ($table->is_downloading()){
 
-        } else {
-            $table->column_suppress('lastname');
-            $table->column_class('lastname', 'lastname');
-            $table->column_suppress('firstname');
-            $table->column_class('firstname', 'firstname');
-        }
         foreach ($useridentity as $cur) {
             $table->column_class($cur, $cur == 'phone1' ? 'phone' : $cur);
         }

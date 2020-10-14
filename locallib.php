@@ -876,7 +876,7 @@ class checkmark {
         require_capability('mod/checkmark:manageoverrides', $this->context);
 
         $cmgroupmode = groups_get_activity_groupmode($this->cm);
-        // Checks if current user is allowed to access all groups of the course
+        // Checks if current user is allowed to access all groups of the course.
         $accessallgroups = ($cmgroupmode == NOGROUPS) ||
                 has_capability('moodle/site:accessallgroups', $this->context);
         // Groups the current user is part of for checking valid requests if !$accessallgroups.
@@ -2783,8 +2783,8 @@ class checkmark {
              * First we check to see if the form has just been submitted
              * to request user_preference updates!
              */
-            list($filter, $sumabs, $sumrel, $seperatenamecolumns, $format, $printperpage, $printoptimum, $textsize, $pageorientation,
-                    $printheader, $forcesinglelinenames, $zipped) = $this->print_preferences();
+            list($filter, $sumabs, $sumrel, $seperatenamecolumns, $format, $printperpage, $printoptimum, $textsize,
+                    $pageorientation, $printheader, $forcesinglelinenames, $zipped) = $this->print_preferences();
 
             ob_start();
             $this->get_print_data($filter);
