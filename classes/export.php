@@ -128,6 +128,7 @@ class export {
      *            \\mod_checkmark\\MTablePDF::OUTPUT\_FORMAT\_(PDF|XLSX|ODS|CSV\_(COMMA|TAB))
      * @param bool $sumabs
      * @param bool $sumrel
+     * @param bool $seperatenamecolumns Indicates if name fragment should be printed in seperate columns
      */
     public function set_general_data($groupmode, $groupid, $selected, $filter, $format, $sumabs, $sumrel, $seperatenamecolumns) {
         $this->groupmode = $groupmode;
