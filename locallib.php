@@ -2511,18 +2511,7 @@ class checkmark {
             $grp = array();
             $grp[] =& $mform->createElement('select', 'bulkaction', '');
             $enablebulk = false;
-            if ($this->checkmark->trackattendance
-                    && has_capability('mod/checkmark:trackattendance', $this->context)) {
-                $grp[0]->addOption(get_string('setattendant', 'checkmark'), 'setattendant');
-                $grp[0]->addOption(get_string('setabsent', 'checkmark'), 'setabsent');
-                $grp[0]->addOption('---', '', array('disabled' => 'disabled'));
-                $enablebulk = true;
-            }
-            if (has_capability('mod/checkmark:manageoverrides', $this->context)) {
-                $grp[0]->addOption(get_string('grant_extension', 'checkmark'), 'extend');
-                $grp[0]->addOption('---', '', ['disabled' => 'disabled']);
-                $enablebulk = true;
-            }
+
             if (($this->checkmark->grade <= 0)) {
                 // No autograde possible if no numeric grades are selected!
                 $mform->addElement('html', html_writer::div(get_string('autograde_non_numeric_grades', 'checkmark'),
@@ -2530,6 +2519,14 @@ class checkmark {
                 $grp[0]->addOption(get_string('grade_automatically', 'checkmark'), 'grade', array('disabled' => 'disabled'));
             } else {
                 $grp[0]->addOption(get_string('grade_automatically', 'checkmark'), 'grade');
+                $enablebulk = true;
+            }
+
+            if ($this->checkmark->trackattendance
+                    && has_capability('mod/checkmark:trackattendance', $this->context)) {
+                $grp[0]->addOption('---', '', array('disabled' => 'disabled'));
+                $grp[0]->addOption(get_string('setattendant', 'checkmark'), 'setattendant');
+                $grp[0]->addOption(get_string('setabsent', 'checkmark'), 'setabsent');
                 $enablebulk = true;
             }
 
@@ -2545,9 +2542,14 @@ class checkmark {
                     $attr = array();
                     $enablebulk = true;
                 }
-                $grp[0]->addOption('---', '', array('disabled' => 'disabled'));
                 $grp[0]->addOption(get_string('setattendantandgrade', 'checkmark'), 'setattendantandgrade', $attr);
                 $grp[0]->addOption(get_string('setabsentandgrade', 'checkmark'), 'setabsentandgrade', $attr);
+            }
+
+            if (has_capability('mod/checkmark:manageoverrides', $this->context)) {
+                $grp[0]->addOption('---', '', ['disabled' => 'disabled']);
+                $grp[0]->addOption(get_string('grant_extension', 'checkmark'), 'extend');
+                $enablebulk = true;
             }
 
             $attr = array();

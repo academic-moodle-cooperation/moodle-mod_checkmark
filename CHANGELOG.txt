@@ -1,6 +1,9 @@
 CHANGELOG
 =========
 
+3.10.0 (in development)
+* [FEATURE] #6071 Reorder bulk processing dropdown in order to have "grade automatically" on top
+
 3.9.1 (2020-09-23)
 ------------------
 * [FIXED]   #6703 Fixed user and group overrides not considering the moodle/site:accessallgroups
