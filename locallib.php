@@ -873,6 +873,14 @@ class checkmark {
     public function override_dates(array $entities, int $timeavailable, int $timedue, int $cutoffdate,
             string $mode = \mod_checkmark\overrideform::USER) {
         global $DB, $USER;
+        require_capability('mod/checkmark:manageoverrides', $this->context);
+
+        $cmgroupmode = groups_get_activity_groupmode($this->cm);
+        // Checks if current user is allowed to access all groups of the course
+        $accessallgroups = ($cmgroupmode == NOGROUPS) ||
+                has_capability('moodle/site:accessallgroups', $this->context);
+        // Groups the current user is part of for checking valid requests if !$accessallgroups.
+        $usergroups = groups_get_all_groups($this->cm->course, $USER->id);
 
         if (empty($entities) || !is_array($entities)) {
             return;
@@ -920,10 +928,22 @@ class checkmark {
                     )
             );
             if ($mode == \mod_checkmark\overrideform::GROUP) {
+                if (!$accessallgroups && !array_key_exists($cur, $usergroups)) {
+                    // Will always throw an exception once we get here.
+                    require_capability('moodle/site:accessallgroups', $this->context);
+                }
                 $record->groupid = $cur;
                 $existingrecord = $DB->get_record('checkmark_overrides',
                         array('groupid' => $cur, 'checkmarkid' => $this->cm->instance));
             } else {
+                if (!$accessallgroups) {
+                    $curgroups = groups_get_all_groups($this->cm->course, $cur);
+                    // Checks if user to override has at least one group in common with the user performing the action.
+                    if (empty(array_intersect(array_keys($usergroups), array_keys($curgroups)))) {
+                        // Will always throw an exception once we get here.
+                        require_capability('moodle/site:accessallgroups', $this->context);
+                    }
+                }
                 $record->userid = $cur;
                 $existingrecord = $DB->get_record('checkmark_overrides', array('userid' => $cur,
                         'checkmarkid' => $this->cm->instance));
@@ -996,10 +1016,20 @@ class checkmark {
      * @throws dml_exception
      */
     public function delete_override($entities, $mode = \mod_checkmark\overrideform::USER) {
-        global $DB;
+        global $DB, $USER;
         if (empty($entities)) {
             return;
         }
+
+        require_capability('mod/checkmark:manageoverrides', $this->context);
+
+        // Checks if current user is allowed to access all groups of the course.
+        $cmgroupmode = groups_get_activity_groupmode($this->cm);
+        $accessallgroups = ($cmgroupmode == NOGROUPS) ||
+                has_capability('moodle/site:accessallgroups', $this->context);
+        // Groups the current user is part of for checking valid requests if !$accessallgroups.
+        $usergroups = groups_get_all_groups($this->cm->course, $USER->id);
+
         if (!is_array($entities)) {
             $entities = array($entities);
         }
@@ -1014,6 +1044,10 @@ class checkmark {
         foreach ($entities as $cur) {
             $existingrecord = null;
             if ($mode == \mod_checkmark\overrideform::GROUP) {
+                if (!$accessallgroups && !array_key_exists($cur, $usergroups)) {
+                    // Will always throw an exception once we get here.
+                    require_capability('moodle/site:accessallgroups', $this->context);
+                }
                 $existingrecord = $DB->get_record('checkmark_overrides',
                         array('groupid' => $cur, 'checkmarkid' => $this->cm->instance));
                 $eventparams['objectid'] = $existingrecord->id;
@@ -1022,6 +1056,12 @@ class checkmark {
                 $event = \mod_checkmark\event\group_override_deleted::create($eventparams);
 
             } else {
+                $curgroups = groups_get_all_groups($this->cm->course, $cur);
+                // Checks if user to delete the override from has at least one group in common with the user performing the action.
+                if (empty(array_intersect(array_keys($usergroups), array_keys($curgroups)))) {
+                    // Will always throw an exception once we get here.
+                    require_capability('moodle/site:accessallgroups', $this->context);
+                }
                 $existingrecord = $DB->get_record('checkmark_overrides', array('userid' => $cur,
                         'checkmarkid' => $this->cm->instance));
                 $eventparams['objectid'] = $existingrecord->id;
@@ -1044,27 +1084,45 @@ class checkmark {
      * @throws dml_exception
      */
     public function reorder_group_overrides(int $groupidfrom, bool $decrease = false) {
-        global $DB;
+        global $DB, $USER;
+
+        require_capability('mod/checkmark:manageoverrides', $this->context);
+
+        // Checks if current user is allowed to access all groups of the course.
+        $cmgroupmode = groups_get_activity_groupmode($this->cm);
+        $accessallgroups = ($cmgroupmode == NOGROUPS) ||
+                has_capability('moodle/site:accessallgroups', $this->context);
+
         $sign = '<';
         $minmax = 'MIN';
         if ($decrease) {
             $sign = '>';
             $minmax = 'MAX';
         }
+        $joinstring = "";
+        $joinwhere = "";
+        $params = ['groupid' => $groupidfrom, 'checkmarkid' => $this->cm->instance,
+                'checkmarkid2' => $this->cm->instance, 'checkmarkid3' => $this->cm->instance];
+
+        if (!$accessallgroups) {
+            $joinstring = "JOIN {groups_members} gm ON (gm.groupid = ov.groupid)";
+            $joinwhere = "AND gm.userid = :userid ";
+            $params['userid'] = $USER->id;
+        }
         $sql = "SELECT groupid AS groupidto, grouppriority
                   FROM {checkmark_overrides} o
                   JOIN (
                         SELECT $minmax(grouppriority) priority
-                          FROM {checkmark_overrides}
+                          FROM {checkmark_overrides} ov
+                          $joinstring
                          WHERE (
                                 SELECT grouppriority
                                   FROM {checkmark_overrides}
                                  WHERE groupid = :groupid AND checkmarkid = :checkmarkid
-                            ) $sign grouppriority AND groupid IS NOT NULL
+                            ) $sign grouppriority AND checkmarkid = :checkmarkid2 AND ov.groupid IS NOT NULL $joinwhere
                         ) o1 ON o1.priority = o.grouppriority
-                WHERE checkmarkid = :checkmarkid2;";
+                WHERE checkmarkid = :checkmarkid3;";
 
-        $params = ['groupid' => $groupidfrom, 'checkmarkid' => $this->cm->instance, 'checkmarkid2' => $this->cm->instance];
         $groupto = $DB->get_record_sql($sql, $params, MUST_EXIST);
             $this->swap_group_overrides($groupidfrom, $groupto->groupidto);
     }

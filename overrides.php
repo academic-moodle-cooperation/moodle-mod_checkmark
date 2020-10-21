@@ -45,19 +45,27 @@ require_capability('mod/checkmark:manageoverrides', $context);
 
 $cmgroupmode = groups_get_activity_groupmode($cm);
 $accessallgroups = ($cmgroupmode == NOGROUPS) || has_capability('moodle/site:accessallgroups', $context);
+$joinstring = "";
+$joinwhere = "";
+$params = ['checkmarkid' => $cm->instance];
+if (!$accessallgroups) {
+    $joinstring = "JOIN {groups_members} gm ON (gm.groupid = ov.groupid)";
+    $joinwhere = "AND gm.userid = :userid ";
+    $params['userid'] = $USER->id;
+}
 
 $sql = "SELECT MAX(grouppriority) AS max
-          FROM {checkmark_overrides}
-         WHERE checkmarkid = ? AND groupid IS NOT NULL AND
-            (timeavailable IS NOT NULL OR timedue IS NOT NULL OR cutoffdate IS NOT NULL)";
-$params = [$cm->instance];
+          FROM {checkmark_overrides} ov
+          $joinstring
+         WHERE checkmarkid = :checkmarkid AND ov.groupid IS NOT NULL AND
+            (timeavailable IS NOT NULL OR timedue IS NOT NULL OR cutoffdate IS NOT NULL) $joinwhere";
 $highestgrouppriority = $DB->get_record_sql($sql, $params)->max;
 
 $sql = "SELECT MIN(grouppriority) AS max
-          FROM {checkmark_overrides}
-         WHERE checkmarkid = ? AND groupid IS NOT NULL AND
-            (timeavailable IS NOT NULL OR timedue IS NOT NULL OR cutoffdate IS NOT NULL)";
-$params = [$cm->instance];
+          FROM {checkmark_overrides} ov
+          $joinstring
+         WHERE checkmarkid = :checkmarkid AND ov.groupid IS NOT NULL AND
+            (timeavailable IS NOT NULL OR timedue IS NOT NULL OR cutoffdate IS NOT NULL) $joinwhere";
 $lowestgrouppriority = $DB->get_record_sql($sql, $params)->max;
 
 // Get the course groups that the current user can access.
