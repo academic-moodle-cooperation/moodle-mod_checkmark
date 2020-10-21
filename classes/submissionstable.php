@@ -635,19 +635,63 @@ class submissionstable extends \table_sql {
         $table->sumabs     = get_user_preferences('checkmark_sumabs', 1);
         $table->sumrel     = get_user_preferences('checkmark_sumrel', 1);
         $forcesinglelinenames = get_user_preferences('checkmark_forcesinglelinenames', 0);
+        $seperatenamecolumns = get_user_preferences('checkmark_seperatenamecolumns', 0);
         $table->quickgrade = 0;
         $table->filter = $filter;
         $table->defaultselectstate = true; // Select all checkboxes by default!
 
         // Adapt table for export view (columns, etc.)!
-        $tableheaders = ['', get_string('name')];
-        $tablecolumns = ['selection', 'fullname'];
-        $table->cellwidth = [['mode' => 'Fixed', 'value' => '25']];
-        $table->columnformat = ['fullname' => ['align' => 'L']];
-        if ($forcesinglelinenames) {
-            $table->columnformat['fullname']['stretch'] = MTablePDF::STRETCH_SCALING;
+        $tableheaders = [''];
+        $tablecolumns = ['selection'];
+        $helpicons = [null];
+        $table->cellwidth = [];
+        $table->columnformat = [];
+        $namefieldcount = 1;
+        if (!$seperatenamecolumns) {
+            $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '25'];
+            $table->columnformat['fullname'] = ['align' => 'L'];
+            $tablecolumns[] = 'fullname';
+            $tableheaders[] = get_string('name');
+            $helpicons[] = null;
+            $table->column_suppress('fullname');
+            $table->column_class('fullname', 'fullname');
+            if ($forcesinglelinenames) {
+                $table->columnformat['fullname']['stretch'] = MTablePDF::STRETCH_SCALING;
+            }
+        } else {
+            // Find name fields used in nameformat and create columns in the same order.
+
+            if (has_capability('moodle/site:viewfullnames', $table->context)) {
+                $nameformat = $CFG->alternativefullnameformat;
+            } else {
+                $nameformat = $CFG->fullnamedisplay;
+            }
+            // Use default setting from language if no other format is defined.
+            if ($nameformat == 'language') {
+                $nameformat = get_string('fullnamedisplay');
+            }
+            $allnamefields = get_all_user_name_fields();
+            $usednamefields = [];
+            foreach ($allnamefields as $name) {
+                if (($position = strpos($nameformat, $name)) !== false) {
+                    $usednamefields[$position] = $name;
+                }
+            }
+            // Sort names in the order stated in $nameformat.
+            ksort($usednamefields);
+
+            foreach ($usednamefields as $name) {
+                $tablecolumns[] = $name;
+                $tableheaders[] = get_string($name);
+                $helpicons[] = null;
+                $table->column_suppress($name);
+                $table->column_class($name, $name);
+                $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '25'];
+                $table->columnformat[$name] = ['align' => 'L'];
+            }
+            $namefieldcount = count($usednamefields);
+
         }
-        $helpicons = [null, null];
         $table->add_colgroup(1, 'sel');
 
         $useridentity = get_extra_user_fields($table->context);
@@ -658,7 +702,7 @@ class submissionstable extends \table_sql {
             $table->columnformat[$cur] = ['align' => 'L'];
             $helpicons[] = null;
         }
-        $table->add_colgroup(count($useridentity) + 1, 'user');
+        $table->add_colgroup(count($useridentity) + $namefieldcount, 'user');
         if ($table->groupmode != NOGROUPS) {
             $tableheaders[] = get_string('group');
             $tablecolumns[] = 'groups';
@@ -754,9 +798,6 @@ class submissionstable extends \table_sql {
         $table->collapsible(true);
         $table->initialbars(true);
 
-        $table->column_suppress('fullname');
-
-        $table->column_class('fullname', 'fullname');
         foreach ($useridentity as $cur) {
             $table->column_class($cur, $cur == 'phone1' ? 'phone' : $cur);
         }
@@ -1080,7 +1121,7 @@ class submissionstable extends \table_sql {
 
     /**
      * This function is called for each data row to allow processing of the
-     * user picture.
+     * user name.
      *
      * @param object $values Contains object with all the values of record.
      * @return string Return user fullname.
@@ -1755,12 +1796,13 @@ class submissionstable extends \table_sql {
                 return \html_writer::tag('div', $example->print_examplestate(), ['id' => 'ex'.$values->id.'_'.$match[1]]);
             }
         }
-        // Process user identity fields!
+        // Process user identity fields and name fields!
         $useridentity = get_extra_user_fields($this->context);
+        $allnamefields = get_all_user_name_fields();
         if ($colname === 'phone') {
             $colname = 'phone1';
         }
-        if (in_array($colname, $useridentity)) {
+        if (in_array($colname, $useridentity) || in_array($colname, $allnamefields)) {
             if (!empty($values->$colname)) {
                 if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
                     return $values->$colname;
@@ -1775,7 +1817,6 @@ class submissionstable extends \table_sql {
                 }
             }
         }
-
         return '';
     }
 
