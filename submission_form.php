@@ -92,7 +92,10 @@ class checkmark_submission_form extends moodleform {
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');
 
-        $PAGE->requires->js_call_amd('mod_checkmark/submission', 'initializer');
+        // Only preload js if the form is editable.
+        if ($this->_customdata->editable) {
+            $PAGE->requires->js_call_amd('mod_checkmark/submission', 'initializer');
+        }
 
         // Set data from last submission and hidden fields!
         $this->_customdata->examples = [];
