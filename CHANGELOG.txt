@@ -3,6 +3,7 @@ CHANGELOG
 
 3.10.0 (in development)
 * [FEATURE] #6071 Reorder bulk processing dropdown in order to have "grade automatically" on top
+* [FIXED]   #6773 Include submissions with "No grade" set in "Ungraded" bulk select
 
 3.9.1 (2020-09-23)
 ------------------
