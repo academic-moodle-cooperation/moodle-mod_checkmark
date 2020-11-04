@@ -17,7 +17,8 @@
 {{!
     @template mod_checkmark/examplestate
 
-    Single state of a checkmark example.
+    Single state of a checkmark example. Displays a different icon based on if a check was
+    set and if it was overridden by the teacher
 
     Classes required for JS:
     * none
@@ -31,9 +32,10 @@
 
     Example context (json):
     {
-        "checkid": 276432
+        "checkid": 276432,
         "is_checked": true,
-        "is_forced": { "checked": false, "unchecked": true }
+        "is_forced": true,
+        "is_forced_checked": true
     }
 }}
 <span {{#checkid}}data-checkid="{{.}}"{{/checkid}}{{!

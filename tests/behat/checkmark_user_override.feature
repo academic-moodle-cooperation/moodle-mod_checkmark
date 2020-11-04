@@ -301,12 +301,3 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I navigate to "User overrides" in current page administration
     Then I should see "Student 1"
     And I should not see "Student 2"
-
-
-
-
-
-
-
-
-
