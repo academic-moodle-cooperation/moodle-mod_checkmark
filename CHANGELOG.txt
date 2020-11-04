@@ -3,6 +3,8 @@ CHANGELOG
 
 3.10.0 (in development)
 * [FEATURE] #6071 Reorder bulk processing dropdown in order to have "grade automatically" on top
+* [FIXED]   #6768 Fixed wrong count of examples checked in student view if a checkmark is not
+                  editable by the student anymore
 
 3.9.1 (2020-09-23)
 ------------------

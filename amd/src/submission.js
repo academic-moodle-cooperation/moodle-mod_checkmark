@@ -37,7 +37,7 @@ define(['core/log', 'jquery'], function(log, $) {
     /**
      * UpdateSummary updates the displayed summary during submission edit
      *
-     * @return {boolean} true if everything's allright (no error handling by now)
+     * @return {boolean} true if everything's alright (no error handling by now)
      */
     Submission.prototype.updateSummary = function() {
         let examplesNew = 0;
@@ -78,23 +78,22 @@ define(['core/log', 'jquery'], function(log, $) {
      * @return {boolean} true if everything's ok (no error-handling implemented)
      */
     instance.initializer = function() {
-        log.debug('Init checkmark submissions js!', 'checkmark');
+        // Only execute init if checkmarkform is actually present.
+        if ($('#checkmarkform').length) {
+            log.debug('Init checkmark submissions js!', 'checkmark');
+            // Register event-listener on checkboxes to ensure update of the check counter.
+            $('input[data-example]').on('click', instance.updateSummary);
+            // Register event-listener on reset-button to ensure proper data to be displayed on form-reset!
+            $('#id_resetbutton').on('click', this.resetSubmissionForm);
 
-        $('input[data-example]').on('click', instance.updateSummary);
-
-        // Register event-listener on reset-button to ensure proper data to be displayed on form-reset!
-        $('#id_resetbutton').on('click', this.resetSubmissionForm);
-
-        // Reset the formular after init to ensure correct checkbox-states after page-reload!
-        const form = $('.submissionform')[0];
-        if (form) {
-            form.reset();
+            // Reset the formular after init to ensure correct checkbox-states after page-reload!
+            const form = $('.submissionform')[0];
+            if (form) {
+                form.reset();
+            }
+            // Update summary to display correct data after form-reset!
+            this.updateSummary();
         }
-
-
-        // Update summary to display correct data after form-reset!
-        this.updateSummary();
-
         return true;
     };
 
