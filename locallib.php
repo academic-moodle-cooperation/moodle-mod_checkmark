@@ -367,6 +367,7 @@ class checkmark {
         $data->checkmarkid = $this->checkmark->id;
         $data->edit = $editmode;
         $data->examples = $this->get_examples();
+        $data->editable = $editable;
         if ($submission) {
             $data->sid = $submission->get_id();
             if (!empty($submission->get_examples())) {
