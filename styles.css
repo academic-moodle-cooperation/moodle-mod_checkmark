@@ -222,8 +222,6 @@
 }
 
 .excontainer {
-    width: fit-content;
-    height: fit-content;
     position: relative;
     top: -21px;
     left: -6.5px;

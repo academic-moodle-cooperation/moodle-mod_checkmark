@@ -1092,7 +1092,8 @@ class submissionstable extends \table_sql {
             } else if ($select === self::SEL_NONE) {
                 $selectstate = false;
             }
-            if (empty($values->timemarked) || ($values->timesubmitted > $values->timemarked)) {
+            if (empty($values->grade) || $values->grade == -1 || empty($values->timemarked) ||
+                    ($values->timesubmitted > $values->timemarked)) {
                 if ($select == self::SEL_REQ_GRADING) {
                     $selectstate = true;
                 }
