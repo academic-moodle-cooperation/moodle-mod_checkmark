@@ -9,6 +9,7 @@ CHANGELOG
 + [CHANGED] #6773 Change "ungraded" bulk select so that all students with "No grade" are selected
                   regardless of an existing graded date.
 * [FIXED]   #6773 Include submissions with "No grade" set in "Ungraded" bulk select
+* [FIXED]   #6783 Include style definition for overwritten info in plugin css
 
 3.9.1 (2020-09-23)
 ------------------

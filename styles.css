@@ -231,7 +231,7 @@
 }
 
 .exborder {
-    border: 5px red solid;
+    border: 5px #dc3545 solid;
 }
 
 .path-mod-checkmark div.fileuploadsubmission {
@@ -241,4 +241,8 @@
 
 .path-mod-checkmark div.fileuploadsubmissiontime {
     float: right;
+}
+
+.path-mod-checkmark .text-error {
+    color: #dc3545;
 }
