@@ -1830,7 +1830,7 @@ class submissionstable extends \table_sql {
 
     /**
      * Gets all name fields defined in the configuration of moodle and returns them as an array sorted in the given order
-     * @param $context object Current context for looking up moodle/site:viewfullnames capability
+     * @param object $context Current context for looking up moodle/site:viewfullnames capability
      * @return array Array with all name fields. Sorted by the order given in the display string;
      * @throws coding_exception
      */
