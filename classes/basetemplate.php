@@ -86,13 +86,12 @@ abstract class basetemplate extends submissionstable {
     }
 
     /**
-     * Sets up all the columns, headers, etc.
+     * Sets up just the column(s) for name. When checkmark_seperatenamecolumns is set, a seperate column is generated for each
+     * name fragment
+     *
+     * @throws \coding_exception
      */
-    /**
-     * Sets up all the columns, header, formats, etc.
-     */
-    public function setup_columns() {
-        // Adapt table for export view (columns, etc.)!
+    public function setup_name_colums() {
         $seperatenamecolumns = get_user_preferences('checkmark_seperatenamecolumns', 0);
         $this->tableheaders = [];
         $this->tablecolumns = [];
@@ -112,6 +111,14 @@ abstract class basetemplate extends submissionstable {
                 $this->columnformat[$name] = ['align' => 'L', 'stretch' => MTablePDF::STRETCH_SCALING];
             }
         }
+    }
+
+    /**
+     * Sets up all the columns, headers, etc.
+     */
+    public function setup_columns() {
+        // Adapt table for export view (columns, etc.)!
+        $this->setup_name_colums();
 
         // Dynamically add examples!
         foreach ($this->checkmark->checkmark->examples as $key => $example) {

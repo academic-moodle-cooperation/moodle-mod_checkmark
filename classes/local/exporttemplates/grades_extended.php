@@ -63,16 +63,12 @@ class grades_extended extends basetemplate {
      */
     public function setup_columns() {
         // Adapt table for export view (columns, etc.)!
-        $this->tableheaders = [get_string('name'), get_string('idnumber')];
-        $this->tablecolumns = ['fullname', 'idnumber'];
-        $this->cellwidth = [
-            ['mode' => 'Fixed', 'value' => '25'],
-            ['mode' => 'Fixed', 'value' => '20']
-        ];
-        $this->columnformat = [
-            'fullname' => ['align' => 'L', 'stretch' => MTablePDF::STRETCH_SCALING],
-            'idnumber' => ['align' => 'L']
-        ];
+        $this->setup_name_colums();
+        // Add id number.
+        $this->tableheaders[] = get_string('idnumber');
+        $this->tablecolumns[] = 'idnumber';
+        $this->cellwidth[] = ['mode' => 'Fixed', 'value' => '20'];
+        $this->columnformat['idnumber'] = ['align' => 'L'];
 
         // Dynamically add examples!
         foreach ($this->checkmark->checkmark->examples as $key => $example) {
