@@ -58,7 +58,7 @@ define(['jquery', 'core/log'], function($, log) {
         } else if (type == 'none') {
             $(e.data.inst.table + ' input[type="checkbox"].checkboxgroup1').prop('checked', false);
         } else {
-            var checkboxes = $(e.data.inst.table + ' input[type="checkbox"]');
+            var checkboxes = $(e.data.inst.table + ' input[type="checkbox"].checkboxgroup1');
 
             checkboxes.each(function(idx, current) {
                 if ($(current).data(type) == 1) {
