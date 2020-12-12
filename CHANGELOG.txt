@@ -1,7 +1,8 @@
 CHANGELOG
 =========
 
-3.10.0 (in development)
+3.10.0 (2020-11-10)
+------------------
 * [FEATURE] #6685 Add the option to export every name fragment (e.g. firstname, lastname)
                   in a dedicated column. This is controlled by a checkbox to additional settings
 # [FEATURE] #6680 Add unit tests to override dates feature (#6360)
