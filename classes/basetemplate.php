@@ -86,21 +86,39 @@ abstract class basetemplate extends submissionstable {
     }
 
     /**
-     * Sets up all the columns, headers, etc.
+     * Sets up just the column(s) for name. When checkmark_seperatenamecolumns is set, a seperate column is generated for each
+     * name fragment
+     *
+     * @throws \coding_exception
      */
+    public function setup_name_colums() {
+        $seperatenamecolumns = get_user_preferences('checkmark_seperatenamecolumns', 0);
+        $this->tableheaders = [];
+        $this->tablecolumns = [];
+        $this->cellwidth = [];
+        $this->columnformat = [];
+        if (!$seperatenamecolumns) {
+            $this->tableheaders[] = get_string('name');
+            $this->tablecolumns[] = 'fullname';
+            $this->cellwidth[] = ['mode' => 'Fixed', 'value' => '25'];
+            $this->columnformat['fullname'] = ['align' => 'L', 'stretch' => MTablePDF::STRETCH_SCALING];
+        } else {
+            $usednamefields = submissionstable::get_name_fields($this->context);
+            foreach ($usednamefields as $name) {
+                $this->tableheaders[] = get_string($name);
+                $this->tablecolumns[] = $name;
+                $this->cellwidth[] = ['mode' => 'Fixed', 'value' => '25'];
+                $this->columnformat[$name] = ['align' => 'L', 'stretch' => MTablePDF::STRETCH_SCALING];
+            }
+        }
+    }
+
     /**
-     * Sets up all the columns, header, formats, etc.
+     * Sets up all the columns, headers, etc.
      */
     public function setup_columns() {
         // Adapt table for export view (columns, etc.)!
-        $this->tableheaders = [get_string('name')];
-        $this->tablecolumns = ['fullname'];
-        $this->cellwidth = [
-            ['mode' => 'Fixed', 'value' => '25']
-        ];
-        $this->columnformat = [
-            'fullname' => ['align' => 'L', 'stretch' => MTablePDF::STRETCH_SCALING]
-        ];
+        $this->setup_name_colums();
 
         // Dynamically add examples!
         foreach ($this->checkmark->checkmark->examples as $key => $example) {

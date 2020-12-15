@@ -660,26 +660,7 @@ class submissionstable extends \table_sql {
             }
         } else {
             // Find name fields used in nameformat and create columns in the same order.
-
-            if (has_capability('moodle/site:viewfullnames', $table->context)) {
-                $nameformat = $CFG->alternativefullnameformat;
-            } else {
-                $nameformat = $CFG->fullnamedisplay;
-            }
-            // Use default setting from language if no other format is defined.
-            if ($nameformat == 'language') {
-                $nameformat = get_string('fullnamedisplay');
-            }
-            $allnamefields = get_all_user_name_fields();
-            $usednamefields = [];
-            foreach ($allnamefields as $name) {
-                if (($position = strpos($nameformat, $name)) !== false) {
-                    $usednamefields[$position] = $name;
-                }
-            }
-            // Sort names in the order stated in $nameformat.
-            ksort($usednamefields);
-
+            $usednamefields = self::get_name_fields($table->context);
             foreach ($usednamefields as $name) {
                 $tablecolumns[] = $name;
                 $tableheaders[] = get_string($name);
@@ -690,7 +671,6 @@ class submissionstable extends \table_sql {
                 $table->columnformat[$name] = ['align' => 'L'];
             }
             $namefieldcount = count($usednamefields);
-
         }
         $table->add_colgroup(1, 'sel');
 
@@ -1846,5 +1826,34 @@ class submissionstable extends \table_sql {
             return null;
         }
         return str_replace(array("\r\n", "\n"), '<br>', $text);
+    }
+
+    /**
+     * Gets all name fields defined in the configuration of moodle and returns them as an array sorted in the given order
+     * @param object $context Current context for looking up moodle/site:viewfullnames capability
+     * @return array Array with all name fields. Sorted by the order given in the display string;
+     * @throws coding_exception
+     */
+    public static function get_name_fields ($context) {
+        global $CFG;
+        if (has_capability('moodle/site:viewfullnames', $context)) {
+            $nameformat = $CFG->alternativefullnameformat;
+        } else {
+            $nameformat = $CFG->fullnamedisplay;
+        }
+        // Use default setting from language if no other format is defined.
+        if ($nameformat == 'language') {
+            $nameformat = get_string('fullnamedisplay');
+        }
+        $allnamefields = get_all_user_name_fields();
+        $usednamefields = [];
+        foreach ($allnamefields as $name) {
+            if (($position = strpos($nameformat, $name)) !== false) {
+                $usednamefields[$position] = $name;
+            }
+        }
+        // Sort names in the order stated in $nameformat.
+        ksort($usednamefields);
+        return $usednamefields;
     }
 }
