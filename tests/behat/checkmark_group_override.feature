@@ -371,7 +371,6 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I should see "Due date"
     And I should see "Sunday, 1 March 2020, 8:00"
 
-  @currentdev
   Scenario: A teacher without accessallgroups permission should only be able to add group overrides for groups that he/she it in,
   when the activity's group mode is "separate groups"
     Given the following "permission overrides" exist:
@@ -391,7 +390,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     Then the "Groups" select box should contain "Group 1"
     And the "Groups" select box should not contain "Group 2"
 
-  @javascript @currentdev
+  @javascript
   Scenario: A teacher without accessallgroups permission should only be able to see the group overrides for groups that he/she is in,
   when the activity's group mode is "separate groups"
     Given the following "permission overrides" exist:
