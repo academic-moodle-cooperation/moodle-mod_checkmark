@@ -485,6 +485,7 @@ class checkmark {
                 $CFG->wwwroot . '/mod/checkmark/view.php?id=' . $this->cm->id);
 
         echo html_writer::tag('div', $this->submittedlink(), array('class' => 'text-info'));
+        echo html_writer::tag('div', $this->submittedlink(), array('class' => 'text-info text-center'));
         echo html_writer::tag('div', '', array('class' => 'clearer'));
     }
 
@@ -829,11 +830,13 @@ class checkmark {
             }
             if ($cnt = $this->count_real_submissions($group)) {
                 $submitted = html_writer::tag('a', get_string('viewsubmissions', 'checkmark', $cnt), [
+                        'class' => 'btn btn-secondary',
                         'href' => $urlbase . 'submissions.php?id=' . $this->cm->id,
                         'id' => 'submissions'
                 ]);
             } else {
                 $submitted = html_writer::tag('a', get_string('noattempts', 'checkmark'), [
+                        'class' => 'btn btn-secondary',
                         'href' => $urlbase . 'submissions.php?id=' . $this->cm->id,
                         'id' => 'submissions'
                 ]);
