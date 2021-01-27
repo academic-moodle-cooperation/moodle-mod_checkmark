@@ -950,10 +950,14 @@ class submissionstable extends \table_sql {
      * @throws coding_exception
      */
     public function get_userids($filter, $ids = []) {
+        return self::get_userids_static($this->context, $this->checkmark->checkmark->id, $this->currentgroup, $filter, $ids);
+    }
+
+    public static function get_userids_static ($context, $checkmarkid, $currentgroup, $filter, $ids = []) {
         global $DB;
 
         // Get all ppl that are allowed to submit checkmarks!
-        list($esql, $params) = get_enrolled_sql($this->context, 'mod/checkmark:submit', $this->currentgroup);
+        list($esql, $params) = get_enrolled_sql($context, 'mod/checkmark:submit', $currentgroup);
         if (!empty($ids) && is_array($ids)) {
             $usrlst = $ids;
         }
@@ -980,9 +984,9 @@ class submissionstable extends \table_sql {
             } else if ($filter == \checkmark::FILTER_EXTENSION) {
                 $wherefilter = " AND o.id IS NOT NULL";
             }
-            $params['checkmarkid'] = $this->checkmark->checkmark->id;
-            $params['checkmarkid2'] = $this->checkmark->checkmark->id;
-            $params['checkmarkid3'] = $this->checkmark->checkmark->id;
+            $params['checkmarkid'] = $checkmarkid;
+            $params['checkmarkid2'] = $checkmarkid;
+            $params['checkmarkid3'] = $checkmarkid;
             $sql = "SELECT DISTINCT u.id FROM {user} u
                  LEFT JOIN (".$esql.") eu ON eu.id=u.id
                  LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid) AND s.checkmarkid = :checkmarkid

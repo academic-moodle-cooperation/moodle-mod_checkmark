@@ -509,12 +509,26 @@ class checkmark {
 
         groups_print_activity_menu($this->cm,
                 $CFG->wwwroot . '/mod/checkmark/view.php?id=' . $this->cm->id);
-        $summary = new \mod_checkmark\gradingsummary(10,true,8,
-                6,1610668800, 1610841600, $this->cm->id,
-                0,true,true, false);
-        echo html_writer::div($this->get_renderer()->render_checkmark_grading_summary($summary));
+
+        echo html_writer::div($this->get_renderer()->render_checkmark_grading_summary($this->create_grading_summary()));
         echo html_writer::tag('div', $this->submittedlink(), array('class' => 'text-info text-center'));
         echo html_writer::tag('div', '', array('class' => 'clearer'));
+    }
+
+    public function create_grading_summary() {
+        $submissionsenabled = time() > $this->checkmark->timeavailable;
+        $participantcount = count(submissionstable::get_userids_static($this->context, $this->checkmark->id,
+                        null, \checkmark::FILTER_ALL));
+        $submittedcount = count(submissionstable::get_userids_static($this->context, $this->checkmark->id,
+                null, \checkmark::FILTER_SUBMITTED));
+        $needsgrading = count(submissionstable::get_userids_static($this->context, $this->checkmark->id,
+                null, \checkmark::FILTER_REQUIRE_GRADING));
+        $cangrade = has_capability('mod/checkmark:grade', $this->context);
+
+        $summary = new \mod_checkmark\gradingsummary($participantcount, $submissionsenabled,$submittedcount,
+                $needsgrading, $this->checkmark->timedue, $this->checkmark->cutoffdate, $this->cm->id,
+                $this->course->startdate, $cangrade, $this->cm->visible, $this->course->relativedatesmode);
+        return $summary;
     }
 
     /**
