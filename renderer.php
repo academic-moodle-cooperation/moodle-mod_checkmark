@@ -162,7 +162,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         // Create a table for the data.
         $o = '';
         $o .= $this->output->container_start('gradingsummary');
-        $o .= $this->output->heading(get_string('gradingsummary', 'assign'), 3);
+        $o .= $this->output->heading(get_string('gradingsummary', 'checkmark'), 3);
         $o .= $this->output->box_start('boxaligncenter gradingsummarytable');
         $t = new html_table();
 
@@ -172,16 +172,16 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         $this->add_table_row_tuple($t, $cell1content, $cell2content);
 
         // Status.
-        $cell1content = get_string('numberofparticipants', 'assign');
+        $cell1content = get_string('numberofparticipants', 'checkmark');
         $cell2content = $summary->participantcount;
         $this->add_table_row_tuple($t, $cell1content, $cell2content);
 
         // Submitted for grading.
         if (time() > $summary->timeavailable) {
-            $cell1content = get_string('numberofsubmittedassignments', 'assign');
+            $cell1content = get_string('numberofsubmittedassignments', 'checkmark');
             $cell2content = $summary->submissionssubmittedcount;
             $this->add_table_row_tuple($t, $cell1content, $cell2content);
-            $cell1content = get_string('numberofsubmissionsneedgrading', 'assign');
+            $cell1content = get_string('numberofsubmissionsneedgrading', 'checkmark');
             $cell2content = $summary->submissionsneedgradingcount;
             $this->add_table_row_tuple($t, $cell1content, $cell2content);
         } else {
@@ -193,16 +193,16 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         $time = time();
         if ($summary->duedate) {
             // Due date.
-            $cell1content = get_string('duedate', 'assign');
+            $cell1content = get_string('duedate', 'checkmark');
             $duedate = $summary->duedate;
             if ($summary->courserelativedatesmode) {
                 // Returns a formatted string, in the format '10d 10h 45m'.
                 $diffstr = get_time_interval_string($duedate, $summary->coursestartdate);
                 if ($duedate >= $summary->coursestartdate) {
-                    $cell2content = get_string('relativedatessubmissionduedateafter', 'mod_assign',
+                    $cell2content = get_string('relativedatessubmissionduedateafter', 'checkmark',
                             ['datediffstr' => $diffstr]);
                 } else {
-                    $cell2content = get_string('relativedatessubmissionduedatebefore', 'mod_assign',
+                    $cell2content = get_string('relativedatessubmissionduedatebefore', 'checkmark',
                             ['datediffstr' => $diffstr]);
                 }
             } else {
@@ -212,12 +212,12 @@ class mod_checkmark_renderer extends plugin_renderer_base {
             $this->add_table_row_tuple($t, $cell1content, $cell2content);
 
             // Time remaining.
-            $cell1content = get_string('timeremaining', 'assign');
+            $cell1content = get_string('timeremaining', 'checkmark');
             if ($summary->courserelativedatesmode) {
-                $cell2content = get_string('relativedatessubmissiontimeleft', 'mod_assign');
+                $cell2content = get_string('relativedatessubmissiontimeleft', 'checkmark');
             } else {
                 if ($duedate - $time <= 0) {
-                    $cell2content = get_string('assignmentisdue', 'assign');
+                    $cell2content = get_string('checkmarkisdue', 'checkmark');
                 } else {
                     $cell2content = format_time($duedate - $time);
                 }
@@ -226,13 +226,13 @@ class mod_checkmark_renderer extends plugin_renderer_base {
             $this->add_table_row_tuple($t, $cell1content, $cell2content);
 
             if ($duedate < $time) {
-                $cell1content = get_string('latesubmissions', 'assign');
+                $cell1content = get_string('latesubmissions', 'checkmark');
                 $cutoffdate = $summary->cutoffdate;
                 if ($cutoffdate) {
                     if ($cutoffdate > $time) {
-                        $cell2content = get_string('latesubmissionsaccepted', 'assign', userdate($summary->cutoffdate));
+                        $cell2content = get_string('latesubmissionsaccepted', 'checkmark', userdate($summary->cutoffdate));
                     } else {
-                        $cell2content = get_string('nomoresubmissionsaccepted', 'assign');
+                        $cell2content = get_string('nomoresubmissionsaccepted', 'checkmark');
                     }
 
                     $this->add_table_row_tuple($t, $cell1content, $cell2content);
