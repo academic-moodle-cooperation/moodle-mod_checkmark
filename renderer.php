@@ -153,12 +153,12 @@ class mod_checkmark_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Render a table containing the current status of the grading process.
+     * Render a table containing the current status of the grading process and attendance.
      *
-     * @param checkmark_grading_summary $summary
+     * @param \mod_checkmark\gradingsummary $summary Information that should be displayed in the grading summary
      * @return string
      */
-    public function render_checkmark_grading_summary(\mod_checkmark\gradingsummary $summary) {
+    public function render_checkmark_grading_summary( $summary) {
         // Create a table for the data.
         $o = '';
         $o .= $this->output->container_start('gradingsummary');
@@ -249,16 +249,23 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         return $o;
     }
 
-    private function print_attandance_info ($t, $summary) {
+    /**
+     * Adds attendance/absence columns to the gradingsummary table if attendance is tracked
+     *
+     * @param object $table  Table to add rows to
+     * @param \mod_checkmark\gradingsummary $summary Information that should be displayed in the grading summary
+     * @throws coding_exception
+     */
+    private function print_attandance_info ($table, $summary) {
         if ($summary->attendantcount > 0) {
             $cell1content = get_string('attendance', 'checkmark');
             $cell2content = $summary->attendantcount;
-            $this->add_table_row_tuple($t, $cell1content, $cell2content);
+            $this->add_table_row_tuple($table, $cell1content, $cell2content);
         }
         if ($summary->absencecount > 0) {
             $cell1content = get_string('absent', 'checkmark');
             $cell2content = $summary->absencecount;
-            $this->add_table_row_tuple($t, $cell1content, $cell2content);
+            $this->add_table_row_tuple($table, $cell1content, $cell2content);
         }
     }
 }

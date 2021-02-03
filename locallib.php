@@ -515,6 +515,12 @@ class checkmark {
         echo html_writer::tag('div', '', array('class' => 'clearer'));
     }
 
+    /**
+     * Creates a gradingsummary object for use in the gradingsummary table
+     *
+     * @return \mod_checkmark\gradingsummary
+     * @throws coding_exception
+     */
     public function create_grading_summary() {
         $participantcount = submissionstable::count_userids($this->context, $this->checkmark->id,
                         null, self::FILTER_ALL);

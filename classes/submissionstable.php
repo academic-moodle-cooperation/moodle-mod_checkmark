@@ -953,6 +953,18 @@ class submissionstable extends \table_sql {
         return self::get_userids_static($this->context, $this->checkmark->checkmark->id, $this->currentgroup, $filter, $ids);
     }
 
+    /**
+     * Gets all userids for a checkmark activity filtered by pre-defined filters and groups.
+     *
+     * @param object $context Current context
+     * @param int $checkmarkid Id of the checkmark activity to retrieve user ids for
+     * @param int|null $currentgroup Group that should be filtered for. null if all groups should be selected
+     * @param int $filter Currently active filter (FILTER_ALL, FILTER_REQUIRE_GRADING, FILTER_SUBMITTED...)
+     * @param array $ids (optional) Array of userids to filter for
+     * @return array|int[] Array of found userids. [-1] if none are found
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     public static function get_userids_static ($context, $checkmarkid, $currentgroup, $filter, $ids = []) {
         global $DB;
 
@@ -1016,6 +1028,16 @@ class submissionstable extends \table_sql {
         return $users;
     }
 
+    /**
+     * Counts all user ids filtered by pre-defined filters and groups.
+     *
+     * @param object $context Current context
+     * @param int $checkmarkid Id of the checkmark activity to retrieve user ids for
+     * @param int|null $currentgroup Group that should be filtered for. null if all groups should be selected
+     * @param int $filter Currently active filter (FILTER_ALL, FILTER_REQUIRE_GRADING, FILTER_SUBMITTED...)
+     * @param array $ids (optional) Array of userids to filter for
+     * @return array|int[] Array of found userids. [-1] if none are found
+     */
     public static function count_userids ($context, $checkmarkid, $currentgroup, $filter, $ids = []) {
         $idsres = self::get_userids_static($context, $checkmarkid, $currentgroup, $filter, $ids);
         if (empty($idsres) || $idsres[0] === -1) {
