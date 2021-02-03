@@ -179,12 +179,16 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         $this->add_table_row_tuple($t, $cell1content, $cell2content);
 
         // Submitted for grading.
-        if ($summary->submissionsenabled) {
+        if (time() > $summary->timeavailable) {
             $cell1content = get_string('numberofsubmittedassignments', 'assign');
             $cell2content = $summary->submissionssubmittedcount;
             $this->add_table_row_tuple($t, $cell1content, $cell2content);
             $cell1content = get_string('numberofsubmissionsneedgrading', 'assign');
             $cell2content = $summary->submissionsneedgradingcount;
+            $this->add_table_row_tuple($t, $cell1content, $cell2content);
+        } else {
+            $cell1content = get_string('allowsubmissionsfromdate', 'checkmark');
+            $cell2content = userdate($summary->timeavailable);
             $this->add_table_row_tuple($t, $cell1content, $cell2content);
         }
 
@@ -235,14 +239,29 @@ class mod_checkmark_renderer extends plugin_renderer_base {
 
                     $this->add_table_row_tuple($t, $cell1content, $cell2content);
                 }
+                $this->print_attandance_info($t, $summary);
             }
-
+        } else {
+            $this->print_attandance_info($t, $summary);
         }
 
         // All done - write the table.
         $o .= html_writer::table($t);
         $o .= $this->output->box_end();
         return $o;
+    }
+
+    private function print_attandance_info ($t, $summary) {
+        if ($summary->attendantcount > 0) {
+            $cell1content = get_string('attendance', 'checkmark');
+            $cell2content = $summary->attendantcount;
+            $this->add_table_row_tuple($t, $cell1content, $cell2content);
+        }
+        if ($summary->absencecount > 0) {
+            $cell1content = get_string('absent', 'checkmark');
+            $cell2content = $summary->absencecount;
+            $this->add_table_row_tuple($t, $cell1content, $cell2content);
+        }
     }
 }
 /**

@@ -516,18 +516,26 @@ class checkmark {
     }
 
     public function create_grading_summary() {
-        $submissionsenabled = time() > $this->checkmark->timeavailable;
-        $participantcount = count(submissionstable::get_userids_static($this->context, $this->checkmark->id,
-                        null, \checkmark::FILTER_ALL));
-        $submittedcount = count(submissionstable::get_userids_static($this->context, $this->checkmark->id,
-                null, \checkmark::FILTER_SUBMITTED));
-        $needsgrading = count(submissionstable::get_userids_static($this->context, $this->checkmark->id,
-                null, \checkmark::FILTER_REQUIRE_GRADING));
+        $participantcount = submissionstable::count_userids($this->context, $this->checkmark->id,
+                        null, \checkmark::FILTER_ALL);
+        $submittedcount = submissionstable::count_userids($this->context, $this->checkmark->id,
+                null, \checkmark::FILTER_SUBMITTED);
+        $needsgrading = submissionstable::count_userids($this->context, $this->checkmark->id,
+                null, \checkmark::FILTER_REQUIRE_GRADING);
         $cangrade = has_capability('mod/checkmark:grade', $this->context);
+        $attendantcount = -1;
+        $absencecount = -1;
+        if ($this->checkmark->trackattendance) {
+            $attendantcount = submissionstable::count_userids($this->context, $this->checkmark->id,
+                    null, \checkmark::FILTER_ATTENDANT);
+            $absencecount = submissionstable::count_userids($this->context, $this->checkmark->id,
+                    null, \checkmark::FILTER_ABSENT);
+        }
 
-        $summary = new \mod_checkmark\gradingsummary($participantcount, $submissionsenabled,$submittedcount,
+        $summary = new \mod_checkmark\gradingsummary($participantcount, $this->checkmark->timeavailable, $submittedcount,
                 $needsgrading, $this->checkmark->timedue, $this->checkmark->cutoffdate, $this->cm->id,
-                $this->course->startdate, $cangrade, $this->cm->visible, $this->course->relativedatesmode);
+                $this->course->startdate, $cangrade, $this->cm->visible, $this->course->relativedatesmode, $attendantcount,
+                $absencecount);
         return $summary;
     }
 

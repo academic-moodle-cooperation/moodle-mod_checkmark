@@ -983,6 +983,12 @@ class submissionstable extends \table_sql {
                 $wherefilter = " AND COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0) ";
             } else if ($filter == \checkmark::FILTER_EXTENSION) {
                 $wherefilter = " AND o.id IS NOT NULL";
+            } else if ($filter == \checkmark::FILTER_ATTENDANT) {
+                $wherefilter .= ' AND attendance = 1';
+            } else if ($filter == \checkmark::FILTER_ABSENT) {
+                $wherefilter .= ' AND attendance = 0';
+            } else if ($filter == \checkmark::FILTER_UNKNOWN) {
+                $wherefilter .= ' AND attendance IS NULL';
             }
             $params['checkmarkid'] = $checkmarkid;
             $params['checkmarkid2'] = $checkmarkid;
@@ -1008,6 +1014,15 @@ class submissionstable extends \table_sql {
         }
 
         return $users;
+    }
+
+    public static function count_userids ($context, $checkmarkid, $currentgroup, $filter, $ids = []) {
+        $idsres = self::get_userids_static($context, $checkmarkid, $currentgroup, $filter, $ids);
+        if (empty($idsres) || $idsres[0] === -1) {
+            return 0;
+        } else {
+            return count($idsres);
+        }
     }
 
     /**

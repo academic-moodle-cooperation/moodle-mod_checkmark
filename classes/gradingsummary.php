@@ -37,8 +37,8 @@ defined('MOODLE_INTERNAL') || die();
 class gradingsummary implements renderable {
     /** @var int participantcount - The number of users who can submit to this assignment */
     public $participantcount = 0;
-    /** @var bool submissionsenabled - Allow submissions */
-    public $submissionsenabled = false;
+    /** @var int timeavailable - Allow submissions */
+    public $timeavailable = 0;
     /** @var int submissionssubmittedcount - The number of submissions in submitted status */
     public $submissionssubmittedcount = 0;
     /** @var int submissionsneedgradingcount - The number of submissions that need grading */
@@ -57,12 +57,16 @@ class gradingsummary implements renderable {
     public $isvisible = true;
     /** @var boolean relativedatesmode - Is the course a relative dates mode course or not */
     public $courserelativedatesmode = false;
+    /** @var int attendantcount - Is the course a relative dates mode course or not */
+    public $attendantcount = -1;
+    /** @var int absencecount - Is the course a relative dates mode course or not */
+    public $absencecount = -1;
 
     /**
      * assign_grading_summary constructor.
      *
      * @param int $participantcount
-     * @param bool $submissionsenabled
+     * @param int $timeavailable
      * @param int $submissionssubmittedcount
      * @param int $submissionsneedgradingcount
      * @param int $duedate
@@ -71,12 +75,15 @@ class gradingsummary implements renderable {
      * @param int $coursestartdate
      * @param bool $cangrade
      * @param bool $isvisible
+     * @param bool $courserelativedatesmode
+     * @param int $attendantcount
+     * @param int $absencecount
      */
-    public function __construct(int $participantcount, bool $submissionsenabled, int $submissionssubmittedcount,
+    public function __construct(int $participantcount, int $timeavailable, int $submissionssubmittedcount,
             int $submissionsneedgradingcount, int $duedate, int $cutoffdate, int $coursemoduleid, int $coursestartdate,
-            bool $cangrade, bool $isvisible, bool $courserelativedatesmode) {
+            bool $cangrade, bool $isvisible, bool $courserelativedatesmode, int $attendantcount, int $absencecount) {
         $this->participantcount = $participantcount;
-        $this->submissionsenabled = $submissionsenabled;
+        $this->timeavailable = $timeavailable;
         $this->submissionssubmittedcount = $submissionssubmittedcount;
         $this->submissionsneedgradingcount = $submissionsneedgradingcount;
         $this->duedate = $duedate;
@@ -86,6 +93,8 @@ class gradingsummary implements renderable {
         $this->cangrade = $cangrade;
         $this->isvisible = $isvisible;
         $this->courserelativedatesmode = $courserelativedatesmode;
+        $this->attendantcount = $attendantcount;
+        $this->absencecount = $absencecount;
     }
 
 }
