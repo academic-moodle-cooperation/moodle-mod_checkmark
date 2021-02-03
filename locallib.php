@@ -517,19 +517,19 @@ class checkmark {
 
     public function create_grading_summary() {
         $participantcount = submissionstable::count_userids($this->context, $this->checkmark->id,
-                        null, \checkmark::FILTER_ALL);
+                        null, self::FILTER_ALL);
         $submittedcount = submissionstable::count_userids($this->context, $this->checkmark->id,
-                null, \checkmark::FILTER_SUBMITTED);
+                null, self::FILTER_SUBMITTED);
         $needsgrading = submissionstable::count_userids($this->context, $this->checkmark->id,
-                null, \checkmark::FILTER_REQUIRE_GRADING);
+                null, self::FILTER_REQUIRE_GRADING);
         $cangrade = has_capability('mod/checkmark:grade', $this->context);
         $attendantcount = -1;
         $absencecount = -1;
         if ($this->checkmark->trackattendance) {
             $attendantcount = submissionstable::count_userids($this->context, $this->checkmark->id,
-                    null, \checkmark::FILTER_ATTENDANT);
+                    null, self::FILTER_ATTENDANT);
             $absencecount = submissionstable::count_userids($this->context, $this->checkmark->id,
-                    null, \checkmark::FILTER_ABSENT);
+                    null, self::FILTER_ABSENT);
         }
 
         $summary = new \mod_checkmark\gradingsummary($participantcount, $this->checkmark->timeavailable, $submittedcount,

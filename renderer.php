@@ -173,8 +173,6 @@ class mod_checkmark_renderer extends plugin_renderer_base {
 
         // Status.
         $cell1content = get_string('numberofparticipants', 'assign');
-
-
         $cell2content = $summary->participantcount;
         $this->add_table_row_tuple($t, $cell1content, $cell2content);
 
