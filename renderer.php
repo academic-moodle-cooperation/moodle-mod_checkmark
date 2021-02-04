@@ -246,6 +246,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         // All done - write the table.
         $o .= html_writer::table($t);
         $o .= $this->output->box_end();
+        $o .= $this->output->container_end();
         return $o;
     }
 
