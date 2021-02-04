@@ -540,7 +540,7 @@ class checkmark {
 
         $summary = new \mod_checkmark\gradingsummary($participantcount, $this->checkmark->timeavailable, $submittedcount,
                 $needsgrading, $this->checkmark->timedue, $this->checkmark->cutoffdate, $this->cm->id,
-                $this->course->startdate, $cangrade, $this->cm->visible, $this->course->relativedatesmode, $attendantcount,
+                $this->course->startdate, $cangrade, $this->cm->visible, $attendantcount,
                 $absencecount);
         return $summary;
     }

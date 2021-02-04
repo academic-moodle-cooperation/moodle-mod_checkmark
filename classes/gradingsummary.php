@@ -55,8 +55,6 @@ class gradingsummary implements renderable {
     public $cangrade = false;
     /** @var boolean isvisible - Is the assignment's context module visible to students? */
     public $isvisible = true;
-    /** @var boolean relativedatesmode - Is the course a relative dates mode course or not */
-    public $courserelativedatesmode = false;
     /** @var int attendantcount - Is the course a relative dates mode course or not */
     public $attendantcount = -1;
     /** @var int absencecount - Is the course a relative dates mode course or not */
@@ -75,13 +73,12 @@ class gradingsummary implements renderable {
      * @param int $coursestartdate
      * @param bool $cangrade
      * @param bool $isvisible
-     * @param bool $courserelativedatesmode
      * @param int $attendantcount
      * @param int $absencecount
      */
     public function __construct(int $participantcount, int $timeavailable, int $submissionssubmittedcount,
             int $submissionsneedgradingcount, int $duedate, int $cutoffdate, int $coursemoduleid, int $coursestartdate,
-            bool $cangrade, bool $isvisible, bool $courserelativedatesmode, int $attendantcount, int $absencecount) {
+            bool $cangrade, bool $isvisible, int $attendantcount, int $absencecount) {
         $this->participantcount = $participantcount;
         $this->timeavailable = $timeavailable;
         $this->submissionssubmittedcount = $submissionssubmittedcount;
@@ -92,7 +89,6 @@ class gradingsummary implements renderable {
         $this->coursestartdate = $coursestartdate;
         $this->cangrade = $cangrade;
         $this->isvisible = $isvisible;
-        $this->courserelativedatesmode = $courserelativedatesmode;
         $this->attendantcount = $attendantcount;
         $this->absencecount = $absencecount;
     }

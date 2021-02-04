@@ -195,32 +195,17 @@ class mod_checkmark_renderer extends plugin_renderer_base {
             // Due date.
             $cell1content = get_string('duedate', 'checkmark');
             $duedate = $summary->duedate;
-            if ($summary->courserelativedatesmode) {
-                // Returns a formatted string, in the format '10d 10h 45m'.
-                $diffstr = get_time_interval_string($duedate, $summary->coursestartdate);
-                if ($duedate >= $summary->coursestartdate) {
-                    $cell2content = get_string('relativedatessubmissionduedateafter', 'checkmark',
-                            ['datediffstr' => $diffstr]);
-                } else {
-                    $cell2content = get_string('relativedatessubmissionduedatebefore', 'checkmark',
-                            ['datediffstr' => $diffstr]);
-                }
-            } else {
-                $cell2content = userdate($duedate);
+            $cell2content = userdate($duedate);
             }
 
             $this->add_table_row_tuple($t, $cell1content, $cell2content);
 
             // Time remaining.
             $cell1content = get_string('timeremaining', 'checkmark');
-            if ($summary->courserelativedatesmode) {
-                $cell2content = get_string('relativedatessubmissiontimeleft', 'checkmark');
+            if ($duedate - $time <= 0) {
+                $cell2content = get_string('checkmarkisdue', 'checkmark');
             } else {
-                if ($duedate - $time <= 0) {
-                    $cell2content = get_string('checkmarkisdue', 'checkmark');
-                } else {
-                    $cell2content = format_time($duedate - $time);
-                }
+                $cell2content = format_time($duedate - $time);
             }
 
             $this->add_table_row_tuple($t, $cell1content, $cell2content);
