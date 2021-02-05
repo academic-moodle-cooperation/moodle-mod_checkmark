@@ -223,8 +223,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
                     $this->add_table_row_tuple($t, $cell1content, $cell2content);
                 }
                 $this->print_attandance_info($t, $summary);
-            }
-        } else {
+            } else {
             $this->print_attandance_info($t, $summary);
         }
 
