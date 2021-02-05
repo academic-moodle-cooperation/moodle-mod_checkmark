@@ -196,36 +196,36 @@ class mod_checkmark_renderer extends plugin_renderer_base {
             $cell1content = get_string('duedate', 'checkmark');
             $duedate = $summary->duedate;
             $cell2content = userdate($duedate);
-            }
-
-            $this->add_table_row_tuple($t, $cell1content, $cell2content);
-
-            // Time remaining.
-            $cell1content = get_string('timeremaining', 'checkmark');
-            if ($duedate - $time <= 0) {
-                $cell2content = get_string('checkmarkisdue', 'checkmark');
-            } else {
-                $cell2content = format_time($duedate - $time);
-            }
-
-            $this->add_table_row_tuple($t, $cell1content, $cell2content);
-
-            if ($duedate < $time) {
-                $cell1content = get_string('latesubmissions', 'checkmark');
-                $cutoffdate = $summary->cutoffdate;
-                if ($cutoffdate) {
-                    if ($cutoffdate > $time) {
-                        $cell2content = get_string('latesubmissionsaccepted', 'checkmark', userdate($summary->cutoffdate));
-                    } else {
-                        $cell2content = get_string('nomoresubmissionsaccepted', 'checkmark');
-                    }
-
-                    $this->add_table_row_tuple($t, $cell1content, $cell2content);
-                }
-                $this->print_attandance_info($t, $summary);
-            } else {
-            $this->print_attandance_info($t, $summary);
         }
+
+        $this->add_table_row_tuple($t, $cell1content, $cell2content);
+
+        // Time remaining.
+        $cell1content = get_string('timeremaining', 'checkmark');
+        if ($duedate - $time <= 0) {
+            $cell2content = get_string('checkmarkisdue', 'checkmark');
+        } else {
+            $cell2content = format_time($duedate - $time);
+        }
+
+        $this->add_table_row_tuple($t, $cell1content, $cell2content);
+
+        if ($duedate < $time) {
+            $cell1content = get_string('latesubmissions', 'checkmark');
+            $cutoffdate = $summary->cutoffdate;
+            if ($cutoffdate) {
+                if ($cutoffdate > $time) {
+                    $cell2content = get_string('latesubmissionsaccepted', 'checkmark', userdate($summary->cutoffdate));
+                } else {
+                    $cell2content = get_string('nomoresubmissionsaccepted', 'checkmark');
+                }
+
+                $this->add_table_row_tuple($t, $cell1content, $cell2content);
+            }
+            $this->print_attandance_info($t, $summary);
+        } else {
+        $this->print_attandance_info($t, $summary);
+    }
 
         // All done - write the table.
         $o .= html_writer::table($t);
