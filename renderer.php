@@ -224,8 +224,8 @@ class mod_checkmark_renderer extends plugin_renderer_base {
             }
             $this->print_attandance_info($t, $summary);
         } else {
-        $this->print_attandance_info($t, $summary);
-    }
+            $this->print_attandance_info($t, $summary);
+        }
 
         // All done - write the table.
         $o .= html_writer::table($t);
