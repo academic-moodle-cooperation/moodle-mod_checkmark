@@ -227,6 +227,13 @@ class mod_checkmark_renderer extends plugin_renderer_base {
             $this->print_attandance_info($t, $summary);
         }
 
+        // Show count of presentationgradings if presenationgrading is active.
+        if ($summary->presentationgradingcount > 0) {
+            $cell1content = get_string('presentationgradingcount', 'checkmark');
+            $cell2content = $summary->presentationgradingcount;
+            $this->add_table_row_tuple($t, $cell1content, $cell2content);
+        }
+
         // All done - write the table.
         $o .= html_writer::table($t);
         $o .= $this->output->box_end();

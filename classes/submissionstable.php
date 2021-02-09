@@ -996,11 +996,15 @@ class submissionstable extends \table_sql {
             } else if ($filter == \checkmark::FILTER_EXTENSION) {
                 $wherefilter = " AND o.id IS NOT NULL";
             } else if ($filter == \checkmark::FILTER_ATTENDANT) {
-                $wherefilter .= ' AND attendance = 1';
+                $wherefilter .= " AND attendance = 1";
             } else if ($filter == \checkmark::FILTER_ABSENT) {
-                $wherefilter .= ' AND attendance = 0';
+                $wherefilter .= " AND attendance = 0";
             } else if ($filter == \checkmark::FILTER_UNKNOWN) {
-                $wherefilter .= ' AND attendance IS NULL';
+                $wherefilter .= " AND attendance IS NULL";
+            } else if ($filter == \checkmark::FILTER_PRESENTATIONGRADING) {
+                $wherefilter .= " AND presentationgrade IS NOT NULL";
+            } else if ($filter == \checkmark::FILTER_NO_PRESENTATIONGRADING) {
+                $wherefilter .= " AND presentationgrade IS NULL";
             }
             $params['checkmarkid'] = $checkmarkid;
             $params['checkmarkid2'] = $checkmarkid;

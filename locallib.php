@@ -62,6 +62,10 @@ class checkmark {
     const FILTER_EXTENSION = 8;
     /** FILER NOT SUBMITTED */
     const FILTER_NOT_SUBMITTED = 9;
+    /** FILER PRESENTATIONGRADING */
+    const FILTER_PRESENTATIONGRADING = 10;
+    /** FILER NO PRESENTATIONGRADING */
+    const FILTER_NO_PRESENTATIONGRADING = 11;
 
     /** DELIMITER Used to connect example-names, example-grades, submission-examplenumbers! */
     const DELIMITER = ',';
@@ -532,6 +536,7 @@ class checkmark {
         $attendantcount = -1;
         $absencecount = -1;
         $needattendanceentrycount = -1;
+        $presentationgradingcount = -1;
         if ($this->checkmark->trackattendance) {
             $attendantcount = submissionstable::count_userids($this->context, $this->checkmark->id,
                     null, self::FILTER_ATTENDANT);
@@ -540,11 +545,15 @@ class checkmark {
             $needattendanceentrycount = submissionstable::count_userids($this->context, $this->checkmark->id,
                     null, self::FILTER_UNKNOWN);
         }
+        if ($this->checkmark->presentationgrading) {
+            $presentationgradingcount = submissionstable::count_userids($this->context, $this->checkmark->id,
+                    null, self::FILTER_PRESENTATIONGRADING);
+        }
 
         $summary = new \mod_checkmark\gradingsummary($participantcount, $this->checkmark->timeavailable, $submittedcount,
                 $needsgrading, $this->checkmark->timedue, $this->checkmark->cutoffdate, $this->cm->id,
                 $this->course->startdate, $cangrade, $this->cm->visible, $attendantcount,
-                $absencecount, $needattendanceentrycount);
+                $absencecount, $needattendanceentrycount, $presentationgradingcount);
         return $summary;
     }
 

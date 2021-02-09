@@ -198,6 +198,7 @@ $string['presentationgrading'] = 'Track presentation grades';
 $string['presentationgrading_help'] = 'If activated presentation grades can be recorded as extra element of grading information.';
 $string['presentationgrading_grade'] = 'Grade presentation';
 $string['presentationgrading_grade_help'] = 'This elements control how the presentation can be graded. For the grade you can select either <ul><li><strong>none</strong> no grade will be recorded, but you are able to use a text as feedback.</li><li><strong>scale</strong> Use a scale to grade student\'s presentation</li><li><strong>point</strong> use a numerical value to grade student\'s presentation</li></ul>';
+$string['presentationgradingcount'] = 'Graded presentations';
 $string['presentationheader'] = 'Presentation grading';
 $string['printsettingstitle'] = 'Export settings';
 $string['remembertoupdategrades'] = 'You\'ve got automatically graded submissions in this checkmark. We highly recommend to update or regrade the submissions if you changed the examples\' grades!';

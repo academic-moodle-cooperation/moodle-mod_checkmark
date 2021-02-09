@@ -61,6 +61,8 @@ class gradingsummary implements renderable {
     public $absencecount = -1;
     /** @var int $needattendanceentrycount - Count of students without registered attendance. -1 if attendance is not active */
     public $needattendanceentrycount = -1;
+    /** @var int $presentationgradingcount - Count of graded presentations. -1 if presentationgrading is not active */
+    public $presentationgradingcount = -1;
 
     /**
      * assign_grading_summary constructor.
@@ -78,10 +80,12 @@ class gradingsummary implements renderable {
      * @param int $attendantcount
      * @param int $absencecount
      * @param int $needattendanceentrycount
+     * @param int $presentationgradingcount
      */
     public function __construct(int $participantcount, int $timeavailable, int $submissionssubmittedcount,
             int $submissionsneedgradingcount, int $duedate, int $cutoffdate, int $coursemoduleid, int $coursestartdate,
-            bool $cangrade, bool $isvisible, int $attendantcount, int $absencecount, int $needattendanceentrycount) {
+            bool $cangrade, bool $isvisible, int $attendantcount, int $absencecount, int $needattendanceentrycount,
+            int $presentationgradingcount) {
         $this->participantcount = $participantcount;
         $this->timeavailable = $timeavailable;
         $this->submissionssubmittedcount = $submissionssubmittedcount;
@@ -95,6 +99,7 @@ class gradingsummary implements renderable {
         $this->attendantcount = $attendantcount;
         $this->absencecount = $absencecount;
         $this->needattendanceentrycount = $needattendanceentrycount;
+        $this->presentationgradingcount = $presentationgradingcount;
     }
 
 }
