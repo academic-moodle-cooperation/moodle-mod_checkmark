@@ -158,7 +158,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
      * @param \mod_checkmark\gradingsummary $summary Information that should be displayed in the grading summary
      * @return string
      */
-    public function render_checkmark_grading_summary( $summary) {
+    public function render_checkmark_grading_summary($summary) {
         // Create a table for the data.
         $o = '';
         $o .= $this->output->container_start('gradingsummary');
@@ -191,26 +191,26 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         }
 
         $time = time();
+        $duedate = null;
         if ($summary->duedate) {
             // Due date.
             $cell1content = get_string('duedate', 'checkmark');
             $duedate = $summary->duedate;
             $cell2content = userdate($duedate);
+            $this->add_table_row_tuple($t, $cell1content, $cell2content);
+
+            // Time remaining.
+            $cell1content = get_string('timeremaining', 'checkmark');
+            if ($duedate - $time <= 0) {
+                $cell2content = get_string('checkmarkisdue', 'checkmark');
+            } else {
+                $cell2content = format_time($duedate - $time);
+            }
+            $this->add_table_row_tuple($t, $cell1content, $cell2content);
         }
 
-        $this->add_table_row_tuple($t, $cell1content, $cell2content);
-
-        // Time remaining.
-        $cell1content = get_string('timeremaining', 'checkmark');
-        if ($duedate - $time <= 0) {
-            $cell2content = get_string('checkmarkisdue', 'checkmark');
-        } else {
-            $cell2content = format_time($duedate - $time);
-        }
-
-        $this->add_table_row_tuple($t, $cell1content, $cell2content);
-
-        if ($duedate < $time) {
+        // Show late submissions info if regular due date was reached or is not present.
+        if ($duedate < $time || !$duedate) {
             $cell1content = get_string('latesubmissions', 'checkmark');
             $cutoffdate = $summary->cutoffdate;
             if ($cutoffdate) {
@@ -237,7 +237,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
     /**
      * Adds attendance/absence columns to the gradingsummary table if attendance is tracked
      *
-     * @param object $table  Table to add rows to
+     * @param html_table $table  Table to add rows to
      * @param \mod_checkmark\gradingsummary $summary Information that should be displayed in the grading summary
      * @throws coding_exception
      */
@@ -250,6 +250,11 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         if ($summary->absencecount > 0) {
             $cell1content = get_string('absent', 'checkmark');
             $cell2content = $summary->absencecount;
+            $this->add_table_row_tuple($table, $cell1content, $cell2content);
+        }
+        if ($summary->needattendanceentrycount > 0) {
+            $cell1content = get_string('needattendanceentrycount', 'checkmark');
+            $cell2content = $summary->needattendanceentrycount;
             $this->add_table_row_tuple($table, $cell1content, $cell2content);
         }
     }

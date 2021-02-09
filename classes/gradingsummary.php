@@ -55,10 +55,12 @@ class gradingsummary implements renderable {
     public $cangrade = false;
     /** @var boolean isvisible - Is the assignment's context module visible to students? */
     public $isvisible = true;
-    /** @var int attendantcount - Is the course a relative dates mode course or not */
+    /** @var int attendantcount - Count of attending students. -1 if attendance is not active */
     public $attendantcount = -1;
-    /** @var int absencecount - Is the course a relative dates mode course or not */
+    /** @var int absencecount - Count of absent students. -1 if attendance is not active */
     public $absencecount = -1;
+    /** @var int $needattendanceentrycount - Count of students without registered attendance. -1 if attendance is not active */
+    public $needattendanceentrycount = -1;
 
     /**
      * assign_grading_summary constructor.
@@ -75,10 +77,11 @@ class gradingsummary implements renderable {
      * @param bool $isvisible
      * @param int $attendantcount
      * @param int $absencecount
+     * @param int $needattendanceentrycount
      */
     public function __construct(int $participantcount, int $timeavailable, int $submissionssubmittedcount,
             int $submissionsneedgradingcount, int $duedate, int $cutoffdate, int $coursemoduleid, int $coursestartdate,
-            bool $cangrade, bool $isvisible, int $attendantcount, int $absencecount) {
+            bool $cangrade, bool $isvisible, int $attendantcount, int $absencecount, int $needattendanceentrycount) {
         $this->participantcount = $participantcount;
         $this->timeavailable = $timeavailable;
         $this->submissionssubmittedcount = $submissionssubmittedcount;
@@ -91,6 +94,7 @@ class gradingsummary implements renderable {
         $this->isvisible = $isvisible;
         $this->attendantcount = $attendantcount;
         $this->absencecount = $absencecount;
+        $this->needattendanceentrycount = $needattendanceentrycount;
     }
 
 }

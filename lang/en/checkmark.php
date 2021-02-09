@@ -176,6 +176,7 @@ $string['informstudents_help'] = 'If activated, the participant receives a notif
 $string['introattachments'] = 'Additional files';
 $string['introattachments_help'] = 'Additional files for use in the checkmark, such as answer templates, may be added. Download links for the files will then be displayed on the checkmark page under the description.';
 $string['latesubmissionwarning'] = 'Submission was rejected as it was made after the deadline';
+$string['needattendanceentrycount'] = 'Needs attendance record';
 $string['nostudents'] = 'There are no users to be displayed!';
 $string['nostudentsmatching'] = 'There are no users matching the current settings!';
 $string['nosubmission'] = 'No checkmarks have been submitted';
@@ -398,6 +399,7 @@ $string['noattempts'] = 'No attempts have been made on this checkmark';
 $string['nochangeviolation'] = 'You must override at least one of the checkmark settings.';
 $string['nolatesubmissions'] = 'No late submissions accepted. ';
 $string['nomoresubmissions'] = 'No further submissions are allowed.';
+$string['nomoresubmissionsaccepted'] = 'Only allowed for participants who have been granted an extension';
 $string['nonnegativeintrequired'] = 'Needs to be greater or equal zero (>= 0) and integral!';
 $string['noopen'] = 'No open date';
 $string['notavailableyet'] = 'Sorry, this checkmark is not yet available.<br />Checkmark instructions will be displayed here on the date given below.';

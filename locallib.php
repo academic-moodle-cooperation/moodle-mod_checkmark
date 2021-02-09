@@ -531,17 +531,20 @@ class checkmark {
         $cangrade = has_capability('mod/checkmark:grade', $this->context);
         $attendantcount = -1;
         $absencecount = -1;
+        $needattendanceentrycount = -1;
         if ($this->checkmark->trackattendance) {
             $attendantcount = submissionstable::count_userids($this->context, $this->checkmark->id,
                     null, self::FILTER_ATTENDANT);
             $absencecount = submissionstable::count_userids($this->context, $this->checkmark->id,
                     null, self::FILTER_ABSENT);
+            $needattendanceentrycount = submissionstable::count_userids($this->context, $this->checkmark->id,
+                    null, self::FILTER_UNKNOWN);
         }
 
         $summary = new \mod_checkmark\gradingsummary($participantcount, $this->checkmark->timeavailable, $submittedcount,
                 $needsgrading, $this->checkmark->timedue, $this->checkmark->cutoffdate, $this->cm->id,
                 $this->course->startdate, $cangrade, $this->cm->visible, $attendantcount,
-                $absencecount);
+                $absencecount, $needattendanceentrycount);
         return $summary;
     }
 
