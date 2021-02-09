@@ -2992,6 +2992,7 @@ class checkmark {
      * Returns all possible filters
      *
      * @param bool $trackattendance whether or not to include filters for attendance
+     * @param bool $presentationgrading whether or not to include filters for presentationgrading
      * @return array all possible filters
      * @throws coding_exception
      */
