@@ -112,7 +112,7 @@ class export {
      *
      */
     public function __construct() {
-        $this->filters = \checkmark::get_possible_filters(true);
+        $this->filters = \checkmark::get_possible_filters(true, true);
         $this->formats = \checkmark::get_formats();
     }
 

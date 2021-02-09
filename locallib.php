@@ -2478,17 +2478,7 @@ class checkmark {
          * to request user_preference updates!
          */
 
-        $filters = array(self::FILTER_ALL => get_string('all'),
-                self::FILTER_NOT_SUBMITTED => get_string('filternotsubmitted', 'checkmark'),
-                self::FILTER_SUBMITTED => get_string('submitted', 'checkmark'),
-                self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'),
-                self::FILTER_EXTENSION => get_string('filtergrantedextension', 'checkmark'));
-
-        if ($this->checkmark->trackattendance) {
-            $filters[self::FILTER_ATTENDANT] = get_string('all_attendant', 'checkmark');
-            $filters[self::FILTER_ABSENT] = get_string('all_absent', 'checkmark');
-            $filters[self::FILTER_UNKNOWN] = get_string('all_unknown', 'checkmark');
-        }
+        $filters = self::get_possible_filters($this->checkmark->trackattendance, $this->checkmark->presentationgrading);
 
         $updatepref = optional_param('updatepref', 0, PARAM_INT);
 
@@ -2870,7 +2860,9 @@ class checkmark {
                     'context' => $this->context,
                     'examplescount' => count($this->get_examples()),
                     'table' => $tablehtml,
-                    'tracksattendance' => $this->checkmark->trackattendance
+                    'tracksattendance' => $this->checkmark->trackattendance,
+                    'filters' => self::get_possible_filters($this->checkmark->trackattendance,
+                            $this->checkmark->presentationgrading)
             ];
             $formaction = new moodle_url('/mod/checkmark/export.php', [
                     'id' => $this->cm->id,
@@ -2993,7 +2985,7 @@ class checkmark {
      * @throws coding_exception
      */
     protected function get_filters() {
-        return self::get_possible_filters($this->checkmark->trackattendance);
+        return self::get_possible_filters($this->checkmark->trackattendance, $this->checkmark->presentationgrading);
     }
 
     /**
@@ -3003,7 +2995,7 @@ class checkmark {
      * @return array all possible filters
      * @throws coding_exception
      */
-    public static function get_possible_filters($trackattendance = false) {
+    public static function get_possible_filters($trackattendance = false, $presentationgrading = false) {
         $filters = [
                 self::FILTER_ALL => get_string('all'),
                 self::FILTER_NOT_SUBMITTED => get_string('filternotsubmitted', 'checkmark'),
@@ -3016,6 +3008,13 @@ class checkmark {
             $filters[self::FILTER_ATTENDANT] = get_string('all_attendant', 'checkmark');
             $filters[self::FILTER_ABSENT] = get_string('all_absent', 'checkmark');
             $filters[self::FILTER_UNKNOWN] = get_string('all_unknown', 'checkmark');
+        }
+
+        if ($presentationgrading) {
+            $filters[self::FILTER_PRESENTATIONGRADING] = get_string('all_with_presentationgrading',
+                    'checkmark');
+            $filters[self::FILTER_NO_PRESENTATIONGRADING] = get_string('all_without_presentationgrading',
+                    'checkmark');
         }
 
         return $filters;

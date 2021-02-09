@@ -862,6 +862,7 @@ class submissionstable extends \table_sql {
 
         $where = "u.id ".$sqluserids;
 
+        // These filters might not be necessary as the userids used in the joins are already filtered by them.
         if ($filter == \checkmark::FILTER_SUBMITTED) {
             $where .= ' AND s.timemodified > 0';
         } else if ($filter == \checkmark::FILTER_REQUIRE_GRADING) {
@@ -872,6 +873,10 @@ class submissionstable extends \table_sql {
             $where .= ' AND attendance = 0';
         } else if ($filter == \checkmark::FILTER_UNKNOWN) {
             $where .= ' AND attendance IS NULL';
+        } else if ($filter == \checkmark::FILTER_PRESENTATIONGRADING) {
+            $where .= " AND presentationgrade IS NOT NULL";
+        } else if ($filter == \checkmark::FILTER_NO_PRESENTATIONGRADING) {
+            $where .= " AND presentationgrade IS NULL";
         }
 
         $groupby = " u.id, s.id, f.id, ".$ufields." ".$useridentityfields.", f.attendance";
