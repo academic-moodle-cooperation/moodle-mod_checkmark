@@ -514,7 +514,10 @@ class checkmark {
         groups_print_activity_menu($this->cm,
                 $CFG->wwwroot . '/mod/checkmark/view.php?id=' . $this->cm->id);
 
-        echo html_writer::div($this->get_renderer()->render_checkmark_grading_summary($this->create_grading_summary()));
+        //Print grading summary only when 
+        if (has_capability('mod/checkmark:grade', $this->context)) {
+            echo html_writer::div($this->get_renderer()->render_checkmark_grading_summary($this->create_grading_summary()));
+        }
         echo html_writer::tag('div', $this->submittedlink(), array('class' => 'text-info text-center'));
         echo html_writer::tag('div', '', array('class' => 'clearer'));
     }
