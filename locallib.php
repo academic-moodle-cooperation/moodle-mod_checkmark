@@ -429,6 +429,16 @@ class checkmark {
 
         $this->view_intro();
         echo "\n";
+
+        //Print grading summary only when user has mod/checkmark:grade capability.
+        if (has_capability('mod/checkmark:grade', $this->context)) {
+            echo html_writer::div($this->get_renderer()->render_checkmark_grading_summary($this->create_grading_summary()));
+        }
+        echo html_writer::tag('div', $this->submittedlink(), array('class' => 'text-info text-center'));
+        echo $OUTPUT->container_start('studentview');
+        if (has_capability('mod/checkmark:grade', $this->context)) {
+            echo $OUTPUT->heading(get_string('studentpreview', 'checkmark'), 3);
+        }
         $this->view_dates();
         echo "\n";
         $this->view_attendancehint();
@@ -456,6 +466,7 @@ class checkmark {
             echo $OUTPUT->box_end();
             echo "\n";
         }
+        echo $OUTPUT->container_end();
 
         $this->view_feedback();
         echo "\n";
@@ -514,12 +525,6 @@ class checkmark {
         groups_print_activity_menu($this->cm,
                 $CFG->wwwroot . '/mod/checkmark/view.php?id=' . $this->cm->id);
 
-        //Print grading summary only when 
-        if (has_capability('mod/checkmark:grade', $this->context)) {
-            echo html_writer::div($this->get_renderer()->render_checkmark_grading_summary($this->create_grading_summary()));
-        }
-        echo html_writer::tag('div', $this->submittedlink(), array('class' => 'text-info text-center'));
-        echo html_writer::tag('div', '', array('class' => 'clearer'));
     }
 
     /**
@@ -567,6 +572,8 @@ class checkmark {
      */
     public function view_intro() {
         global $OUTPUT;
+        echo $OUTPUT->container_start('description');
+        echo $OUTPUT->heading($this->checkmark->name, 3);
         $notoverridden = (!$this->overrides || $this->overrides->timeavailable === null);
         $cmptime = $notoverridden ? $this->checkmark->timeavailable : $this->overrides->timeavailable;
         if ($this->checkmark->alwaysshowdescription || (time() > $cmptime)) {
@@ -578,6 +585,7 @@ class checkmark {
                 echo $OUTPUT->box_end();
             }
         }
+        echo $OUTPUT->container_end();
     }
 
     /**

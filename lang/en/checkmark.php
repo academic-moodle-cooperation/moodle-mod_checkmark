@@ -443,6 +443,7 @@ $string['seperatenamecolumns'] = 'Split fullname into single columns';
 $string['seperatenamecolumns_help'] = 'If enabled, all fragments of the displayed fullname (i.e. first name and surname) will be split into single columns.';
 $string['showalltoggle'] = 'Show all examples';
 $string['showrecentsubmissions'] = 'Show recent submissions';
+$string['studentpreview'] = 'Student preview';
 $string['submission'] = 'Submission';
 $string['submissionfeedback'] = 'Submission feedback';
 $string['submissions'] = 'Submissions';
