@@ -427,7 +427,7 @@ class checkmark {
             \core\notification::error(get_string('latesubmissionwarning', 'checkmark'));
         }
 
-        $this->view_intro();
+        echo $this->get_intro();
         echo "\n";
 
         //Print grading summary only when user has mod/checkmark:grade capability.
@@ -436,36 +436,47 @@ class checkmark {
         }
         echo html_writer::tag('div', $this->submittedlink(), array('class' => 'text-info text-center'));
         echo $OUTPUT->container_start('studentview');
-        if (has_capability('mod/checkmark:grade', $this->context)) {
-            echo $OUTPUT->heading(get_string('studentpreview', 'checkmark'), 3);
-        }
-        $this->view_dates();
-        echo "\n";
-        $this->view_attendancehint();
-        echo "\n";
+        $previewform = new MoodleQuickForm('optionspref', 'post', '#', '');
+
+        $content = '';
+        $content .= $this->get_dates();
+        $content .= "\n";
+        $content .= $this->get_attendancehint();
+        $content .= "\n";
 
         if ($editable && has_capability('mod/checkmark:submit', $context, $USER, false) && !empty($mform)) {
-            echo $OUTPUT->box_start('generalbox boxaligncenter', 'checkmarkform');
-            echo $this->print_summary();
-            $mform->display();
-            echo $OUTPUT->box_end();
-            echo "\n";
+            $content .= $OUTPUT->box_start('generalbox boxaligncenter', 'checkmarkform');
+            $content .= $this->print_summary();
+            $content .= $mform->render();
+            $content .= $OUTPUT->box_end();
+            $content .= "\n";
         } else {
-            echo $OUTPUT->box_start('generalbox boxaligncenter', 'checkmark');
+            $content .= $OUTPUT->box_start('generalbox boxaligncenter', 'checkmark');
             // Display overview!
             if (has_capability('mod/checkmark:view_preview', $context) ||
                     has_capability('mod/checkmark:submit', $context, $USER, false)) {
-                echo $this->print_summary();
-                echo html_writer::start_tag('div', array('class' => 'mform'));
-                echo html_writer::start_tag('div', array('class' => 'clearfix'));
-                echo $this->print_user_submission($USER->id, true);
-                echo html_writer::end_tag('div');
-                echo html_writer::end_tag('div');
+                $content .= $this->print_summary();
+                $content .= html_writer::start_tag('div', array('class' => 'mform'));
+                $content .= html_writer::start_tag('div', array('class' => 'clearfix'));
+                $content .= $this->print_user_submission($USER->id, true);
+                $content .= html_writer::end_tag('div');
+                $content .= html_writer::end_tag('div');
 
             }
-            echo $OUTPUT->box_end();
-            echo "\n";
+            $content .= $OUTPUT->box_end();
+            $content .= "\n";
         }
+
+        if (has_capability('mod/checkmark:grade', $this->context)) {
+            $previewform->addElement('header', 'studentpreview',
+                    get_string('studentpreview', 'checkmark'));
+            $previewform->addElement('html', $content);
+            $previewform->display();
+        } else {
+            echo $content;
+        }
+
+
         echo $OUTPUT->container_end();
 
         $this->view_feedback();
@@ -570,22 +581,24 @@ class checkmark {
      *
      * The default implementation prints the checkmark description in a box
      */
-    public function view_intro() {
+    public function get_intro() {
         global $OUTPUT;
-        echo $OUTPUT->container_start('description');
-        echo $OUTPUT->heading($this->checkmark->name, 3);
+        $content = '';
+        $content .= $OUTPUT->container_start('description');
+        $content .= $OUTPUT->heading($this->checkmark->name, 3);
         $notoverridden = (!$this->overrides || $this->overrides->timeavailable === null);
         $cmptime = $notoverridden ? $this->checkmark->timeavailable : $this->overrides->timeavailable;
         if ($this->checkmark->alwaysshowdescription || (time() > $cmptime)) {
             $introattachments = $this->get_introattachments();
             if (!empty($this->checkmark->intro || !empty($introattachments))) {
-                echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
-                echo format_module_intro('checkmark', $this->checkmark, $this->cm->id);
-                echo $introattachments;
-                echo $OUTPUT->box_end();
+                $content .= $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
+                $content .= format_module_intro('checkmark', $this->checkmark, $this->cm->id);
+                $content .= $introattachments;
+                $content .= $OUTPUT->box_end();
             }
         }
-        echo $OUTPUT->container_end();
+        $content .= $OUTPUT->container_end();
+        return $content;
     }
 
     /**
@@ -606,14 +619,15 @@ class checkmark {
      *
      * @throws coding_exception
      */
-    public function view_dates() {
+    public function get_dates() {
         global $OUTPUT;
+        $content = '';
         if (!$this->checkmark->timeavailable && !$this->checkmark->timedue && (!$this->overrides ||
                         ($this->overrides && !$this->overrides->timeavailable && !$this->overrides->timedue))) {
             return;
         }
 
-        echo $OUTPUT->box_start('generalbox boxaligncenter', 'dates');
+        $content .= $OUTPUT->box_start('generalbox boxaligncenter', 'dates');
         $table = new html_table();
         $table->attributes['class'] = 'table-condensed';
         $rows = [];
@@ -650,8 +664,9 @@ class checkmark {
             $rows[] = new html_table_row($row);
         }
         $table->data = $rows;
-        echo html_writer::table($table);
-        echo $OUTPUT->box_end();
+        $content .= html_writer::table($table);
+        $content .= $OUTPUT->box_end();
+        return $content;
     }
 
     /**
@@ -659,13 +674,13 @@ class checkmark {
      *
      * @throws coding_exception
      */
-    public function view_attendancehint() {
+    public function get_attendancehint() {
         global $OUTPUT;
         if (!$this->checkmark->trackattendance || !$this->checkmark->attendancegradelink) {
             return;
         }
 
-        echo $OUTPUT->box(get_string('attendancegradelink_hint', 'checkmark'), 'generalbox', 'attendancehint');
+        return $OUTPUT->box(get_string('attendancegradelink_hint', 'checkmark'), 'generalbox', 'attendancehint');
     }
 
     /**
