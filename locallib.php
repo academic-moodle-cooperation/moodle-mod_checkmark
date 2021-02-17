@@ -430,7 +430,7 @@ class checkmark {
         echo $this->get_intro();
         echo "\n";
 
-        //Print grading summary only when user has mod/checkmark:grade capability.
+        // Print grading summary only when user has mod/checkmark:grade capability.
         if (has_capability('mod/checkmark:grade', $this->context)) {
             echo html_writer::div($this->get_renderer()->render_checkmark_grading_summary($this->create_grading_summary()));
         }
