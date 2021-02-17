@@ -917,24 +917,11 @@ class checkmark {
 
         $context = context_module::instance($this->cm->id);
         if (has_capability('mod/checkmark:grade', $context)) {
-            if ($allgroups and has_capability('moodle/site:accessallgroups', $context)) {
-                $group = 0;
-            } else {
-                $group = groups_get_activity_group($this->cm);
-            }
-            if ($cnt = $this->count_real_submissions($group)) {
-                $submitted = html_writer::tag('a', get_string('viewsubmissions', 'checkmark', $cnt), [
-                        'class' => 'btn btn-secondary',
-                        'href' => $urlbase . 'submissions.php?id=' . $this->cm->id,
-                        'id' => 'submissions'
-                ]);
-            } else {
-                $submitted = html_writer::tag('a', get_string('noattempts', 'checkmark'), [
-                        'class' => 'btn btn-secondary',
-                        'href' => $urlbase . 'submissions.php?id=' . $this->cm->id,
-                        'id' => 'submissions'
-                ]);
-            }
+            $submitted = html_writer::tag('a', get_string('viewsubmissions', 'checkmark'), [
+                    'class' => 'btn btn-secondary',
+                    'href' => $urlbase . 'submissions.php?id=' . $this->cm->id,
+                    'id' => 'submissions'
+            ]);
         } else {
             if (isloggedin()) {
                 if ($submission = $this->get_submission($USER->id)) {

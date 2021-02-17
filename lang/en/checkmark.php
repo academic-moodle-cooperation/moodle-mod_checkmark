@@ -466,7 +466,7 @@ $string['viewfeedback'] = 'View checkmark grades and feedback';
 $string['summary_abs'] = 'x/y examples checked';
 $string['summary_rel'] = '% examples checked';
 $string['viewmysubmission'] = 'View my submission';
-$string['viewsubmissions'] = 'View {$a} submitted checkmarks';
+$string['viewsubmissions'] = 'View all submissions';
 $string['yoursubmission'] = 'Your submission';
 $string['zippedgrouppdfs'] = 'Groups as separate PDFs';
 /*
