@@ -475,7 +475,6 @@ class checkmark {
         } else {
             echo $content;
         }
-        
         echo $OUTPUT->container_end();
 
         $this->view_feedback();
