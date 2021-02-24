@@ -86,4 +86,46 @@ class mod_checkmark_generator extends testing_module_generator {
 
         return parent::create_instance($record, (array)$options);
     }
+
+    /**
+     * Create a submission in a given checkmark for a given student with given checks at the current time
+     *
+     * @param array $data Array containing all information
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
+    public function create_submission($data) {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
+        if (!isset($data['userid'])) {
+            throw new coding_exception('Must specify user (id) when creating a checkmark submission.');
+        }
+        if (!isset($data['checkmark'])) {
+            throw new coding_exception('Must specify checkmark when creating a checkmark submission.');
+        }
+        $userid = $data['userid'];
+        //$module = $DB->get_record('course_modules', ['idnumber' => $data['idnumber']]);
+        //var_dump($data);
+        //var_dump($module);
+        if (!$cm = get_coursemodule_from_instance('checkmark', $data['checkmark'])) {
+            throw new coding_exception('Invalid checkmark instance');
+        }
+        //var_dump($cm);
+        $checkmark = new checkmark($cm->id);
+        $submission = $checkmark->get_submission($userid, true);
+        $i = 1;
+        foreach ($submission->get_examples() as $key => $example) {
+            $name = $key;
+            if (isset($data['example' . $i]) && ($data['example' . $i] != 0)) {
+                $submission->get_example($key)->set_state(\mod_checkmark\example::CHECKED);
+            } else {
+                $submission->get_example($key)->set_state(\mod_checkmark\example::UNCHECKED);
+            }
+            $i++;
+        }
+        //var_dump($submission);
+        $checkmark->update_submission($submission);
+    }
+
 }
