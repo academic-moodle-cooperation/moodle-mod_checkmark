@@ -105,13 +105,9 @@ class mod_checkmark_generator extends testing_module_generator {
             throw new coding_exception('Must specify checkmark when creating a checkmark submission.');
         }
         $userid = $data['userid'];
-        //$module = $DB->get_record('course_modules', ['idnumber' => $data['idnumber']]);
-        //var_dump($data);
-        //var_dump($module);
         if (!$cm = get_coursemodule_from_instance('checkmark', $data['checkmark'])) {
             throw new coding_exception('Invalid checkmark instance');
         }
-        //var_dump($cm);
         $checkmark = new checkmark($cm->id);
         $submission = $checkmark->get_submission($userid, true);
         $i = 1;
@@ -124,7 +120,6 @@ class mod_checkmark_generator extends testing_module_generator {
             }
             $i++;
         }
-        //var_dump($submission);
         $checkmark->update_submission($submission);
     }
 
