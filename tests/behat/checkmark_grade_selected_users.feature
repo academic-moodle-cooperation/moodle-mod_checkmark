@@ -60,5 +60,4 @@ Feature: In a checkmark I want to grade selected submissions.
     And I press "start"
     And I press "Continue"
     Then I should see "Auto-grading successful! 1 submission updated."
-    And I follow "Export"
-    And I should see "60 / 100"
+    Then "Student 1" row "Grade" column of "generaltable" table should contain "60 / 100"
