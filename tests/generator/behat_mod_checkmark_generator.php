@@ -50,7 +50,7 @@ class behat_mod_checkmark_generator extends behat_generator_base {
                             'switchids' => ['checkmark' => 'checkmark', 'user' => 'userid'],
                     ],
             ];
-        }
+    }
 
     /**
      * Look up the id of a quiz from its name.
@@ -59,11 +59,11 @@ class behat_mod_checkmark_generator extends behat_generator_base {
      * @return int corresponding id.
      */
     public function get_checkmark_id(string $checkmarkname) {
-            global $DB;
+        global $DB;
 
-            if (!$id = $DB->get_field('checkmark', 'id', ['name' => $checkmarkname])) {
-                throw new Exception('There is no quiz with name "' . $checkmarkname . '" does not exist');
-            }
-            return $id;
+        if (!$id = $DB->get_field('checkmark', 'id', ['name' => $checkmarkname])) {
+            throw new Exception('There is no quiz with name "' . $checkmarkname . '" does not exist');
         }
+        return $id;
+    }
 }
