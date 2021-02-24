@@ -2119,11 +2119,7 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
             $group = groups_get_activity_group($PAGE->cm);
         }
         $link = new moodle_url('/mod/checkmark/submissions.php', array('id' => $PAGE->cm->id));
-        if ($count = $checkmarkinstance->count_real_submissions($group)) {
-            $string = get_string('viewsubmissions', 'checkmark', $count);
-        } else {
-            $string = get_string('noattempts', 'checkmark');
-        }
+        $string = get_string('viewsubmissions', 'checkmark');
         $checkmarknode->add($string, $link, navigation_node::TYPE_SETTING);
     }
 }
