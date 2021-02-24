@@ -4,7 +4,7 @@ Feature: In a checkmark I want to grade selected submissions.
     As a teacher
     I need to able to grade a selected user
 
-  @javascript
+  @javascript @currentdev
   Scenario: Grade selected users
     Given the following "courses" exist:
       | fullname | shortname | category |
@@ -60,4 +60,4 @@ Feature: In a checkmark I want to grade selected submissions.
     And I press "start"
     And I press "Continue"
     Then I should see "Auto-grading successful! 1 submission updated."
-    Then "Student 1" row "Grade" column of "generaltable" table should contain "60 / 100"
+    And I should see "60"
