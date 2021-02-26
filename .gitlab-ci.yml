@@ -45,7 +45,8 @@ variables:
     - cd ../..
     - moodle-plugin-ci install --moodle="moodle-upstream-core" --db-user=root --db-pass=superrootpass --db-host=127.0.0.1
   services:
-    - mysql:8.0.23
+    - name: mysql:8.0.23
+      command: ["mysqld", "--default-authentication-plugin=mysql_native_password"]
     - docker:dind
 
   variables:
