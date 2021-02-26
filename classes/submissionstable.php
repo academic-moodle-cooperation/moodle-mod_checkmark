@@ -491,7 +491,7 @@ class submissionstable extends \table_sql {
         $params['examplecount'] = $examplecount;
 
         if ($table->groupmode != NOGROUPS) {
-            $getgroupsql = "SELECT MAX(grps.courseid) AS courseid, MIN(grps.name) AS groups, grpm.userid AS userid
+            $getgroupsql = "SELECT MAX(grps.courseid) AS courseid, MIN(grps.name) AS \"groups\", grpm.userid AS userid
                          FROM {groups_members} grpm
                     LEFT JOIN {groups} grps ON grps.id = grpm.groupid
                         WHERE grps.courseid = :courseid
@@ -819,7 +819,7 @@ class submissionstable extends \table_sql {
         $params['examplecount'] = $table->examplecount;
 
         if ($table->groupmode != NOGROUPS) {
-            $getgroupsql = "SELECT MAX(grps.courseid) AS courseid, MIN(grps.name) AS groups";
+            $getgroupsql = "SELECT MAX(grps.courseid) AS courseid, MIN(grps.name) AS \"groups\"";
             $params['courseid'] = $table->checkmark->course->id;
             $getgroupsql .= ", grpm.userid AS userid
                          FROM {groups_members} grpm
@@ -844,7 +844,7 @@ class submissionstable extends \table_sql {
             $fields .= ", f.presentationfeedback AS presentationfeedback";
         }
         if ($table->groupmode != NOGROUPS) {
-            $fields .= ", MAX(groups) AS groups";
+            $fields .= ", MAX(groups) AS \"groups\"";
         }
         $params['checkmarkid'] = $table->checkmark->checkmark->id;
         $params['checkmarkid2'] = $table->checkmark->checkmark->id;
