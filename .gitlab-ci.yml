@@ -38,6 +38,20 @@ variables:
     DB: "mariadb"
     MYSQL_ROOT_PASSWORD: "superrootpass"
 
+.mysql:
+  before_script:
+    # Wait until database is ready
+    - timeout 3m bash -c 'echo -e "DB...\c"; until </dev/tcp/127.0.0.1/3306; do echo -e ".\c"; sleep 1; done; echo "ok";' 2> /dev/null
+    - cd ../..
+    - moodle-plugin-ci install --moodle="moodle-upstream-core" --db-user=root --db-pass=superrootpass --db-host=127.0.0.1
+  services:
+    - mysql:8.0.23
+    - docker:dind
+
+  variables:
+    DB: "mysqli"
+    MYSQL_ROOT_PASSWORD: "superrootpass"
+
 .job_template: &job_definition
   script:
     - moodle-plugin-ci phplint
@@ -61,6 +75,13 @@ code_checker_pgsql:
 
 code_checker_mariadb:
   extends: .mariadb
+  <<: *job_definition
+  image: amcdev/moodle-plugin-ci:7.3-docker-node-14.15.0
+  variables:
+    MOODLE_BRANCH: "MOODLE_310_STABLE"
+
+code_checker_mysql:
+  extends: .mysql
   <<: *job_definition
   image: amcdev/moodle-plugin-ci:7.3-docker-node-14.15.0
   variables:
