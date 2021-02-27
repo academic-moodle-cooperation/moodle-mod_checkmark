@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Generator file for mod_checkmark's PHPUnit tests
+ * Generator file for mod_checkmark's behat tests
  *
  * @package   mod_checkmark
  * @category  test
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Daniel Binder
+ * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,8 +31,8 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package   mod_checkmark
  * @category  test
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Daniel Binder
+ * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_mod_checkmark_generator extends behat_generator_base {
@@ -53,16 +53,16 @@ class behat_mod_checkmark_generator extends behat_generator_base {
     }
 
     /**
-     * Look up the id of a quiz from its name.
+     * Look up the id of a checkmark from its name.
      *
-     * @param string $quizname the quiz name, for example 'Test quiz'.
+     * @param string $checkmarkname the checkmark name, for example 'Checkmark 1'.
      * @return int corresponding id.
      */
     public function get_checkmark_id(string $checkmarkname) {
         global $DB;
 
         if (!$id = $DB->get_field('checkmark', 'id', ['name' => $checkmarkname])) {
-            throw new Exception('There is no quiz with name "' . $checkmarkname . '" does not exist');
+            throw new Exception('There is no checkmark with name "' . $checkmarkname);
         }
         return $id;
     }
