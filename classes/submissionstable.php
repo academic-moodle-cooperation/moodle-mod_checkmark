@@ -515,7 +515,7 @@ class submissionstable extends \table_sql {
             $fields .= ", f.presentationfeedback AS presentationfeedback";
         }
         if ($table->groupmode != NOGROUPS) {
-            $fields .= ", groups";
+            $fields .= ", \"groups\"";
         }
         $params['checkmarkid'] = $table->checkmark->checkmark->id;
         $params['checkmarkid2'] = $table->checkmark->checkmark->id;
