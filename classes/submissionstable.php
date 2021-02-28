@@ -844,7 +844,7 @@ class submissionstable extends \table_sql {
             $fields .= ", f.presentationfeedback AS presentationfeedback";
         }
         if ($table->groupmode != NOGROUPS) {
-            $fields .= ", MAX(groups) AS \"groups\"";
+            $fields .= ", MAX(\"groups\") AS \"groups\"";
         }
         $params['checkmarkid'] = $table->checkmark->checkmark->id;
         $params['checkmarkid2'] = $table->checkmark->checkmark->id;
