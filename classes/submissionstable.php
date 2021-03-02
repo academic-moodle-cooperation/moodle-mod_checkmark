@@ -1140,19 +1140,19 @@ class submissionstable extends \table_sql {
      * @return string Return user groups.
      */
     public function col_groups($values) {
-        if (isset($values->groups)) {
+        if (isset($values->groupname)) {
             $groups = groups_get_all_groups($this->checkmark->course->id, $values->id, 0, 'g.name');
-            $values->groups = '';
+            $values->groupname = '';
             foreach ($groups as $group) {
-                if ($values->groups != '') {
-                    $values->groups .= ', ';
+                if ($values->groupname != '') {
+                    $values->groupname .= ', ';
                 }
-                $values->groups .= $group->name;
+                $values->groupname .= $group->name;
             }
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
-                return $values->groups;
+                return $values->groupname;
             } else {
-                return \html_writer::tag('div', $values->groups, ['id' => 'gr'.$values->id]);
+                return \html_writer::tag('div', $values->groupname, ['id' => 'gr'.$values->id]);
             }
         } else if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
             return '';
