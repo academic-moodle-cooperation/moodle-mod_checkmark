@@ -491,7 +491,7 @@ class submissionstable extends \table_sql {
         $params['examplecount'] = $examplecount;
 
         if ($table->groupmode != NOGROUPS) {
-            $getgroupsql = "SELECT MAX(grps.courseid) AS courseid, MIN(grps.name) AS groups, grpm.userid AS userid
+            $getgroupsql = "SELECT MAX(grps.courseid) AS courseid, MIN(grps.name) AS groupname, grpm.userid AS userid
                          FROM {groups_members} grpm
                     LEFT JOIN {groups} grps ON grps.id = grpm.groupid
                         WHERE grps.courseid = :courseid
@@ -515,7 +515,7 @@ class submissionstable extends \table_sql {
             $fields .= ", f.presentationfeedback AS presentationfeedback";
         }
         if ($table->groupmode != NOGROUPS) {
-            $fields .= ", groups";
+            $fields .= ", groupname";
         }
         $params['checkmarkid'] = $table->checkmark->checkmark->id;
         $params['checkmarkid2'] = $table->checkmark->checkmark->id;
@@ -545,7 +545,7 @@ class submissionstable extends \table_sql {
         $where .= "u.id ".$sqluserids;
         $groupby = " u.id, s.id, f.id, ".$ufields." ".$useridentityfields;
         if ($table->groupmode != NOGROUPS) {
-            $groupby .= ", grpq.groups";
+            $groupby .= ", grpq.groupname";
         }
 
         $table->set_sql($fields, $from, $where, $params, $groupby);
@@ -819,7 +819,7 @@ class submissionstable extends \table_sql {
         $params['examplecount'] = $table->examplecount;
 
         if ($table->groupmode != NOGROUPS) {
-            $getgroupsql = "SELECT MAX(grps.courseid) AS courseid, MIN(grps.name) AS groups";
+            $getgroupsql = "SELECT MAX(grps.courseid) AS courseid, MIN(grps.name) AS groupname";
             $params['courseid'] = $table->checkmark->course->id;
             $getgroupsql .= ", grpm.userid AS userid
                          FROM {groups_members} grpm
@@ -844,7 +844,7 @@ class submissionstable extends \table_sql {
             $fields .= ", f.presentationfeedback AS presentationfeedback";
         }
         if ($table->groupmode != NOGROUPS) {
-            $fields .= ", MAX(groups) AS groups";
+            $fields .= ", MAX(groupname) AS groupname";
         }
         $params['checkmarkid'] = $table->checkmark->checkmark->id;
         $params['checkmarkid2'] = $table->checkmark->checkmark->id;
@@ -1140,19 +1140,19 @@ class submissionstable extends \table_sql {
      * @return string Return user groups.
      */
     public function col_groups($values) {
-        if (isset($values->groups)) {
+        if (isset($values->groupname)) {
             $groups = groups_get_all_groups($this->checkmark->course->id, $values->id, 0, 'g.name');
-            $values->groups = '';
+            $values->groupname = '';
             foreach ($groups as $group) {
-                if ($values->groups != '') {
-                    $values->groups .= ', ';
+                if ($values->groupname != '') {
+                    $values->groupname .= ', ';
                 }
-                $values->groups .= $group->name;
+                $values->groupname .= $group->name;
             }
             if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
-                return $values->groups;
+                return $values->groupname;
             } else {
-                return \html_writer::tag('div', $values->groups, ['id' => 'gr'.$values->id]);
+                return \html_writer::tag('div', $values->groupname, ['id' => 'gr'.$values->id]);
             }
         } else if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
             return '';
