@@ -2187,10 +2187,14 @@ function mod_checkmark_core_calendar_is_event_visible(calendar_event $event) {
  * @param \core_calendar\action_factory $factory
  * @return \core_calendar\local\event\entities\action_interface|null
  */
-function mod_checkmark_core_calendar_provide_event_action(calendar_event $event, \core_calendar\action_factory $factory) {
+function mod_checkmark_core_calendar_provide_event_action(calendar_event $event, \core_calendar\action_factory $factory, int $userid = 0) {
     global $CFG, $USER;
 
     require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
+    
+    if (empty($userid)) {
+        $userid = $USER->id;
+    }
 
     $cm = get_fast_modinfo($event->courseid)->instances['checkmark'][$event->instance];
     $context = context_module::instance($cm->id);
@@ -2230,6 +2234,14 @@ function mod_checkmark_core_calendar_provide_event_action(calendar_event $event,
             $name = get_string('editmysubmission', 'checkmark');
         }
         $actionable = true;
+    }
+    
+    $completion = new \completion_info($cm->get_course());
+
+    $completiondata = $completion->get_data($cm, false, $userid);
+
+    if ($completiondata->completionstate != COMPLETION_INCOMPLETE) {
+        return null;
     }
 
     return $factory->create_instance(
