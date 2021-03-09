@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.10.1 (2021-03-09)
+------------------
+* [FIXED] #6836 Fixed a bug causing error messages in checkmarks with active groups when using a MySQL
+                database with version number 8 or higher
+
+
 3.10.0 (2020-11-10)
 ------------------
 * [FEATURE] #6685 Add the option to export every name fragment (e.g. firstname, lastname)
