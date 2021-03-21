@@ -42,14 +42,20 @@ class behat_mod_checkmark_generator extends behat_generator_base {
      * @return Structure of objects that can be generated
      */
     protected function get_creatable_entities(): array {
-            return [
-                    'submissions' => [
-                            'singular' => 'submission',
-                            'datagenerator' => 'submission',
-                            'required' => ['checkmark', 'user'],
-                            'switchids' => ['checkmark' => 'checkmark', 'user' => 'userid'],
-                    ],
-            ];
+        return [
+                'submissions' => [
+                        'singular' => 'submission',
+                        'datagenerator' => 'submission',
+                        'required' => ['checkmark', 'user'],
+                        'switchids' => ['checkmark' => 'checkmark', 'user' => 'userid'],
+                ],
+                'feedbacks' => [
+                        'singular' => 'feedback',
+                        'datagenerator' => 'feedback',
+                        'required' => ['checkmark', 'user'],
+                        'switchids' => ['checkmark' => 'checkmark', 'user' => 'userid', 'attendance' => 'attendance'],
+                ]
+        ];
     }
 
     /**
@@ -65,5 +71,22 @@ class behat_mod_checkmark_generator extends behat_generator_base {
             throw new Exception('There is no checkmark with name "' . $checkmarkname);
         }
         return $id;
+    }
+
+    /**
+     * Look up the id of an attendance state for a given description.
+     *
+     * @param string $attandancestate
+     * @return int|null
+     * @throws coding_exception
+     */
+    public function get_attendance_id(string $attandancestate) {
+        if ($attandancestate === get_string('attendant', 'checkmark')) {
+            return 1;
+        } else if ($attandancestate === get_string('absent', 'checkmark')) {
+            return 0;
+        } else {
+            return null;
+        }
     }
 }

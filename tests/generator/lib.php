@@ -98,17 +98,9 @@ class mod_checkmark_generator extends testing_module_generator {
     public function create_submission($data) {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
-        if (!isset($data['userid'])) {
-            throw new coding_exception('Must specify user (id) when creating a checkmark submission.');
-        }
-        if (!isset($data['checkmark'])) {
-            throw new coding_exception('Must specify checkmark when creating a checkmark submission.');
-        }
+        $checkmark = $this->get_test_checkmark($data);
         $userid = $data['userid'];
-        if (!$cm = get_coursemodule_from_instance('checkmark', $data['checkmark'])) {
-            throw new coding_exception('Invalid checkmark instance');
-        }
-        $checkmark = new checkmark($cm->id);
+
         $submission = $checkmark->get_submission($userid, true);
         $i = 1;
         foreach ($submission->get_examples() as $key => $example) {
@@ -121,6 +113,83 @@ class mod_checkmark_generator extends testing_module_generator {
             $i++;
         }
         $checkmark->update_submission($submission);
+    }
+
+    /**
+     * Grade a given checkmark for a given student and set attendance if activated.
+     *
+     * @param array $data Array containing all information
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
+    public function create_feedback($data) {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
+        $checkmark = $this->get_test_checkmark($data);
+        $userid = $data['userid'];
+
+        $feedback = $checkmark->prepare_new_feedback($userid);
+        if (isset($data['grade'])) {
+            $feedback->grade = $data['grade'];
+        }
+        if (isset($data['feedback'])) {
+            $feedback->feedback = $data['feedback'];
+        }
+        if (isset($data['attendance']) && $checkmark->checkmark->trackattendance) {
+            $feedback->attendance = $data['attendance'];
+        } else if (isset($data['attendance'])) {
+            throw new coding_exception('Attendance cannot be set because the current checkmark activity 
+            does not have attendace tracking enabled.');
+        }
+        if (isset($data['presentationgrade']) && $checkmark->checkmark->presentationgrade) {
+            $feedback->presentationgrade = $data['presentationgrade'];
+        } else if (isset($data['presentationgrade'])) {
+            throw new coding_exception('Presentation grade cannot be set because the current checkmark activity 
+            does not have presentation grading enabled.');
+        }
+        if (isset($data['presentationfeedback']) && $checkmark->checkmark->presentationgrade) {
+            $feedback->presentationfeedback = $data['presentationfeedback'];
+        } else if (isset($data['presentationfeedback'])) {
+            throw new coding_exception('Presentation feedback cannot be set because the current checkmark activity 
+            does not have presentation grading enabled.');
+        }
+
+        $feedback->timemodified = time();
+        try {
+            $DB->update_record('checkmark_feedbacks', $feedback);
+        } catch (Exception $e) {
+            var_dump($feedback);
+            throw new coding_exception($e->getMessage());
+        }
+        // Trigger grade event!
+        $checkmark->update_grade($feedback);
+        // Trigger the event!
+        \mod_checkmark\event\grade_updated::manual($checkmark->cm, array('userid' => $feedback->userid,
+                'feedbackid' => $feedback->id))->trigger();
+    }
+
+    /**
+     * Helper method to discover a checkmark matching the given data.
+     *
+     * @param array $data Array containing all information
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
+    private function get_test_checkmark($data) {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
+        if (!isset($data['userid'])) {
+            throw new coding_exception('Must specify user (id) when creating a checkmark submission.');
+        }
+        if (!isset($data['checkmark'])) {
+            throw new coding_exception('Must specify checkmark when creating a checkmark submission.');
+        }
+        if (!$cm = get_coursemodule_from_instance('checkmark', $data['checkmark'])) {
+            throw new coding_exception('Invalid checkmark instance');
+        }
+        return new checkmark($cm->id);
     }
 
 }
