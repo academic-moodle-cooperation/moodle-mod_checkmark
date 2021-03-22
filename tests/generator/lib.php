@@ -142,13 +142,13 @@ class mod_checkmark_generator extends testing_module_generator {
             throw new coding_exception('Attendance cannot be set because the current checkmark activity 
             does not have attendace tracking enabled.');
         }
-        if (isset($data['presentationgrade']) && $checkmark->checkmark->presentationgrade) {
+        if (isset($data['presentationgrade']) && $checkmark->checkmark->presentationgrading) {
             $feedback->presentationgrade = $data['presentationgrade'];
         } else if (isset($data['presentationgrade'])) {
             throw new coding_exception('Presentation grade cannot be set because the current checkmark activity 
             does not have presentation grading enabled.');
         }
-        if (isset($data['presentationfeedback']) && $checkmark->checkmark->presentationgrade) {
+        if (isset($data['presentationfeedback']) && $checkmark->checkmark->presentationgrading) {
             $feedback->presentationfeedback = $data['presentationfeedback'];
         } else if (isset($data['presentationfeedback'])) {
             throw new coding_exception('Presentation feedback cannot be set because the current checkmark activity 
