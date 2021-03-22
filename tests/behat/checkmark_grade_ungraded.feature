@@ -18,7 +18,7 @@ Feature: In a checkmark I want to grade ungraded submissions.
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
     # We do not need to manually create the checkmark instance again,
-    # this has been testet in checkmark_adding.feature, use generators!
+    # this has been tested in checkmark_adding.feature, use generators!
     And the following "activities" exist:
       | activity  | course | idnumber | name        | intro         |
       | checkmark | C1     | CM1      | Checkmark 1 | Description 1 |
@@ -37,7 +37,7 @@ Feature: In a checkmark I want to grade ungraded submissions.
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
-    And I click on "submissions" "link"
+    And I navigate to "View all submissions" in current page administration
     And I click on "Ungraded" "link"
     And I set the following fields to these values:
       | bulkaction | grade |

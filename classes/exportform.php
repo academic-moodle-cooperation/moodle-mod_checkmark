@@ -18,8 +18,8 @@
  * exportform.php
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2017 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Philipp Hager, Daniel Binder
+ * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_checkmark;
@@ -31,8 +31,8 @@ defined('MOODLE_INTERNAL') || die();
  * This class contains the grading form for checkmark-submissions
  *
  * @package   mod_checkmark
- * @author    Philipp Hager
- * @copyright 2017 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Philipp Hager, Daniel Binder
+ * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class exportform extends \moodleform {
@@ -69,19 +69,7 @@ class exportform extends \moodleform {
         $this->context = $this->_customdata['context'];
         $this->examplescount = $this->_customdata['examplescount'];
         $this->table = $this->_customdata['table'];
-        $filters = [
-            \checkmark::FILTER_ALL             => get_string('all'),
-            \checkmark::FILTER_NOT_SUBMITTED   => get_string('filternotsubmitted', 'checkmark'),
-            \checkmark::FILTER_SUBMITTED       => get_string('submitted', 'checkmark'),
-            \checkmark::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'),
-            \checkmark::FILTER_EXTENSION       => get_string('filtergrantedextension', 'checkmark')
-
-        ];
-        if ($this->_customdata['tracksattendance']) {
-            $filters[\checkmark::FILTER_ATTENDANT] = get_string('all_attendant', 'checkmark');
-            $filters[\checkmark::FILTER_ABSENT] = get_string('all_absent', 'checkmark');
-            $filters[\checkmark::FILTER_UNKNOWN] = get_string('all_unknown', 'checkmark');
-        }
+        $filters = $this->_customdata['filters'];
 
         // Here come the hidden params!
         $mform->addElement('hidden', 'updatepref');

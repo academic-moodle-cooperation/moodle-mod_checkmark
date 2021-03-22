@@ -862,6 +862,7 @@ class submissionstable extends \table_sql {
 
         $where = "u.id ".$sqluserids;
 
+        // These filters might not be necessary as the userids used in the joins are already filtered by them.
         if ($filter == \checkmark::FILTER_SUBMITTED) {
             $where .= ' AND s.timemodified > 0';
         } else if ($filter == \checkmark::FILTER_REQUIRE_GRADING) {
@@ -872,6 +873,10 @@ class submissionstable extends \table_sql {
             $where .= ' AND attendance = 0';
         } else if ($filter == \checkmark::FILTER_UNKNOWN) {
             $where .= ' AND attendance IS NULL';
+        } else if ($filter == \checkmark::FILTER_PRESENTATIONGRADING) {
+            $where .= " AND presentationgrade IS NOT NULL";
+        } else if ($filter == \checkmark::FILTER_NO_PRESENTATIONGRADING) {
+            $where .= " AND presentationgrade IS NULL";
         }
 
         $groupby = " u.id, s.id, f.id, ".$ufields." ".$useridentityfields.", f.attendance";
@@ -950,10 +955,26 @@ class submissionstable extends \table_sql {
      * @throws coding_exception
      */
     public function get_userids($filter, $ids = []) {
+        return self::get_userids_static($this->context, $this->checkmark->checkmark->id, $this->currentgroup, $filter, $ids);
+    }
+
+    /**
+     * Gets all userids for a checkmark activity filtered by pre-defined filters and groups.
+     *
+     * @param object $context Current context
+     * @param int $checkmarkid Id of the checkmark activity to retrieve user ids for
+     * @param int|null $currentgroup Group that should be filtered for. null if all groups should be selected
+     * @param int $filter Currently active filter (FILTER_ALL, FILTER_REQUIRE_GRADING, FILTER_SUBMITTED...)
+     * @param array $ids (optional) Array of userids to filter for
+     * @return array|int[] Array of found userids. [-1] if none are found
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    public static function get_userids_static ($context, $checkmarkid, $currentgroup, $filter, $ids = []) {
         global $DB;
 
         // Get all ppl that are allowed to submit checkmarks!
-        list($esql, $params) = get_enrolled_sql($this->context, 'mod/checkmark:submit', $this->currentgroup);
+        list($esql, $params) = get_enrolled_sql($context, 'mod/checkmark:submit', $currentgroup);
         if (!empty($ids) && is_array($ids)) {
             $usrlst = $ids;
         }
@@ -979,10 +1000,20 @@ class submissionstable extends \table_sql {
                 $wherefilter = " AND COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0) ";
             } else if ($filter == \checkmark::FILTER_EXTENSION) {
                 $wherefilter = " AND o.id IS NOT NULL";
+            } else if ($filter == \checkmark::FILTER_ATTENDANT) {
+                $wherefilter .= " AND attendance = 1";
+            } else if ($filter == \checkmark::FILTER_ABSENT) {
+                $wherefilter .= " AND attendance = 0";
+            } else if ($filter == \checkmark::FILTER_UNKNOWN) {
+                $wherefilter .= " AND attendance IS NULL";
+            } else if ($filter == \checkmark::FILTER_PRESENTATIONGRADING) {
+                $wherefilter .= " AND presentationgrade IS NOT NULL";
+            } else if ($filter == \checkmark::FILTER_NO_PRESENTATIONGRADING) {
+                $wherefilter .= " AND presentationgrade IS NULL";
             }
-            $params['checkmarkid'] = $this->checkmark->checkmark->id;
-            $params['checkmarkid2'] = $this->checkmark->checkmark->id;
-            $params['checkmarkid3'] = $this->checkmark->checkmark->id;
+            $params['checkmarkid'] = $checkmarkid;
+            $params['checkmarkid2'] = $checkmarkid;
+            $params['checkmarkid3'] = $checkmarkid;
             $sql = "SELECT DISTINCT u.id FROM {user} u
                  LEFT JOIN (".$esql.") eu ON eu.id=u.id
                  LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid) AND s.checkmarkid = :checkmarkid
@@ -1004,6 +1035,25 @@ class submissionstable extends \table_sql {
         }
 
         return $users;
+    }
+
+    /**
+     * Counts all user ids filtered by pre-defined filters and groups.
+     *
+     * @param object $context Current context
+     * @param int $checkmarkid Id of the checkmark activity to retrieve user ids for
+     * @param int|null $currentgroup Group that should be filtered for. null if all groups should be selected
+     * @param int $filter Currently active filter (FILTER_ALL, FILTER_REQUIRE_GRADING, FILTER_SUBMITTED...)
+     * @param array $ids (optional) Array of userids to filter for
+     * @return array|int[] Array of found userids. [-1] if none are found
+     */
+    public static function count_userids ($context, $checkmarkid, $currentgroup, $filter, $ids = []) {
+        $idsres = self::get_userids_static($context, $checkmarkid, $currentgroup, $filter, $ids);
+        if (empty($idsres) || $idsres[0] === -1) {
+            return 0;
+        } else {
+            return count($idsres);
+        }
     }
 
     /**

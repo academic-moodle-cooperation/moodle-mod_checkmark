@@ -251,7 +251,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     Then the "Users" select box should contain "Student 1"
     And the "Users" select box should not contain "Student 2"
 
-  @javascript @currentdev
+  @javascript
   Scenario: A teacher without accessallgroups permission should only be able to see the user override for users that he/she shares groups with,
   when the activity's group mode is "separate groups"
     Given the following "permission overrides" exist:

@@ -124,6 +124,147 @@ class mod_checkmark_renderer extends plugin_renderer_base {
 
         return $result;
     }
+
+    /**
+     * Utility function to add a row of data to a table with 2 columns where the first column is the table's header.
+     * Modified the table param and does not return a value.
+     *
+     * @param html_table $table The table to append the row of data to
+     * @param string $first The first column text
+     * @param string $second The second column text
+     * @param array $firstattributes The first column attributes (optional)
+     * @param array $secondattributes The second column attributes (optional)
+     * @return void
+     */
+    private function add_table_row_tuple(html_table $table, $first, $second, $firstattributes = [],
+            $secondattributes = []) {
+        $row = new html_table_row();
+        $cell1 = new html_table_cell($first);
+        $cell1->header = true;
+        if (!empty($firstattributes)) {
+            $cell1->attributes = $firstattributes;
+        }
+        $cell2 = new html_table_cell($second);
+        if (!empty($secondattributes)) {
+            $cell2->attributes = $secondattributes;
+        }
+        $row->cells = array($cell1, $cell2);
+        $table->data[] = $row;
+    }
+
+    /**
+     * Render a table containing the current status of the grading process and attendance.
+     *
+     * @param \mod_checkmark\gradingsummary $summary Information that should be displayed in the grading summary
+     * @return string
+     */
+    public function render_checkmark_grading_summary($summary) {
+        // Create a table for the data.
+        $o = '';
+        $o .= $this->output->container_start('gradingsummary');
+        $o .= $this->output->heading(get_string('gradingsummary', 'checkmark'), 3);
+        $o .= $this->output->box_start('boxaligncenter gradingsummarytable');
+        $t = new html_table();
+
+        // Visibility Status.
+        $cell1content = get_string('hiddenfromstudents');
+        $cell2content = (!$summary->isvisible) ? get_string('yes') : get_string('no');
+        $this->add_table_row_tuple($t, $cell1content, $cell2content);
+
+        // Status.
+        $cell1content = get_string('numberofparticipants', 'checkmark');
+        $cell2content = $summary->participantcount;
+        $this->add_table_row_tuple($t, $cell1content, $cell2content);
+
+        // Submitted for grading.
+        if (time() > $summary->timeavailable) {
+            $cell1content = get_string('numberofsubmittedassignments', 'checkmark');
+            $cell2content = $summary->submissionssubmittedcount;
+            $this->add_table_row_tuple($t, $cell1content, $cell2content);
+            $cell1content = get_string('numberofsubmissionsneedgrading', 'checkmark');
+            $cell2content = $summary->submissionsneedgradingcount;
+            $this->add_table_row_tuple($t, $cell1content, $cell2content);
+        } else {
+            $cell1content = get_string('allowsubmissionsfromdate', 'checkmark');
+            $cell2content = userdate($summary->timeavailable);
+            $this->add_table_row_tuple($t, $cell1content, $cell2content);
+        }
+
+        $time = time();
+        $duedate = null;
+        if ($summary->duedate) {
+            // Due date.
+            $cell1content = get_string('duedate', 'checkmark');
+            $duedate = $summary->duedate;
+            $cell2content = userdate($duedate);
+            $this->add_table_row_tuple($t, $cell1content, $cell2content);
+
+            // Time remaining.
+            $cell1content = get_string('timeremaining', 'checkmark');
+            if ($duedate - $time <= 0) {
+                $cell2content = get_string('checkmarkisdue', 'checkmark');
+            } else {
+                $cell2content = format_time($duedate - $time);
+            }
+            $this->add_table_row_tuple($t, $cell1content, $cell2content);
+        }
+
+        // Show late submissions info if regular due date was reached or is not present.
+        if ($duedate < $time || !$duedate) {
+            $cell1content = get_string('latesubmissions', 'checkmark');
+            $cutoffdate = $summary->cutoffdate;
+            if ($cutoffdate) {
+                if ($cutoffdate > $time) {
+                    $cell2content = get_string('latesubmissionsaccepted', 'checkmark', userdate($summary->cutoffdate));
+                } else {
+                    $cell2content = get_string('nomoresubmissionsaccepted', 'checkmark');
+                }
+
+                $this->add_table_row_tuple($t, $cell1content, $cell2content);
+            }
+            $this->print_attandance_info($t, $summary);
+        } else {
+            $this->print_attandance_info($t, $summary);
+        }
+
+        // Show count of presentationgradings if presenationgrading is active.
+        if ($summary->presentationgradingcount > 0) {
+            $cell1content = get_string('presentationgradingcount', 'checkmark');
+            $cell2content = $summary->presentationgradingcount;
+            $this->add_table_row_tuple($t, $cell1content, $cell2content);
+        }
+
+        // All done - write the table.
+        $o .= html_writer::table($t);
+        $o .= $this->output->box_end();
+        $o .= $this->output->container_end();
+        return $o;
+    }
+
+    /**
+     * Adds attendance/absence columns to the gradingsummary table if attendance is tracked
+     *
+     * @param html_table $table  Table to add rows to
+     * @param \mod_checkmark\gradingsummary $summary Information that should be displayed in the grading summary
+     * @throws coding_exception
+     */
+    private function print_attandance_info ($table, $summary) {
+        if ($summary->attendantcount > 0) {
+            $cell1content = get_string('attendance', 'checkmark');
+            $cell2content = $summary->attendantcount;
+            $this->add_table_row_tuple($table, $cell1content, $cell2content);
+        }
+        if ($summary->absencecount > 0) {
+            $cell1content = get_string('absent', 'checkmark');
+            $cell2content = $summary->absencecount;
+            $this->add_table_row_tuple($table, $cell1content, $cell2content);
+        }
+        if ($summary->needattendanceentrycount > 0) {
+            $cell1content = get_string('needattendanceentrycount', 'checkmark');
+            $cell2content = $summary->needattendanceentrycount;
+            $this->add_table_row_tuple($table, $cell1content, $cell2content);
+        }
+    }
 }
 /**
  * A class that extends rendererable class and is used by the checkmark module.

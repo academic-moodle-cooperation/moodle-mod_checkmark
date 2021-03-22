@@ -18,7 +18,7 @@ Feature: In checkmark, a teacher should be able to how many students have submit
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
     # We do not need to manually create the checkmark instance again,
-    # this has been testet in checkmark_adding.feature, use generators!
+    # this has been tested in checkmark_adding.feature, use generators!
     And the following "activities" exist:
       | activity  | course | idnumber | name          | intro                  |
       | checkmark | C1     | CM1      | Kreuzerlübung | Standard-Einstellungen |
@@ -37,4 +37,16 @@ Feature: In checkmark, a teacher should be able to how many students have submit
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Kreuzerlübung"
-    Then I should see "View 1 submitted checkmarks"
+    Then I should see "View all submissions"
+    And the following should exist in the "generaltable" table:
+      | Hidden from students  |
+      | No                    |
+    And the following should exist in the "generaltable" table:
+      | Participants  |
+      | 1             |
+    And the following should exist in the "generaltable" table:
+      | Submitted  |
+      | 1          |
+    And the following should exist in the "generaltable" table:
+      | Needs grading  |
+      | 1              |

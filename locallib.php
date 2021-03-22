@@ -62,6 +62,10 @@ class checkmark {
     const FILTER_EXTENSION = 8;
     /** FILER NOT SUBMITTED */
     const FILTER_NOT_SUBMITTED = 9;
+    /** FILER PRESENTATIONGRADING */
+    const FILTER_PRESENTATIONGRADING = 10;
+    /** FILER NO PRESENTATIONGRADING */
+    const FILTER_NO_PRESENTATIONGRADING = 11;
 
     /** DELIMITER Used to connect example-names, example-grades, submission-examplenumbers! */
     const DELIMITER = ',';
@@ -423,40 +427,86 @@ class checkmark {
             \core\notification::error(get_string('latesubmissionwarning', 'checkmark'));
         }
 
-        $this->view_intro();
-        echo "\n";
-        $this->view_dates();
-        echo "\n";
-        $this->view_attendancehint();
+        echo $this->get_intro();
         echo "\n";
 
+        // Print grading summary only when user has mod/checkmark:grade capability.
+        if (has_capability('mod/checkmark:grade', $this->context)) {
+            echo html_writer::div($this->get_renderer()->render_checkmark_grading_summary($this->create_grading_summary()));
+        }
+        echo html_writer::tag('div', $this->submittedlink(), array('class' => 'text-info text-center'));
+        echo $OUTPUT->container_start('studentview');
+        $previewform = new MoodleQuickForm('optionspref', 'post', '#', '');
+
+        $content = '';
+        $content .= $this->get_dates();
+        $content .= "\n";
+        $content .= $this->get_attendancehint();
+        $content .= "\n";
+
         if ($editable && has_capability('mod/checkmark:submit', $context, $USER, false) && !empty($mform)) {
-            echo $OUTPUT->box_start('generalbox boxaligncenter', 'checkmarkform');
-            echo $this->print_summary();
-            $mform->display();
-            echo $OUTPUT->box_end();
-            echo "\n";
+            $content .= $OUTPUT->box_start('generalbox boxaligncenter', 'checkmarkform');
+            $content .= $this->print_summary();
+            $content .= $mform->render();
+            $content .= $OUTPUT->box_end();
+            $content .= "\n";
         } else {
-            echo $OUTPUT->box_start('generalbox boxaligncenter', 'checkmark');
+            $content .= $OUTPUT->box_start('generalbox boxaligncenter', 'checkmark');
             // Display overview!
             if (has_capability('mod/checkmark:view_preview', $context) ||
                     has_capability('mod/checkmark:submit', $context, $USER, false)) {
-                echo $this->print_summary();
-                echo html_writer::start_tag('div', array('class' => 'mform'));
-                echo html_writer::start_tag('div', array('class' => 'clearfix'));
-                echo $this->print_user_submission($USER->id, true);
-                echo html_writer::end_tag('div');
-                echo html_writer::end_tag('div');
+                $content .= $this->print_summary();
+                $content .= html_writer::start_tag('div', array('class' => 'mform'));
+                $content .= html_writer::start_tag('div', array('class' => 'clearfix'));
+                $content .= $this->print_user_submission($USER->id, true);
+                $content .= html_writer::end_tag('div');
+                $content .= html_writer::end_tag('div');
 
             }
-            echo $OUTPUT->box_end();
-            echo "\n";
+            $content .= $OUTPUT->box_end();
+            $content .= "\n";
         }
+
+        if (has_capability('mod/checkmark:grade', $this->context)) {
+            $previewform->addElement('header', 'studentpreview',
+                    get_string('studentpreview', 'checkmark'));
+            $previewform->addElement('html', $content);
+            $previewform->display();
+        } else {
+            echo $content;
+        }
+        echo $OUTPUT->container_end();
 
         $this->view_feedback();
         echo "\n";
         $this->view_footer();
         echo "\n";
+    }
+    /**
+     * Utility function to add a row of data to a table with 2 columns where the first column is the table's header.
+     * Modified the table param and does not return a value.
+     *
+     * @param html_table $table The table to append the row of data to
+     * @param string $first The first column text
+     * @param string $second The second column text
+     * @param array $firstattributes The first column attributes (optional)
+     * @param array $secondattributes The second column attributes (optional)
+     * @return void
+     */
+    private function add_table_row_tuple(html_table $table, $first, $second, $firstattributes = [],
+            $secondattributes = []) {
+        $row = new html_table_row();
+        $cell1 = new html_table_cell($first);
+        $cell1->header = true;
+        if (!empty($firstattributes)) {
+            $cell1->attributes = $firstattributes;
+        }
+        $cell2 = new html_table_cell($second);
+        if (!empty($secondattributes)) {
+            $cell2->attributes = $secondattributes;
+        }
+        $row->cells = array($cell1, $cell2);
+        $table->data[] = $row;
     }
     /**
      * Display the header and top of a page
@@ -484,8 +534,44 @@ class checkmark {
         groups_print_activity_menu($this->cm,
                 $CFG->wwwroot . '/mod/checkmark/view.php?id=' . $this->cm->id);
 
-        echo html_writer::tag('div', $this->submittedlink(), array('class' => 'text-info'));
-        echo html_writer::tag('div', '', array('class' => 'clearer'));
+    }
+
+    /**
+     * Creates a gradingsummary object for use in the gradingsummary table
+     *
+     * @return \mod_checkmark\gradingsummary
+     * @throws coding_exception
+     */
+    public function create_grading_summary() {
+        $participantcount = submissionstable::count_userids($this->context, $this->checkmark->id,
+                        null, self::FILTER_ALL);
+        $submittedcount = submissionstable::count_userids($this->context, $this->checkmark->id,
+                null, self::FILTER_SUBMITTED);
+        $needsgrading = submissionstable::count_userids($this->context, $this->checkmark->id,
+                null, self::FILTER_REQUIRE_GRADING);
+        $cangrade = has_capability('mod/checkmark:grade', $this->context);
+        $attendantcount = -1;
+        $absencecount = -1;
+        $needattendanceentrycount = -1;
+        $presentationgradingcount = -1;
+        if ($this->checkmark->trackattendance) {
+            $attendantcount = submissionstable::count_userids($this->context, $this->checkmark->id,
+                    null, self::FILTER_ATTENDANT);
+            $absencecount = submissionstable::count_userids($this->context, $this->checkmark->id,
+                    null, self::FILTER_ABSENT);
+            $needattendanceentrycount = submissionstable::count_userids($this->context, $this->checkmark->id,
+                    null, self::FILTER_UNKNOWN);
+        }
+        if ($this->checkmark->presentationgrading) {
+            $presentationgradingcount = submissionstable::count_userids($this->context, $this->checkmark->id,
+                    null, self::FILTER_PRESENTATIONGRADING);
+        }
+
+        $summary = new \mod_checkmark\gradingsummary($participantcount, $this->checkmark->timeavailable, $submittedcount,
+                $needsgrading, $this->checkmark->timedue, $this->checkmark->cutoffdate, $this->cm->id,
+                $this->course->startdate, $cangrade, $this->cm->visible, $attendantcount,
+                $absencecount, $needattendanceentrycount, $presentationgradingcount);
+        return $summary;
     }
 
     /**
@@ -493,19 +579,24 @@ class checkmark {
      *
      * The default implementation prints the checkmark description in a box
      */
-    public function view_intro() {
+    public function get_intro() {
         global $OUTPUT;
+        $content = '';
+        $content .= $OUTPUT->container_start('description');
+        $content .= $OUTPUT->heading($this->checkmark->name, 3);
         $notoverridden = (!$this->overrides || $this->overrides->timeavailable === null);
         $cmptime = $notoverridden ? $this->checkmark->timeavailable : $this->overrides->timeavailable;
         if ($this->checkmark->alwaysshowdescription || (time() > $cmptime)) {
             $introattachments = $this->get_introattachments();
             if (!empty($this->checkmark->intro || !empty($introattachments))) {
-                echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
-                echo format_module_intro('checkmark', $this->checkmark, $this->cm->id);
-                echo $introattachments;
-                echo $OUTPUT->box_end();
+                $content .= $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
+                $content .= format_module_intro('checkmark', $this->checkmark, $this->cm->id);
+                $content .= $introattachments;
+                $content .= $OUTPUT->box_end();
             }
         }
+        $content .= $OUTPUT->container_end();
+        return $content;
     }
 
     /**
@@ -526,14 +617,15 @@ class checkmark {
      *
      * @throws coding_exception
      */
-    public function view_dates() {
+    public function get_dates() {
         global $OUTPUT;
+        $content = '';
         if (!$this->checkmark->timeavailable && !$this->checkmark->timedue && (!$this->overrides ||
                         ($this->overrides && !$this->overrides->timeavailable && !$this->overrides->timedue))) {
             return;
         }
 
-        echo $OUTPUT->box_start('generalbox boxaligncenter', 'dates');
+        $content .= $OUTPUT->box_start('generalbox boxaligncenter', 'dates');
         $table = new html_table();
         $table->attributes['class'] = 'table-condensed';
         $rows = [];
@@ -570,8 +662,9 @@ class checkmark {
             $rows[] = new html_table_row($row);
         }
         $table->data = $rows;
-        echo html_writer::table($table);
-        echo $OUTPUT->box_end();
+        $content .= html_writer::table($table);
+        $content .= $OUTPUT->box_end();
+        return $content;
     }
 
     /**
@@ -579,13 +672,13 @@ class checkmark {
      *
      * @throws coding_exception
      */
-    public function view_attendancehint() {
+    public function get_attendancehint() {
         global $OUTPUT;
         if (!$this->checkmark->trackattendance || !$this->checkmark->attendancegradelink) {
             return;
         }
 
-        echo $OUTPUT->box(get_string('attendancegradelink_hint', 'checkmark'), 'generalbox', 'attendancehint');
+        return $OUTPUT->box(get_string('attendancegradelink_hint', 'checkmark'), 'generalbox', 'attendancehint');
     }
 
     /**
@@ -822,22 +915,11 @@ class checkmark {
 
         $context = context_module::instance($this->cm->id);
         if (has_capability('mod/checkmark:grade', $context)) {
-            if ($allgroups and has_capability('moodle/site:accessallgroups', $context)) {
-                $group = 0;
-            } else {
-                $group = groups_get_activity_group($this->cm);
-            }
-            if ($cnt = $this->count_real_submissions($group)) {
-                $submitted = html_writer::tag('a', get_string('viewsubmissions', 'checkmark', $cnt), [
-                        'href' => $urlbase . 'submissions.php?id=' . $this->cm->id,
-                        'id' => 'submissions'
-                ]);
-            } else {
-                $submitted = html_writer::tag('a', get_string('noattempts', 'checkmark'), [
-                        'href' => $urlbase . 'submissions.php?id=' . $this->cm->id,
-                        'id' => 'submissions'
-                ]);
-            }
+            $submitted = html_writer::tag('a', get_string('viewsubmissions', 'checkmark'), [
+                    'class' => 'btn btn-secondary',
+                    'href' => $urlbase . 'submissions.php?id=' . $this->cm->id,
+                    'id' => 'submissions'
+            ]);
         } else {
             if (isloggedin()) {
                 if ($submission = $this->get_submission($USER->id)) {
@@ -2407,17 +2489,7 @@ class checkmark {
          * to request user_preference updates!
          */
 
-        $filters = array(self::FILTER_ALL => get_string('all'),
-                self::FILTER_NOT_SUBMITTED => get_string('filternotsubmitted', 'checkmark'),
-                self::FILTER_SUBMITTED => get_string('submitted', 'checkmark'),
-                self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'),
-                self::FILTER_EXTENSION => get_string('filtergrantedextension', 'checkmark'));
-
-        if ($this->checkmark->trackattendance) {
-            $filters[self::FILTER_ATTENDANT] = get_string('all_attendant', 'checkmark');
-            $filters[self::FILTER_ABSENT] = get_string('all_absent', 'checkmark');
-            $filters[self::FILTER_UNKNOWN] = get_string('all_unknown', 'checkmark');
-        }
+        $filters = self::get_possible_filters($this->checkmark->trackattendance, $this->checkmark->presentationgrading);
 
         $updatepref = optional_param('updatepref', 0, PARAM_INT);
 
@@ -2799,7 +2871,9 @@ class checkmark {
                     'context' => $this->context,
                     'examplescount' => count($this->get_examples()),
                     'table' => $tablehtml,
-                    'tracksattendance' => $this->checkmark->trackattendance
+                    'tracksattendance' => $this->checkmark->trackattendance,
+                    'filters' => self::get_possible_filters($this->checkmark->trackattendance,
+                            $this->checkmark->presentationgrading)
             ];
             $formaction = new moodle_url('/mod/checkmark/export.php', [
                     'id' => $this->cm->id,
@@ -2922,17 +2996,18 @@ class checkmark {
      * @throws coding_exception
      */
     protected function get_filters() {
-        return self::get_possible_filters($this->checkmark->trackattendance);
+        return self::get_possible_filters($this->checkmark->trackattendance, $this->checkmark->presentationgrading);
     }
 
     /**
      * Returns all possible filters
      *
      * @param bool $trackattendance whether or not to include filters for attendance
+     * @param bool $presentationgrading whether or not to include filters for presentationgrading
      * @return array all possible filters
      * @throws coding_exception
      */
-    public static function get_possible_filters($trackattendance = false) {
+    public static function get_possible_filters($trackattendance = false, $presentationgrading = false) {
         $filters = [
                 self::FILTER_ALL => get_string('all'),
                 self::FILTER_NOT_SUBMITTED => get_string('filternotsubmitted', 'checkmark'),
@@ -2945,6 +3020,13 @@ class checkmark {
             $filters[self::FILTER_ATTENDANT] = get_string('all_attendant', 'checkmark');
             $filters[self::FILTER_ABSENT] = get_string('all_absent', 'checkmark');
             $filters[self::FILTER_UNKNOWN] = get_string('all_unknown', 'checkmark');
+        }
+
+        if ($presentationgrading) {
+            $filters[self::FILTER_PRESENTATIONGRADING] = get_string('all_with_presentationgrading',
+                    'checkmark');
+            $filters[self::FILTER_NO_PRESENTATIONGRADING] = get_string('all_without_presentationgrading',
+                    'checkmark');
         }
 
         return $filters;

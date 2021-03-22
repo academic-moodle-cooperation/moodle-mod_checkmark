@@ -4,7 +4,7 @@ Feature: In a checkmark I want to grade selected submissions.
     As a teacher
     I need to able to grade a selected user
 
-  @javascript
+  @javascript @currentdev
   Scenario: Grade selected users
     Given the following "courses" exist:
       | fullname | shortname | category |
@@ -34,7 +34,7 @@ Feature: In a checkmark I want to grade selected submissions.
       | student3 | G2    |
       | student4 | G2    |
     # We do not need to manually create the checkmark instance again,
-    # this has been testet in checkmark_adding.feature, use generators!
+    # this has been tested in checkmark_adding.feature, use generators!
     And the following "activities" exist:
       | activity  | course | idnumber | name        | intro         | groupmode |
       | checkmark | C1     | CM1      | Checkmark 1 | Description 1 | 1         |
@@ -45,20 +45,16 @@ Feature: In a checkmark I want to grade selected submissions.
       | Example 1 | 1 |
       | Example 2 | 1 |
       | Example 3 | 1 |
-      | Example 4 | 1 |
-      | Example 5 | 1 |
-      | Example 6 | 1 |
     And I press "Save changes"
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
-    And I click on "submissions" "link"
+    And I navigate to "View all submissions" in current page administration
     And I click on "selected[]" "checkbox"
     And I set the following fields to these values:
       | bulkaction | grade |
     And I press "start"
     And I press "Continue"
     Then I should see "Auto-grading successful! 1 submission updated."
-    And I follow "Export"
-    And I should see "60 / 100"
+    Then "Student 1" row "Grade" column of "generaltable" table should contain "30 / 100"
