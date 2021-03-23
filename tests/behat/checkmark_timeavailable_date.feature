@@ -26,4 +26,4 @@ Feature: Change Allow submission from date
     And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
     Then I should see "Allow submissions from"
-    And I should see "##yesterday##l, j F Y##"
+    And I should see "##yesterday##%A, %d %B %Y##"
