@@ -223,9 +223,9 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timedue[hour]      | 08 |
       | timedue[minute]    | 00 |
       | id_cutoffdate_enabled | 1 |
-      | cutoffdate[day]       | ## tomorrow ## j ## |
-      | cutoffdate[month]     | ## tomorrow ## n ## |
-      | cutoffdate[year]      | ## tomorrow ## Y ## |
+      | cutoffdate[day]       | ## tomorrow ## %d ## |
+      | cutoffdate[month]     | ## tomorrow ## %B ## |
+      | cutoffdate[year]      | ## tomorrow ## %Y ## |
       | cutoffdate[hour]      | 08 |
       | cutoffdate[minute]    | 00 |
     And I press "Save and display"
