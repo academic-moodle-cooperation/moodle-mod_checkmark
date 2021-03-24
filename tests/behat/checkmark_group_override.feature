@@ -189,13 +189,13 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I click on "Group 1" item in the autocomplete list
     And I set the following fields to these values:
       | id_timeavailable_enabled | 1 |
-      | timeavailable[day]       | ## tomorrow ## j ## |
-      | timeavailable[month]     | ## tomorrow ## n ## |
-      | timeavailable[year]      | ## tomorrow ## Y ## |
+      | timeavailable[day]       | ## tomorrow ## %d ## |
+      | timeavailable[month]     | ## tomorrow ## %B ## |
+      | timeavailable[year]      | ## tomorrow ## %Y ## |
       | timeavailable[hour]      | 08 |
       | timeavailable[minute]    | 00 |
     And I press "id_override"
-    Then I should see "## tomorrow ##l, j F Y, 8:00##"
+    Then I should see "## tomorrow ##%A, %d %B %Y, 8:00##"
     And I log out
     When I log in as "student2"
     And I am on "Course 1" course homepage
@@ -206,7 +206,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
-    Then I should see "## tomorrow ##l, j F Y, 8:00##"
+    Then I should see "## tomorrow ##%A, %d %B %Y, 8:00##"
     And "Save changes" "button" should not be visible
 
   @javascript
@@ -223,9 +223,9 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timedue[hour]      | 08 |
       | timedue[minute]    | 00 |
       | id_cutoffdate_enabled | 1 |
-      | cutoffdate[day]       | ## tomorrow ## j ## |
-      | cutoffdate[month]     | ## tomorrow ## n ## |
-      | cutoffdate[year]      | ## tomorrow ## Y ## |
+      | cutoffdate[day]       | ## tomorrow ## %d ## |
+      | cutoffdate[month]     | ## tomorrow ## %B ## |
+      | cutoffdate[year]      | ## tomorrow ## %Y ## |
       | cutoffdate[hour]      | 08 |
       | cutoffdate[minute]    | 00 |
     And I press "Save and display"
