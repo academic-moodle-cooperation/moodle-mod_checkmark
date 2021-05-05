@@ -2065,6 +2065,8 @@ function checkmark_supports($feature) {
             return true;
         case FEATURE_MOD_ARCHETYPE:
             return MOD_ARCHETYPE_OTHER;
+        case FEATURE_COMPLETION_HAS_RULES:
+            return true;
 
         default:
             return false;

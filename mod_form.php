@@ -372,6 +372,32 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->addHelpButton('attendancegradebook', 'attendancegradebook', 'checkmark');
     }
 
+    /**
+     * Add any custom completion rules to the form.
+     *
+     * @return array Contains the names of the added form elements
+     */
+    public function add_completion_rules() {
+        $mform =& $this->_form;
+
+        $mform->addElement('advcheckbox', 'completionsubmit',
+                get_string('requiresubmit', 'checkmark'),
+                get_string('completionsubmit', 'checkmark'));
+        // Enable this completion rule by default.
+        $mform->setDefault('completionsubmit', 1);
+        return array('completionsubmit');
+    }
+
+    /**
+     * Determines if completion is enabled for this module.
+     *
+     * @param array $data
+     * @return bool
+     */
+    public function completion_rule_enabled($data) {
+        return !empty($data['completionsubmit']);
+    }
+
     /** Needed by plugin checkmark if it includes a filemanager element in the settings form! */
     public function has_instance() {
         return ($this->_instance != null);
