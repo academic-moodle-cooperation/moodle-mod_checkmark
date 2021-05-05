@@ -1201,7 +1201,21 @@ function xmldb_checkmark_upgrade($oldversion) {
         }
 
         // Checkmark savepoint reached.
-        upgrade_mod_savepoint(true, 2020060800, 'checkmark');
+        upgrade_mod_savepoint(true, 2020111002, 'checkmark');
+    }
+    if ($oldversion < 2021050500) {
+
+        // Define field completionsubmit to be added to checkmark.
+        $table = new xmldb_table('checkmark');
+        $field = new xmldb_field('completionsubmit', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'flexiblenaming');
+
+        // Conditionally launch add field completionsubmit.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2020111002, 'checkmark');
     }
     return true;
 }
