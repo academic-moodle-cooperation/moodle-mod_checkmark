@@ -2441,10 +2441,10 @@ class checkmark {
             $update->timemodified = time();
             $DB->update_record('checkmark_submissions', $update);
 
-            // Update completion state if submission is changed
+            // Update completion state if submission is changed.
             $completion = new completion_info($this->course);
-            if($completion->is_enabled($this->cm) && $this->checkmark->completionsubmit) {
-                $completion->update_state($this->cm,COMPLETION_COMPLETE);
+            if ($completion->is_enabled($this->cm) && $this->checkmark->completionsubmit) {
+                $completion->update_state($this->cm, COMPLETION_COMPLETE);
             }
         }
 
