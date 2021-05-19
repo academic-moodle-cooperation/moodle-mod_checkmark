@@ -1201,9 +1201,9 @@ function xmldb_checkmark_upgrade($oldversion) {
         }
 
         // Checkmark savepoint reached.
-        upgrade_mod_savepoint(true, 2020111002, 'checkmark');
+        upgrade_mod_savepoint(true, 2020060800, 'checkmark');
     }
-    if ($oldversion < 2021050500) {
+    if ($oldversion < 2021051900) {
 
         // Define field completionsubmit to be added to checkmark.
         $table = new xmldb_table('checkmark');
@@ -1215,7 +1215,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         }
 
         // Checkmark savepoint reached.
-        upgrade_mod_savepoint(true, 2020111002, 'checkmark');
+        upgrade_mod_savepoint(true, 2021051900, 'checkmark');
     }
     return true;
 }
