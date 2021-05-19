@@ -65,7 +65,7 @@ class grades extends basetemplate {
         parent::setup_columns();
 
         if ($this->checkmark->checkmark->grade != 0) {
-            $this->tableheaders[] = get_string('grade');
+            $this->tableheaders[] = get_string('grade', 'grades');
             $this->tablecolumns[] = 'grade';
             $this->cellwidth[] = ['mode' => 'Fixed', 'value' => '15'];
             $this->columnformat['grade'] = ['align' => 'R'];

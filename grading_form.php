@@ -156,7 +156,7 @@ class mod_checkmark_grading_form extends moodleform {
 
         $grademenu = array(-1 => get_string('nograde')) + make_grades_menu($this->_customdata->checkmark->grade);
 
-        $mform->addElement('select', 'xgrade', get_string('grade').':', $grademenu, $attributes);
+        $mform->addElement('select', 'xgrade', get_string('grade', 'grades').':', $grademenu, $attributes);
         if ($this->_customdata->feedbackobj !== false) {
             $mform->setDefault('xgrade', $this->_customdata->feedbackobj->grade );
         }
