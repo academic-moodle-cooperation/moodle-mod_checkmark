@@ -2264,3 +2264,30 @@ function mod_checkmark_get_fontawesome_icon_map() {
             'mod_checkmark:overwrittendates' => 'fa-clock-o text-info'
     ];
 }
+
+/**
+*
+* Obtains the automatic completion state for this module based on any conditions
+* in checkmark settings.
+*
+* @param object $course Course
+* @param object $cm Course-module
+* @param int $userid User ID
+* @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
+* @return bool True if completed, false if not, $type if conditions not set.
+*/
+function checkmark_get_completion_state($course, $cm, $userid, $type) {
+    global $CFG, $DB;
+    require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
+
+    $checkmark = new checkmark($cm->id, null, $cm, $course);
+
+    // If completion option is enabled, evaluate it and return true/false.
+    if ($checkmark->checkmark->completionsubmit) {
+        $submission = $checkmark->get_submission($userid, false);
+        return $submission && $submission->timecreated && $submission->timemodified;
+    } else {
+        // Completion option is not enabled so just return $type.
+        return $type;
+    }
+}
