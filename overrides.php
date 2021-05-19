@@ -124,7 +124,7 @@ if ($groupmode) {
     $colname = get_string('user');
     list($sort, $params) = users_order_by_sql('u');
     $params['checkmarkid'] = $cm->instance;
-    $namefields = core_user\fields::for_name()->get_sql('u');
+    $namefields = core_user\fields::for_name()->get_sql('u')->selects;
 
     if ($accessallgroups) {
         $sql = 'SELECT o.* ' . $namefields . '
