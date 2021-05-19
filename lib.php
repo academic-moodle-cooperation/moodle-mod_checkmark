@@ -1378,9 +1378,9 @@ function checkmark_refresh_events($courseid = 0, $instance = null, $cm = null) {
 function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
     global $CFG, $USER, $DB, $OUTPUT;
 
-    $userfields = get_all_user_name_fields(true, 'u');
+    $userfields = core_user\fields::for_name()->get_sql('u');
     if (!$submissions = $DB->get_records_sql('
-            SELECT asb.id, asb.timemodified, cm.id AS cmid, asb.userid,
+            SELECT asb.id, asb.timemodified, cm.id AS cmid, asb.userid
                    ' . $userfields . ', u.email, u.picture
               FROM {checkmark_submissions} asb
               JOIN {checkmark} a       ON a.id = asb.checkmarkid
@@ -1608,7 +1608,7 @@ function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $c
             $tmpactivity->grade = $grades->items[CHECKMARK_GRADE_ITEM]->grades[$submission->userid]->str_long_grade;
         }
 
-        $userfields = explode(',', user_picture::fields());
+        $userfields = core_user\fields::for_userpic()->get_required_fields();
         foreach ($userfields as $userfield) {
             if ($userfield == 'id') {
                 $tmpactivity->user->{$userfield} = $submission->userid; // Aliased in SQL above!

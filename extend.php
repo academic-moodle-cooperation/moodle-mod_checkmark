@@ -160,9 +160,9 @@ try {
             $cancelurl = new moodle_url('/mod/checkmark/overrides.php', array('id' => $id));
             $confirmstr = null;
             if ($type === \mod_checkmark\overrideform::USER) {
-                $namefields = get_all_user_name_fields(true);
+                $namefields = core_user\fields::for_name()->get_sql();
                 $user = $DB->get_record('user', array('id' => $users),
-                        'id, ' . $namefields);
+                        'id ' . $namefields);
                 $confirmstr = get_string('overridedeleteusersure', 'checkmark', fullname($user));
             } else {
                 $groupname = groups_get_group_name($entities);

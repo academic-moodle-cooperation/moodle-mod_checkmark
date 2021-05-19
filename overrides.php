@@ -124,9 +124,10 @@ if ($groupmode) {
     $colname = get_string('user');
     list($sort, $params) = users_order_by_sql('u');
     $params['checkmarkid'] = $cm->instance;
+    $namefields = core_user\fields::for_name()->get_sql('u');
 
     if ($accessallgroups) {
-        $sql = 'SELECT o.*, ' . get_all_user_name_fields(true, 'u') . '
+        $sql = 'SELECT o.* ' . $namefields . '
                   FROM {checkmark_overrides} o
                   JOIN {user} u ON o.userid = u.id
                  WHERE o.checkmarkid = :checkmarkid
@@ -137,7 +138,7 @@ if ($groupmode) {
         list($insql, $inparams) = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
         $params += $inparams;
 
-        $sql = 'SELECT o.*, ' . get_all_user_name_fields(true, 'u') . '
+        $sql = 'SELECT o.* ' . $namefields . '
                   FROM {checkmark_overrides} o
                   JOIN {user} u ON o.userid = u.id
                   JOIN {groups_members} gm ON u.id = gm.userid
