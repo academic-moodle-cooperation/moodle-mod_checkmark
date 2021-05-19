@@ -2265,8 +2265,7 @@ function mod_checkmark_get_fontawesome_icon_map() {
     ];
 }
 
- /**
- *
+/**
  * Obtains the automatic completion state for this module based on any conditions
  * in checkmark settings.
  *
@@ -2274,7 +2273,10 @@ function mod_checkmark_get_fontawesome_icon_map() {
  * @param object $cm Course-module
  * @param int $userid User ID
  * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
- * @return bool True if completed, false if not, $type if conditions not set.
+ * @return bool
+ * @throws coding_exception
+ * @throws dml_exception
+ * @throws moodle_exception
  */
 function checkmark_get_completion_state($course, $cm, $userid, $type) {
     global $CFG, $DB;
