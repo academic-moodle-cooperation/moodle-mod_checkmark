@@ -875,9 +875,9 @@ class submissionstable extends \table_sql {
         } else if ($filter == \checkmark::FILTER_UNKNOWN) {
             $where .= ' AND attendance IS NULL';
         } else if ($filter == \checkmark::FILTER_PRESENTATIONGRADING) {
-            $where .= " AND presentationgrade IS NOT NULL";
+            $where .= " AND presentationgrade IS NOT NULL OR presentationfeedback IS NOT NULL";
         } else if ($filter == \checkmark::FILTER_NO_PRESENTATIONGRADING) {
-            $where .= " AND presentationgrade IS NULL";
+            $where .= " AND presentationgrade IS NULL AND presentationfeedback IS NULL";
         }
 
         $groupby = " u.id, s.id, f.id ".$ufields." ".$useridentityfields.", f.attendance";

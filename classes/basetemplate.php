@@ -209,9 +209,9 @@ abstract class basetemplate extends submissionstable {
         } else if ($filter == \checkmark::FILTER_NOT_SUBMITTED) {
             $where = " AND (s.timemodified <= 0 OR s.timemodified IS NULL)";
         } else if ($filter == \checkmark::FILTER_PRESENTATIONGRADING) {
-            $where .= " AND presentationgrade IS NOT NULL";
+            $where .= " AND presentationgrade IS NOT NULL OR presentationfeedback IS NOT NULL";
         } else if ($filter == \checkmark::FILTER_NO_PRESENTATIONGRADING) {
-            $where .= " AND presentationgrade IS NULL";
+            $where .= " AND presentationgrade IS NULL AND presentationfeedback IS NULL";
         }
 
         $groupby = " u.id, s.id, f.id ".$ufields.", u.idnumber, f.attendance";
