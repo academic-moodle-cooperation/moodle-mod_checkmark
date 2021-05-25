@@ -48,7 +48,7 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
             'name', 'intro', 'introformat', 'alwaysshowdescription', 'resubmit', 'timeavailable', 'timedue', 'cutoffdate',
             'gradingdue', 'emailteachers', 'exampleprefix', 'grade', 'trackattendance', 'attendancegradelink',
             'attendancegradebook', 'presentationgrading', 'presentationgrade', 'presentationgradebook', 'timemodified',
-                'flexiblenaming'));
+                'flexiblenaming', 'completionsubmit'));
 
         $overrides = new backup_nested_element('overrides');
 
