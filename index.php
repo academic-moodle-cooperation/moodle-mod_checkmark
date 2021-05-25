@@ -49,7 +49,7 @@ $strsectionname  = get_string('sectionname', 'format_'.$course->format);
 $strname = get_string('name');
 $strduedate = get_string('duedate', 'checkmark');
 $strsubmitted = get_string('submitted', 'checkmark');
-$strgrade = get_string('grade');
+$strgrade = get_string('grade', 'grades');
 
 
 $PAGE->set_url('/mod/checkmark/index.php', array('id' => $course->id));

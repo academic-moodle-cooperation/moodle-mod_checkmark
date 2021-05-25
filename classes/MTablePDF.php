@@ -790,7 +790,7 @@ class MTablePDF extends \pdf {
         // Get system context in order to retrieve user fields.
         $systemcontext = context_system::instance();
         // Get all user fields.
-        $textonlycolumns = get_extra_user_fields($systemcontext);
+        $textonlycolumns = \core_user\fields::for_identity($systemcontext)->get_required_fields();
 
         array_push($textonlycolumns, "fullname");
 

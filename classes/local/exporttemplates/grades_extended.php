@@ -85,7 +85,7 @@ class grades_extended extends basetemplate {
         $this->columnformat['summary'] = ['align' => 'L'];
 
         if ($this->checkmark->checkmark->grade != 0) {
-            $this->tableheaders[] = get_string('grade');
+            $this->tableheaders[] = get_string('grade', 'grades');
             $this->tablecolumns[] = 'grade';
             $this->cellwidth[] = ['mode' => 'Fixed', 'value' => '15'];
             $this->columnformat['grade'] = ['align' => 'R'];

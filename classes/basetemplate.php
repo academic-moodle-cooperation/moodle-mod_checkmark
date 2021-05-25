@@ -172,11 +172,11 @@ abstract class basetemplate extends submissionstable {
 
         // Create and set the SQL!
         $params = array();
-        $ufields = \user_picture::fields('u');
+        $ufields = \core_user\fields::for_userpic()->get_sql('u')->selects;
         $table->examplecount = count($table->checkmark->checkmark->examples);
         $params['examplecount'] = $table->examplecount;
 
-        $fields = "u.id, ".$ufields.", u.idnumber,
+        $fields = "u.id ".$ufields.", u.idnumber,
                   MAX(s.id) AS submissionid, MAX(f.id) AS feedbackid, MAX(f.grade) AS grade,
                   MAX(f.feedback) AS feedback, MAX(s.timemodified) AS timesubmitted,
                   MAX(f.timemodified) AS timemarked, 100 * COUNT( DISTINCT cchks.id ) / :examplecount AS summary,
@@ -209,12 +209,12 @@ abstract class basetemplate extends submissionstable {
         } else if ($filter == \checkmark::FILTER_NOT_SUBMITTED) {
             $where = " AND (s.timemodified <= 0 OR s.timemodified IS NULL)";
         } else if ($filter == \checkmark::FILTER_PRESENTATIONGRADING) {
-            $where .= " AND presentationgrade IS NOT NULL";
+            $where .= " AND presentationgrade IS NOT NULL OR presentationfeedback IS NOT NULL";
         } else if ($filter == \checkmark::FILTER_NO_PRESENTATIONGRADING) {
-            $where .= " AND presentationgrade IS NULL";
+            $where .= " AND presentationgrade IS NULL AND presentationfeedback IS NULL";
         }
 
-        $groupby = " u.id, s.id, f.id, ".$ufields.", u.idnumber, f.attendance";
+        $groupby = " u.id, s.id, f.id ".$ufields.", u.idnumber, f.attendance";
 
         $table->set_sql($fields, $from, $where, $params, $groupby);
         $table->set_count_sql("SELECT COUNT(DISTINCT u.id) FROM ".$from." WHERE ".$where, $params);
