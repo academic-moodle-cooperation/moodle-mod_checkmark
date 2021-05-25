@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+3.11.0 (2021-05-19)
+------------------
+* [FEATURE] #6826 Add a dashboard similar to the one in mod_assign to the main page of checkmark
+                  showing all key information of the open checkmark activity
+* [FEATURE] #6829 Add filter in Submissions/Export to display users with or without a presentation grade
+* [FEATURE] #6829 Implement a custom completion rule for the submission of a checkmark
+* [FEATURE] #6833 Implement behat generator functions for submissions and grading
+
 3.10.1 (2021-03-09)
 ------------------
 * [FIXED] #6836 Fixed a bug causing error messages in checkmarks with active groups when using a MySQL

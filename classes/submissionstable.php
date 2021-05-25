@@ -367,7 +367,8 @@ class submissionstable extends \table_sql {
         $helpicons = [null, null];
         $table->add_colgroup(1, 'sel');
 
-        $useridentity = get_extra_user_fields($table->context);
+        // Get idenityfields visible in the given context.
+        $useridentity = \core_user\fields::for_identity($table->context)->get_required_fields();
         foreach ($useridentity as $cur) {
             $tablecolumns[] = $cur;
             $tableheaders[] = ($cur == 'phone1') ? get_string('phone') : get_string($cur);
@@ -389,7 +390,7 @@ class submissionstable extends \table_sql {
         $table->addexamplecolumns($tablecolumns, $tableheaders, $helpicons);
 
         if ($table->checkmark->checkmark->grade != 0) {
-            $tableheaders[] = get_string('grade');
+            $tableheaders[] = get_string('grade', 'grades');
             $tablecolumns[] = 'grade';
             $helpicons[] = null;
             $feedbackcols = 3;
@@ -399,7 +400,7 @@ class submissionstable extends \table_sql {
         $tableheaders[] = get_string('comment', 'checkmark');
         $tablecolumns[] = 'feedback';
         $helpicons[] = null;
-        $tableheaders[] = get_string('lastmodified').' ('.get_string('grade').')';
+        $tableheaders[] = get_string('lastmodified').' ('.get_string('grade', 'grades').')';
         $tablecolumns[] = 'timemarked';
         $helpicons[] = null;
         $table->add_colgroup($feedbackcols, 'feedback');
@@ -485,8 +486,8 @@ class submissionstable extends \table_sql {
 
         // Create and set the SQL!
         $params = [];
-        $useridentityfields = get_extra_user_fields_sql($table->context, 'u');
-        $ufields = \user_picture::fields('u');
+        $useridentityfields = $useridentity = \core_user\fields::for_identity($table->context)->get_sql('u')->selects;
+        $ufields = \core_user\fields::for_userpic()->get_sql('u')->selects;
         $examplecount = count($table->checkmark->checkmark->examples);
         $params['examplecount'] = $examplecount;
 
@@ -502,7 +503,7 @@ class submissionstable extends \table_sql {
         } else {
             $groupssql = '';
         }
-        $fields = "u.id, ' ' AS selection, ' ' AS picture, ".$ufields." ".$useridentityfields.",
+        $fields = "u.id, ' ' AS selection, ' ' AS picture ".$ufields." ".$useridentityfields.",
                   s.id AS submissionid, f.id AS feedbackid, f.grade, f.feedback,
                   s.timemodified AS timesubmitted, f.timemodified AS timemarked";
         if ($table->checkmark->checkmark->trackattendance) {
@@ -543,7 +544,7 @@ class submissionstable extends \table_sql {
             $where .= 'f.attendance IS NULL AND ';
         }
         $where .= "u.id ".$sqluserids;
-        $groupby = " u.id, s.id, f.id, ".$ufields." ".$useridentityfields;
+        $groupby = " u.id, s.id, f.id ".$ufields." ".$useridentityfields;
         if ($table->groupmode != NOGROUPS) {
             $groupby .= ", grpq.groupname";
         }
@@ -554,7 +555,7 @@ class submissionstable extends \table_sql {
         $table->gradinginfo = grade_get_grades($table->checkmark->course->id, 'mod', 'checkmark', $table->checkmark->checkmark->id,
                                                $users);
         $table->strupdate = get_string('update');
-        $table->strgrade = get_string('grade');
+        $table->strgrade = get_string('grade', 'grades');
         $table->grademenu = make_grades_menu($table->checkmark->checkmark->grade);
         if ($table->checkmark->checkmark->presentationgrading && $table->checkmark->checkmark->presentationgrade) {
             $table->presentationgrademenu = make_grades_menu($table->checkmark->checkmark->presentationgrade);
@@ -674,7 +675,7 @@ class submissionstable extends \table_sql {
         }
         $table->add_colgroup(1, 'sel');
 
-        $useridentity = get_extra_user_fields($table->context);
+        $useridentity = \core_user\fields::for_identity($table->context)->get_required_fields();
         foreach ($useridentity as $cur) {
             $tableheaders[] = ($cur == 'phone1') ? get_string('phone') : get_string($cur);
             $tablecolumns[] = $cur;
@@ -711,7 +712,7 @@ class submissionstable extends \table_sql {
         }
 
         if ($table->checkmark->checkmark->grade != 0) {
-            $tableheaders[] = get_string('grade');
+            $tableheaders[] = get_string('grade', 'grades');
             $tablecolumns[] = 'grade';
             $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '15'];
             $table->columnformat['grade'] = ['align' => 'R'];
@@ -813,8 +814,8 @@ class submissionstable extends \table_sql {
 
         // Create and set the SQL!
         $params = [];
-        $useridentityfields = get_extra_user_fields_sql($table->checkmark->context, 'u');
-        $ufields = \user_picture::fields('u');
+        $useridentityfields = \core_user\fields::for_identity($table->checkmark->context)->get_sql('u')->selects;
+        $ufields = \core_user\fields::for_userpic()->get_sql('u')->selects;
         $table->examplecount = count($table->checkmark->checkmark->examples);
         $params['examplecount'] = $table->examplecount;
 
@@ -832,7 +833,7 @@ class submissionstable extends \table_sql {
         } else {
             $groupssql = '';
         }
-        $fields = "u.id, ' ' AS selection, ".$ufields." ".$useridentityfields.",
+        $fields = "u.id, ' ' AS selection ".$ufields." ".$useridentityfields.",
                   MAX(s.id) AS submissionid, MAX(f.id) AS feedbackid, MAX(f.grade) AS grade,
                   MAX(f.feedback) AS feedback, MAX(s.timemodified) AS timesubmitted,
                   MAX(f.timemodified) AS timemarked, 100 * COUNT( DISTINCT cchks.id ) / :examplecount AS summary,
@@ -879,7 +880,7 @@ class submissionstable extends \table_sql {
             $where .= " AND presentationgrade IS NULL";
         }
 
-        $groupby = " u.id, s.id, f.id, ".$ufields." ".$useridentityfields.", f.attendance";
+        $groupby = " u.id, s.id, f.id ".$ufields." ".$useridentityfields.", f.attendance";
 
         $table->set_sql($fields, $from, $where, $params, $groupby);
         $table->set_count_sql("SELECT COUNT(DISTINCT u.id) FROM ".$from." WHERE ".$where, $params);
@@ -1828,8 +1829,8 @@ class submissionstable extends \table_sql {
             }
         }
         // Process user identity fields and name fields!
-        $useridentity = get_extra_user_fields($this->context);
-        $allnamefields = get_all_user_name_fields();
+        $useridentity = \core_user\fields::for_identity($this->context)->get_required_fields();
+        $allnamefields = \core_user\fields::for_name()->get_required_fields();
         if ($colname === 'phone') {
             $colname = 'phone1';
         }
@@ -1895,7 +1896,7 @@ class submissionstable extends \table_sql {
         if ($nameformat == 'language') {
             $nameformat = get_string('fullnamedisplay');
         }
-        $allnamefields = get_all_user_name_fields();
+        $allnamefields = \core_user\fields::for_name()->get_required_fields();
         $usednamefields = [];
         foreach ($allnamefields as $name) {
             if (($position = strpos($nameformat, $name)) !== false) {
