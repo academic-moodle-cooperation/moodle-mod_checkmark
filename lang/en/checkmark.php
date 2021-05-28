@@ -298,6 +298,7 @@ $string['availabledate_help'] = 'Begin of the submission period. After this date
 $string['cannotviewcheckmark'] = 'You can not view this checkmark';
 $string['checksummary'] = 'Checkmark summary';
 $string['comment'] = 'Comment';
+$string['completiondetail:submit'] = 'Make a submission';
 $string['completionsubmit'] = 'Student must submit to this activity to complete it';
 $string['configshowrecentsubmissions'] = 'Everyone can see notifications of submissions in recent activity reports.';
 $string['coursemisconf'] = 'Course is miss-configured';
