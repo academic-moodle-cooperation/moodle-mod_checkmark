@@ -14,6 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Extension of activity_custom_completion for enabling activity completion on checkmark submit
+ *
+ * @package   mod_checkmark
+ * @author    Daniel Binder, based on the work of Simey Lameze
+ * @copyright 2021 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 declare(strict_types=1);
 
 namespace mod_checkmark\completion;
@@ -24,7 +33,7 @@ use core_completion\activity_custom_completion;
  * Extension of activity_custom_completion for enabling activity completion on checkmark submit
  *
  * @package   mod_checkmark
- * @author    Daniel Binder
+ * @author    Daniel Binder, based on the work of Simey Lameze
  * @copyright 2021 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
