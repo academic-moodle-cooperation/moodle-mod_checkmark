@@ -6,7 +6,7 @@ CHANGELOG
 * [FEATURE] #6826 Add a dashboard similar to the one in mod_assign to the main page of checkmark
                   showing all key information of the open checkmark activity
 * [FEATURE] #6829 Add filter in Submissions/Export to display users with or without a presentation grade
-* [FEATURE] #6829 Implement a custom completion rule for the submission of a checkmark
+* [FEATURE] #6841 Implement a custom completion rule for the submission of a checkmark
 * [FEATURE] #6833 Implement behat generator functions for submissions and grading
 * [FEATURE] #6913 List "All" after "100" in the "Submissions shown per page" [github #52/pullrequest #53]
 
@@ -20,9 +20,9 @@ CHANGELOG
 ------------------
 * [FEATURE] #6685 Add the option to export every name fragment (e.g. firstname, lastname)
                   in a dedicated column. This is controlled by a checkbox to additional settings
-# [FEATURE] #6680 Add unit tests to override dates feature (#6360)
+* [FEATURE] #6680 Add unit tests to override dates feature (#6360)
 * [CHANGED] #6071 Reorder bulk processing dropdown in order to have "grade automatically" on top
-+ [CHANGED] #6773 Change "ungraded" bulk select so that all students with "No grade" are selected
+* [CHANGED] #6773 Change "ungraded" bulk select so that all students with "No grade" are selected
                   regardless of an existing graded date.
 * [FIXED]   #6773 Include submissions with "No grade" set in "Ungraded" bulk select
 * [FIXED]   #6783 Include style definition for overwritten info in plugin css
