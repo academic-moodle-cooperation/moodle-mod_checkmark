@@ -7,7 +7,7 @@ CHANGELOG
                   showing all key information of the open checkmark activity
 * [FEATURE] #6829 Add filter in Submissions/Export to display users with or without a presentation grade
 * [FEATURE] #6841 Add activity completion badges to the checkmark landing page
-* [FEATURE] #6829 Implement a custom completion rule for the submission of a checkmark
+* [FEATURE] #6841 Implement a custom completion rule for the submission of a checkmark
 * [FEATURE] #6833 Implement behat generator functions for submissions and grading
 * [FEATURE] #6913 List "All" after "100" in the "Submissions shown per page" [github #52/pullrequest #53]
 * [FIXED] #6830 Replace deprecated methods and strings with their successors
