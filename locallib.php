@@ -848,7 +848,9 @@ class checkmark {
         // Second row!
         if ($showfeedback) {
             if ($this->checkmark->grade) {
-                $content = html_writer::tag('div', html_writer::tag('strong', get_string('grade', 'grades') . ': ') . $grade->str_long_grade,
+                $content =
+                        html_writer::tag('div', html_writer::tag('strong',
+                                        get_string('grade', 'grades') . ': ') . $grade->str_long_grade,
                         array('class' => 'grade'));
             } else {
                 $content = '';

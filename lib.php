@@ -2271,37 +2271,6 @@ function mod_checkmark_get_fontawesome_icon_map() {
 }
 
 /**
- * Obtains the automatic completion state for this module based on any conditions
- * in checkmark settings.
- *
- * @param object $course Course
- * @param object $cm Course-module
- * @param int $userid User ID
- * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
- * @return bool
- * @throws coding_exception
- * @throws dml_exception
- * @throws moodle_exception
- */
-/*
-function checkmark_get_completion_state($course, $cm, $userid, $type) {
-    global $CFG, $DB;
-    require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
-
-    $checkmark = new checkmark($cm->id, null, $cm, $course);
-
-    // If completion option is enabled, evaluate it and return true/false.
-    if ($checkmark->checkmark->completionsubmit) {
-        $submission = $checkmark->get_submission($userid, false);
-        return $submission && $submission->timecreated && $submission->timemodified;
-    } else {
-        // Completion option is not enabled so just return $type.
-        return $type;
-    }
-}
-*/
-
-/**
  * Callback which returns human-readable strings describing the active completion custom rules for the module instance.
  *
  * @param cm_info|stdClass $cm object with fields ->completion and ->customdata['customcompletionrules']

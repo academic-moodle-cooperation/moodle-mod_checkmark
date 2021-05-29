@@ -51,7 +51,7 @@ class custom_completion extends activity_custom_completion {
         // If completion option is enabled, evaluate it and return true/false.
         if ($checkmark->checkmark->completionsubmit) {
             $submission = $checkmark->get_submission($userid, false);
-            $status =  $submission && $submission->timecreated && $submission->timemodified;
+            $status = $submission && $submission->timecreated && $submission->timemodified;
             return $status ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE;
         } else {
             // Completion option is not enabled so just return $type.
