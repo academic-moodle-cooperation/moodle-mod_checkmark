@@ -663,6 +663,14 @@ class checkmark {
         }
         $table->data = $rows;
         $content .= html_writer::table($table);
+
+        // Show the activity information output activity completion.
+        global $USER;
+        $modinfo = get_fast_modinfo($this->course);
+        $cmobj = $modinfo->get_cm($this->cm->id);
+        $cmcompletion = \core_completion\cm_completion_details::get_instance($cmobj, $USER->id);
+        // Pass empty array for the dates so only the completion marks are rendered.
+        $content .= $OUTPUT->activity_information($cmobj, $cmcompletion, []);
         $content .= $OUTPUT->box_end();
         return $content;
     }
@@ -840,7 +848,9 @@ class checkmark {
         // Second row!
         if ($showfeedback) {
             if ($this->checkmark->grade) {
-                $content = html_writer::tag('div', html_writer::tag('strong', get_string('grade', 'grades') . ': ') . $grade->str_long_grade,
+                $content =
+                        html_writer::tag('div', html_writer::tag('strong',
+                                        get_string('grade', 'grades') . ': ') . $grade->str_long_grade,
                         array('class' => 'grade'));
             } else {
                 $content = '';
