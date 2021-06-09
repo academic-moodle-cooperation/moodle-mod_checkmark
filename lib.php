@@ -1383,7 +1383,7 @@ function checkmark_refresh_events($courseid = 0, $instance = null, $cm = null) {
 function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
     global $CFG, $USER, $DB, $OUTPUT;
 
-    $userfields = core_user\fields::for_name()->get_sql('u');
+    $userfields = core_user\fields::for_name()->get_sql('u')->selects;
     if (!$submissions = $DB->get_records_sql('
             SELECT asb.id, asb.timemodified, cm.id AS cmid, asb.userid
                    ' . $userfields . ', u.email, u.picture
