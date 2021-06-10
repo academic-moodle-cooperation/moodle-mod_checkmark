@@ -1,5 +1,8 @@
 CHANGELOG
 =========
+3.11.1 (2021-06-10)
+------------------
+* [FIXED] #6944 Fixed not being able to see a course with both "checkmark" activity and a "recent activity" block.
 
 3.11.0 (2021-05-19)
 ------------------
