@@ -9,8 +9,6 @@ require_once($CFG->dirroot . '/mod/checkmark/externallib.php');
 
 /**
  * External mod checkmark functions unit tests
- *
- *  @SuppressWarnings("CPD-START")
  */
 class mod_checkmark_external_testcase extends externallib_advanced_testcase {
 
@@ -263,8 +261,3 @@ class mod_checkmark_external_testcase extends externallib_advanced_testcase {
 
     }
 }
-
-
-/**
- * @SuppressWarnings("CPD-END")
- */
