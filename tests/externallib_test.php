@@ -96,7 +96,6 @@ class mod_checkmark_external_testcase extends externallib_advanced_testcase {
     public function test_get_checkmark() {
         global $CFG, $DB, $USER;
 
-
         $result = $this->init_test_suite_one_course();
 
         // Checkmark name should be equal to 'Checkmark Module'.
