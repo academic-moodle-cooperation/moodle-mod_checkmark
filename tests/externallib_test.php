@@ -194,13 +194,13 @@ class mod_checkmark_external_testcase extends externallib_advanced_testcase {
 
         $result = mod_checkmark_external::submit($checkmark->cmid, $submissionexamples);
 
-        // checkmark name should be equal to 'Checkmark Module'
+        // Checkmark name should be equal to 'Checkmark Module'!
         $this->assertEquals('Checkmark Module', $result->checkmark->name);
 
-        // Course id in checkmark should be equal to the id of the course
+        // Course id in checkmark should be equal to the id of the course!
         $this->assertEquals($course->id, $result->checkmark->course);
 
-        // check the examples checked status of the result object
+        // Check the examples checked status of the result object!
         $this->assertEquals($result->checkmark->examples[0]->id % 2, $result->checkmark->examples[0]->checked);
         $this->assertEquals($result->checkmark->examples[1]->id % 2, $result->checkmark->examples[1]->checked);
         $this->assertEquals($result->checkmark->examples[2]->id % 2, $result->checkmark->examples[2]->checked);
@@ -214,13 +214,13 @@ class mod_checkmark_external_testcase extends externallib_advanced_testcase {
 
         $result = mod_checkmark_external::get_checkmark($checkmark->cmid);
 
-        // checkmark name should be equal to 'Checkmark Module'
+        // Checkmark name should be equal to 'Checkmark Module'!
         $this->assertEquals('Checkmark Module', $result->checkmark->name);
 
-        // Course id in checkmark should be equal to the id of the course
+        // Course id in checkmark should be equal to the id of the course!
         $this->assertEquals($course->id, $result->checkmark->course);
 
-        // check the examples checked status was correctly saved
+        // Check the examples checked status was correctly saved!
         $this->assertEquals($result->checkmark->examples[0]->id % 2, $result->checkmark->examples[0]->checked);
         $this->assertEquals($result->checkmark->examples[1]->id % 2, $result->checkmark->examples[1]->checked);
         $this->assertEquals($result->checkmark->examples[2]->id % 2, $result->checkmark->examples[2]->checked);

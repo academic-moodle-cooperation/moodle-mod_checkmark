@@ -1,4 +1,18 @@
 <?php
+// This file is part of mod_checkmark for Moodle - http://moodle.org/
+//
+// It is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// It is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -26,7 +40,9 @@ class mod_checkmark_external extends external_api {
      */
     public static function get_checkmarks_by_courses_returns() {
         return new external_single_structure([
-            'checkmarks' => new external_multiple_structure(self::checkmark_structure(), 'All checkmarks for the given courses'),
+            'checkmarks' => new external_multiple_structure(
+                self::checkmark_structure(),
+                'All checkmarks for the given courses'),
             'warnings' => new external_warnings()
         ]);
     }
@@ -191,19 +207,21 @@ class mod_checkmark_external extends external_api {
         // Create the submission if needed & return its id!
         $submission = $checkmark->get_submission(0, true);
 
-        $example_counter = count($submission->get_examples());
+        $examplecounter = count($submission->get_examples());
         foreach ($submission->get_examples() as $key => $example) {
 
-            $maybe_submission_example = null;
+            $maybesubmissionexample = null;
             foreach ($params['submission_examples'] as $submissionexample) {
                 if ($example->get_id() === $submissionexample['id']) {
-                    $maybe_submission_example = $submissionexample;
-                    $example_counter--;
+                    $maybesubmissionexample = $submissionexample;
+                    $examplecounter--;
                     break;
                 }
             }
 
-            if ($maybe_submission_example && isset($maybe_submission_example['checked']) && $maybe_submission_example['checked'] != 0) {
+            if ($maybesubmissionexample &&
+                isset($maybesubmissionexample['checked']) &&
+                $maybesubmissionexample['checked'] != 0) {
                 $submission->get_example($key)->set_state(\mod_checkmark\example::CHECKED);
             } else {
                 $submission->get_example($key)->set_state(\mod_checkmark\example::UNCHECKED);
@@ -211,7 +229,7 @@ class mod_checkmark_external extends external_api {
 
         }
 
-        if ($example_counter !== 0) {
+        if ($examplecounter !== 0) {
             throw new InvalidArgumentException("Submission examples do not match the checkmark examples.");
         }
 
@@ -330,10 +348,10 @@ class mod_checkmark_external extends external_api {
      * Converts the given examples to match the example structure for result values
      *
      * @param $examples \mod_checkmark\example[]    The examples to export
-     * @param false $export_checked Export the information if the example is checked by the user via a submission
+     * @param false $exportchecked Export the information if the example is checked by the user via a submission
      * @return array                                The exported examples (conforms to the example_structure)
      */
-    private static function export_examples($examples, $export_checked = false) {
+    private static function export_examples($examples, $exportchecked = false) {
         $resultexamples = [];
         foreach ($examples as $example) {
 
@@ -341,7 +359,7 @@ class mod_checkmark_external extends external_api {
             $resultexample->id = $example->get_id();
             $resultexample->name = $example->get_name();
 
-            if ($export_checked) {
+            if ($exportchecked) {
                 $resultexample->checked = $example->is_checked() ? 1 : 0;
             }
 
