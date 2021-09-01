@@ -64,10 +64,10 @@ class mod_checkmark_external extends external_api {
 
             // Get the checkmarks in this course, this function checks users visibility permissions.
             // We can avoid then additional validate_context calls.
-            $checkmark_instances = get_all_instances_in_courses("checkmark", $courses);
-            foreach ($checkmark_instances as $checkmark_instance) {
+            $checkmarkinstances = get_all_instances_in_courses("checkmark", $courses);
+            foreach ($checkmarkinstances as $checkmarkinstance) {
 
-                $checkmark = new checkmark($checkmark_instance->coursemodule);
+                $checkmark = new checkmark($checkmarkinstance->coursemodule);
                 $rcheckmarks[] = self::export_checkmark($checkmark);
             }
         }
@@ -150,7 +150,7 @@ class mod_checkmark_external extends external_api {
      * checkmark. Updates the submission of the checkmark and returns the checkmark
      *
      * @param $id
-     * @param $submission_examples
+     * @param $submissionexamples
      * @return stdClass
      * @throws coding_exception
      * @throws dml_exception
@@ -159,11 +159,11 @@ class mod_checkmark_external extends external_api {
      * @throws required_capability_exception
      * @throws restricted_context_exception
      */
-    public static function submit($id, $submission_examples) {
+    public static function submit($id, $submissionexamples) {
         global $USER;
         $params = self::validate_parameters(self::submit_parameters(), [
             'id' => $id,
-            'submission_examples' => $submission_examples
+            'submission_examples' => $submissionexamples
         ]);
 
         $warnings = [];
@@ -195,9 +195,9 @@ class mod_checkmark_external extends external_api {
         foreach ($submission->get_examples() as $key => $example) {
 
             $maybe_submission_example = null;
-            foreach ($params['submission_examples'] as $submission_example) {
-                if ($example->get_id() === $submission_example['id']) {
-                    $maybe_submission_example = $submission_example;
+            foreach ($params['submission_examples'] as $submissionexample) {
+                if ($example->get_id() === $submissionexample['id']) {
+                    $maybe_submission_example = $submissionexample;
                     $example_counter--;
                     break;
                 }
@@ -300,30 +300,30 @@ class mod_checkmark_external extends external_api {
      * @throws dml_exception
      */
     private static function export_checkmark($checkmark) {
-        $result_checkmark = new stdClass();
+        $resultcheckmark = new stdClass();
 
-        $result_checkmark->id = $checkmark->cm->id;
-        $result_checkmark->instance = $checkmark->checkmark->id;
-        $result_checkmark->course = $checkmark->checkmark->course;
-        $result_checkmark->name = $checkmark->checkmark->name;
-        $result_checkmark->intro = $checkmark->checkmark->intro;
-        $result_checkmark->introformat = $checkmark->checkmark->introformat;
-        $result_checkmark->timedue = $checkmark->checkmark->timedue;
-        $result_checkmark->cutoffdate = $checkmark->checkmark->cutoffdate;
+        $resultcheckmark->id = $checkmark->cm->id;
+        $resultcheckmark->instance = $checkmark->checkmark->id;
+        $resultcheckmark->course = $checkmark->checkmark->course;
+        $resultcheckmark->name = $checkmark->checkmark->name;
+        $resultcheckmark->intro = $checkmark->checkmark->intro;
+        $resultcheckmark->introformat = $checkmark->checkmark->introformat;
+        $resultcheckmark->timedue = $checkmark->checkmark->timedue;
+        $resultcheckmark->cutoffdate = $checkmark->checkmark->cutoffdate;
 
         if ($checkmark->get_submission()) {
-            $result_checkmark->submission_timecreated = $checkmark->get_submission()->timecreated;
-            $result_checkmark->submission_timemodified = $checkmark->get_submission()->timemodified;
-            $result_checkmark->examples = self::export_examples($checkmark->get_submission()->get_examples(), true);
+            $resultcheckmark->submission_timecreated = $checkmark->get_submission()->timecreated;
+            $resultcheckmark->submission_timemodified = $checkmark->get_submission()->timemodified;
+            $resultcheckmark->examples = self::export_examples($checkmark->get_submission()->get_examples(), true);
         } else {
-            $result_checkmark->examples = self::export_examples($checkmark->get_examples());
+            $resultcheckmark->examples = self::export_examples($checkmark->get_examples());
         }
 
         if ($checkmark->get_feedback()) {
-            $result_checkmark->feedback = self::export_feedback($checkmark->get_feedback());
+            $resultcheckmark->feedback = self::export_feedback($checkmark->get_feedback());
         }
 
-        return $result_checkmark;
+        return $resultcheckmark;
     }
 
     /**
@@ -334,21 +334,21 @@ class mod_checkmark_external extends external_api {
      * @return array                                The exported examples (conforms to the example_structure)
      */
     private static function export_examples($examples, $export_checked = false) {
-        $result_examples = [];
+        $resultexamples = [];
         foreach ($examples as $example) {
 
-            $result_example = new stdClass();
-            $result_example->id = $example->get_id();
-            $result_example->name = $example->get_name();
+            $resultexample = new stdClass();
+            $resultexample->id = $example->get_id();
+            $resultexample->name = $example->get_name();
 
             if ($export_checked) {
-                $result_example->checked = $example->is_checked() ? 1 : 0;
+                $resultexample->checked = $example->is_checked() ? 1 : 0;
             }
 
-            $result_examples[] = $result_example;
+            $resultexamples[] = $resultexample;
         }
 
-        return $result_examples;
+        return $resultexamples;
     }
 
     /**
@@ -358,15 +358,15 @@ class mod_checkmark_external extends external_api {
      * @return object           The exported feedback (conforms to the feedback_structure)
      */
     private static function export_feedback($feedback) {
-        $result_feedback = new stdClass();
+        $resultfeedback = new stdClass();
 
-        $result_feedback->grade = $feedback->grade;
-        $result_feedback->feedback = $feedback->feedback;
-        $result_feedback->feedbackformat = $feedback->format;
-        $result_feedback->timecreated = $feedback->timecreated;
-        $result_feedback->timemodified = $feedback->timemodified;
+        $resultfeedback->grade = $feedback->grade;
+        $resultfeedback->feedback = $feedback->feedback;
+        $resultfeedback->feedbackformat = $feedback->format;
+        $resultfeedback->timecreated = $feedback->timecreated;
+        $resultfeedback->timemodified = $feedback->timemodified;
 
-        return $result_feedback;
+        return $resultfeedback;
     }
 
 }

@@ -1,5 +1,19 @@
 <?php
-// phpcs:disable
+// This file is part of mod_checkmark for Moodle - http://moodle.org/
+//
+// It is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// It is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -69,7 +83,7 @@ class mod_checkmark_external_testcase extends externallib_advanced_testcase {
 
         $result = mod_checkmark_external::get_checkmarks_by_courses([]);
 
-        // user is enrolled only in course1 and course2, so the third checkmark module in course3 should not be included
+        // User is enrolled only in course1 and course2, so the third checkmark module in course3 should not be included.
         $this->assertEquals(2, count($result->checkmarks));
     }
 
@@ -102,10 +116,10 @@ class mod_checkmark_external_testcase extends externallib_advanced_testcase {
 
         $result = mod_checkmark_external::get_checkmark($checkmark->cmid);
 
-        // checkmark name should be equal to 'Checkmark Module'
+        // Checkmark name should be equal to 'Checkmark Module'.
         $this->assertEquals('Checkmark Module', $result->checkmark->name);
 
-        // Course id in checkmark should be equal to the id of the course
+        // Course id in checkmark should be equal to the id of the course.
         $this->assertEquals($course->id, $result->checkmark->course);
     }
 
@@ -137,7 +151,7 @@ class mod_checkmark_external_testcase extends externallib_advanced_testcase {
 
         $this->setUser($user);
 
-        // Test should throw require_login_exception
+        // Test should throw require_login_exception!
         $this->expectException(require_login_exception::class);
 
         $result = mod_checkmark_external::get_checkmark($checkmark->cmid);
@@ -173,12 +187,12 @@ class mod_checkmark_external_testcase extends externallib_advanced_testcase {
 
         $result = mod_checkmark_external::get_checkmark($checkmark->cmid);
 
-        $submission_examples = [];
+        $submissionexamples = [];
         foreach ($result->checkmark->examples as $example) {
-            $submission_examples[] = ['id' => $example->id, 'checked' => $example->id % 2];
+            $submissionexamples[] = ['id' => $example->id, 'checked' => $example->id % 2];
         }
 
-        $result = mod_checkmark_external::submit($checkmark->cmid, $submission_examples);
+        $result = mod_checkmark_external::submit($checkmark->cmid, $submissionexamples);
 
         // checkmark name should be equal to 'Checkmark Module'
         $this->assertEquals('Checkmark Module', $result->checkmark->name);
@@ -242,22 +256,22 @@ class mod_checkmark_external_testcase extends externallib_advanced_testcase {
             'name' => 'Checkmark Module',
             'intro' => 'Checkmark module for automated php unit tests',
             'introformat' => FORMAT_HTML,
-            'cutoffdate' => time() - 60 * 60 * 24 // yesterday
+            'cutoffdate' => time() - 60 * 60 * 24 // Yesterday.
         ]);
 
         $this->setUser($user);
 
         $result = mod_checkmark_external::get_checkmark($checkmark->cmid);
 
-        $submission_examples = [];
+        $submissionexamples = [];
         foreach ($result->checkmark->examples as $example) {
-            $submission_examples[] = ['id' => $example->id, 'checked' => $example->id % 2];
+            $submissionexamples[] = ['id' => $example->id, 'checked' => $example->id % 2];
         }
 
-        // Test should throw moodle_exception because the 'cutofdate' was yesterday
+        // Test should throw moodle_exception because the 'cutofdate' was yesterday.
         $this->expectException(moodle_exception::class);
 
-        $result = mod_checkmark_external::submit($checkmark->cmid, $submission_examples);
+        $result = mod_checkmark_external::submit($checkmark->cmid, $submissionexamples);
 
     }
 }
