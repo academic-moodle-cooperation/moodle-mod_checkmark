@@ -26,6 +26,9 @@ require_once($CFG->dirroot . '/mod/checkmark/externallib.php');
  */
 class mod_checkmark_external_testcase extends externallib_advanced_testcase {
 
+    private $_course;
+    private $_checkmark;
+
     /**
      * Test if the user only gets checkmarks for enrolled courses
      */
@@ -93,34 +96,14 @@ class mod_checkmark_external_testcase extends externallib_advanced_testcase {
     public function test_get_checkmark() {
         global $CFG, $DB, $USER;
 
-        $this->resetAfterTest(true);
 
-        $user = $this->getDataGenerator()->create_user();
-
-        $course = $this->getDataGenerator()->create_course([
-            'fullname' => 'PHPUnitTestCourse',
-            'summary' => 'Test course for automated php unit tests',
-            'summaryformat' => FORMAT_HTML
-        ]);
-
-        $this->getDataGenerator()->enrol_user($user->id, $course->id);
-
-        $checkmark = self::getDataGenerator()->create_module('checkmark', [
-            'course' => $course->id,
-            'name' => 'Checkmark Module',
-            'intro' => 'Checkmark module for automated php unit tests',
-            'introformat' => FORMAT_HTML,
-        ]);
-
-        $this->setUser($user);
-
-        $result = mod_checkmark_external::get_checkmark($checkmark->cmid);
+        $result = $this->init_test_suite_one_course();
 
         // Checkmark name should be equal to 'Checkmark Module'.
         $this->assertEquals('Checkmark Module', $result->checkmark->name);
 
         // Course id in checkmark should be equal to the id of the course.
-        $this->assertEquals($course->id, $result->checkmark->course);
+        $this->assertEquals($this->_course->id, $result->checkmark->course);
     }
 
     /**
@@ -164,54 +147,33 @@ class mod_checkmark_external_testcase extends externallib_advanced_testcase {
     public function test_get_submit() {
         global $CFG, $DB, $USER;
 
-        $this->resetAfterTest(true);
-
-        $user = $this->getDataGenerator()->create_user();
-
-        $course = $this->getDataGenerator()->create_course([
-            'fullname' => 'PHPUnitTestCourse',
-            'summary' => 'Test course for automated php unit tests',
-            'summaryformat' => FORMAT_HTML
-        ]);
-
-        $this->getDataGenerator()->enrol_user($user->id, $course->id);
-
-        $checkmark = self::getDataGenerator()->create_module('checkmark', [
-            'course' => $course->id,
-            'name' => 'Checkmark Module',
-            'intro' => 'Checkmark module for automated php unit tests',
-            'introformat' => FORMAT_HTML,
-        ]);
-
-        $this->setUser($user);
-
-        $result = mod_checkmark_external::get_checkmark($checkmark->cmid);
+        $result = $this->init_test_suite_one_course();
 
         $submissionexamples = [];
         foreach ($result->checkmark->examples as $example) {
             $submissionexamples[] = ['id' => $example->id, 'checked' => $example->id % 2];
         }
 
-        $result = mod_checkmark_external::submit($checkmark->cmid, $submissionexamples);
+        $result = mod_checkmark_external::submit($this->_checkmark->cmid, $submissionexamples);
 
         // Checkmark name should be equal to 'Checkmark Module'!
         $this->assertEquals('Checkmark Module', $result->checkmark->name);
 
         // Course id in checkmark should be equal to the id of the course!
-        $this->assertEquals($course->id, $result->checkmark->course);
+        $this->assertEquals($this->_course->id, $result->checkmark->course);
 
         // Check the examples checked status of the result object!
         for ($i = 0; $i < 10; $i++) {
             $this->assertEquals($result->checkmark->examples[$i]->id % 2, $result->checkmark->examples[$i]->checked);
         }
 
-        $result = mod_checkmark_external::get_checkmark($checkmark->cmid);
+        $result = mod_checkmark_external::get_checkmark($this->_checkmark->cmid);
 
         // Checkmark name should be equal to 'Checkmark Module'!
         $this->assertEquals('Checkmark Module', $result->checkmark->name);
 
         // Course id in checkmark should be equal to the id of the course!
-        $this->assertEquals($course->id, $result->checkmark->course);
+        $this->assertEquals($this->_course->id, $result->checkmark->course);
 
         // Check the examples checked status was correctly saved!
         for ($i = 0; $i < 10; $i++) {
@@ -259,5 +221,33 @@ class mod_checkmark_external_testcase extends externallib_advanced_testcase {
 
         $result = mod_checkmark_external::submit($checkmark->cmid, $submissionexamples);
 
+    }
+
+    public function init_test_suite_one_course() {
+        $this->resetAfterTest(true);
+
+        $user = $this->getDataGenerator()->create_user();
+
+        $course = $this->getDataGenerator()->create_course([
+            'fullname' => 'PHPUnitTestCourse',
+            'summary' => 'Test course for automated php unit tests',
+            'summaryformat' => FORMAT_HTML
+        ]);
+
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $checkmark = self::getDataGenerator()->create_module('checkmark', [
+            'course' => $course->id,
+            'name' => 'Checkmark Module',
+            'intro' => 'Checkmark module for automated php unit tests',
+            'introformat' => FORMAT_HTML,
+        ]);
+
+        $this->setUser($user);
+
+        $result = mod_checkmark_external::get_checkmark($checkmark->cmid);
+        $this->_course = $course;
+        $this->_checkmark = $checkmark;
+        return $result;
     }
 }
