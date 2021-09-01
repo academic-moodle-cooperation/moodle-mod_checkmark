@@ -38,6 +38,7 @@ class mod_checkmark_external extends external_api {
 
     /**
      * Returns description of the get_checkmarks_by_courses parameters
+     *
      * @return external_function_parameters
      */
     public static function get_checkmarks_by_courses_parameters() {
@@ -50,6 +51,7 @@ class mod_checkmark_external extends external_api {
 
     /**
      * Returns description of the get_checkmarks_by_courses result value
+     *
      * @return external_single_structure
      */
     public static function get_checkmarks_by_courses_returns() {
@@ -154,6 +156,7 @@ class mod_checkmark_external extends external_api {
 
     /**
      * Returns description of the submit parameters
+     *
      * @return external_function_parameters
      */
     public static function submit_parameters() {
@@ -166,6 +169,7 @@ class mod_checkmark_external extends external_api {
 
     /**
      * Returns description of the submit result value
+     *
      * @return external_single_structure
      */
     public static function submit_returns() {
@@ -258,6 +262,7 @@ class mod_checkmark_external extends external_api {
 
     /**
      * Description of the checkmark structure in result values
+     *
      * @return external_single_structure
      */
     private static function checkmark_structure() {
@@ -281,6 +286,7 @@ class mod_checkmark_external extends external_api {
 
     /**
      * Description of the feedback structure in result values
+     *
      * @return external_single_structure
      */
     private static function feedback_structure() {
@@ -298,6 +304,7 @@ class mod_checkmark_external extends external_api {
 
     /**
      * Description of the example structure in result values
+     *
      * @return external_single_structure
      */
     private static function example_structure() {
@@ -312,6 +319,7 @@ class mod_checkmark_external extends external_api {
 
     /**
      * Description of the submit_example structure in parameters
+     * 
      * @return external_single_structure
      */
     private static function submit_example_structure() {
