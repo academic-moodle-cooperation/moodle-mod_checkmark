@@ -319,7 +319,7 @@ class mod_checkmark_external extends external_api {
 
     /**
      * Description of the submit_example structure in parameters
-     * 
+     *
      * @return external_single_structure
      */
     private static function submit_example_structure() {
