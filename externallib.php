@@ -14,12 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * External lib with webservices functions
+ *
+ * @package   mod_checkmark
+ * @author    Philipp Hager
+ * @copyright 2021 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir . '/externallib.php');
 require_once($CFG->dirroot . '/user/externallib.php');
 require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 
+/**
+ * External lib class
+ *
+ * @package   mod_checkmark
+ */
 class mod_checkmark_external extends external_api {
 
     /**
@@ -165,8 +179,8 @@ class mod_checkmark_external extends external_api {
      * Checks if the user can submit a checkmark and if the given submission_examples match the examples of the
      * checkmark. Updates the submission of the checkmark and returns the checkmark
      *
-     * @param $id
-     * @param $submissionexamples
+     * @param $id int of the checkmark
+     * @param $submissionexamples array
      * @return stdClass
      * @throws coding_exception
      * @throws dml_exception

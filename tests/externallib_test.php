@@ -14,6 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Unit tests for external lib
+ *
+ * @package   mod_checkmark
+ * @author    Philipp Hager
+ * @copyright 2021 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -23,10 +32,18 @@ require_once($CFG->dirroot . '/mod/checkmark/externallib.php');
 
 /**
  * External mod checkmark functions unit tests
+ *
+ * @package   mod_checkmark
  */
 class mod_checkmark_external_testcase extends externallib_advanced_testcase {
 
+    /*
+     * Variable that holds instance of the current course
+     */
     private $_course;
+    /*
+     * Variable that holds instance of the current checkmark
+     */
     private $_checkmark;
 
     /**
