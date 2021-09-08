@@ -2897,7 +2897,8 @@ class checkmark {
             ]);
             $mform = new \mod_checkmark\exportform($formaction, $customdata, 'post', '', [
                     'name' => 'optionspref',
-                    'class' => 'combinedprintpreviewform'
+                    'class' => 'combinedprintpreviewform',
+                    'data-double-submit-protection' => 'off'
             ]);
 
             $data = [
