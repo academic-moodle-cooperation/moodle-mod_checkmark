@@ -67,7 +67,7 @@ class mod_checkmark_external extends external_api {
      * Get all checkmarks for the courses with the given ids. If the ids are empty all checkmarks from all
      * user-enrolled courses are returned.
      *
-     * @param $courseids array the ids of the courses to get checkmarks for (all user enrolled courses if empty array)
+     * @param array $courseids the ids of the courses to get checkmarks for (all user enrolled courses if empty array)
      * @return stdClass
      * @throws coding_exception
      * @throws dml_exception
@@ -133,6 +133,7 @@ class mod_checkmark_external extends external_api {
     /**
      * Returns the checkmark for the given id (cmid is used to find the checkmark)
      *
+     * @param int $id id of the checkmark
      * @throws restricted_context_exception
      * @throws coding_exception
      * @throws dml_exception
@@ -183,8 +184,8 @@ class mod_checkmark_external extends external_api {
      * Checks if the user can submit a checkmark and if the given submission_examples match the examples of the
      * checkmark. Updates the submission of the checkmark and returns the checkmark
      *
-     * @param $id int of the checkmark
-     * @param $submissionexamples array
+     * @param int $id id of the checkmark
+     * @param array $submissionexamples array holding all submitted examples
      * @return stdClass
      * @throws coding_exception
      * @throws dml_exception
@@ -335,7 +336,7 @@ class mod_checkmark_external extends external_api {
     /**
      * Converts the given checkmark to match the checkmark structure for result values
      *
-     * @param $checkmark checkmark  The checkmark to be exported
+     * @param checkmark $checkmark The checkmark instance to be exported
      * @return object               The exported checkmark (conforms to the checkmark_structure)
      * @throws dml_exception
      */
@@ -369,7 +370,7 @@ class mod_checkmark_external extends external_api {
     /**
      * Converts the given examples to match the example structure for result values
      *
-     * @param $examples \mod_checkmark\example[]    The examples to export
+     * @param array $examples Array of \mod_checkmark\example that are going to be exported
      * @param false $exportchecked Export the information if the example is checked by the user via a submission
      * @return array                                The exported examples (conforms to the example_structure)
      */
@@ -394,7 +395,7 @@ class mod_checkmark_external extends external_api {
     /**
      * Converts the given feedback to match the feedback structure for result values
      *
-     * @param $feedback object  Feedback to be exported
+     * @param object $feedback   Feedback to be exported
      * @return object           The exported feedback (conforms to the feedback_structure)
      */
     private static function export_feedback($feedback) {
