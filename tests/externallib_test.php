@@ -194,7 +194,7 @@ class mod_checkmark_external_testcase extends externallib_advanced_testcase {
     }
 
     /**
-     * Test if the user gets an exception if the submission is already closed ('cutofdate' was yesterday)
+     * Test if the user gets an exception if the submission is already closed ('cutoffdate' was yesterday)
      */
     public function test_get_submit_negative() {
         global $CFG, $DB, $USER;
