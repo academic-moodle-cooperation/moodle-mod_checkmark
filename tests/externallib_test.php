@@ -236,8 +236,8 @@ class mod_checkmark_external_testcase extends externallib_advanced_testcase {
     }
 
     /**
-     * Test if the user gets an exception if the submission is already closed ('cutofdate' was yesterday)
-     * @return checkmark object that will be used from the tests
+     * Creates a course, a new checkmark instance inside, and enrols one user
+     * @return stdClass object that will be used from the tests
      */
     public function init_test_suite_one_course() {
         $this->resetAfterTest(true);
