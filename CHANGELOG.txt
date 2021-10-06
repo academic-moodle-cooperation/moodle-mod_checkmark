@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+3.11.2 (2021-07-30)
+------------------
+* [FEATURE] #6952 Implement webservices - github pull request 62 by Alexander Melem <alexander@melem-software.com>
+
 3.11.1 (2021-06-10)
 ------------------
 * [FIXED] #6944 Fixed not being able to see a course with both "checkmark" activity and a "recent activity" block.

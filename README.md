@@ -3,9 +3,9 @@ Checkmark Module
 
 This file is part of the mod_checkmark plugin for Moodle - <http://moodle.org/>
 
-*Author:*    Daniel Binder, Philipp Hager, Katarzyna Potocka
+*Author:*    Daniel Binder, Philipp Hager, Katarzyna Potocka, Alexander Melem
 
-*Copyright:* 2020 [Academic Moodle Cooperation](http://www.academic-moodle-cooperation.org)
+*Copyright:* 2021 [Academic Moodle Cooperation](http://www.academic-moodle-cooperation.org)
 
 *License:*   [GNU GPL v3 or later](http://www.gnu.org/copyleft/gpl.html)
 
@@ -33,7 +33,7 @@ session there is the option of automatic grading on the basis of the assignments
 Requirements
 ------------
 
-The plugin is available for Moodle 2.5+. This version is for Moodle 3.11.0.
+The plugin is available for Moodle 2.5+.
 
 
 Installation
@@ -67,6 +67,13 @@ Default checkmark settings
 * Due date
 * Cut-off date
 * Remind me to grade by
+  
+
+Webservices
+-----------
+* mod_checkmark_get_checkmarks_by_courses
+* mod_checkmark_get_checkmark
+* mod_checkmark_submit
 
 Documentation
 -------------
