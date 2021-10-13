@@ -2188,7 +2188,11 @@ function mod_checkmark_core_calendar_is_event_visible(calendar_event $event) {
  *
  * @param calendar_event $event
  * @param \core_calendar\action_factory $factory
+ * @param int $userid User the calender events should be retorned for. If 0 the events for the current user are returned
  * @return \core_calendar\local\event\entities\action_interface|null
+ * @throws coding_exception
+ * @throws dml_exception
+ * @throws moodle_exception
  */
 function mod_checkmark_core_calendar_provide_event_action(calendar_event $event,
         \core_calendar\action_factory $factory, int $userid = 0) {
