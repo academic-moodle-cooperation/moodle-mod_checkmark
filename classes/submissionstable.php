@@ -336,7 +336,7 @@ class submissionstable extends \table_sql {
             $helpicons[] = null;
         }
 
-        $this->add_colgroup(count($this->checkmark->checkmark->examples), 'examples');
+        $this->add_colgroup('examples', count($this->checkmark->checkmark->examples));
 
     }
 
@@ -365,7 +365,7 @@ class submissionstable extends \table_sql {
         $tablecolumns = ['selection', 'fullname'];
         $tableheaders = ['', get_string('fullnameuser')];
         $helpicons = [null, null];
-        $table->add_colgroup(1, 'sel');
+        $table->add_colgroup('sel', 1);
 
         // Get idenityfields visible in the given context.
         $useridentity = \core_user\fields::for_identity($table->context)->get_required_fields();
@@ -374,18 +374,18 @@ class submissionstable extends \table_sql {
             $tableheaders[] = ($cur == 'phone1') ? get_string('phone') : get_string($cur);
             $helpicons[] = null;
         }
-        $table->add_colgroup(count($useridentity) + 1, 'user');
+        $table->add_colgroup('user', count($useridentity) + 1);
         if ($table->groupmode != NOGROUPS) {
             $tableheaders[] = get_string('group');
             $tablecolumns[] = 'groups';
             $helpicons[] = null;
-            $table->add_colgroup(1, 'group');
+            $table->add_colgroup('group', 1);
         }
 
         $tableheaders[] = get_string('lastmodified').' ('.get_string('submission', 'checkmark').')';
         $tablecolumns[] = 'timesubmitted';
         $helpicons[] = null;
-        $table->add_colgroup(1, 'timesubmitted');
+        $table->add_colgroup('timesubmitted', 1);
 
         $table->addexamplecolumns($tablecolumns, $tableheaders, $helpicons);
 
@@ -403,13 +403,13 @@ class submissionstable extends \table_sql {
         $tableheaders[] = get_string('lastmodified').' ('.get_string('grade', 'grades').')';
         $tablecolumns[] = 'timemarked';
         $helpicons[] = null;
-        $table->add_colgroup($feedbackcols, 'feedback');
+        $table->add_colgroup('feedback', $feedbackcols);
 
         if ($table->checkmark->checkmark->trackattendance) {
             $tableheaders[] = get_string('attendance', 'checkmark');
             $tablecolumns[] = 'attendance';
             $helpicons[] = new \help_icon('attendance', 'checkmark');
-            $table->add_colgroup(1, 'attendance');
+            $table->add_colgroup('attendance', 1);
         }
 
         $tableheaders[] = get_string('status');
@@ -422,9 +422,9 @@ class submissionstable extends \table_sql {
             $tableheaders[] = get_string('outcome', 'grades');
             $tablecolumns[] = 'outcome'; // No sorting based on outcomes column!
             $helpicons[] = null;
-            $table->add_colgroup(3, 'status_and_gradebook');
+            $table->add_colgroup('status_and_gradebook', 3);
         } else {
-            $table->add_colgroup(2, 'status_and_gradebook');
+            $table->add_colgroup('status_and_gradebook', 2);
         }
         if ($table->checkmark->checkmark->presentationgrading) {
             $span = 1;
@@ -437,7 +437,7 @@ class submissionstable extends \table_sql {
             $tableheaders[] = get_string('presentationfeedback_table', 'checkmark');
             $tablecolumns[] = 'presentationfeedback';
             $helpicons[] = null;
-            $table->add_colgroup($span, 'presentationgrade');
+            $table->add_colgroup('presentationgrade', $span);
         }
 
         $table->define_columns($tablecolumns);
@@ -673,7 +673,7 @@ class submissionstable extends \table_sql {
             }
             $namefieldcount = count($usednamefields);
         }
-        $table->add_colgroup(1, 'sel');
+        $table->add_colgroup('sel', 1);
 
         $useridentity = \core_user\fields::for_identity($table->context)->get_required_fields();
         foreach ($useridentity as $cur) {
@@ -683,14 +683,14 @@ class submissionstable extends \table_sql {
             $table->columnformat[$cur] = ['align' => 'L'];
             $helpicons[] = null;
         }
-        $table->add_colgroup(count($useridentity) + $namefieldcount, 'user');
+        $table->add_colgroup('user', count($useridentity) + $namefieldcount);
         if ($table->groupmode != NOGROUPS) {
             $tableheaders[] = get_string('group');
             $tablecolumns[] = 'groups';
             $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '20'];
             $table->columnformat['groups'] = ['align' => 'L'];
             $helpicons[] = null;
-            $table->add_colgroup(1, 'group');
+            $table->add_colgroup('group', 1);
         }
 
         $tablecolumns[] = 'timesubmitted';
@@ -698,7 +698,7 @@ class submissionstable extends \table_sql {
         $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '30'];
         $table->columnformat['timesubmitted'] = ['align' => 'L'];
         $helpicons[] = null;
-        $table->add_colgroup(1, 'timesubmitted');
+        $table->add_colgroup('timesubmitted', 1);
 
         $table->addexamplecolumns($tablecolumns, $tableheaders, $helpicons);
 
@@ -708,7 +708,7 @@ class submissionstable extends \table_sql {
             $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '20'];
             $table->columnformat['summary'] = ['align' => 'L'];
             $helpicons[] = null;
-            $table->add_colgroup(1, 'summary');
+            $table->add_colgroup('summary', 1);
         }
 
         if ($table->checkmark->checkmark->grade != 0) {
@@ -731,9 +731,9 @@ class submissionstable extends \table_sql {
             $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '50'];
             $table->columnformat['outcome'] = ['align' => 'L'];
             $helpicons[] = null;
-            $table->add_colgroup(3, 'feedback outcomes');
+            $table->add_colgroup('feedback outcomes', 3);
         } else {
-            $table->add_colgroup(2, 'feedback outcomes');
+            $table->add_colgroup('feedback outcomes', 2);
         }
 
         if ($table->checkmark->checkmark->trackattendance) {
@@ -742,7 +742,7 @@ class submissionstable extends \table_sql {
             $tablecolumns[] = 'attendance';
             $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '20'];
             $table->columnformat['attendance'] = ['align' => 'R'];
-            $table->add_colgroup(1, 'attendance');
+            $table->add_colgroup('attendance', 1);
         }
         if ($table->checkmark->checkmark->presentationgrading) {
             $span = 1;
@@ -759,7 +759,7 @@ class submissionstable extends \table_sql {
             $tablecolumns[] = 'presentationfeedback';
             $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '50'];
             $table->columnformat['presentationfeedback'] = ['align' => 'L'];
-            $table->add_colgroup($span, 'presentationgrade');
+            $table->add_colgroup('presentationgrade', $span);
         }
 
         $tableheaders[] = get_string('signature', 'checkmark');
@@ -767,7 +767,7 @@ class submissionstable extends \table_sql {
         $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '30'];
         $table->columnformat['signature'] = ['align' => 'L'];
         $helpicons[] = null;
-        $table->add_colgroup(1, 'signature');
+        $table->add_colgroup('signature', 1);
 
         $table->define_columns($tablecolumns);
         $table->define_headers($tableheaders);
@@ -894,10 +894,10 @@ class submissionstable extends \table_sql {
     /**
      * Adds a new colgroup!
      *
-     * @param int $span how many cols the group should span
      * @param string $class the col groups css class(es)
+     * @param int $span how many cols the group should span
      */
-    protected function add_colgroup($span = 1, $class) {
+    protected function add_colgroup($class, $span = 1) {
         $colgrp = new \stdClass();
         $colgrp->span = $span;
         $colgrp->class = $class;
