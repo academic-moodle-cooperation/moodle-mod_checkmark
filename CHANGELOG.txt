@@ -1,5 +1,12 @@
 CHANGELOG
 =========
+
+WIP
+------------------
+* [FEATURE] #6990 Remove checkmark activities marked as complete from calender and timeline -
+                  github pull request 62 by Leo Dintner
+
+
 3.11.2 (2021-07-30)
 ------------------
 * [FEATURE] #6952 Implement webservices - github pull request 62 by Alexander Melem <alexander@melem-software.com>
