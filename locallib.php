@@ -543,12 +543,13 @@ class checkmark {
      * @throws coding_exception
      */
     public function create_grading_summary() {
+        $currentgroup = groups_get_activity_group($this->cm, true);
         $participantcount = submissionstable::count_userids($this->context, $this->checkmark->id,
-                        null, self::FILTER_ALL);
+                $currentgroup, self::FILTER_ALL);
         $submittedcount = submissionstable::count_userids($this->context, $this->checkmark->id,
-                null, self::FILTER_SUBMITTED);
+                $currentgroup, self::FILTER_SUBMITTED);
         $needsgrading = submissionstable::count_userids($this->context, $this->checkmark->id,
-                null, self::FILTER_REQUIRE_GRADING);
+                $currentgroup, self::FILTER_REQUIRE_GRADING);
         $cangrade = has_capability('mod/checkmark:grade', $this->context);
         $attendantcount = -1;
         $absencecount = -1;
@@ -556,15 +557,15 @@ class checkmark {
         $presentationgradingcount = -1;
         if ($this->checkmark->trackattendance) {
             $attendantcount = submissionstable::count_userids($this->context, $this->checkmark->id,
-                    null, self::FILTER_ATTENDANT);
+                    $currentgroup, self::FILTER_ATTENDANT);
             $absencecount = submissionstable::count_userids($this->context, $this->checkmark->id,
-                    null, self::FILTER_ABSENT);
+                    $currentgroup, self::FILTER_ABSENT);
             $needattendanceentrycount = submissionstable::count_userids($this->context, $this->checkmark->id,
-                    null, self::FILTER_UNKNOWN);
+                    $currentgroup, self::FILTER_UNKNOWN);
         }
         if ($this->checkmark->presentationgrading) {
             $presentationgradingcount = submissionstable::count_userids($this->context, $this->checkmark->id,
-                    null, self::FILTER_PRESENTATIONGRADING);
+                    $currentgroup, self::FILTER_PRESENTATIONGRADING);
         }
 
         $summary = new \mod_checkmark\gradingsummary($participantcount, $this->checkmark->timeavailable, $submittedcount,
