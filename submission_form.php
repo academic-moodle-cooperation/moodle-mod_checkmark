@@ -39,6 +39,10 @@ require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
  */
 class checkmark_submission_form extends moodleform {
 
+    public function __construct($action=null, $customdata=null){
+        parent::__construct($action, $customdata);
+    }
+
     /**
      * Defines the submission form
      */
@@ -71,7 +75,7 @@ class checkmark_submission_form extends moodleform {
             $mform->addElement('advcheckbox',
                     $key, null, $example->prefix . $example->name.' ('.$example->grade.' '.$pointsstring.')',
                     $attr, [0, 1]);
-            if (array_key_exists('example'.$key, $this->_customdata)) {
+            if (property_exists($this->_customdata, 'example'.$key)) {
                 $mform->setDefault($key, $this->_customdata->{'example'.$key});
             }
         }
