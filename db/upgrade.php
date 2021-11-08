@@ -1031,7 +1031,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         $pbar->update($i, $count, 'Update events...');
         foreach ($rs as $cur) {
             $calendarevent = calendar_event::load($cur->id);
-            if (!array_key_exists($cur->instance, $cmnames)) {
+            if (!property_exists($cur->instance, $cmnames)) {
                 $cmnames[$cur->instance] = $DB->get_field('checkmark', 'name', array('id' => $cur->instance));
             }
             $cur->name = $cmnames[$cur->instance];

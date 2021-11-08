@@ -1025,7 +1025,7 @@ class checkmark {
                     )
             );
             if ($mode == \mod_checkmark\overrideform::GROUP) {
-                if (!$accessallgroups && !array_key_exists($cur, $usergroups)) {
+                if (!$accessallgroups && !property_exists($cur, $usergroups)) {
                     // Will always throw an exception once we get here.
                     require_capability('moodle/site:accessallgroups', $this->context);
                 }
@@ -1141,7 +1141,7 @@ class checkmark {
         foreach ($entities as $cur) {
             $existingrecord = null;
             if ($mode == \mod_checkmark\overrideform::GROUP) {
-                if (!$accessallgroups && !array_key_exists($cur, $usergroups)) {
+                if (!$accessallgroups && !property_exists($cur, $usergroups)) {
                     // Will always throw an exception once we get here.
                     require_capability('moodle/site:accessallgroups', $this->context);
                 }
@@ -1992,19 +1992,19 @@ class checkmark {
                     // todo Check if the checks changed method fits in here somehow.
                     $updatedb = false;
 
-                    if (!array_key_exists($id, $oldgrades)) {
+                    if (!property_exists($id, $oldgrades)) {
                         $oldgrades[$id] = -1;
                     }
-                    if (!array_key_exists($id, $oldfeedbacks)) {
+                    if (!property_exists($id, $oldfeedbacks)) {
                         $oldfeedbacks[$id] = null;
                     }
-                    if (!array_key_exists($id, $oldattendances)) {
+                    if (!property_exists($id, $oldattendances)) {
                         $oldattendances[$id] = null;
                     }
-                    if (!array_key_exists($id, $oldpresgrades)) {
+                    if (!property_exists($id, $oldpresgrades)) {
                         $oldpresgrades[$id] = -1;
                     }
-                    if (!array_key_exists($id, $oldpresfeedbacks)) {
+                    if (!property_exists($id, $oldpresfeedbacks)) {
                         $oldpresfeedbacks[$id] = null;
                     }
 
