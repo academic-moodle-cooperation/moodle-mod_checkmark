@@ -66,6 +66,9 @@ class checkmark {
     const FILTER_PRESENTATIONGRADING = 10;
     /** FILER NO PRESENTATIONGRADING */
     const FILTER_NO_PRESENTATIONGRADING = 11;
+    /** FILER NO PRESENTATIONGRADING */
+    const FILTER_GRADED = 12;
+
 
     /** DELIMITER Used to connect example-names, example-grades, submission-examplenumbers! */
     const DELIMITER = ',';
@@ -3030,6 +3033,7 @@ class checkmark {
                 self::FILTER_ALL => get_string('all'),
                 self::FILTER_NOT_SUBMITTED => get_string('filternotsubmitted', 'checkmark'),
                 self::FILTER_SUBMITTED => get_string('submitted', 'checkmark'),
+                self::FILTER_GRADED => get_string('graded', 'checkmark'),
                 self::FILTER_REQUIRE_GRADING => get_string('requiregrading', 'checkmark'),
                 self::FILTER_EXTENSION => get_string('filtergrantedextension', 'checkmark')
         ];

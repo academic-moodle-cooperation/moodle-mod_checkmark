@@ -94,6 +94,7 @@ define(['jquery', 'core/log'], function($, log) {
 
         $('#' + instance.id + ' a.all').on('click', null, {inst: this, type: 'all'}, this.updateCheckboxes);
         $('#' + instance.id + ' a.none').on('click', null, {inst: this, type: 'none'}, this.updateCheckboxes);
+        $('#' + instance.id + ' a.graded').on('click', null, {inst: this, type: 'graded'}, this.updateCheckboxes);
         $('#' + instance.id + ' a.submitted').on('click', null, {inst: this, type: 'submitted'}, this.updateCheckboxes);
         $('#' + instance.id + ' a.ungraded').on('click', null, {inst: this, type: 'ungraded'}, this.updateCheckboxes);
 
