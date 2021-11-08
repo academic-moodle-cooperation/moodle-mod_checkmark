@@ -71,7 +71,7 @@ class checkmark_submission_form extends moodleform {
             $mform->addElement('advcheckbox',
                     $key, null, $example->prefix . $example->name.' ('.$example->grade.' '.$pointsstring.')',
                     $attr, [0, 1]);
-            if (property_exists('example'.$key, $this->_customdata)) {
+            if (property_exists($this->_customdata, 'example'.$key)) {
                 $mform->setDefault($key, $this->_customdata->{'example'.$key});
             }
         }
