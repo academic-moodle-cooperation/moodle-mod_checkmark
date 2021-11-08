@@ -891,7 +891,7 @@ class MTablePDF extends \pdf {
                 }
                 $cell['data'] = strip_tags($cell['data']);
 
-                if (property_exists('format', $cell)) {
+                if (property_exists($cell, 'format')) {
                     $worksheet->write_string($line, $i, $cell['data'], $workbook->add_format($cell['format']));
                 } else {
                     if ($first) {
