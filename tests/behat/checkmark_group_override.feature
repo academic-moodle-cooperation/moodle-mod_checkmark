@@ -70,6 +70,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timedue[minute]    | 00 |
     And I open the autocomplete suggestions list
     And I click on "Group 1" item in the autocomplete list
+    And I press the escape key
     And I press "id_override"
     Then I should see "Group 1"
     And I should see "Due date"
@@ -119,6 +120,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timedue[minute]    | 00 |
     And I open the autocomplete suggestions list
     And I click on "Group 1" item in the autocomplete list
+    And I press the escape key
     And I press "id_override"
     Then I should see "Group 1"
     And I should see "Due date"
@@ -127,6 +129,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I open the autocomplete suggestions list
     And I click on "Group 2" item in the autocomplete list
     And I click on "Group 3" item in the autocomplete list
+    And I press the escape key
     And I press "id_override"
     Then I should see "Group 2"
     And I should see "Group 3"
@@ -156,6 +159,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timedue[minute]    | 00 |
     And I open the autocomplete suggestions list
     And I click on "Group 1" item in the autocomplete list
+    And I press the escape key
     And I press "id_override"
     Then I should see "Saturday, 1 February 2020, 8:00"
     And I log out
@@ -194,6 +198,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timeavailable[minute]    | 00 |
     And I open the autocomplete suggestions list
     And I click on "Group 1" item in the autocomplete list
+    And I press the escape key
     And I press "id_override"
     Then I should see "## tomorrow ##%A, %d %B %Y, 8:00##"
     And I log out
@@ -240,6 +245,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | cutoffdate[minute]    | 00 |
     And I open the autocomplete suggestions list
     And I click on "Group 1" item in the autocomplete list
+    And I press the escape key
     And I press "id_override"
     Then I should see "Sunday, 2 February 2020, 8:00"
     And I log out
@@ -271,6 +277,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timedue[minute]    | 00 |
     And I open the autocomplete suggestions list
     And I click on "Group 1" item in the autocomplete list
+    And I press the escape key
     And I press "id_override"
     Then I should see "Group 1"
     And I should see "Due date"
@@ -285,6 +292,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timedue[minute]    | 00 |
     And I open the autocomplete suggestions list
     And I click on "Group 2" item in the autocomplete list
+    And I press the escape key
     And I press "id_override"
     Then I should see "Group 2"
     And I log out
@@ -342,6 +350,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timedue[minute]    | 00 |
     And I open the autocomplete suggestions list
     And I click on "Group 1" item in the autocomplete list
+    And I press the escape key
     And I press "id_override"
     Then I should see "Group 1"
     And I should see "Due date"
@@ -366,6 +375,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timedue[minute]    | 00 |
     And I open the autocomplete suggestions list
     And I click on "Student 1" item in the autocomplete list
+    And I press the escape key
     And I press "id_override"
     Then I should see "Student 1"
     And I should see "Due date"
@@ -416,6 +426,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I press "Add group override"
     And I open the autocomplete suggestions list
     And I click on "Group 1" item in the autocomplete list
+    And I press the escape key
     And I press "Override and create a new override"
     And I set the following fields to these values:
       | id_timeavailable_enabled | 1        |
@@ -426,6 +437,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timeavailable[minute]    | 00       |
     And I open the autocomplete suggestions list
     And I click on "Group 2" item in the autocomplete list
+    And I press the escape key
     And I press "id_override"
     And I log out
     When I log in as "teacher1"
