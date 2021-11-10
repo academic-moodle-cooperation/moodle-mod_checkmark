@@ -416,6 +416,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I am on "Course 1" course homepage
     And I follow "Checkmark 2"
     And I navigate to "Group overrides" in current page administration
+    And I press "Add group override"
     And I open the autocomplete suggestions list
     And I click on "Group 1" item in the autocomplete list
     And I press the escape key
@@ -426,7 +427,6 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timeavailable[year]      | 2015    |
       | timeavailable[hour]      | 08      |
       | timeavailable[minute]    | 00      |
-    And I press "Add group override"
     And I press "Override and create a new override"
     And I open the autocomplete suggestions list
     And I click on "Group 2" item in the autocomplete list
