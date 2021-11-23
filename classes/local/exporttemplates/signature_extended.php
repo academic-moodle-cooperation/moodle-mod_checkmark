@@ -44,7 +44,7 @@ class signature_extended extends grades_extended {
      * @param \checkmark|int $checkmarkorcmid checkmark object or course module id of checkmark instance
      * @return signature_extended
      */
-    static public function get_table_instance($uniqueid, $checkmarkorcmid = null) {
+    public static function get_table_instance($uniqueid, $checkmarkorcmid = null) {
         return new signature_extended($uniqueid, $checkmarkorcmid);
     }
 

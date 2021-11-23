@@ -1408,7 +1408,7 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
     $owngroups = groups_get_user_groups($course->id);
 
     foreach ($submissions as $submission) {
-        if (!array_key_exists($submission->cmid, $modinfo->cms)) {
+        if (!property_exists($modinfo->cms, $submission->cmid)) {
             continue;
         }
         $cm = $modinfo->cms[$submission->cmid];
@@ -1425,7 +1425,7 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
          * only graders will see it if specified!
          */
         if (empty($showrecentsubs)) {
-            if (!array_key_exists($cm->id, $grader)) {
+            if (!property_exists($grader, $cm->id)) {
                 $grader[$cm->id] = has_capability('moodle/grade:viewall',
                         context_module::instance($cm->id));
             }
@@ -2188,12 +2188,20 @@ function mod_checkmark_core_calendar_is_event_visible(calendar_event $event) {
  *
  * @param calendar_event $event
  * @param \core_calendar\action_factory $factory
+ * @param int $userid User the calender events should be retorned for. If 0 the events for the current user are returned
  * @return \core_calendar\local\event\entities\action_interface|null
+ * @throws coding_exception
+ * @throws dml_exception
+ * @throws moodle_exception
  */
-function mod_checkmark_core_calendar_provide_event_action(calendar_event $event, \core_calendar\action_factory $factory) {
+function mod_checkmark_core_calendar_provide_event_action(calendar_event $event,
+        \core_calendar\action_factory $factory, int $userid = 0) {
     global $CFG, $USER;
 
     require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
+    if (empty($userid)) {
+        $userid = $USER->id;
+    }
 
     $cm = get_fast_modinfo($event->courseid)->instances['checkmark'][$event->instance];
     $context = context_module::instance($cm->id);
@@ -2233,6 +2241,13 @@ function mod_checkmark_core_calendar_provide_event_action(calendar_event $event,
             $name = get_string('editmysubmission', 'checkmark');
         }
         $actionable = true;
+    }
+    $completion = new \completion_info($cm->get_course());
+
+    $completiondata = $completion->get_data($cm, false, $userid);
+
+    if ($completiondata->completionstate != COMPLETION_INCOMPLETE) {
+        return null;
     }
 
     return $factory->create_instance(

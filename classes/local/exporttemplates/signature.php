@@ -45,7 +45,7 @@ class signature extends basetemplate {
      * @param \checkmark|int $checkmarkorcmid checkmark object or course module id of checkmark instance
      * @return signature
      */
-    static public function get_table_instance($uniqueid, $checkmarkorcmid = null) {
+    public static function get_table_instance($uniqueid, $checkmarkorcmid = null) {
         return new signature($uniqueid, $checkmarkorcmid);
     }
 

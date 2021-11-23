@@ -350,7 +350,7 @@ class submissionstable extends \table_sql {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    static public function create_submissions_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL) {
+    public static function create_submissions_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL) {
         global $CFG, $DB;
         // We need to have the same ID to ensure the columns are collapsed if their collapsed in the other table!
         $table = new submissionstable('mod-checkmark-submissions', $checkmarkorcmid);
@@ -628,7 +628,7 @@ class submissionstable extends \table_sql {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    static public function create_export_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL, $ids = []) {
+    public static function create_export_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL, $ids = []) {
         global $CFG, $DB;
         // We need to have the same ID to ensure the columns are collapsed if their collapsed in the other table!
         $table = new submissionstable('mod-checkmark-submissions', $checkmarkorcmid);
@@ -1097,7 +1097,7 @@ class submissionstable extends \table_sql {
     }
 
     /***************************************************************
-     *** COLUMN OUTPUT METHODS *************************************
+     * COLUMN OUTPUT METHODS ***************************************
      **************************************************************/
 
     /**

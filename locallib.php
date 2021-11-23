@@ -543,12 +543,13 @@ class checkmark {
      * @throws coding_exception
      */
     public function create_grading_summary() {
+        $currentgroup = groups_get_activity_group($this->cm, true);
         $participantcount = submissionstable::count_userids($this->context, $this->checkmark->id,
-                        null, self::FILTER_ALL);
+                $currentgroup, self::FILTER_ALL);
         $submittedcount = submissionstable::count_userids($this->context, $this->checkmark->id,
-                null, self::FILTER_SUBMITTED);
+                $currentgroup, self::FILTER_SUBMITTED);
         $needsgrading = submissionstable::count_userids($this->context, $this->checkmark->id,
-                null, self::FILTER_REQUIRE_GRADING);
+                $currentgroup, self::FILTER_REQUIRE_GRADING);
         $cangrade = has_capability('mod/checkmark:grade', $this->context);
         $attendantcount = -1;
         $absencecount = -1;
@@ -556,15 +557,15 @@ class checkmark {
         $presentationgradingcount = -1;
         if ($this->checkmark->trackattendance) {
             $attendantcount = submissionstable::count_userids($this->context, $this->checkmark->id,
-                    null, self::FILTER_ATTENDANT);
+                    $currentgroup, self::FILTER_ATTENDANT);
             $absencecount = submissionstable::count_userids($this->context, $this->checkmark->id,
-                    null, self::FILTER_ABSENT);
+                    $currentgroup, self::FILTER_ABSENT);
             $needattendanceentrycount = submissionstable::count_userids($this->context, $this->checkmark->id,
-                    null, self::FILTER_UNKNOWN);
+                    $currentgroup, self::FILTER_UNKNOWN);
         }
         if ($this->checkmark->presentationgrading) {
             $presentationgradingcount = submissionstable::count_userids($this->context, $this->checkmark->id,
-                    null, self::FILTER_PRESENTATIONGRADING);
+                    $currentgroup, self::FILTER_PRESENTATIONGRADING);
         }
 
         $summary = new \mod_checkmark\gradingsummary($participantcount, $this->checkmark->timeavailable, $submittedcount,
@@ -1021,7 +1022,7 @@ class checkmark {
                     )
             );
             if ($mode == \mod_checkmark\overrideform::GROUP) {
-                if (!$accessallgroups && !array_key_exists($cur, $usergroups)) {
+                if (!$accessallgroups && !property_exists($usergroups, $cur)) {
                     // Will always throw an exception once we get here.
                     require_capability('moodle/site:accessallgroups', $this->context);
                 }
@@ -1137,7 +1138,7 @@ class checkmark {
         foreach ($entities as $cur) {
             $existingrecord = null;
             if ($mode == \mod_checkmark\overrideform::GROUP) {
-                if (!$accessallgroups && !array_key_exists($cur, $usergroups)) {
+                if (!$accessallgroups && !property_exists($usergroups, $cur)) {
                     // Will always throw an exception once we get here.
                     require_capability('moodle/site:accessallgroups', $this->context);
                 }
@@ -1988,19 +1989,19 @@ class checkmark {
                     // todo Check if the checks changed method fits in here somehow.
                     $updatedb = false;
 
-                    if (!array_key_exists($id, $oldgrades)) {
+                    if (!property_exists($oldgrades, $id)) {
                         $oldgrades[$id] = -1;
                     }
-                    if (!array_key_exists($id, $oldfeedbacks)) {
+                    if (!property_exists($oldfeedbacks, $id)) {
                         $oldfeedbacks[$id] = null;
                     }
-                    if (!array_key_exists($id, $oldattendances)) {
+                    if (!property_exists($oldattendances, $id)) {
                         $oldattendances[$id] = null;
                     }
-                    if (!array_key_exists($id, $oldpresgrades)) {
+                    if (!property_exists($oldpresgrades, $id)) {
                         $oldpresgrades[$id] = -1;
                     }
-                    if (!array_key_exists($id, $oldpresfeedbacks)) {
+                    if (!property_exists($oldpresfeedbacks, $id)) {
                         $oldpresfeedbacks[$id] = null;
                     }
 
