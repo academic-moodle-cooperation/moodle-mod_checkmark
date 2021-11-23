@@ -40,8 +40,6 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I press "Save and display"
     When I navigate to "User overrides" in current page administration
     And I press "Add user override"
-    And I open the autocomplete suggestions list
-    And I click on "Student 1" item in the autocomplete list
     And I set the following fields to these values:
       | id_timedue_enabled | 1 |
       | timedue[day]       | 1 |
@@ -49,6 +47,9 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timedue[year]      | 2020 |
       | timedue[hour]      | 08 |
       | timedue[minute]    | 00 |
+    And I open the autocomplete suggestions list
+    And I click on "Student 1" item in the autocomplete list
+    And I press the escape key
     And I press "id_override"
     Then I should see "Saturday, 1 February 2020, 8:00"
     And I log out
@@ -78,8 +79,6 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I press "Save and display"
     When I navigate to "User overrides" in current page administration
     And I press "Add user override"
-    And I open the autocomplete suggestions list
-    And I click on "Student 1" item in the autocomplete list
     And I set the following fields to these values:
       | id_timeavailable_enabled | 1 |
       | timeavailable[day]       | ## tomorrow ## %d ## |
@@ -87,6 +86,9 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timeavailable[year]      | ## tomorrow ## %Y ## |
       | timeavailable[hour]      | 08 |
       | timeavailable[minute]    | 00 |
+    And I open the autocomplete suggestions list
+    And I click on "Student 1" item in the autocomplete list
+    And I press the escape key
     And I press "id_override"
     Then I should see "## tomorrow ##%A, %d %B %Y, 8:00##"
     And I log out
@@ -124,8 +126,6 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I press "Save and display"
     When I navigate to "User overrides" in current page administration
     And I press "Add user override"
-    And I open the autocomplete suggestions list
-    And I click on "Student 1" item in the autocomplete list
     And I set the following fields to these values:
       | id_cutoffdate_enabled | 1 |
       | cutoffdate[day]       | 2 |
@@ -133,6 +133,9 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | cutoffdate[year]      | 2020 |
       | cutoffdate[hour]      | 08 |
       | cutoffdate[minute]    | 00 |
+    And I open the autocomplete suggestions list
+    And I click on "Student 1" item in the autocomplete list
+    And I press the escape key
     And I press "id_override"
     Then I should see "Sunday, 2 February 2020, 8:00"
     And I log out
@@ -155,8 +158,6 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I follow "Checkmark 1"
     And I navigate to "User overrides" in current page administration
     And I press "Add user override"
-    And I open the autocomplete suggestions list
-    And I click on "Student 1" item in the autocomplete list
     And I set the following fields to these values:
       | id_timedue_enabled | 1 |
       | timedue[day]       | 1 |
@@ -164,6 +165,9 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timedue[year]      | 2020 |
       | timedue[hour]      | 08 |
       | timedue[minute]    | 00 |
+    And I open the autocomplete suggestions list
+    And I click on "Student 1" item in the autocomplete list
+    And I press the escape key
     And I press "id_override"
     Then I should see "Student 1"
     And I should see "Due date"
@@ -204,8 +208,6 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I follow "Checkmark 1"
     And I navigate to "User overrides" in current page administration
     And I press "Add user override"
-    And I open the autocomplete suggestions list
-    And I click on "Student 1" item in the autocomplete list
     And I set the following fields to these values:
       | id_timedue_enabled | 1 |
       | timedue[day]       | 1 |
@@ -213,6 +215,9 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timedue[year]      | 2020 |
       | timedue[hour]      | 08 |
       | timedue[minute]    | 00 |
+    And I open the autocomplete suggestions list
+    And I click on "Student 1" item in the autocomplete list
+    And I press the escape key
     And I press "id_override"
     Then I should see "Student 1"
     And I should see "Due date"
@@ -221,6 +226,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I open the autocomplete suggestions list
     And I click on "Student 2" item in the autocomplete list
     And I click on "Student 3" item in the autocomplete list
+    And I press the escape key
     And I press "id_override"
     Then I should see "Student 1"
     And I should see "Student 2"
@@ -274,8 +280,6 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I follow "Checkmark 2"
     And I navigate to "User overrides" in current page administration
     And I press "Add user override"
-    And I open the autocomplete suggestions list
-    And I click on "Student 1" item in the autocomplete list
     And I set the following fields to these values:
       | id_timeavailable_enabled | 1       |
       | timeavailable[day]       | 1       |
@@ -283,9 +287,10 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timeavailable[year]      | 2015    |
       | timeavailable[hour]      | 08      |
       | timeavailable[minute]    | 00      |
-    And I press "Override and create a new override"
     And I open the autocomplete suggestions list
-    And I click on "Student 2" item in the autocomplete list
+    And I click on "Student 1" item in the autocomplete list
+    And I press the escape key
+    And I press "Override and create a new override"
     And I set the following fields to these values:
       | id_timeavailable_enabled | 1        |
       | timeavailable[day]       | 1        |
@@ -293,6 +298,9 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timeavailable[year]      | 2015     |
       | timeavailable[hour]      | 08       |
       | timeavailable[minute]    | 00       |
+    And I open the autocomplete suggestions list
+    And I click on "Student 2" item in the autocomplete list
+    And I press the escape key
     And I press "id_override"
     And I log out
     When I log in as "teacher1"

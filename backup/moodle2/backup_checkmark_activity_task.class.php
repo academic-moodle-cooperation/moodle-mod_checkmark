@@ -59,7 +59,7 @@ class backup_checkmark_activity_task extends backup_activity_task {
      * @param string $content encoded link to transform
      * @return string transformed link
      */
-    static public function encode_content_links($content) {
+    public static function encode_content_links($content) {
         global $CFG;
 
         $base = preg_quote($CFG->wwwroot, '/');
