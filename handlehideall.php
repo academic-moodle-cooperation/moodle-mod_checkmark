@@ -39,7 +39,7 @@ $prefs = json_decode(get_user_preferences('flextable_' . $uniqueid), true);
 foreach ($columns as $col) {
     if ($hide) {
         $prefs['collapse'][$col] = true;
-        if (array_key_exists($col, $prefs['sortby'])) {
+        if (array_key_exists($prefs['sortby'], $col)) {
             unset($prefs['sortby'][$col]);
         }
     } else {
