@@ -212,6 +212,8 @@ abstract class basetemplate extends submissionstable {
             $where .= " AND presentationgrade IS NOT NULL OR presentationfeedback IS NOT NULL";
         } else if ($filter == \checkmark::FILTER_NO_PRESENTATIONGRADING) {
             $where .= " AND presentationgrade IS NULL AND presentationfeedback IS NULL";
+        } else if ($filter == \checkmark::FILTER_GRADED) {
+            $where .= " AND COALESCE(f.timemodified,0) >= COALESCE(s.timemodified,0) AND f.timemodified IS NOT NULL";
         }
 
         $groupby = " u.id, s.id, f.id ".$ufields.", u.idnumber, f.attendance";
