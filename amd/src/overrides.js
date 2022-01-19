@@ -16,7 +16,7 @@
 /**
  * Handles overlays/tooltips in checkmark!
  *
- * @package   mod_checkmark
+ * @module   mod_checkmark/checkboxcontroller
  * @author    Philipp Hager
  * @copyright 2018 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -42,6 +42,7 @@ define(['jquery', 'jqueryui', 'core/str', 'core/log'], function($, jqui, str, lo
 
     /**
      * Initialises the JavaScript
+     * @param config Config params
      */
     instance.initializer = function(config) {
         this.table = $(config.id);

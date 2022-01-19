@@ -63,6 +63,8 @@ class submissionstable extends \table_sql {
     const SEL_SUBMITTED = 2;
     /** select submissions which require grading */
     const SEL_REQ_GRADING = 3;
+    /** select submissions which have been graded */
+    const SEL_GRADED = 4;
 
     /** @var \checkmark protected checkmark instance */
     protected $checkmark;
@@ -350,7 +352,7 @@ class submissionstable extends \table_sql {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    static public function create_submissions_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL) {
+    public static function create_submissions_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL) {
         global $CFG, $DB;
         // We need to have the same ID to ensure the columns are collapsed if their collapsed in the other table!
         $table = new submissionstable('mod-checkmark-submissions', $checkmarkorcmid);
@@ -628,7 +630,7 @@ class submissionstable extends \table_sql {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    static public function create_export_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL, $ids = []) {
+    public static function create_export_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL, $ids = []) {
         global $CFG, $DB;
         // We need to have the same ID to ensure the columns are collapsed if their collapsed in the other table!
         $table = new submissionstable('mod-checkmark-submissions', $checkmarkorcmid);
@@ -878,6 +880,8 @@ class submissionstable extends \table_sql {
             $where .= " AND presentationgrade IS NOT NULL OR presentationfeedback IS NOT NULL";
         } else if ($filter == \checkmark::FILTER_NO_PRESENTATIONGRADING) {
             $where .= " AND presentationgrade IS NULL AND presentationfeedback IS NULL";
+        } else if ($filter == \checkmark::FILTER_GRADED) {
+            $where .= " AND COALESCE(f.timemodified,0) >= COALESCE(s.timemodified,0) AND f.timemodified IS NOT NULL";
         }
 
         $groupby = " u.id, s.id, f.id ".$ufields." ".$useridentityfields.", f.attendance";
@@ -1011,6 +1015,8 @@ class submissionstable extends \table_sql {
                 $wherefilter .= " AND presentationgrade IS NOT NULL OR presentationfeedback IS NOT NULL";
             } else if ($filter == \checkmark::FILTER_NO_PRESENTATIONGRADING) {
                 $wherefilter .= " AND presentationgrade IS NULL AND presentationfeedback IS NULL";
+            } else if ($filter == \checkmark::FILTER_GRADED) {
+                $wherefilter .= " AND COALESCE(f.timemodified,0) >= COALESCE(s.timemodified,0) AND f.timemodified IS NOT NULL";
             }
             $params['checkmarkid'] = $checkmarkid;
             $params['checkmarkid2'] = $checkmarkid;
@@ -1071,6 +1077,7 @@ class submissionstable extends \table_sql {
 
         $allurl = new \moodle_url($baseurl, ['select' => self::SEL_ALL]);
         $noneurl = new \moodle_url($baseurl, ['select' => self::SEL_NONE]);
+        $gradedurl = new \moodle_url($baseurl, ['select' => self::SEL_GRADED]);
         $reqgradingurl = new \moodle_url($baseurl, ['select' => self::SEL_REQ_GRADING]);
         $submittedurl = new \moodle_url($baseurl, ['select' => self::SEL_SUBMITTED]);
 
@@ -1089,6 +1096,8 @@ class submissionstable extends \table_sql {
         return \html_writer::tag('div', $title.
                                         \html_writer::link($allurl, get_string('all'), ['class' => 'all']).' / '.
                                         \html_writer::link($noneurl, get_string('none'), ['class' => 'none']).' / '.
+                                        \html_writer::link($gradedurl, get_string('graded', 'checkmark'),
+                                                ['class' => 'graded']).' / '.
                                         \html_writer::link($reqgradingurl, get_string('ungraded', 'checkmark'),
                                                            ['class' => 'ungraded']).' / '.
                                         \html_writer::link($submittedurl, get_string('submitted', 'checkmark'),
@@ -1097,7 +1106,7 @@ class submissionstable extends \table_sql {
     }
 
     /***************************************************************
-     *** COLUMN OUTPUT METHODS *************************************
+     * COLUMN OUTPUT METHODS ***************************************
      **************************************************************/
 
     /**
@@ -1123,17 +1132,23 @@ class submissionstable extends \table_sql {
             } else if ($select === self::SEL_NONE) {
                 $selectstate = false;
             }
-            if (empty($values->grade) || $values->grade == -1 || empty($values->timemarked) ||
+            if (empty($values->timemarked) ||
                     ($values->timesubmitted > $values->timemarked)) {
                 if ($select == self::SEL_REQ_GRADING) {
                     $selectstate = true;
+                } else if ($select == self::SEL_GRADED) {
+                    $selectstate = false;
                 }
                 $attr['data-ungraded'] = 1;
+                $attr['data-graded'] = 0;
             } else {
                 if ($select == self::SEL_REQ_GRADING) {
                     $selectstate = false;
+                } else if ($select == self::SEL_GRADED) {
+                    $selectstate = true;
                 }
                 $attr['data-ungraded'] = 0;
+                $attr['data-graded'] = 1;
             }
             if (!empty($values->submissionid)) {
                 if ($select == self::SEL_SUBMITTED) {

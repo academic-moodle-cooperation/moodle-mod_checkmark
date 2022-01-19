@@ -70,6 +70,7 @@ class exportform extends \moodleform {
         $this->examplescount = $this->_customdata['examplescount'];
         $this->table = $this->_customdata['table'];
         $filters = $this->_customdata['filters'];
+        $filter = get_user_preferences('checkmark_filter_export', \checkmark::FILTER_ALL);
 
         // Here come the hidden params!
         $mform->addElement('hidden', 'updatepref');
@@ -78,6 +79,7 @@ class exportform extends \moodleform {
 
         $mform->addElement('header', 'data_settings_header', get_string('datasettingstitle', 'checkmark'));
         $mform->addElement('select', 'datafilter', get_string('show'),  $filters);
+        $mform->setDefault('datafilter', $filter);
 
         $this->add_groupselect();
 

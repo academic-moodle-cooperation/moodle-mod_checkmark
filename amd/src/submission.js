@@ -16,7 +16,7 @@
 /**
  * submission.js
  *
- * @package   mod_checkmark
+ * @module   mod_checkmark/checkboxcontroller
  * @author    Philipp Hager
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -60,7 +60,7 @@ define(['core/log', 'jquery'], function(log, $) {
      *   I) prevents default reset behaviour
      *  II) resets the form manually
      * III) ensure to display updated data
-     * @param {Event} e event-object
+     * @param {Event} event event-object
      * @return {boolean} true if everything's allright (no error handling by now)
      */
     Submission.prototype.resetSubmissionForm = function(event) {

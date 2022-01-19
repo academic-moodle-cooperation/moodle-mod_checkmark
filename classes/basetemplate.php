@@ -137,7 +137,7 @@ abstract class basetemplate extends submissionstable {
      * @param \checkmark|int $checkmarkorcmid
      * @return basetemplate object
      */
-    static public function get_table_instance($uniqueid, $checkmarkorcmid = null) {
+    public static function get_table_instance($uniqueid, $checkmarkorcmid = null) {
         throw new \coding_exception('Method has to be overridden!');
     }
 
@@ -149,7 +149,7 @@ abstract class basetemplate extends submissionstable {
      * @param int[] $ids for which user ids to filter
      * @return submissionstable object
      */
-    static public function create_export_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL, $ids = array()) {
+    public static function create_export_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL, $ids = array()) {
         global $CFG, $DB;
         // We need to have the same ID to ensure the columns are collapsed if their collapsed in the other table!
         $table = static::get_table_instance('mod-checkmark-submissions', $checkmarkorcmid);
@@ -212,6 +212,8 @@ abstract class basetemplate extends submissionstable {
             $where .= " AND presentationgrade IS NOT NULL OR presentationfeedback IS NOT NULL";
         } else if ($filter == \checkmark::FILTER_NO_PRESENTATIONGRADING) {
             $where .= " AND presentationgrade IS NULL AND presentationfeedback IS NULL";
+        } else if ($filter == \checkmark::FILTER_GRADED) {
+            $where .= " AND COALESCE(f.timemodified,0) >= COALESCE(s.timemodified,0) AND f.timemodified IS NOT NULL";
         }
 
         $groupby = " u.id, s.id, f.id ".$ufields.", u.idnumber, f.attendance";
