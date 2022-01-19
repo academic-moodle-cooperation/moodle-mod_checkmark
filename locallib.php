@@ -2196,11 +2196,7 @@ class checkmark {
                 break;
         }
     }
-
-    protected function check_if_graded_and_feedbacked($userids) {
-        global $DB;
-    }
-
+    
     /**
      * Sets the attendance for a bunch of users
      *
