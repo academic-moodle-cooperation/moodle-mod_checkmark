@@ -1831,9 +1831,9 @@ class checkmark {
                     // Now all the grading stuff!
                     if (in_array($bulkaction, array('setattendantandgrade', 'setabsentandgrade', 'grade'))) {
                         $result = $this->autograde_submissions(self::FILTER_SELECTED, $selected, true);
-                        $result_graded = $this->autograde_submissions(self::FILTER_SELECTED_GRADED,
+                        $resultgraded = $this->autograde_submissions(self::FILTER_SELECTED_GRADED,
                                 $selected, true);
-                        if (!optional_param('confirm', 0, PARAM_BOOL) && $result_graded != 0) {
+                        if (!optional_param('confirm', 0, PARAM_BOOL) && $resultgraded != 0) {
                             $PAGE->set_title(format_string($this->checkmark->name, true));
                             $PAGE->set_heading($this->course->fullname);
                             if (!isset($SESSION->checkmark)) {
@@ -1864,7 +1864,7 @@ class checkmark {
                                     echo $OUTPUT->header();
                                     $confirmboxcontent =
                                             $OUTPUT->notification(get_string('autograde_confirm', 'checkmark',
-                                                    ['total' => $amount, 'graded' => $result_graded]) .
+                                                    ['total' => $amount, 'graded' => $resultgraded]) .
                                                     html_writer::empty_tag('br') . $amountinfo, 'info') .
                                             $OUTPUT->confirm(get_string('autograde_confirm_continue', 'checkmark'),
                                                     'submissions.php?id=' . $this->cm->id . '&bulk=1&bulkaction=' .
