@@ -2196,7 +2196,6 @@ class checkmark {
                 break;
         }
     }
-   
     /**
      * Sets the attendance for a bunch of users
      *
