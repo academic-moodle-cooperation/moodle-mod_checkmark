@@ -457,7 +457,7 @@ function checkmark_update_examples($checkmark, $cmid = false) {
 function checkmark_user_outline($course, $user, $mod, $checkmark) {
     global $CFG;
     require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
-    require_once('$CFG->libdir/gradelib.php');
+    require_once($CFG->libdir . '/gradelib.php');
     $instance = new checkmark($mod->id, $checkmark, $mod, $course);
     $grades = grade_get_grades($course->id, 'mod', 'checkmark', $checkmark->id, $user->id);
     if (!empty($grades->items[CHECKMARK_GRADE_ITEM]->grades)) {
@@ -481,7 +481,7 @@ function checkmark_user_outline($course, $user, $mod, $checkmark) {
 function checkmark_user_complete($course, $user, $mod, $checkmark) {
     global $CFG;
     require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
-    require_once('$CFG->libdir/gradelib.php');
+    require_once($CFG->libdir . '/gradelib.php');
 
     $instance = new checkmark($mod->id, $checkmark, $mod, $course);
     $grades = grade_get_grades($course->id, 'mod', 'checkmark', $checkmark->id, $user->id);
