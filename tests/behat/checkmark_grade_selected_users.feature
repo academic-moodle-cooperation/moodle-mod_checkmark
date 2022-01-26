@@ -45,7 +45,7 @@ Feature: In a checkmark I want to grade selected submissions.
     And the following "mod_checkmark > feedbacks" exist:
       | checkmark   | user      | feedback              | grade |
       | Checkmark 1 | student1  | Lel so bad            | 81    |
-      | Checkmark 1 | student1  | Lel so bad            | 40    |
+      | Checkmark 1 | student2  | Lel so bad            | 40    |
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
