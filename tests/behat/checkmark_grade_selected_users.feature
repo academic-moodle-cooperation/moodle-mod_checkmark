@@ -44,7 +44,8 @@ Feature: In a checkmark I want to grade selected submissions.
       | Checkmark 1 | student2  | 1        | 1        | 1        | 0        | 0        | 0        | 0        | 0        | 0        | 0         |
     And the following "mod_checkmark > feedbacks" exist:
       | checkmark   | user      | feedback              | grade |
-      | Checkmark 1 | student2  | Lel so bad            | 81    |
+      | Checkmark 1 | student1  | Lel so bad            | 81    |
+      | Checkmark 1 | student1  | Lel so bad            | 40    |
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
@@ -56,4 +57,4 @@ Feature: In a checkmark I want to grade selected submissions.
     And I press "Continue"
     Then I should see "Auto-grading successful! 1 submission updated."
     Then "Student 1" row "Grade" column of "generaltable" table should contain "60 / 100"
-    And "Student 2" row "Grade" column of "generaltable" table should contain "30 / 100"
+    And "Student 2" row "Grade" column of "generaltable" table should contain "40 / 100"
