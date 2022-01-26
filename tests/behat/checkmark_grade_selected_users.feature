@@ -38,15 +38,13 @@ Feature: In a checkmark I want to grade selected submissions.
     And the following "activities" exist:
       | activity  | course | idnumber | name        | intro         | groupmode |
       | checkmark | C1     | CM1      | Checkmark 1 | Description 1 | 1         |
-    And I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
-    And I set the following fields to these values:
-      | Example 1 | 1 |
-      | Example 2 | 1 |
-      | Example 3 | 1 |
-    And I press "Save changes"
-    And I log out
+    Given the following "mod_checkmark > submissions" exist:
+      | checkmark   | user      | example1 | example2 | example3 | example4 | example5 | example6 | example7 | example8 | example9 | example10 |
+      | Checkmark 1 | student1  | 1        | 1        | 1        | 1        | 1        | 1        | 0        | 0        | 0        | 0         |
+      | Checkmark 1 | student2  | 1        | 1        | 1        | 0        | 0        | 0        | 0        | 0        | 0        | 0         |
+    And the following "mod_checkmark > feedbacks" exist:
+      | checkmark   | user      | feedback              | grade |
+      | Checkmark 1 | student2  | Lel so bad            | 81    |
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
@@ -57,4 +55,5 @@ Feature: In a checkmark I want to grade selected submissions.
     And I press "start"
     And I press "Continue"
     Then I should see "Auto-grading successful! 1 submission updated."
-    Then "Student 1" row "Grade" column of "generaltable" table should contain "30 / 100"
+    Then "Student 1" row "Grade" column of "generaltable" table should contain "60 / 100"
+    And "Student 2" row "Grade" column of "generaltable" table should contain "30 / 100"
