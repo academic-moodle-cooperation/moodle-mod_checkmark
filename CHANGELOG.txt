@@ -8,6 +8,7 @@ WIP
 * [FIXED] #6970 Fix download buttons getting disabled after pressing them
 * [FEATURE] #6990 Remove checkmark activities marked as complete from calender and timeline -
                   github pull request 62 by Leo Dintner
+* [FEATURE] #6377 Do not warn on grade automatically when no grades or feedbacks would be overwritten
 
 3.11.2 (2021-07-30)
 ------------------
