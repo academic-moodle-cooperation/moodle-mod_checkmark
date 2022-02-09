@@ -1,4 +1,4 @@
-@mod @mod_checkmark @amc @currentdev
+@mod @mod_checkmark @amc
 Feature: In a course, a teacher should be able to add overrides to general dates for a certain user
   In order to change the dates for a single user or multiple users
   As a teacher
