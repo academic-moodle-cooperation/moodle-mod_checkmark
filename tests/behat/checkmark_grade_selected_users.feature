@@ -54,7 +54,7 @@ Feature: In a checkmark I want to grade selected submissions.
     And I click on "selected[]" "checkbox"
     And I set the following fields to these values:
       | bulkaction | grade |
-    And I press "start"
+    And I press "Start"
     And I press "Continue"
     Then I should see "Auto-grading successful! 1 submission updated."
     Then "Student 1" row "Grade" column of "generaltable" table should contain "30 / 100"
