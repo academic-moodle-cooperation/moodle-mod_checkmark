@@ -1349,6 +1349,9 @@ class checkmark {
         switch ($filter) {
             case self::FILTER_SELECTED:
                 // Prepare list with selected users!
+                if (empty($selected)) {
+                    return 0;
+                }
                 $usrlst = $selected;
 
                 list($sqluserids, $userparams) = $DB->get_in_or_equal($usrlst, SQL_PARAMS_NAMED, 'user');
@@ -1362,6 +1365,9 @@ class checkmark {
                 break;
             case self::FILTER_SELECTED_GRADED:
                 // Prepare list with selected users!
+                if (empty($selected)) {
+                    return 0;
+                }
                 $usrlst = $selected;
 
                 list($sqluserids, $userparams) = $DB->get_in_or_equal($usrlst, SQL_PARAMS_NAMED, 'user');
@@ -1796,16 +1802,19 @@ class checkmark {
                 $bulkaction = optional_param('bulkaction', null, PARAM_ALPHA);
                 $selected = optional_param_array('selected', array(), PARAM_INT);
                 $confirm = optional_param('confirm', 0, PARAM_BOOL);
+                $result = $this->autograde_submissions(self::FILTER_SELECTED, $selected, true);
+                $resultgraded = $this->autograde_submissions(self::FILTER_SELECTED_GRADED,
+                        $selected, true);
                 if ($selected == array() && $confirm) {
                     $selected = $SESSION->checkmark->autograde->selected;
                 }
                 if (isset($selected) && (count($selected) == 0)) {
                     $message .= $OUTPUT->notification(get_string('bulk_no_users_selected', 'checkmark'), 'error');
                 }
-                if ($bulkaction && ($selected || ($confirm && !empty($SESSION->checkmark->autograde->selected)))) {
+                if ($bulkaction && ($selected || (($confirm || $resultgraded == 0) && !empty($SESSION->checkmark->autograde->selected)))) {
                     // Process bulk action!
                     $confirmedaction = in_array($bulkaction, ['setattendantandgrade', 'setabsentandgrade'])
-                            && optional_param('confirm', 0, PARAM_BOOL);
+                            && (optional_param('confirm', 0, PARAM_BOOL) || $resultgraded == 0);
                     if ($confirmedaction || in_array($bulkaction, ['setattendant', 'setabsent', 'setunknown'])) {
                         // Check if some of the selected users don't have a feedback entry and create on if so!
                         foreach ($selected as $sel) {
@@ -1830,9 +1839,6 @@ class checkmark {
 
                     // Now all the grading stuff!
                     if (in_array($bulkaction, array('setattendantandgrade', 'setabsentandgrade', 'grade'))) {
-                        $result = $this->autograde_submissions(self::FILTER_SELECTED, $selected, true);
-                        $resultgraded = $this->autograde_submissions(self::FILTER_SELECTED_GRADED,
-                                $selected, true);
                         if (!optional_param('confirm', 0, PARAM_BOOL) && $resultgraded != 0) {
                             $PAGE->set_title(format_string($this->checkmark->name, true));
                             $PAGE->set_heading($this->course->fullname);
