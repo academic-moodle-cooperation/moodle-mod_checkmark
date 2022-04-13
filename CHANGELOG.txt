@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+3.11.3 (2022-04-13)
+------------------
+* [FIXED] #7137 Fix a bug preventing simultaneous attendance and grading when no grades were set yet
+
 3.11.2 (2021-07-30)
 ------------------
 * [FEATURE] #6952 Implement webservices - github pull request #62 by Alexander Melem <alexander@melem-software.com>
