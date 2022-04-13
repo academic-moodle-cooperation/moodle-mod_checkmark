@@ -62,7 +62,7 @@ variables:
     - moodle-plugin-ci validate
     - moodle-plugin-ci savepoints
     - moodle-plugin-ci mustache
-      #    - moodle-plugin-ci grunt
+    - moodle-plugin-ci grunt
     - moodle-plugin-ci phpdoc
     - moodle-plugin-ci phpunit
     - moodle-plugin-ci behat
@@ -70,20 +70,20 @@ variables:
 code_checker_pgsql:
   extends: .postgres
   <<: *job_definition
-  image: amcdev/moodle-plugin-ci:7.4
+  image: amcdev/moodle-plugin-ci:7.4-n.16
   variables:
     MOODLE_BRANCH: "MOODLE_311_STABLE"
 
 code_checker_mariadb:
   extends: .mariadb
   <<: *job_definition
-  image: amcdev/moodle-plugin-ci:7.4
+  image: amcdev/moodle-plugin-ci:7.4-n.16
   variables:
     MOODLE_BRANCH: "MOODLE_311_STABLE"
 
 code_checker_mysql:
   extends: .mysql
   <<: *job_definition
-  image: amcdev/moodle-plugin-ci:7.4
+  image: amcdev/moodle-plugin-ci:7.4-n.16
   variables:
     MOODLE_BRANCH: "MOODLE_311_STABLE"
