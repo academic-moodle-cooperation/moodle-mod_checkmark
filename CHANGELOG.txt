@@ -3,6 +3,7 @@ CHANGELOG
 
 3.11.3 (2022-04-13)
 ------------------
+* [FEATURE] #7139 Relevant dates are shown when show activity details is set
 * [FIXED] #7137 Fix a bug preventing simultaneous attendance and grading when no grades were set yet
 
 3.11.2 (2021-07-30)
