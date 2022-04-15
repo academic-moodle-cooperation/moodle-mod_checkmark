@@ -44,13 +44,10 @@ class dates extends activity_dates {
     protected function get_dates(): array {
         global $DB;
 
-        $timeavailable = $this->cm->customdata['timeavailable'];
-        $timedue = $this->cm->customdata['timedue'];
-
         $now = time();
         $dates = [];
-
-        if ($timeavailable) {
+        if (isset($this->cm->customdata['timeavailable'])) {
+            $timeavailable = $this->cm->customdata['timeavailable'];
             $openlabelid = $timeavailable > $now ? 'activitydate:opens' : 'activitydate:opened';
             $dates[] = [
                 'label' => get_string($openlabelid, 'core_course'),
@@ -58,10 +55,10 @@ class dates extends activity_dates {
             ];
         }
 
-        if ($timedue) {
-            $closelabelid = $timedue > $now ? 'activitydate:closes' : 'activitydate:closed';
+        if (isset($this->cm->customdata['timedue'])) {
+            $timedue = $this->cm->customdata['timedue'];
             $dates[] = [
-                'label' => get_string($closelabelid, 'core_course'),
+                'label' => get_string('activitydate:submissionsdue', 'mod_assign'),
                 'timestamp' => (int) $timedue,
             ];
         }
