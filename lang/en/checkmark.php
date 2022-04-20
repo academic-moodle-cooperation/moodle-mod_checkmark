@@ -74,6 +74,10 @@ $string['privacy:metadata:timedue'] = 'Due date for the submission.';
 $string['privacy:path:feedback'] = 'Feedback';
 $string['privacy:path:submission'] = 'Submission';
 
+$string['activitydate:submissionsdue'] = 'Due:';
+$string['activitydate:submissionsopen'] = 'Opens:';
+$string['activitydate:submissionsopened'] = 'Opened:';
+
 $string['absent'] = 'Absent';
 $string['activateindividuals'] = 'Activate individual function';
 $string['strassignment'] = 'Assignment';
