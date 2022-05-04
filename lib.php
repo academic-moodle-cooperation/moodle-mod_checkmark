@@ -457,7 +457,7 @@ function checkmark_update_examples($checkmark, $cmid = false) {
 function checkmark_user_outline($course, $user, $mod, $checkmark) {
     global $CFG;
     require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
-    require_once('$CFG->libdir/gradelib.php');
+    require_once($CFG->libdir . '/gradelib.php');
     $instance = new checkmark($mod->id, $checkmark, $mod, $course);
     $grades = grade_get_grades($course->id, 'mod', 'checkmark', $checkmark->id, $user->id);
     if (!empty($grades->items[CHECKMARK_GRADE_ITEM]->grades)) {
@@ -481,7 +481,7 @@ function checkmark_user_outline($course, $user, $mod, $checkmark) {
 function checkmark_user_complete($course, $user, $mod, $checkmark) {
     global $CFG;
     require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
-    require_once('$CFG->libdir/gradelib.php');
+    require_once($CFG->libdir . '/gradelib.php');
 
     $instance = new checkmark($mod->id, $checkmark, $mod, $course);
     $grades = grade_get_grades($course->id, 'mod', 'checkmark', $checkmark->id, $user->id);
@@ -508,7 +508,7 @@ function checkmark_get_coursemodule_info($coursemodule) {
     global $DB, $USER;
 
     $dbparams = array('id' => $coursemodule->instance);
-    $fields = 'id, name, alwaysshowdescription, timeavailable, intro, introformat, completionsubmit';
+    $fields = 'id, name, alwaysshowdescription, timeavailable, timedue, intro, introformat, completionsubmit';
     if (!$checkmark = $DB->get_record('checkmark', $dbparams, $fields)) {
         return false;
     }
@@ -533,6 +533,14 @@ function checkmark_get_coursemodule_info($coursemodule) {
     // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
     if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
         $result->customdata['customcompletionrules']['completionsubmit'] = $checkmark->completionsubmit;
+    }
+
+    // Populate some other values that can be used in calendar or on dashboard.
+    if ($checkmark->timeavailable) {
+        $result->customdata['timeavailable'] = $checkmark->timeavailable;
+    }
+    if ($checkmark->timedue) {
+        $result->customdata['timedue'] = $checkmark->timedue;
     }
 
     return $result;

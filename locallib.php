@@ -68,6 +68,8 @@ class checkmark {
     const FILTER_NO_PRESENTATIONGRADING = 11;
     /** FILER NO PRESENTATIONGRADING */
     const FILTER_GRADED = 12;
+    /** FILTER_SELECTED_GRADED */
+    const FILTER_SELECTED_GRADED = 13;
 
 
     /** DELIMITER Used to connect example-names, example-grades, submission-examplenumbers! */
@@ -1347,6 +1349,9 @@ class checkmark {
         switch ($filter) {
             case self::FILTER_SELECTED:
                 // Prepare list with selected users!
+                if (empty($selected)) {
+                    return 0;
+                }
                 $usrlst = $selected;
 
                 list($sqluserids, $userparams) = $DB->get_in_or_equal($usrlst, SQL_PARAMS_NAMED, 'user');
@@ -1356,6 +1361,24 @@ class checkmark {
                           FROM {user} u
                      LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid
                          WHERE u.deleted = 0 AND u.id " . $sqluserids;
+                $params['checkmarkid'] = $this->checkmark->id;
+                break;
+            case self::FILTER_SELECTED_GRADED:
+                // Prepare list with selected users!
+                if (empty($selected)) {
+                    return 0;
+                }
+                $usrlst = $selected;
+
+                list($sqluserids, $userparams) = $DB->get_in_or_equal($usrlst, SQL_PARAMS_NAMED, 'user');
+                $params = array_merge_recursive($params, $userparams);
+
+                $sql = "SELECT u.id, f.attendance
+                          FROM {user} u
+                     LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid
+                     LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid) AND s.checkmarkid = f.checkmarkid
+                         WHERE u.deleted = 0 AND u.id " . $sqluserids .
+                        "AND COALESCE(f.timemodified,0) >= COALESCE(s.timemodified,0) AND f.timemodified IS NOT NULL";
                 $params['checkmarkid'] = $this->checkmark->id;
                 break;
             case self::FILTER_REQUIRE_GRADING:
@@ -1779,16 +1802,19 @@ class checkmark {
                 $bulkaction = optional_param('bulkaction', null, PARAM_ALPHA);
                 $selected = optional_param_array('selected', array(), PARAM_INT);
                 $confirm = optional_param('confirm', 0, PARAM_BOOL);
+                $result = $this->autograde_submissions(self::FILTER_SELECTED, $selected, true);
+                $resultgraded = $this->autograde_submissions(self::FILTER_SELECTED_GRADED,
+                        $selected, true);
                 if ($selected == array() && $confirm) {
                     $selected = $SESSION->checkmark->autograde->selected;
                 }
                 if (isset($selected) && (count($selected) == 0)) {
                     $message .= $OUTPUT->notification(get_string('bulk_no_users_selected', 'checkmark'), 'error');
                 }
-                if ($bulkaction && ($selected || ($confirm && !empty($SESSION->checkmark->autograde->selected)))) {
+                if ($bulkaction && ($selected || (($confirm || $resultgraded == 0) && !empty($SESSION->checkmark->autograde->selected)))) {
                     // Process bulk action!
                     $confirmedaction = in_array($bulkaction, ['setattendantandgrade', 'setabsentandgrade'])
-                            && optional_param('confirm', 0, PARAM_BOOL);
+                            && (optional_param('confirm', 0, PARAM_BOOL) || $resultgraded == 0);
                     if ($confirmedaction || in_array($bulkaction, ['setattendant', 'setabsent', 'setunknown'])) {
                         // Check if some of the selected users don't have a feedback entry and create on if so!
                         foreach ($selected as $sel) {
@@ -1813,7 +1839,7 @@ class checkmark {
 
                     // Now all the grading stuff!
                     if (in_array($bulkaction, array('setattendantandgrade', 'setabsentandgrade', 'grade'))) {
-                        if (!optional_param('confirm', 0, PARAM_BOOL)) {
+                        if (!optional_param('confirm', 0, PARAM_BOOL) && $resultgraded != 0) {
                             $PAGE->set_title(format_string($this->checkmark->name, true));
                             $PAGE->set_heading($this->course->fullname);
                             if (!isset($SESSION->checkmark)) {
@@ -1823,7 +1849,6 @@ class checkmark {
                                 $SESSION->checkmark->autograde = new stdClass();
                             }
                             $SESSION->checkmark->autograde->selected = $selected;
-                            $result = $this->autograde_submissions(self::FILTER_SELECTED, $selected, true);
                             if ($result == 1) {
                                 $amount = get_string('autograde_stronesubmission', 'checkmark');
                             } else {
@@ -1842,16 +1867,18 @@ class checkmark {
                                 } else if (in_array($bulkaction, ['setattendantandgrade', 'setabsentandgrade'])) {
                                     $amount = count($selected);
                                 }
-                                echo $OUTPUT->header();
-                                $confirmboxcontent = $OUTPUT->notification(get_string('autograde_confirm', 'checkmark', $amount) .
-                                                html_writer::empty_tag('br') . $amountinfo, 'info') .
-                                        $OUTPUT->confirm(get_string('autograde_confirm_continue', 'checkmark'),
-                                                'submissions.php?id=' . $this->cm->id . '&bulk=1&bulkaction=' .
-                                                $bulkaction . '&confirm=1',
-                                                'submissions.php?id=' . $this->cm->id);
-                                echo $OUTPUT->box($confirmboxcontent, 'generalbox');
-                                echo $OUTPUT->footer();
-                                die();
+                                    echo $OUTPUT->header();
+                                    $confirmboxcontent =
+                                            $OUTPUT->notification(get_string('autograde_confirm', 'checkmark',
+                                                    ['total' => $amount, 'graded' => $resultgraded]) .
+                                                    html_writer::empty_tag('br') . $amountinfo, 'info') .
+                                            $OUTPUT->confirm(get_string('autograde_confirm_continue', 'checkmark'),
+                                                    'submissions.php?id=' . $this->cm->id . '&bulk=1&bulkaction=' .
+                                                    $bulkaction . '&confirm=1',
+                                                    'submissions.php?id=' . $this->cm->id);
+                                    echo $OUTPUT->box($confirmboxcontent, 'generalbox');
+                                    echo $OUTPUT->footer();
+                                    die();
                             }
                         } else {
                             if (($this->checkmark->grade <= 0)) {
@@ -2175,7 +2202,6 @@ class checkmark {
                 break;
         }
     }
-
     /**
      * Sets the attendance for a bunch of users
      *

@@ -42,7 +42,6 @@ Feature: In a checkmark I want to grade ungraded submissions.
     And I set the following fields to these values:
       | bulkaction | grade |
     And I press "Start"
-    And I press "Continue"
     Then I should see "Auto-grading successful! 1 submission updated."
     And I follow "Export"
     And I should see "60 / 100"

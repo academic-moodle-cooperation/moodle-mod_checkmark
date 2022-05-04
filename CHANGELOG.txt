@@ -1,15 +1,24 @@
 CHANGELOG
 =========
 
-WIP
+3.11.3 (2022-04-13)
 ------------------
-* [FEATURE] #6990 Remove checkmark activities marked as complete from calender and timeline -
-                  github pull request 62 by Leo Dintner
-
+* [FEATURE] #7139 Relevant dates are shown when show activity details is set
+* [FIXED] #7137 Fix a bug preventing simultaneous attendance and grading when no grades were set yet
 
 3.11.2 (2021-07-30)
 ------------------
-* [FEATURE] #6952 Implement webservices - github pull request 62 by Alexander Melem <alexander@melem-software.com>
+* [FEATURE] #6952 Implement webservices - github pull request #62 by Alexander Melem <alexander@melem-software.com>
+* [FEATURE] #6990 Remove checkmark activities marked as complete from calender and timeline -
+                  github pull request 62 by Leo Dintner
+* [FEATURE] #6377 Do not warn on grade automatically when no grades or feedbacks would be overwritten
+* [FEATURE] #7001 Add "graded" filter and bulk select to overview and export pages
+* [FIXED] #6989 Fix a deprecation warning being displayed when using PHP >8.0 - github pull request #67 by
+                Mario Wehr <m.wehr@fh-kaernten.at>
+* [FIXED] #6970 Fix download buttons getting disabled after pressing them
+* [FIXED] #7007 Fix reset of filter in export page
+* [FIXED] #7026 Make grading dashboard on landing page group sensitive to the group selected above it
+* [FIXED] #7109 Fix not working require_once statements in lib.php funcitons
 
 3.11.1 (2021-06-10)
 ------------------

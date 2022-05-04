@@ -74,6 +74,10 @@ $string['privacy:metadata:timedue'] = 'Due date for the submission.';
 $string['privacy:path:feedback'] = 'Feedback';
 $string['privacy:path:submission'] = 'Submission';
 
+$string['activitydate:submissionsdue'] = 'Due:';
+$string['activitydate:submissionsopen'] = 'Opens:';
+$string['activitydate:submissionsopened'] = 'Opened:';
+
 $string['absent'] = 'Absent';
 $string['activateindividuals'] = 'Activate individual function';
 $string['strassignment'] = 'Assignment';
@@ -103,7 +107,7 @@ $string['autograde_strmultiplesubmissions'] = '{$a} submissions';
 $string['autograde_stronesubmission'] = '1 submission';
 $string['autograde_strreq'] = 'Submissions which require a grade-update';
 $string['autogradebuttonstitle'] = 'Calculate submission-grades for checkmark {$a}';
-$string['autograde_confirm'] = 'You are about to update grades and feedback for <strong>{$a}</strong>. The former grades and feedback will be overwritten.';
+$string['autograde_confirm'] = 'You are about to update grades and feedback for <strong>{$a->total}</strong>. <strong>{$a->graded}</strong> former grades and feedback will be overwritten.';
 $string['autograde_confirm_continue'] = 'Are you shure you wan\'t to continue?';
 $string['autograde_error'] = 'An error occurred during auto-grading.';
 $string['autograde_failed'] = 'Auto-grading failed!';

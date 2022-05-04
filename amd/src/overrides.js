@@ -42,7 +42,7 @@ define(['jquery', 'jqueryui', 'core/str', 'core/log'], function($, jqui, str, lo
 
     /**
      * Initialises the JavaScript
-     * @param config Config params
+     * @param {array} config Config params
      */
     instance.initializer = function(config) {
         this.table = $(config.id);
