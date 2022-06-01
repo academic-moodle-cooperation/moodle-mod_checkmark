@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+3.11.4 (2022-06-01)
+------------------
+* [FIXED] #7179 Fix a bug causing xslx/ods download to fail on certain environment configurations
+
 3.11.3 (2022-04-13)
 ------------------
 * [FEATURE] #7139 Relevant dates are shown when show activity details is set
