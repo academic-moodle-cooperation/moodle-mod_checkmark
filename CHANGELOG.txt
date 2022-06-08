@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+4.0 (in progress)
+------------------
+* [FIXED] #7218 Fixed view all checkmarks failing when a custom user field as set as part of show user identity
+
+3.11.4 (2022-06-01)
+------------------
+* [FIXED] #7179 Fix a bug causing xslx/ods download to fail on certain environment configurations
+
 3.11.3 (2022-04-13)
 ------------------
 * [FEATURE] #7139 Relevant dates are shown when show activity details is set
