@@ -685,7 +685,8 @@ class submissionstable extends \table_sql {
 
         $useridentity = \core_user\fields::for_identity($table->context)->get_required_fields();
         foreach ($useridentity as $cur) {
-            $tableheaders[] = ($cur == 'phone1') ? get_string('phone') : get_string($cur);
+            // Fetches display names of default as well as custom user fields.
+            $tableheaders[] = \core_user\fields::get_display_name($cur);
             $tablecolumns[] = $cur;
             $table->cellwidth[] = ['mode' => 'Fixed', 'value' => '20'];
             $table->columnformat[$cur] = ['align' => 'L'];
@@ -822,7 +823,7 @@ class submissionstable extends \table_sql {
 
         // Create and set the SQL!
         $params = [];
-        $useridentityfields = \core_user\fields::for_identity($table->checkmark->context)->get_sql('u')->selects;
+        $useridentity = \core_user\fields::for_identity($table->context)->get_sql('u', true);
         $ufields = \core_user\fields::for_userpic()->get_sql('u')->selects;
         $table->examplecount = count($table->checkmark->checkmark->examples);
         $params['examplecount'] = $table->examplecount;
@@ -841,7 +842,7 @@ class submissionstable extends \table_sql {
         } else {
             $groupssql = '';
         }
-        $fields = "u.id, ' ' AS selection ".$ufields." ".$useridentityfields.",
+        $fields = "u.id, ' ' AS selection ".$ufields." ".$useridentity->selects.",
                   MAX(s.id) AS submissionid, MAX(f.id) AS feedbackid, MAX(f.grade) AS grade,
                   MAX(f.feedback) AS feedback, MAX(s.timemodified) AS timesubmitted,
                   MAX(f.timemodified) AS timemarked, 100 * COUNT( DISTINCT cchks.id ) / :examplecount AS summary,
@@ -861,13 +862,14 @@ class submissionstable extends \table_sql {
         $users = $table->get_userids($filter, $ids);
         list($sqluserids, $userparams) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'user');
         $params = array_merge_recursive($params, $userparams);
+        $params = array_merge_recursive($params, $useridentity->params);
 
         $from = "{user} u ".
             "LEFT JOIN {checkmark_submissions} s ON u.id = s.userid AND s.checkmarkid = :checkmarkid
                  LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid2
                  LEFT JOIN {checkmark_checks} gchks ON gchks.submissionid = s.id
                  LEFT JOIN {checkmark_checks} cchks ON cchks.submissionid = s.id AND cchks.state = 1 ".
-            $groupssql;
+            $groupssql . $useridentity->joins;
 
         $where = "u.id ".$sqluserids;
 
@@ -890,7 +892,12 @@ class submissionstable extends \table_sql {
             $where .= " AND COALESCE(f.timemodified,0) >= COALESCE(s.timemodified,0) AND f.timemodified IS NOT NULL";
         }
 
-        $groupby = " u.id, s.id, f.id ".$ufields." ".$useridentityfields.", f.attendance";
+        $mappings = $useridentity->mappings;
+        if (!empty($mappings)) {
+            $mappings = "," . implode(",", $useridentity->mappings);
+        }
+
+        $groupby = " u.id, s.id, f.id ".$ufields." ".$mappings.", f.attendance";
 
         $table->set_sql($fields, $from, $where, $params, $groupby);
         $table->set_count_sql("SELECT COUNT(DISTINCT u.id) FROM ".$from." WHERE ".$where, $params);
