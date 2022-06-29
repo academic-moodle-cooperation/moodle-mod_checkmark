@@ -2002,22 +2002,21 @@ class checkmark {
                     $feedback = $this->get_feedback($id); // Don't write a feedback in the DB right now!
 
                     // For fast grade, we need to check if any changes take place!
-                    // todo Check if the checks changed method fits in here somehow.
                     $updatedb = false;
 
-                    if (!property_exists($oldgrades, $id)) {
+                    if (!isset($oldgrades[$id])) {
                         $oldgrades[$id] = -1;
                     }
-                    if (!property_exists($oldfeedbacks, $id)) {
+                    if (!isset($oldfeedbacks[$id])) {
                         $oldfeedbacks[$id] = null;
                     }
-                    if (!property_exists($oldattendances, $id)) {
+                    if (!isset($oldattendances[$id])) {
                         $oldattendances[$id] = null;
                     }
-                    if (!property_exists($oldpresgrades, $id)) {
+                    if (!isset($oldpresgrades[$id])) {
                         $oldpresgrades[$id] = -1;
                     }
-                    if (!property_exists($oldpresfeedbacks, $id)) {
+                    if (!isset($oldpresfeedbacks[$id])) {
                         $oldpresfeedbacks[$id] = null;
                     }
 
