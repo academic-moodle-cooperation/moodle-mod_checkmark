@@ -23,7 +23,7 @@ services:
 test:
   image: amcdev/moodle-plugin-ci:7.4-n.16
   variables:
-    MOODLE_BRANCH: "MOODLE_311_STABLE"
+    MOODLE_BRANCH: "MOODLE_400_STABLE"
   before_script:
     - cd ../..
     - echo $DB_HOST $DB_PORT
