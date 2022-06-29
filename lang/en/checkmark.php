@@ -33,7 +33,6 @@ $string['checkmark:submit'] = 'Submit checkmark';
 $string['checkmark:trackattendance'] = 'Track student\'s attendance';
 $string['checkmark:view'] = 'View checkmark';
 $string['checkmark:view_preview'] = 'Preview';
-
 $string['privacy:metadata:attendance'] = 'User\'s attendance status.';
 $string['privacy:metadata:checks'] = 'Table containing user\'s checked examples (bound to an entry in submissions table).';
 $string['privacy:metadata:cutoffdate'] = 'Time and date until submissions are possible.';
@@ -74,9 +73,9 @@ $string['privacy:metadata:timedue'] = 'Due date for the submission.';
 $string['privacy:path:feedback'] = 'Feedback';
 $string['privacy:path:submission'] = 'Submission';
 
-$string['activitydate:submissionsdue'] = 'Due:';
-$string['activitydate:submissionsopen'] = 'Opens:';
-$string['activitydate:submissionsopened'] = 'Opened:';
+$string['activitydate:due'] = 'Due:';
+$string['activitydate:open'] = 'Opens:';
+$string['activitydate:opened'] = 'Opened:';
 
 $string['absent'] = 'Absent';
 $string['activateindividuals'] = 'Activate individual function';
