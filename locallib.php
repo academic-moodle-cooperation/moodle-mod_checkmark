@@ -1767,20 +1767,6 @@ class checkmark {
         switch ($mode) {
             case 'grade':                       // We are in a main window grading!
                 $userid = required_param('userid', PARAM_INT);
-                if ($formdata = data_submitted() and confirm_sesskey()) {
-
-                    // Create the submission if needed & return its id!
-                    $submission = $this->get_submission($userid, true);
-
-                    foreach ($submission->get_examples_or_example_template() as $key => $example) {
-                        if (isset($formdata->{$key}) && ($formdata->{$key} != 0)) {
-                            $submission->get_example($key)->overwrite_example(\mod_checkmark\example::CHECKED);
-                        } else {
-                            $submission->get_example($key)->overwrite_example(\mod_checkmark\example::UNCHECKED);
-                        }
-                    }
-                }
-                $this->update_submission($submission, true);
                 if ($this->process_feedback()) {
                     $this->display_submissions(get_string('changessaved'));
                 } else {
@@ -3459,6 +3445,19 @@ class checkmark {
         if (isset($formdata->mailinfo) && $formdata->mailinfo !== null) {
             set_user_preference('checkmark_mailinfo', $formdata->mailinfo);
         }
+
+        // Create the submission if needed & return its id!
+        $submission = $this->get_submission($formdata->userid, true);
+
+        foreach ($submission->get_examples_or_example_template() as $key => $example) {
+            if (isset($formdata->{$key}) && ($formdata->{$key} != 0)) {
+                $submission->get_example($key)->overwrite_example(\mod_checkmark\example::CHECKED);
+            } else {
+                $submission->get_example($key)->overwrite_example(\mod_checkmark\example::UNCHECKED);
+            }
+        }
+        // Update checks to save overwritten entries.
+        $this->update_submission($submission, true);
 
         $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark',
                 $this->checkmark->id, $formdata->userid);
