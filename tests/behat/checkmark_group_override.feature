@@ -58,7 +58,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
   Scenario: Add, edit and delete a group override
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I set the following fields to these values:
@@ -108,7 +108,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
   Scenario: Add and duplicate a group override
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I set the following fields to these values:
@@ -165,12 +165,12 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I log out
     When I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     Then I should see "Wednesday, 1 January 2020, 8:00"
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     Then I should see "Saturday, 1 February 2020, 8:00"
 
   @javascript
@@ -204,13 +204,13 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I log out
     When I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     Then I should see "Wednesday, 1 January 2020, 8:00"
     And "Save changes" "button" should be visible
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     Then I should see "## tomorrow ##%A, %d %B %Y, 8:00##"
     And "Save changes" "button" should not be visible
 
@@ -251,13 +251,13 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I log out
     When I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     Then I should see "Saturday, 1 February 2020, 8:00"
     And "Save changes" "button" should be visible
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     Then I should see "Saturday, 1 February 2020, 8:00"
     And "Save changes" "button" should not be visible
 
@@ -265,7 +265,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
   Scenario: Reorder group overrides and use the one with the highest priority for a given user
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I set the following fields to these values:
@@ -298,39 +298,39 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     Then I should see "Saturday, 1 February 2020, 8:00"
     And I log out
     When I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     Then I should see "Sunday, 1 March 2020, 8:00"
     And I log out
     When I log in as "student5"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     Then I should see "Sunday, 1 March 2020, 8:00"
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     And I navigate to "Group overrides" in current page administration
     And I follow "Move down"
     And I log out
     When I log in as "student5"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     Then I should see "Saturday, 1 February 2020, 8:00"
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     And I navigate to "Group overrides" in current page administration
     And I follow "Move up"
     And I log out
     When I log in as "student5"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     Then I should see "Sunday, 1 March 2020, 8:00"
     And I log out
 
@@ -338,7 +338,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
   Scenario: Create user and group overrides and check if user overrides are priorotized over group overrides
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I set the following fields to these values:
@@ -358,12 +358,12 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     Then I should see "Saturday, 1 February 2020, 8:00"
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     And I navigate to "User overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:

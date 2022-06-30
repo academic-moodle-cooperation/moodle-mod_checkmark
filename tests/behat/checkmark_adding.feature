@@ -4,7 +4,7 @@ Feature: In course, a teacher should be able to add a new checkmark
     As a teacher
     I need to be able to add a new checkmark and save it correctly.
 
-  @javascript
+  @javascript @currentdev
   Scenario: Add a checkmark instance
     Given the following "courses" exist:
       | fullname | shortname | category | groupmode |
@@ -21,5 +21,7 @@ Feature: In course, a teacher should be able to add a new checkmark
     When I add a "Checkmark" to section "2" and I fill the form with:
       | Checkmark name | checkmark |
       | Description    | check     |
-    And I follow "checkmark"
+    And I turn editing mode off
+    Then "checkmark" activity should be visible
+    When I click on "checkmark" "activity"
     Then I should see "check"

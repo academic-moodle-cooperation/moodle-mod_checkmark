@@ -28,7 +28,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
   Scenario: Allow a user to have a different due date
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | id_timedue_enabled | 1 |
@@ -67,7 +67,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
   Scenario: Allow a user to have a different allow submissions from date
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | id_timeavailable_enabled | 1 |
@@ -108,7 +108,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
   Scenario: Allow a user to have a different cut-off date
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | id_timedue_enabled | 1 |

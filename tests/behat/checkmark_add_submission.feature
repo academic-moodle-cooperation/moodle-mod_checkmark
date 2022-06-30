@@ -24,7 +24,7 @@ Feature: In a course, a student should be able to add a submission
       | checkmark | C1     | CM1      | Checkmark 1 | Description 1 |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     And I set the following fields to these values:
       | Example 1 | 1 |
       | Example 2 | 1 |

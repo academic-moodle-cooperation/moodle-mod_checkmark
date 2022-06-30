@@ -24,6 +24,6 @@ Feature: Change Allow submission from date
       | checkmark | C1     | CM1      | Checkmark 1 | This checkmark is always available since yesterday! | ##yesterday## |
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "activity"
     Then I should see "Allow submissions from"
     And I should see "##yesterday##%A, %d %B %Y##"

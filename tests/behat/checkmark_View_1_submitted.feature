@@ -24,7 +24,7 @@ Feature: In checkmark, a teacher should be able to how many students have submit
       | checkmark | C1     | CM1      | Kreuzerlübung | Standard-Einstellungen |
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Kreuzerlübung"
+    And I click on "Kreuzerlübung" "activity"
     And I set the following fields to these values:
       | Example 1 | 1 |
       | Example 2 | 1 |
@@ -36,7 +36,7 @@ Feature: In checkmark, a teacher should be able to how many students have submit
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Kreuzerlübung"
+    And I click on "Kreuzerlübung" "activity"
     Then I should see "View all submissions"
     And the following should exist in the "generaltable" table:
       | Hidden from students  |

@@ -4,7 +4,7 @@ Feature: In a checkmark I want to grade selected submissions.
     As a teacher
     I need to able to grade a selected user
 
-  @javascript @currentdev
+  @javascript
   Scenario: Grade selected users
     Given the following "courses" exist:
       | fullname | shortname | category |

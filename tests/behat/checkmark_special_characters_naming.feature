@@ -22,6 +22,6 @@ Feature: In checkmark, a teacher should be able to use any letters, numbers and 
       | checkmark | C1     | CM1      | Cm123!§ | Ds123!§ |
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Cm123!§"
+    And I click on "Cm123!§" "activity"
     Then I should see "Cm123!§"
     And I should see "Ds123!§"
