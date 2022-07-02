@@ -33,7 +33,7 @@ Feature: In course, a teacher should be able to add files to a checkmark
     Then "empty.txt" "link" should exist
     And "upload_users.csv" "link" should exist
     And following "empty.txt" should download between "10" and "40" bytes
-    When I navigate to "Edit settings" in current page administration
+    When I navigate to "Settings" in current page administration
     And I delete "empty.txt" from "Additional files" filemanager
     And I delete "upload_users.csv" from "Additional files" filemanager
     And I press "Save and return to course"
