@@ -343,24 +343,6 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I should see "Due date"
     And I should see "Sunday, 1 March 2020, 8:00"
 
-  @javascript @currentdev
-  Scenario: A teacher without accessallgroups permission should only be able to add group overrides for groups that he/she it in,
-  when the activity's group mode is "separate groups"
-    Given the following "permission overrides" exist:
-      | capability                  | permission | role           | contextlevel | reference |
-      | moodle/site:accessallgroups | Prevent    | editingteacher | Course       | C1        |
-    And the following "activities" exist:
-      | activity    | name        | intro                   | course | idnumber    | groupmode |
-      | checkmark   | Checkmark 2 | Checkmark 2 description | C1     | checkmark2  | 1         |
-    And the following "group members" exist:
-      | user     | group |
-      | teacher1 | G1    |
-    When I am on the "checkmark2" Activity page logged in as teacher1
-    And I navigate to "Group overrides" in current page administration
-    And I press "Add group override"
-    Then the "Groups" select box should contain "Group 1"
-    And the "Groups" select box should not contain "Group 2"
-
   @javascript
   Scenario: A teacher without accessallgroups permission should only be able to see the group overrides for groups that he/she is in,
   when the activity's group mode is "separate groups"
