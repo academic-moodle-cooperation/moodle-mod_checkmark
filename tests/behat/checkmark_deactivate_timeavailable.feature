@@ -22,14 +22,10 @@ Feature: Deactivate Allow submissions from
     And the following "activities" exist:
       | activity  | course | idnumber | name        | timeavailable |
       | checkmark | C1     | CM1      | Checkmark 1 | 0             |
-    And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I click on "Checkmark 1" "activity"
+    When I am on the "CM1" Activity page logged in as teacher1
     Then I should not see "Allow submissions from"
     And I log out
-    And I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as student1
     Then I should not see "Allow submission from"
     And I set the following fields to these values:
       | Example 1 | 1 |

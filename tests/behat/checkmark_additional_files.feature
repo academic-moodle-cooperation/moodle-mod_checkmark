@@ -21,14 +21,15 @@ Feature: In course, a teacher should be able to add files to a checkmark
     When I add a "Checkmark" to section "2" and I fill the form with:
       | Checkmark name | checkmark |
       | Description    | check     |
+      | ID number      | checkmark |
       | Additional files | lib/tests/fixtures/upload_users.csv |
-    And I click on "checkmark" "activity"
+    When I am on the "checkmark" Activity page logged in as teacher1
     Then "upload_users.csv" "link" should exist
     And following "upload_users.csv" should download between "150" and "300" bytes
-    When I navigate to "Edit settings" in current page administration
+    When I navigate to "Settings" in current page administration
     And I upload "lib/tests/fixtures/empty.txt" file to "Additional files" filemanager
     And I press "Save and return to course"
-    And I click on "checkmark" "activity"
+    And I click on "checkmark" "link"
     Then "empty.txt" "link" should exist
     And "upload_users.csv" "link" should exist
     And following "empty.txt" should download between "10" and "40" bytes
@@ -36,6 +37,6 @@ Feature: In course, a teacher should be able to add files to a checkmark
     And I delete "empty.txt" from "Additional files" filemanager
     And I delete "upload_users.csv" from "Additional files" filemanager
     And I press "Save and return to course"
-    And I click on "checkmark" "activity"
+    And I click on "checkmark" "link"
     Then "empty.txt" "link" should not exist
     And "upload_users.csv" "link" should not exist

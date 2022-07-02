@@ -22,9 +22,7 @@ Feature: In a course, a student should be able to add a submission
     And the following "activities" exist:
       | activity  | course | idnumber | name        | intro         |
       | checkmark | C1     | CM1      | Checkmark 1 | Description 1 |
-    When I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I click on "Checkmark 1" "activity"
+    When I am on the "CM1" Activity page logged in as student1
     And I set the following fields to these values:
       | Example 1 | 1 |
       | Example 2 | 1 |

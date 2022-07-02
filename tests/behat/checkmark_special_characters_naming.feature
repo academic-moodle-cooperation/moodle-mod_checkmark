@@ -20,8 +20,6 @@ Feature: In checkmark, a teacher should be able to use any letters, numbers and 
     And the following "activities" exist:
       | activity  | course | idnumber | name    | intro   |
       | checkmark | C1     | CM1      | Cm123!§ | Ds123!§ |
-    When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I click on "Cm123!§" "activity"
+    When I am on the "CM1" Activity page logged in as teacher1
     Then I should see "Cm123!§"
     And I should see "Ds123!§"
