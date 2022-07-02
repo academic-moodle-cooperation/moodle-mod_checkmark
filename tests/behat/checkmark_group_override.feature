@@ -56,9 +56,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
 
   @javascript
   Scenario: Add, edit and delete a group override
-    When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as teacher1
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I set the following fields to these values:
@@ -106,9 +104,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
 
   @javascript
   Scenario: Add and duplicate a group override
-    When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as teacher1
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I set the following fields to these values:
@@ -136,10 +132,8 @@ Feature: In a course, a teacher should be able to add overrides to general dates
 
   @javascript
   Scenario: Allow users in a given group to have a different due date
-    Given I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    When I follow "Checkmark 1"
-    And I navigate to "Edit settings" in current page administration
+    When I am on the "CM1" Activity page logged in as teacher1
+    And I navigate to "Settings" in current page administration
     And I set the following fields to these values:
       | id_timedue_enabled | 1 |
       | timedue[day]       | 1 |
@@ -165,20 +159,18 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I log out
     When I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "link"
     Then I should see "Wednesday, 1 January 2020, 8:00"
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "link"
     Then I should see "Saturday, 1 February 2020, 8:00"
 
   @javascript
   Scenario: Allow a user to have a different allow submissions from date
-    Given I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    When I follow "Checkmark 1"
-    And I navigate to "Edit settings" in current page administration
+    When I am on the "CM1" Activity page logged in as teacher1
+    And I navigate to "Settings" in current page administration
     And I set the following fields to these values:
       | id_timeavailable_enabled | 1 |
       | timeavailable[day]       | 1 |
@@ -202,24 +194,18 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I press "id_override"
     Then I should see "## tomorrow ##%A, %d %B %Y, 8:00##"
     And I log out
-    When I log in as "student2"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as student2
     Then I should see "Wednesday, 1 January 2020, 8:00"
     And "Save changes" "button" should be visible
     And I log out
-    When I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as student1
     Then I should see "## tomorrow ##%A, %d %B %Y, 8:00##"
     And "Save changes" "button" should not be visible
 
   @javascript
   Scenario: Allow a user to have a different cut-off date
-    Given I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    When I follow "Checkmark 1"
-    And I navigate to "Edit settings" in current page administration
+    When I am on the "CM1" Activity page logged in as teacher1
+    And I navigate to "Settings" in current page administration
     And I set the following fields to these values:
       | id_timedue_enabled | 1 |
       | timedue[day]       | 1 |
@@ -249,23 +235,17 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I press "id_override"
     Then I should see "Sunday, 2 February 2020, 8:00"
     And I log out
-    When I log in as "student2"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as student2
     Then I should see "Saturday, 1 February 2020, 8:00"
     And "Save changes" "button" should be visible
     And I log out
-    When I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as student1
     Then I should see "Saturday, 1 February 2020, 8:00"
     And "Save changes" "button" should not be visible
 
   @javascript
   Scenario: Reorder group overrides and use the one with the highest priority for a given user
-    When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as teacher1
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I set the following fields to these values:
@@ -296,49 +276,33 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I press "id_override"
     Then I should see "Group 2"
     And I log out
-    When I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as student1
     Then I should see "Saturday, 1 February 2020, 8:00"
     And I log out
-    When I log in as "student2"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as student2
     Then I should see "Sunday, 1 March 2020, 8:00"
     And I log out
-    When I log in as "student5"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as student5
     Then I should see "Sunday, 1 March 2020, 8:00"
     And I log out
-    When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as teacher1
     And I navigate to "Group overrides" in current page administration
     And I follow "Move down"
     And I log out
-    When I log in as "student5"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as student5
     Then I should see "Saturday, 1 February 2020, 8:00"
     And I log out
-    When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as teacher1
     And I navigate to "Group overrides" in current page administration
     And I follow "Move up"
     And I log out
-    When I log in as "student5"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as student5
     Then I should see "Sunday, 1 March 2020, 8:00"
     And I log out
 
   @javascript
   Scenario: Create user and group overrides and check if user overrides are priorotized over group overrides
-    When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as teacher1
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I set the following fields to these values:
@@ -356,14 +320,12 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I should see "Due date"
     And I should see "Saturday, 1 February 2020, 8:00"
     And I log out
-    When I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as student1
     Then I should see "Saturday, 1 February 2020, 8:00"
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    And I click on "Checkmark 1" "link"
     And I navigate to "User overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
@@ -381,25 +343,6 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I should see "Due date"
     And I should see "Sunday, 1 March 2020, 8:00"
 
-  Scenario: A teacher without accessallgroups permission should only be able to add group overrides for groups that he/she it in,
-  when the activity's group mode is "separate groups"
-    Given the following "permission overrides" exist:
-      | capability                  | permission | role           | contextlevel | reference |
-      | moodle/site:accessallgroups | Prevent    | editingteacher | Course       | C1        |
-    And the following "activities" exist:
-      | activity    | name        | intro                   | course | idnumber    | groupmode |
-      | checkmark   | Checkmark 2 | Checkmark 2 description | C1     | checkmark2  | 1         |
-    And the following "group members" exist:
-      | user     | group |
-      | teacher1 | G1    |
-    When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 2"
-    And I navigate to "Group overrides" in current page administration
-    And I press "Add group override"
-    Then the "Groups" select box should contain "Group 1"
-    And the "Groups" select box should not contain "Group 2"
-
   @javascript
   Scenario: A teacher without accessallgroups permission should only be able to see the group overrides for groups that he/she is in,
   when the activity's group mode is "separate groups"
@@ -412,9 +355,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And the following "group members" exist:
       | user     | group |
       | teacher1 | G1    |
-    And I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 2"
+    When I am on the "checkmark2" Activity page logged in as admin
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I open the autocomplete suggestions list
@@ -440,9 +381,7 @@ Feature: In a course, a teacher should be able to add overrides to general dates
       | timeavailable[minute]    | 00       |
     And I press "id_override"
     And I log out
-    When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 2"
+    When I am on the "checkmark2" Activity page logged in as teacher1
     And I navigate to "Group overrides" in current page administration
     Then I should see "Group 1"
     And I should not see "Group 2"

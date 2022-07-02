@@ -22,9 +22,7 @@ Feature: In a checkmark I want to grade ungraded submissions.
     And the following "activities" exist:
       | activity  | course | idnumber | name        | intro         |
       | checkmark | C1     | CM1      | Checkmark 1 | Description 1 |
-    And I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as student1
     And I set the following fields to these values:
       | Example 1 | 1 |
       | Example 2 | 1 |
@@ -34,9 +32,7 @@ Feature: In a checkmark I want to grade ungraded submissions.
       | Example 6 | 1 |
     And I press "Save changes"
     And I log out
-    When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as teacher1
     And I navigate to "View all submissions" in current page administration
     And I click on "Ungraded" "link"
     And I set the following fields to these values:

@@ -2080,6 +2080,8 @@ function checkmark_supports($feature) {
             return MOD_ARCHETYPE_OTHER;
         case FEATURE_COMPLETION_HAS_RULES:
             return true;
+        case FEATURE_MOD_PURPOSE:
+            return MOD_PURPOSE_ASSESSMENT;
 
         default:
             return false;

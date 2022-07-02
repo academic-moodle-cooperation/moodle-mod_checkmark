@@ -21,5 +21,8 @@ Feature: In course, a teacher should be able to add a new checkmark
     When I add a "Checkmark" to section "2" and I fill the form with:
       | Checkmark name | checkmark |
       | Description    | check     |
-    And I follow "checkmark"
+      | ID number      | checkmark |
+    And I turn editing mode off
+    Then "checkmark" activity should be visible
+    When I am on the "checkmark" Activity page logged in as teacher1
     Then I should see "check"

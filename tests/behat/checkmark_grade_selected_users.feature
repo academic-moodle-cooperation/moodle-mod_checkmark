@@ -4,7 +4,7 @@ Feature: In a checkmark I want to grade selected submissions.
     As a teacher
     I need to able to grade a selected user
 
-  @javascript @currentdev
+  @javascript
   Scenario: Grade selected users
     Given the following "courses" exist:
       | fullname | shortname | category |
@@ -46,9 +46,7 @@ Feature: In a checkmark I want to grade selected submissions.
       | checkmark   | user      | feedback              | grade |
       | Checkmark 1 | student1  | Lel so bad            | 81    |
       | Checkmark 1 | student2  | Lel so bad            | 40    |
-    When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Checkmark 1"
+    When I am on the "CM1" Activity page logged in as teacher1
     And I navigate to "View all submissions" in current page administration
     And I click on "selected[]" "checkbox"
     And I set the following fields to these values:
