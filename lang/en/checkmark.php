@@ -74,7 +74,7 @@ $string['privacy:path:feedback'] = 'Feedback';
 $string['privacy:path:submission'] = 'Submission';
 
 $string['activitydate:due'] = 'Due:';
-$string['activitydate:open'] = 'Opens:';
+$string['activitydate:opens'] = 'Opens:';
 $string['activitydate:opened'] = 'Opened:';
 
 $string['absent'] = 'Absent';
