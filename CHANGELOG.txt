@@ -5,6 +5,9 @@ CHANGELOG
 ------------------
 * [FIXED] #7218 Fixed view all checkmarks failing when a custom user field as set as part of show user identity
 
+3.11.5 (2022-07-05)
+------------------
+* [FIXED] #7225 Fix fastgrading so all combinations and grades can be submitted
 3.11.4 (2022-06-01)
 ------------------
 * [FIXED] #7179 Fix a bug causing xslx/ods download to fail on certain environment configurations

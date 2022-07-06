@@ -1217,5 +1217,19 @@ function xmldb_checkmark_upgrade($oldversion) {
         // Checkmark savepoint reached.
         upgrade_mod_savepoint(true, 2021051900, 'checkmark');
     }
+
+    if ($oldversion < 2021052805) {
+
+        // Changing nullability of field feedback on table checkmark_feedbacks to null.
+        $table = new xmldb_table('checkmark_feedbacks');
+        $field = new xmldb_field('feedback', XMLDB_TYPE_TEXT, null, null, null, null, null, 'grade');
+
+        // Launch change of nullability for field feedback.
+        $dbman->change_field_notnull($table, $field);
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2021052805, 'checkmark');
+    }
+
     return true;
 }
