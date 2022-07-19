@@ -432,14 +432,12 @@ class checkmark {
             \core\notification::error(get_string('latesubmissionwarning', 'checkmark'));
         }
 
-        echo $this->get_intro();
-        echo "\n";
+        echo html_writer::tag('div', $this->submittedlink(), array('class' => 'container-fluid tertiary-navigation'));
 
         // Print grading summary only when user has mod/checkmark:grade capability.
         if (has_capability('mod/checkmark:grade', $this->context)) {
             echo html_writer::div($this->get_renderer()->render_checkmark_grading_summary($this->create_grading_summary()));
         }
-        echo html_writer::tag('div', $this->submittedlink(), array('class' => 'text-info text-center'));
         echo $OUTPUT->container_start('studentview');
         $previewform = new MoodleQuickForm('optionspref', 'post', '#', '');
 
@@ -931,7 +929,7 @@ class checkmark {
 
         $context = context_module::instance($this->cm->id);
         if (has_capability('mod/checkmark:grade', $context)) {
-            $submitted = html_writer::tag('a', get_string('viewsubmissions', 'checkmark'), [
+            $submitted = html_writer::tag('a', get_string('viewallsubmissions', 'checkmark'), [
                     'class' => 'btn btn-secondary',
                     'href' => $urlbase . 'submissions.php?id=' . $this->cm->id,
                     'id' => 'submissions'
