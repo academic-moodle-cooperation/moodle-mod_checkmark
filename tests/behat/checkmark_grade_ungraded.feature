@@ -33,7 +33,7 @@ Feature: In a checkmark I want to grade ungraded submissions.
     And I press "Save changes"
     And I log out
     When I am on the "CM1" Activity page logged in as teacher1
-    And I navigate to "View all submissions" in current page administration
+    And I navigate to "Submissions" in current page administration
     And I click on "Ungraded" "link"
     And I set the following fields to these values:
       | bulkaction | grade |

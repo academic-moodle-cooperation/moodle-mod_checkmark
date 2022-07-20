@@ -1379,6 +1379,24 @@ function checkmark_refresh_events($courseid = 0, $instance = null, $cm = null) {
 }
 
 /**
+ * List the file areas that can be browsed.
+ *
+ * @param stdClass $course
+ * @param stdClass $cm
+ * @param stdClass $context
+ * @return array
+ */
+function checkmark_get_file_areas($course, $cm, $context) {
+    global $CFG;
+    require_once($CFG->dirroot . '/mod/assign/locallib.php');
+
+    $areas = array(
+        CHECKMARK_INTROATTACHMENT_FILEAREA => get_string('introattachments', 'mod_checkmark'),
+    );
+    return $areas;
+}
+
+/**
  * Print recent activity from all checkmarks in a given course
  *
  * This is used by the recent activity block
@@ -2104,6 +2122,22 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
 
     $allgroups = false;
 
+    // Add checkmark submission information!
+    if (has_capability('mod/checkmark:grade', $PAGE->cm->context)) {
+        $keys = $checkmarknode->get_children_key_list();
+        if ($allgroups && has_capability('moodle/site:accessallgroups', $PAGE->cm->context)) {
+            $group = 0;
+        } else {
+            $group = groups_get_activity_group($PAGE->cm);
+        }
+        $link = new moodle_url('/mod/checkmark/submissions.php', array('id' => $PAGE->cm->id));
+        $string = get_string('viewsubmissions', 'checkmark');
+        $key = 'viewsubmissions';
+        $submissionnode = \navigation_node::create($string, $link, navigation_node::TYPE_SETTING,
+            $string, $key, null);
+        $checkmarknode->add_node($submissionnode);
+    }
+
     // Add nodes to override dates for users/groups!
     if (has_capability('mod/checkmark:manageoverrides', $PAGE->cm->context)) {
         $keys = $checkmarknode->get_children_key_list();
@@ -2118,7 +2152,7 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
         $icon = null;
         $groupnode = \navigation_node::create($shorttext, new moodle_url('/mod/checkmark/overrides.php',
                 array('id' => $PAGE->cm->id, 'mode' => 'group')), $type, $shorttext, $key, $icon);
-        $checkmarknode->add_node($groupnode, $keys[1]);
+        $checkmarknode->add_node($groupnode);
 
         $shorttext = get_string('useroverrides', 'checkmark');
         $key = 'extendusers';
@@ -2126,18 +2160,6 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
         $usernode = \navigation_node::create($shorttext, new moodle_url('/mod/checkmark/overrides.php',
                 array('id' => $PAGE->cm->id, 'mode' => 'user')), $type, $shorttext, $key, $icon);
         $checkmarknode->add_node($usernode, 'extendgroups');
-    }
-
-    // Add checkmark submission information!
-    if (has_capability('mod/checkmark:grade', $PAGE->cm->context)) {
-        if ($allgroups && has_capability('moodle/site:accessallgroups', $PAGE->cm->context)) {
-            $group = 0;
-        } else {
-            $group = groups_get_activity_group($PAGE->cm);
-        }
-        $link = new moodle_url('/mod/checkmark/submissions.php', array('id' => $PAGE->cm->id));
-        $string = get_string('viewsubmissions', 'checkmark');
-        $checkmarknode->add($string, $link, navigation_node::TYPE_SETTING);
     }
 }
 

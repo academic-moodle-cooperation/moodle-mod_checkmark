@@ -47,7 +47,7 @@ Feature: In a checkmark I want to grade selected submissions.
       | Checkmark 1 | student1  | Lel so bad            | 81    |
       | Checkmark 1 | student2  | Lel so bad            | 40    |
     When I am on the "CM1" Activity page logged in as teacher1
-    And I navigate to "View all submissions" in current page administration
+    And I navigate to "Submissions" in current page administration
     And I click on "selected[]" "checkbox"
     And I set the following fields to these values:
       | bulkaction | grade |
