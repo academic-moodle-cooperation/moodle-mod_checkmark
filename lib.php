@@ -2115,7 +2115,7 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
         $link = new moodle_url('/mod/checkmark/submissions.php', array('id' => $PAGE->cm->id));
         $string = get_string('viewsubmissions', 'checkmark');
         $key = 'viewsubmissions';
-        $submissionnode =  \navigation_node::create($string, $link, navigation_node::TYPE_SETTING,
+        $submissionnode = \navigation_node::create($string, $link, navigation_node::TYPE_SETTING,
             $string, $key, null);
         $checkmarknode->add_node($submissionnode);
     }
