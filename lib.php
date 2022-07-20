@@ -1379,6 +1379,24 @@ function checkmark_refresh_events($courseid = 0, $instance = null, $cm = null) {
 }
 
 /**
+ * List the file areas that can be browsed.
+ *
+ * @param stdClass $course
+ * @param stdClass $cm
+ * @param stdClass $context
+ * @return array
+ */
+function checkmark_get_file_areas($course, $cm, $context) {
+    global $CFG;
+    require_once($CFG->dirroot . '/mod/assign/locallib.php');
+
+    $areas = array(
+        CHECKMARK_INTROATTACHMENT_FILEAREA => get_string('introattachments', 'mod_checkmark'),
+    );
+    return $areas;
+}
+
+/**
  * Print recent activity from all checkmarks in a given course
  *
  * This is used by the recent activity block

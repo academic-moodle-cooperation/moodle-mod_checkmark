@@ -431,7 +431,7 @@ class checkmark {
         if ($late) {
             \core\notification::error(get_string('latesubmissionwarning', 'checkmark'));
         }
-
+        echo $this->get_introattachments();
         echo html_writer::tag('div', $this->submittedlink(), array('class' => 'container-fluid tertiary-navigation'));
 
         // Print grading summary only when user has mod/checkmark:grade capability.
