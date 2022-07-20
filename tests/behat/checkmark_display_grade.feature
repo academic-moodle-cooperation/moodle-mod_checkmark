@@ -23,7 +23,7 @@ Feature: In a checkmark, a teacher wants to grade a student.
       | activity  | course | idnumber | name        | intro         |
       | checkmark | C1     | CM1      | Checkmark 1 | Description 1 |
     When I am on the "CM1" Activity page logged in as teacher1
-    And I navigate to "View all submissions" in current page administration
+    And I navigate to "Submissions" in current page administration
     And I click on "Grade" "link" in the "student1" "table_row"
     And I set the field "xgrade" to "50"
     And I press "Save changes"
