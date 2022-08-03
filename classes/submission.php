@@ -77,10 +77,10 @@ class submission {
                     SELECT exampleid AS id, state
                       FROM {checkmark_checks}
                      WHERE submissionid = :subid', ['subid' => $submission->id])) {
-                        foreach ($submission->examples as $key => $ex) {
-                            $this->examples[$ex->id]->set_state($ex->state);
-                        }
-                        $submission->examples = $this->examples;
+                    foreach ($submission->examples as $key => $ex) {
+                        $this->examples[$ex->id]->set_state($ex->state);
+                    }
+                    $submission->examples = $this->examples;
                 }
             }
         }
