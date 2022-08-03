@@ -73,18 +73,10 @@ class submission {
             $this->examples = \checkmark::get_examples_static($this->checkmarkid);
 
             if ($submission) {
-                if (!$submission->examples = $DB->get_records_sql('
+                if ($submission->examples = $DB->get_records_sql('
                     SELECT exampleid AS id, state
                       FROM {checkmark_checks}
                      WHERE submissionid = :subid', ['subid' => $submission->id])) {
-                    // Empty submission!
-                    foreach ($this->examples as $key => $example) {
-                        $submission->examples[$key] = $this->examples[$key];
-                        $DB->insert_record('checkmark_checks', (object)['exampleid'    => $key,
-                                                                        'submissionid' => $submission->id,
-                                                                        'state'        => null]);
-                    }
-                } else {
                     foreach ($submission->examples as $key => $ex) {
                         $this->examples[$ex->id]->set_state($ex->state);
                     }

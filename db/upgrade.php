@@ -1231,5 +1231,22 @@ function xmldb_checkmark_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2021052805, 'checkmark');
     }
 
+    if ($oldversion < 2021052806) {
+
+        // Delete all existing checks containing null
+        $where = "state IS NULL";
+        $DB->delete_records_select('checkmark_checks', $where);
+
+        // Changing nullability of field state on table checkmark_checks to not null.
+        $table = new xmldb_table('checkmark_checks');
+        $field = new xmldb_field('state', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, null, 'submissionid');
+
+        // Launch change of nullability for field state.
+        $dbman->change_field_notnull($table, $field);
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2021052806, 'checkmark');
+    }
+
     return true;
 }

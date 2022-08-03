@@ -3602,11 +3602,13 @@ class checkmark {
         $newsubmission = \mod_checkmark\submission::get_mock_submission($this->checkmark->id, $userid);
         $sid = $DB->insert_record('checkmark_submissions', $newsubmission);
 
+        /*
         foreach ($examples as $key => $example) {
             $DB->insert_record('checkmark_checks', (object) ['exampleid' => $key,
                     'submissionid' => $sid,
                     'state' => null]);
         }
+        */
 
         $submission = $DB->get_record('checkmark_submissions', array('checkmarkid' => $this->checkmark->id,
                 'userid' => $userid));
