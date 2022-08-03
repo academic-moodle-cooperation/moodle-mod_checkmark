@@ -1,14 +1,17 @@
 CHANGELOG
 =========
 
+3.11.6 (2022-08-09)
+------------------
+* [FIXED] #7277 Fix occasional presence of null values in check
+
 3.11.5 (2022-07-05)
 ------------------
 * [FIXED] #7225 Fix fastgrading so all combinations and grades can be submitted
-* [FIXED] #7230 Fix save and show next does not save any check data
 
 3.11.4 (2022-06-01)
 ------------------
-* [FIXED] #7197 Fix a bug causing xslx/ods download to fail on certain environment configurations
+* [FIXED] #7179 Fix a bug causing xslx/ods download to fail on certain environment configurations
 
 3.11.3 (2022-04-13)
 ------------------
