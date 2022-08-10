@@ -1233,7 +1233,7 @@ function checkmark_refresh_override_events($checkmark, $override = null) {
             } else {
                 unset($event->id);
             }
-            $event->name = $checkmarkinstance->name;
+            $event->name = get_string('calendardue', 'checkmark', $checkmarkinstance->name);
             calendar_event::create($event, false);
         }
     }
@@ -1323,7 +1323,7 @@ function checkmark_refresh_events($courseid = 0, $instance = null, $cm = null) {
             $eventtype = CHECKMARK_EVENT_TYPE_DUE;
             if ($checkmark->timedue) {
                 $event->eventtype = $eventtype;
-                $event->name = $checkmark->name;
+                $event->name = get_string('calendardue', 'checkmark', $checkmark->name);
 
                 $event->timestart = $checkmark->timedue;
                 $event->timesort = $checkmark->timedue;
@@ -1350,7 +1350,7 @@ function checkmark_refresh_events($courseid = 0, $instance = null, $cm = null) {
             $eventtype = CHECKMARK_EVENT_TYPE_GRADINGDUE;
             if ($checkmark->gradingdue) {
                 $event->eventtype = $eventtype;
-                $event->name = $checkmark->name;
+                $event->name = get_string('calendargradingdue', 'checkmark', $checkmark->name);
 
                 $event->timestart = $checkmark->gradingdue;
                 $event->timesort = $checkmark->gradingdue;
