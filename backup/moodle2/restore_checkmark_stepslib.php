@@ -320,8 +320,10 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
         $data->submissionid = $this->get_new_parentid('checkmark_submission');
         $data->exampleid = $this->get_mappingid('checkmark_examples', $data->exampleid);
 
-        $newitemid = $DB->insert_record('checkmark_checks', $data);
-        $this->set_mapping('checkmark_checks', $oldid, $newitemid, true);
+        if (isset($data->state)) {
+            $newitemid = $DB->insert_record('checkmark_checks', $data);
+            $this->set_mapping('checkmark_checks', $oldid, $newitemid, true);
+        }
     }
 
     /**
