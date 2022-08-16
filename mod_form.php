@@ -328,7 +328,8 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         $mform->setAdvanced('flexiblenaming');
 
-        $mform->addElement('text', 'examplenames', get_string('examplenames', 'checkmark').' ('.checkmark::DELIMITER.')');
+        $mform->addElement('textarea', 'examplenames', get_string('examplenames', 'checkmark').' ('.checkmark::DELIMITER.')',
+            array('wrap' => 'virtual', 'rows' => '1'));
         // We clean these by ourselves!
         $mform->setType('examplenames', PARAM_TEXT);
         $mform->addHelpButton('examplenames', 'examplenames', 'checkmark');
@@ -338,8 +339,8 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->hideIf('examplenames', 'flexiblenaming', 'notchecked');
         $mform->setAdvanced('examplenames');
 
-        $mform->addElement('text', 'examplegrades', get_string('examplegrades', 'checkmark').' ('.checkmark::DELIMITER.')',
-                           array('id' => 'id_examplegrades'));
+        $mform->addElement('textarea', 'examplegrades', get_string('examplegrades', 'checkmark').' ('.checkmark::DELIMITER.')',
+                           array('id' => 'id_examplegrades', 'wrap' => 'virtual', 'rows' => '1'));
         // We clean these by ourselves!
         $mform->setType('examplegrades', PARAM_SEQUENCE);
         $mform->addHelpButton('examplegrades', 'examplegrades', 'checkmark');

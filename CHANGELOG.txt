@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+4.1 (in development)
+------------------
+* [FEATURE] #6995 Use resizable textareas for flexiblenaming components
+
 4.0 (2022-08-10)
 ------------------
 * [FEATURE] #7200 New activity icon matching the style of 4.0
