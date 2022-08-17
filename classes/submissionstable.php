@@ -642,6 +642,7 @@ class submissionstable extends \table_sql {
         $table->sumabs     = get_user_preferences('checkmark_sumabs', 1);
         $table->sumrel     = get_user_preferences('checkmark_sumrel', 1);
         $forcesinglelinenames = get_user_preferences('checkmark_forcesinglelinenames', 0);
+        $sequentialnumbering = get_user_preferences('checkmark_sequentialnumbering', 0);
         $seperatenamecolumns = get_user_preferences('checkmark_seperatenamecolumns', 0);
         $table->quickgrade = 0;
         $table->filter = $filter;
