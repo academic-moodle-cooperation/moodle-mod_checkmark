@@ -2820,6 +2820,8 @@ class checkmark {
                 set_user_preference('checkmark_printheader', $printheader);
                 $forcesinglelinenames = optional_param('forcesinglelinenames', 0, PARAM_INT);
                 set_user_preference('checkmark_forcesinglelinenames', $forcesinglelinenames);
+                $sequentialnumbering = optional_param('sequentialnumbering', 0, PARAM_INT);
+                set_user_preference('checkmark_sequentialnumbering', $sequentialnumbering);
                 $zipped = optional_param('zipped', \mod_checkmark\MTablePDF::UNCOMPRESSED, PARAM_ALPHA);
                 set_user_preference('checkmark_zipped', $zipped);
             } else {
@@ -2845,6 +2847,7 @@ class checkmark {
             $pageorientation = get_user_preferences('checkmark_pageorientation', \mod_checkmark\MTablePDF::LANDSCAPE);
             $printheader = get_user_preferences('checkmark_printheader', 1);
             $forcesinglelinenames = get_user_preferences('checkmark_forcesinglelinenames', 0);
+            $sequentialnumbering = get_user_preferences('checkmark_sequentialnumbering', 0);
             $zipped = get_user_preferences('checkmark_zipped', \mod_checkmark\MTablePDF::UNCOMPRESSED);
         }
 
@@ -2867,7 +2870,8 @@ class checkmark {
                 $pageorientation,
                 $printheader,
                 $forcesinglelinenames,
-                $zipped
+                $zipped,
+                $sequentialnumbering
         ];
     }
 
@@ -3140,7 +3144,7 @@ class checkmark {
          * Get all settings preferences, some will be overwritten if a template is used!
          */
         list($filter, $sumabs, $sumrel, $seperatenamecolumns, $format, $printperpage, ,
-                $textsize, $orientation, $printheader, $forcesinglelinenames) = $this->print_preferences();
+                $textsize, $orientation, $printheader, $forcesinglelinenames, $zipped, $sequentialnumbering) = $this->print_preferences();
 
         if (!empty($template)) {
             $classname = '\\mod_checkmark\\local\\exporttemplates\\' . $template;
@@ -3194,6 +3198,7 @@ class checkmark {
         $pdf->setheadertext($paramarray);
 
         $pdf->showheaderfooter($printheader);
+        $pdf->sequentialnumbering($sequentialnumbering);
         $pdf->setfontsize($textsize);
 
         if (is_number($printperpage) && $printperpage != 0) {
@@ -3222,7 +3227,7 @@ class checkmark {
         $export = new \mod_checkmark\export();
         $export->set_general_data($groupmode, $currentgroup, $usrlst, $filter, $format, $sumabs, $sumrel, $seperatenamecolumns);
         if ($format === \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
-            $export->set_pdf_data($orientation, $printheader, $textsize, $printperpage, $forcesinglelinenames);
+            $export->set_pdf_data($orientation, $printheader, $textsize, $printperpage, $forcesinglelinenames, $sequentialnumbering);
         }
         if ($template) {
             $export->set_used_template($template);
@@ -3266,7 +3271,7 @@ class checkmark {
          * Get all settings preferences, some will be overwritten if a template is used!
          */
         list($filter, $sumabs, $sumrel, $seperatenamecolumns, $format, $printperpage, ,
-                $textsize, $orientation, $printheader, $forcesinglelinenames) = $this->print_preferences();
+                $textsize, $orientation, $printheader, $forcesinglelinenames, $sequentialnumbering) = $this->print_preferences();
 
         if (!empty($template)) {
             $classname = '\\mod_checkmark\\local\\exporttemplates\\' . $template;
@@ -3305,6 +3310,7 @@ class checkmark {
 
             $pdf->setoutputformat(\mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
             $pdf->showheaderfooter($printheader);
+            $pdf->sequentialnumbering($sequentialnumbering);
             $pdf->setfontsize($textsize);
 
             if (is_number($printperpage) && $printperpage != 0) {
@@ -3340,7 +3346,8 @@ class checkmark {
             $groupid = $currentgroup ? $currentgroup->id : 0;
             $curexport->set_general_data($groupmode, $groupid, $usrlst, $filter, $format, $sumabs, $sumrel, $seperatenamecolumns);
             if ($format === \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
-                $curexport->set_pdf_data($orientation, $printheader, $textsize, $printperpage, $forcesinglelinenames);
+                $curexport->set_pdf_data($orientation, $printheader, $textsize, $printperpage,
+                    $forcesinglelinenames, $sequentialnumbering);
             }
             if ($template) {
                 $curexport->set_used_template($template);

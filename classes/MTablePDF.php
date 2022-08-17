@@ -100,6 +100,8 @@ class MTablePDF extends \pdf {
     private $fontsize = self::FONTSIZE_MEDIUM;
     /** @var $showheaderfooter bool if we should show header and footer in PDF */
     private $showheaderfooter = true;
+    /** @var $sequentialnumbering bool if we should display a sequential number at the beginning of each row */
+    private $sequentialnumbering = false;
 
     /** @var $columnwidths array columns widths */
     private $columnwidths = [];
@@ -392,6 +394,15 @@ class MTablePDF extends \pdf {
      */
     public function showheaderfooter($showheaderfooter) {
         $this->showheaderfooter = $showheaderfooter;
+    }
+
+    /**
+     * Define if sequentialnumbering before each row should be printed
+     *
+     * @param bool $sequentialnumbering
+     */
+    public function sequentialnumbering($sequentialnumbering) {
+        $this->sequentialnumbering = $sequentialnumbering;
     }
 
     /**
@@ -726,6 +737,19 @@ class MTablePDF extends \pdf {
      * @param string $filename Name of the exported file
      */
     private function get_pdf($filename) {
+
+        if ($this->sequentialnumbering) {
+            array_unshift($this->columnwidths, ['mode' => 'Fixed', 'value' => '7']);
+            array_unshift($this->columnformat,
+                [["fill" => 0, "align" => "C", "stretch" => self::STRETCH_DISABLED],
+                    ["fill" => 1, "align" => "C", "stretch" => self::STRETCH_DISABLED]]);
+            array_unshift($this->titles, '');
+            $i = 1;
+            foreach ($this->data as &$row) {
+                array_unshift($row, ['rowspan' => 0, 'data' => $i++]);
+            }
+            $test = 1;
+        }
         $this->prepare_pdf();
 
         // Data.
@@ -871,6 +895,7 @@ class MTablePDF extends \pdf {
             $first = true;
             $line++;
             $i = 0;
+
             foreach ($row as $idx => $cell) {
                 if (is_null($cell['data'])) {
                     $cell['data'] = $prev[$idx]['data'];

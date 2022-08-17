@@ -160,6 +160,11 @@ class exportform extends \moodleform {
         $mform->hideIf('forcesinglelinenames', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
         $mform->hideIf('forcesinglelinenames', 'template', 'neq', '');
 
+        $mform->addElement('checkbox', 'sequentialnumbering', get_string('sequentialnumbering', 'checkmark'));
+        $mform->addHelpButton('sequentialnumbering', 'sequentialnumbering', 'checkmark');
+        $mform->hideIf('sequentialnumbering', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
+        $mform->hideIf('sequentialnumbering', 'template', 'neq', '');
+
         $mform->addElement('submit', 'export', get_string('export', 'checkmark'));
 
         $mform->addElement('header', 'data_preview_header', get_string('data_preview', 'checkmark'));

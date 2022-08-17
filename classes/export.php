@@ -151,13 +151,16 @@ class export {
      * @param int $fontsize one of the constants: \\mod_checkmark\\MTablePDF::FONTSIZE\_(SMALL|MEDIUM|LARGE)
      * @param int $perpage
      * @param bool $singlelinenames
+     * @param bool $sequentialnumbering
      */
-    public function set_pdf_data($orientation, $headerfooter, $fontsize, $perpage, $singlelinenames) {
+    public function set_pdf_data($orientation, $headerfooter, $fontsize, $perpage,
+                                 $singlelinenames, $sequentialnumbering) {
         $this->orientation = $orientation;
         $this->headerfooter = $headerfooter;
         $this->fontsize = $fontsize;
         $this->perpage = $perpage;
         $this->singlelinenames = $singlelinenames;
+        $this->sequentialnumbering = $sequentialnumbering;
     }
 
     /**
