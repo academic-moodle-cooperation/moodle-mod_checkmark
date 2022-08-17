@@ -308,8 +308,6 @@ class submissionstable extends \table_sql {
             $returndata[$key] = $this->format_row($row);
         }
 
-        $this->format = self::FORMAT_HTML;
-
         if ($this->rawdata instanceof recordset_walk ||
                 $this->rawdata instanceof moodle_recordset) {
             $this->rawdata->close();
@@ -933,7 +931,7 @@ class submissionstable extends \table_sql {
             $params->id = $this->attributes['id'];
             $PAGE->requires->js_call_amd('mod_checkmark/overrides', 'initializer', [$params]);
         }
-        if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+        if ($this->quickgrade && !$this->use_no_html()) {
             $PAGE->requires->js_call_amd('mod_checkmark/quickgrade', 'init');
         }
 
@@ -1132,7 +1130,7 @@ class submissionstable extends \table_sql {
      */
     public function col_selection($values) {
         // If the data is being downloaded than we don't want to show HTML.
-        if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+        if ($this->use_no_html()) {
             return '';
         } else {
             $select = optional_param('select', null, PARAM_INT);
@@ -1187,7 +1185,7 @@ class submissionstable extends \table_sql {
      * @return string Return user fullname.
      */
     public function col_fullname($values) {
-        if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+        if ($this->use_no_html()) {
             return strip_tags(parent::col_fullname($values));
         } else {
             return parent::col_fullname($values);
@@ -1204,7 +1202,7 @@ class submissionstable extends \table_sql {
     public function col_picture($values) {
         global $OUTPUT;
         // If the data is being downloaded than we don't want to show HTML.
-        if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+        if ($this->use_no_html()) {
             return '';
         } else {
             return $OUTPUT->user_picture($values);
@@ -1228,12 +1226,13 @@ class submissionstable extends \table_sql {
                 }
                 $values->groupname .= $group->name;
             }
-            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+            if ($this->use_no_html()) {
                 return $values->groupname;
             } else {
                 return \html_writer::tag('div', $values->groupname, ['id' => 'gr'.$values->id]);
             }
-        } else if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+        } else if ($this->use_no_html() ||
+            $this->format == self::FORMAT_COLORS) {
             return '';
         } else {
             return \html_writer::tag('div', '-', ['id' => 'gr'.$values->id]);
@@ -1260,12 +1259,12 @@ class submissionstable extends \table_sql {
             if ($finalgrade->locked || $finalgrade->overridden) {
                 $gradeattr = ['id'    => 'g'.$values->id,
                     'class' => $lockedoroverridden];
-                if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                if ($this->use_no_html()) {
                     return $finalgrade->formatted_grade;
                 } else {
                     return \html_writer::tag('div', $finalgrade->formatted_grade, $gradeattr);
                 }
-            } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+            } else if ($this->quickgrade && !$this->use_no_html()) {
                 $attributes = [];
                 $attributes['tabindex'] = $this->tabindex++;
                 $menu = \html_writer::select($this->grademenu,
@@ -1279,7 +1278,7 @@ class submissionstable extends \table_sql {
                 $oldgrade = \html_writer::empty_tag('input', $oldgradeattr);
                 return \html_writer::tag('div', $menu.$oldgrade, ['id' => 'g'.$values->id]);
             } else {
-                if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                if ($this->use_no_html()) {
                     return $this->checkmark->display_grade($values->grade);
                 } else {
                     return \html_writer::tag('div', $this->checkmark->display_grade($values->grade),
@@ -1288,12 +1287,12 @@ class submissionstable extends \table_sql {
             }
         } else {
             if ($finalgrade->locked || $finalgrade->overridden) {
-                if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                if ($this->use_no_html()) {
                     return $finalgrade->formatted_grade;
                 } else {
                     return \html_writer::tag('div', $finalgrade->formatted_grade, ['id' => 'g'.$values->id]);
                 }
-            } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+            } else if ($this->quickgrade && !$this->use_no_html()) {
                 // Allow editing!
                 $attributes = [];
                 $attributes['tabindex'] = $this->tabindex++;
@@ -1308,7 +1307,7 @@ class submissionstable extends \table_sql {
                 $oldgrade = \html_writer::empty_tag('input', $oldgradearr);
                 return \html_writer::tag('div', $menu.$oldgrade, ['id' => 'g'.$values->id]);
             } else {
-                if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                if ($this->use_no_html()) {
                     return '-';
                 } else {
                     return \html_writer::tag('div', '-', ['id' => 'g'.$values->id]);
@@ -1329,12 +1328,12 @@ class submissionstable extends \table_sql {
         if ($values->feedbackid) {
             // Print Comment!
             if ($finalgrade->locked || $finalgrade->overridden) {
-                if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                if ($this->use_no_html()) {
                     return $finalgrade->str_feedback;
                 } else {
                     return \html_writer::tag('div', $finalgrade->str_feedback, ['id' => 'com'.$values->id]);
                 }
-            } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+            } else if ($this->quickgrade && !$this->use_no_html()) {
                 $feedbackclean = self::convert_html_to_text($values->feedback);
                 $inputarr = ['type'  => 'hidden',
                     'name'  => 'oldfeedback['.$values->id.']',
@@ -1347,7 +1346,7 @@ class submissionstable extends \table_sql {
                     'cols'     => 20]);
                 return \html_writer::tag('div', $content.$oldfeedback, ['id' => 'com'.$values->id]);
             } else {
-                if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                if ($this->use_no_html()) {
                     return $values->feedback;
                 } else {
                     return \html_writer::tag('div', $values->feedback, ['id' => 'com'.$values->id]);
@@ -1355,12 +1354,12 @@ class submissionstable extends \table_sql {
             }
         } else {
             if ($finalgrade->locked || $finalgrade->overridden) {
-                if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                if ($this->use_no_html()) {
                     return $finalgrade->str_feedback;
                 } else {
                     return \html_writer::tag('div', $finalgrade->str_feedback, ['id' => 'com'.$values->id]);
                 }
-            } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+            } else if ($this->quickgrade && !$this->use_no_html()) {
                 $inputarr = ['type'  => 'hidden',
                     'name'  => 'oldfeedback'.$values->id,
                     'value' => trim($values->feedback)];
@@ -1373,7 +1372,7 @@ class submissionstable extends \table_sql {
                     'cols'      => '20']);
                 return \html_writer::tag('div', $content.$oldfeedback, ['id' => 'com'.$values->id]);
             } else {
-                if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                if ($this->use_no_html()) {
                     return '';
                 } else {
                     return \html_writer::tag('div', '&nbsp;', ['id' => 'com'.$values->id]);
@@ -1391,7 +1390,7 @@ class submissionstable extends \table_sql {
      * @throws coding_exception
      */
     public function col_timesubmitted($values) {
-        if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+        if ($this->use_no_html()) {
             $timeformat = get_string('strftimedatetimeshort');
         } else {
             $timeformat = get_string('strftimedatetime');
@@ -1409,13 +1408,13 @@ class submissionstable extends \table_sql {
             if ($values->timesubmitted >= $timedue) {
                 $content .= $this->checkmark->display_lateness($values->timesubmitted, $values->id);
             }
-            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+            if ($this->use_no_html()) {
                 return strip_tags($content);
             } else {
                 return \html_writer::tag('div', $content, ['id' => 'ts'.$values->id]);
             }
         } else {
-            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+            if ($this->use_no_html()) {
                 return '-';
             } else {
                 return \html_writer::tag('div', '-', ['id' => 'ts'.$values->id]);
@@ -1432,7 +1431,7 @@ class submissionstable extends \table_sql {
      * @throws coding_exception
      */
     public function col_timemarked($values) {
-        if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+        if ($this->use_no_html()) {
             $timeformat = get_string('strftimedatetimeshort');
         } else {
             $timeformat = get_string('strftimedatetime');
@@ -1440,20 +1439,20 @@ class submissionstable extends \table_sql {
         $finalgrade = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$values->id];
         if ($finalgrade->locked || $finalgrade->overridden) {
             $date = userdate($finalgrade->dategraded, $timeformat);
-            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+            if ($this->use_no_html()) {
                 return $date;
             } else {
                 return \html_writer::tag('div', $date, ['id' => 'tt'.$values->id]);
             }
         } else if ($values->feedbackid && $values->timemarked > 0) {
             $date = userdate($values->timemarked, $timeformat);
-            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+            if ($this->use_no_html()) {
                 return $date;
             } else {
                 return \html_writer::tag('div', $date, ['id' => 'tt'.$values->id]);
             }
         } else {
-            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+            if ($this->use_no_html()) {
                 return \html_writer::tag('div', '-', ['id' => 'tt'.$values->id]);
             } else {
                 return '-';
@@ -1475,7 +1474,7 @@ class submissionstable extends \table_sql {
         // TODO: enhance with AJAX grading!
         $status = ($values->timemarked > 0) && ($values->timemarked >= $values->timesubmitted);
         $text = $status ? $this->strupdate : $this->strgrade;
-        if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+        if ($this->use_no_html()) {
             return $text;
         } else {
             // No more buttons, we use popups!
@@ -1548,7 +1547,7 @@ class submissionstable extends \table_sql {
      */
     public function col_finalgrade($values) {
         $finalgrade = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$values->id];
-        if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+        if ($this->use_no_html()) {
             return $finalgrade->str_grade;
         } else {
             return \html_writer::tag('span', $finalgrade->str_grade, ['id' => 'finalgrade_'.$values->id]);
@@ -1568,7 +1567,7 @@ class submissionstable extends \table_sql {
         foreach ($this->gradinginfo->outcomes as $n => $outcome) {
             $options = make_grades_menu(-$outcome->scaleid);
             $index = $outcome->grades[$values->id]->grade;
-            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+            if ($this->use_no_html()) {
                 $outcomes .= $outcome->name.': '.$options[$index]."\n";
             } else {
                 $outcomes .= \html_writer::start_tag('div', ['class' => 'outcome']);
@@ -1607,7 +1606,7 @@ class submissionstable extends \table_sql {
             // Summary rel!
             $summary = round($values->summary, 2).'%';
         }
-        if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+        if ($this->use_no_html()) {
             return $summary;
         } else {
             return \html_writer::tag('div', $summary, ['id' => 'sum'.$values->id]);
@@ -1633,14 +1632,14 @@ class submissionstable extends \table_sql {
         }
 
         if ($finalgrade->locked || $finalgrade->overridden) {
-            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+            if ($this->use_no_html()) {
                 return $finalgrade->grade;
             } else {
                 $symbol = checkmark_get_attendance_symbol($finalgrade->grade);
                 return \html_writer::tag('div', $symbol, ['id' => 'com'.$values->id]);
             }
         } else if (has_capability('mod/checkmark:trackattendance', $this->context)
-            && $this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+            && $this->quickgrade && !$this->use_no_html()) {
             if ($values->attendance === null) {
                 $values->attendance = -1;
             }
@@ -1661,7 +1660,7 @@ class submissionstable extends \table_sql {
 
             return \html_writer::tag('div', $content.$oldattendance, ['id' => 'att'.$values->id]);
         } else {
-            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+            if ($this->use_no_html()) {
                 if ($values->attendance == null) {
                     $values->attendance = '?';
                 }
@@ -1703,12 +1702,12 @@ class submissionstable extends \table_sql {
         if ($presgradebook && ($finalgrade->locked || $finalgrade->overridden)) {
             $gradeattr = ['id'    => 'pg'.$values->id,
                 'class' => $lockedoroverridden];
-            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+            if ($this->use_no_html()) {
                 return $finalgrade->formatted_grade;
             } else {
                 return \html_writer::tag('div', $finalgrade->formatted_grade, $gradeattr);
             }
-        } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+        } else if ($this->quickgrade && !$this->use_no_html()) {
             if ($values->presentationgrade === null) {
                 $values->presentationgrade = -1;
             }
@@ -1725,7 +1724,7 @@ class submissionstable extends \table_sql {
             $oldgrade = \html_writer::empty_tag('input', $oldgradeattr);
             return \html_writer::tag('div', $menu.$oldgrade, ['id' => 'pg'.$values->id]);
         } else {
-            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+            if ($this->use_no_html()) {
                 if ($values->feedbackid) {
                     return $this->checkmark->display_grade($values->presentationgrade, CHECKMARK_PRESENTATION_ITEM);
                 } else {
@@ -1763,12 +1762,12 @@ class submissionstable extends \table_sql {
 
         // Print Comment!
         if ($presgradebook && ($finalgrade->locked || $finalgrade->overridden)) {
-            if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+            if ($this->use_no_html()) {
                 return $finalgrade->str_feedback;
             } else {
                 return \html_writer::tag('div', $finalgrade->str_feedback, ['id' => 'pcom'.$values->id]);
             }
-        } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+        } else if ($this->quickgrade && !$this->use_no_html()) {
             $feedbackclean = self::convert_html_to_text($values->presentationfeedback);
             $inputarr = ['type'  => 'hidden',
                 'name'  => 'oldpresentationfeedback['.$values->id.']',
@@ -1783,13 +1782,13 @@ class submissionstable extends \table_sql {
             return \html_writer::tag('div', $content.$oldfeedback, ['id' => 'pcom'.$values->id]);
         } else {
             if ($values->feedbackid) {
-                if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                if ($this->use_no_html()) {
                     return ($values->presentationfeedback === null) ? '' : $values->presentationfeedback;
                 } else {
                     return \html_writer::tag('div', $values->presentationfeedback, ['id' => 'pcom'.$values->id]);
                 }
             } else {
-                if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                if ($this->use_no_html()) {
                     return '';
                 } else {
                     return \html_writer::tag('div', '&nbsp;', ['id' => 'com'.$values->id]);
@@ -1831,9 +1830,9 @@ class submissionstable extends \table_sql {
             $test = $this->is_downloading();
             if ($this->is_downloading() == 'xlsx' || $this->is_downloading() == 'ods' || $this->format == self::FORMAT_COLORS) {
                 return $example->get_examplestate_for_export_with_colors();
-            } else if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+            } else if ($this->use_no_html()) {
                 return $example->get_examplestate_for_export();
-            } else if ($this->quickgrade && !$this->is_downloading() && ($this->format != self::FORMAT_DOWNLOAD)) {
+            } else if ($this->quickgrade && !$this->use_no_html()) {
                 $attributes = ['class' => 'examplecheck checkline' . $values->id . ' $' . $example->grade,
                     'id' => 'ex'.$values->id.'_'.$match[1]];
                 if ($example->is_forced()) {
@@ -1864,13 +1863,13 @@ class submissionstable extends \table_sql {
         }
         if (in_array($colname, $useridentity) || in_array($colname, $allnamefields)) {
             if (!empty($values->$colname)) {
-                if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                if ($this->use_no_html()) {
                     return $values->$colname;
                 } else {
                     return \html_writer::tag('div', $values->$colname, ['id' => 'u'.$colname.$values->id]);
                 }
             } else {
-                if ($this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD) {
+                if ($this->use_no_html()) {
                     return '-';
                 } else {
                     return \html_writer::tag('div', '-', ['id' => 'u'.$colname.$values->id]);
@@ -1892,6 +1891,14 @@ class submissionstable extends \table_sql {
         }
         $text = str_replace(array('<br />', '<br>', '</p>'), "\n", $html);
         return strip_tags(trim($text));
+    }
+
+    /**
+     * Helper function to determine if html should be used in export components
+     * @return bool
+     */
+    public function use_no_html() {
+        return $this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD || $this->format == self::FORMAT_COLORS;
     }
 
     /**
