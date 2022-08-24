@@ -1244,6 +1244,13 @@ function xmldb_checkmark_upgrade($oldversion) {
         // Launch change of nullability for field state.
         $dbman->change_field_notnull($table, $field);
 
+        // Define key submission_check_key (unique) to be added to checkmark_checks.
+        $table = new xmldb_table('checkmark_checks');
+        $key = new xmldb_key('submission_check_key', XMLDB_KEY_UNIQUE, ['exampleid', 'submissionid', 'state']);
+
+        // Launch add key submission_check_key.
+        $dbman->add_key($table, $key);
+
         // Checkmark savepoint reached.
         upgrade_mod_savepoint(true, 2021052806, 'checkmark');
     }
