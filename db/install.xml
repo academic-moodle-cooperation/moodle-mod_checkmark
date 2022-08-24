@@ -99,6 +99,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="exampleid" TYPE="foreign" FIELDS="exampleid" REFTABLE="checkmark_examples" REFFIELDS="id"/>
         <KEY NAME="submissionid" TYPE="foreign" FIELDS="submissionid" REFTABLE="checkmark_submissions" REFFIELDS="id"/>
+        <KEY NAME="submission_check_key" TYPE="unique" FIELDS="exampleid, submissionid, state"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="checkmark_overrides" COMMENT="Table containing user-specific overrides for available-, due- and cutoff-dates for users.">
