@@ -209,6 +209,7 @@ $string['presentationgradingcount'] = 'Graded presentations';
 $string['presentationheader'] = 'Presentation grading';
 $string['printsettingstitle'] = 'Export settings';
 $string['remembertoupdategrades'] = 'You\'ve got automatically graded submissions in this checkmark. We highly recommend to update or regrade the submissions if you changed the examples\' grades!';
+$string['reverttodefaults'] = 'Revert to checkmark defaults';
 $string['search:activity'] = 'Checkmark - activity information';
 $string['sendnotifications'] = 'Send notifications';
 $string['select'] = 'Select';

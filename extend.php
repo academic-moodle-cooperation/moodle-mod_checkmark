@@ -88,22 +88,33 @@ try {
         $instance->reorder_group_overrides($groupidfrom, $mode === \mod_checkmark\overrideform::DOWN);
         redirect($return, "Entry swapped", null, \core\output\notification::NOTIFY_SUCCESS);
     } else if ($data = $form->get_data()) {
-        $instance = new checkmark($cm->id, $checkmark, $cm, $course);
-        if ($type === \mod_checkmark\overrideform::GROUP) {
-            $data->userids = [];
-            if (!empty($data->groups)) {
-                $instance->override_dates($data->groups, $data->timeavailable, $data->timedue,
-                        $data->cutoffdate, \mod_checkmark\overrideform::GROUP);
+        if (!empty($data->resetbutton)) {
+            $datareset = [];
+            if (isset($data->groups)) {
+                $datareset['groups'] = $data->groups;
+            } else if ($data->userids) {
+                $datareset['userids'] = $data->userids;
             }
-        } else if (!empty($data->userids)) {
-            $instance->override_dates($data->userids, $data->timeavailable, $data->timedue, $data->cutoffdate);
-        }
+            $form->reset();
+            $form->set_data($datareset);
+        } else {
+            $instance = new checkmark($cm->id, $checkmark, $cm, $course);
+            if ($type === \mod_checkmark\overrideform::GROUP) {
+                $data->userids = [];
+                if (!empty($data->groups)) {
+                    $instance->override_dates($data->groups, $data->timeavailable, $data->timedue,
+                        $data->cutoffdate, \mod_checkmark\overrideform::GROUP);
+                }
+            } else if (!empty($data->userids)) {
+                $instance->override_dates($data->userids, $data->timeavailable, $data->timedue, $data->cutoffdate);
+            }
 
-        if (!empty($data->override)) {
-            redirect($return, get_string('dates_overwritten', 'checkmark'), null, \core\output\notification::NOTIFY_SUCCESS);
-        }
+            if (!empty($data->override)) {
+                redirect($return, get_string('dates_overwritten', 'checkmark'), null, \core\output\notification::NOTIFY_SUCCESS);
+            }
 
-        \core\notification::add(get_string('dates_overwritten', 'checkmark'), \core\output\notification::NOTIFY_SUCCESS);
+            \core\notification::add(get_string('dates_overwritten', 'checkmark'), \core\output\notification::NOTIFY_SUCCESS);
+        }
     } else {
         if (!empty($users)) {
             $entities = json_decode(urldecode(required_param('users', PARAM_RAW)));
