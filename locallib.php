@@ -2427,6 +2427,8 @@ class checkmark {
 
         if ($submitform->is_cancelled()) {
             redirect('submissions.php?id=' . $this->cm->id);
+        } else {
+            $submitform->is_validated();
         }
 
         $submitform->set_data($mformdata);

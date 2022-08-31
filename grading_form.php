@@ -153,14 +153,20 @@ class mod_checkmark_grading_form extends moodleform {
         if ($this->_customdata->gradingdisabled) {
             $attributes['disabled'] = 'disabled';
         }
+        if ($this->_customdata->checkmark->grade > 0) {
+            $name = get_string('gradeoutof', 'checkmark', $this->_customdata->checkmark->grade);
+            $mform->addElement('text', 'xgrade', $name);
+            $mform->addHelpButton('xgrade', 'gradeoutofhelp', 'checkmark');
+            $mform->setType('xgrade', PARAM_ALPHANUM);
+        } else {
+            $grademenu = array(-1 => get_string('nograde')) + make_grades_menu($this->_customdata->checkmark->grade);
 
-        $grademenu = array(-1 => get_string('nograde')) + make_grades_menu($this->_customdata->checkmark->grade);
-
-        $mform->addElement('select', 'xgrade', get_string('grade', 'grades').':', $grademenu, $attributes);
+            $mform->addElement('select', 'xgrade', get_string('grade', 'grades').':', $grademenu, $attributes);
+            $mform->setType('xgrade', PARAM_INT);
+        }
         if ($this->_customdata->feedbackobj !== false) {
             $mform->setDefault('xgrade', $this->_customdata->feedbackobj->grade );
         }
-        $mform->setType('xgrade', PARAM_INT);
     }
 
     /**
@@ -445,5 +451,22 @@ class mod_checkmark_grading_form extends moodleform {
                 $mform->setDefault($example->get_id(), 1);
             }
         }
+    }
+
+    /**
+     * Validates current checkmark grade submission
+     *
+     * @param array $data data from the module form
+     * @param array $files data about files transmitted by the module form
+     * @return string[] array of error messages, to be displayed at the form fields
+     */
+    public function validation($data, $files) {
+        // Allow plugin checkmarks to do any extra validation after the form has been submitted!
+        $errors = parent::validation($data, $files);
+
+        if ($data['xgrade'] > $this->_customdata->checkmark->grade && $this->_customdata->checkmark->grade > 0){
+            $errors['timedue'] = get_string('maxgradeviolation', 'checkmark', $this->_customdata->checkmark->grade);
+        }
+        return $errors;
     }
 }
