@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+3.11.6 (2022-07-05)
+------------------
+* [FIXED] #7277 Fix occasional presence of null values in checkmark_checks.state preventing proper point evaluations
+* [FIXED] #7179 Use calendar event titels fitting with the ones of core plugins
+* [FIXED] #7218 Fixed view all checkmarks failing when a custom user field as set as part of show user identity
+* [FIXED] #7192 Fixed behavior of checkmark when using PHP 8.0
+* [FIXED] #7190 Use custom langstrings for activity completion strings
+
+3.11.5 (2022-07-05)
+------------------
+* [FIXED] #7225 Fix fastgrading so all combinations and grades can be submitted
+
+3.11.4 (2022-06-01)
+------------------
+* [FIXED] #7179 Fix a bug causing xslx/ods download to fail on certain environment configurations
+
 3.11.3 (2022-04-13)
 ------------------
 * [FEATURE] #7139 Relevant dates are shown when show activity details is set
