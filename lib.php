@@ -2116,6 +2116,17 @@ function checkmark_supports($feature) {
 function checkmark_extend_settings_navigation(settings_navigation $settings, navigation_node $checkmarknode) {
     global $PAGE, $DB, $CFG;
 
+    // We want to add these new nodes after the Edit settings node, and before the
+    // Locally assigned roles node. Of course, both of those are controlled by capabilities.
+    $keys = $checkmarknode->get_children_key_list();
+    $beforekey = null;
+    $i = array_search('modedit', $keys);
+    if ($i === false and array_key_exists(0, $keys)) {
+        $beforekey = $keys[0];
+    } else if (array_key_exists($i + 1, $keys)) {
+        $beforekey = $keys[$i + 1];
+    }
+
     $checkmarkrow = $DB->get_record('checkmark', array('id' => $PAGE->cm->instance));
     require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 
@@ -2136,7 +2147,7 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
         $key = 'viewsubmissions';
         $submissionnode = \navigation_node::create($string, $link, navigation_node::TYPE_SETTING,
             $string, $key, null);
-        $checkmarknode->add_node($submissionnode);
+        $checkmarknode->add_node($submissionnode, $beforekey);
     }
 
     // Add nodes to override dates for users/groups!
@@ -2153,7 +2164,7 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
         $icon = null;
         $groupnode = \navigation_node::create($shorttext, new moodle_url('/mod/checkmark/overrides.php',
                 array('id' => $PAGE->cm->id, 'mode' => 'group')), $type, $shorttext, $key, $icon);
-        $checkmarknode->add_node($groupnode);
+        $checkmarknode->add_node($groupnode, $beforekey);
 
         $shorttext = get_string('useroverrides', 'checkmark');
         $key = 'extendusers';
