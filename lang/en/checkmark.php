@@ -261,6 +261,7 @@ $string['trackattendance'] = 'Track attendance';
 $string['trackattendance_help'] = 'Activate this setting in order to enable tracking of participant\'s attendance.';
 $string['ungraded'] = 'Ungraded';
 $string['unknown'] = 'Unknown';
+$string['upgradekeyerror'] = 'Upgrade failed due to multiple checkmark checks existing for a given example/submission pair. Check out the following github issue for further details: {$a}';
 /*
  * End of Block for checkmark specific strings
  */
