@@ -156,13 +156,18 @@ class mod_checkmark_renderer extends plugin_renderer_base {
      * Render a table containing the current status of the grading process and attendance.
      *
      * @param \mod_checkmark\gradingsummary $summary Information that should be displayed in the grading summary
+     * @param object $cm Course module object of the calling activity
      * @return string
+     * @throws coding_exception
      */
-    public function render_checkmark_grading_summary($summary) {
+    public function render_checkmark_grading_summary($summary, $cm) {
         // Create a table for the data.
+        global $CFG;
         $o = '';
         $o .= $this->output->container_start('gradingsummary');
         $o .= $this->output->heading(get_string('gradingsummary', 'checkmark'), 3);
+        $o .= groups_print_activity_menu($cm,
+            $CFG->wwwroot . '/mod/checkmark/view.php?id=' . $cm->id, true);
         $o .= $this->output->box_start('boxaligncenter gradingsummarytable');
         $t = new html_table();
 
