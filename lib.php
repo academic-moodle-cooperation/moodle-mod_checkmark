@@ -1191,6 +1191,7 @@ function checkmark_refresh_override_events($checkmark, $override = null) {
 
         $event = new stdClass();
         $event->type = CALENDAR_EVENT_TYPE_ACTION;
+        $event->format = FORMAT_HTML;
         $event->description = format_module_intro('checkmark', $checkmarkinstance, $cmid);
         // Events module won't show user events when the courseid is nonzero.
         $event->courseid    = ($userid) ? 0 : $checkmarkinstance->course;
@@ -1233,7 +1234,7 @@ function checkmark_refresh_override_events($checkmark, $override = null) {
             } else {
                 unset($event->id);
             }
-            $event->name = $checkmarkinstance->name;
+            $event->name = get_string('calendardue', 'checkmark', $checkmarkinstance->name);
             calendar_event::create($event, false);
         }
     }
@@ -1323,7 +1324,7 @@ function checkmark_refresh_events($courseid = 0, $instance = null, $cm = null) {
             $eventtype = CHECKMARK_EVENT_TYPE_DUE;
             if ($checkmark->timedue) {
                 $event->eventtype = $eventtype;
-                $event->name = $checkmark->name;
+                $event->name = get_string('calendardue', 'checkmark', $checkmark->name);
 
                 $event->timestart = $checkmark->timedue;
                 $event->timesort = $checkmark->timedue;
@@ -1350,7 +1351,7 @@ function checkmark_refresh_events($courseid = 0, $instance = null, $cm = null) {
             $eventtype = CHECKMARK_EVENT_TYPE_GRADINGDUE;
             if ($checkmark->gradingdue) {
                 $event->eventtype = $eventtype;
-                $event->name = $checkmark->name;
+                $event->name = get_string('calendargradingdue', 'checkmark', $checkmark->name);
 
                 $event->timestart = $checkmark->gradingdue;
                 $event->timesort = $checkmark->gradingdue;
@@ -2171,7 +2172,6 @@ function checkmark_page_type_list() {
  */
 function mod_checkmark_core_calendar_is_event_visible(calendar_event $event) {
     global $CFG;
-
     require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 
     $cm = get_fast_modinfo($event->courseid)->instances['checkmark'][$event->instance];
@@ -2181,11 +2181,9 @@ function mod_checkmark_core_calendar_is_event_visible(calendar_event $event) {
 
     if ($event->eventtype == CHECKMARK_EVENT_TYPE_GRADINGDUE) {
         return has_capability('mod/checkmark:grade', $context);
-    } else if ($event->eventtype == CHECKMARK_EVENT_TYPE_DUE) {
-        return has_capability('mod/checkmark:submit', $context) && $checkmark->isopen(true);
+    } else {
+        return true;
     }
-
-    return false;
 }
 
 /**

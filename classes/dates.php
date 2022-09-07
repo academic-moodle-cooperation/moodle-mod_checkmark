@@ -50,7 +50,7 @@ class dates extends activity_dates {
             $timeavailable = $this->cm->customdata['timeavailable'];
             $openlabelid = $timeavailable > $now ? 'activitydate:opens' : 'activitydate:opened';
             $dates[] = [
-                'label' => get_string($openlabelid, 'core_course'),
+                'label' => get_string($openlabelid, 'mod_checkmark'),
                 'timestamp' => (int) $timeavailable,
             ];
         }
@@ -58,7 +58,7 @@ class dates extends activity_dates {
         if (isset($this->cm->customdata['timedue'])) {
             $timedue = $this->cm->customdata['timedue'];
             $dates[] = [
-                'label' => get_string('activitydate:submissionsdue', 'mod_assign'),
+                'label' => get_string('activitydate:due', 'mod_checkmark'),
                 'timestamp' => (int) $timedue,
             ];
         }
