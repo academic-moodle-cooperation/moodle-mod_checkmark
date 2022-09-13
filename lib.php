@@ -1417,7 +1417,7 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
     $owngroups = groups_get_user_groups($course->id);
 
     foreach ($submissions as $submission) {
-        if (!property_exists($modinfo->cms, $submission->cmid)) {
+        if (!array_key_exists($submission->cmid, $modinfo->cms)) {
             continue;
         }
         $cm = $modinfo->cms[$submission->cmid];
@@ -1434,7 +1434,7 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
          * only graders will see it if specified!
          */
         if (empty($showrecentsubs)) {
-            if (!property_exists($grader, $cm->id)) {
+            if (!array_key_exists($cm->id, $grader)) {
                 $grader[$cm->id] = has_capability('moodle/grade:viewall',
                         context_module::instance($cm->id));
             }
