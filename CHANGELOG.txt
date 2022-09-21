@@ -1,14 +1,11 @@
 CHANGELOG
 =========
 
-4.1 (in development)
-------------------
-* [FEATURE] #6995 Use resizable textareas for flexiblenaming components
-
 4.0 (2022-08-10)
 ------------------
 * [FEATURE] #7200 New activity icon matching the style of 4.0
 * [FEATURE] #7237 Adjust structure of the checkmark activity page to fit new style of 4.0
+* [FEATURE] #6995 Use resizable textareas for flexiblenaming components
 * [CHANGED] #6991 Revised the phrasing of multiple langstrings
 * [FIXED] #7179 Use calendar event titels fitting with the ones of core plugins
 * [FIXED] #7218 Fixed view all checkmarks failing when a custom user field as set as part of show user identity
