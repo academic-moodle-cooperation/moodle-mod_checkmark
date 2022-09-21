@@ -12,7 +12,7 @@ CHANGELOG
 * [CHANGED] #6991 Revised the phrasing of multiple langstrings
 * [FIXED] #7179 Use calendar event titels fitting with the ones of core plugins
 * [FIXED] #7218 Fixed view all checkmarks failing when a custom user field as set as part of show user identity
-* [FIXED] #7192 Fixed behavior of checkmark when using PHP 8.0
+* [FIXED] #7192/#7310 Fixed behavior of checkmark when using PHP 8.0
 * [FIXED] #7190 Use custom langstrings for activity completion strings
 
 3.11.6 (2022-07-05)
