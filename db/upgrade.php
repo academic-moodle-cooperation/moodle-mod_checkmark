@@ -1244,8 +1244,18 @@ function xmldb_checkmark_upgrade($oldversion) {
         // Launch change of nullability for field state.
         $dbman->change_field_notnull($table, $field);
 
-        // Checkmark savepoint reached.
-        upgrade_mod_savepoint(true, 2021052806, 'checkmark');
+        try {
+            // Define key submission_check_key (unique) to be added to checkmark_checks.
+            $table = new xmldb_table('checkmark_checks');
+            $key = new xmldb_key('submission_check_key', XMLDB_KEY_UNIQUE, ['exampleid', 'submissionid']);
+
+            // Launch add key submission_check_key.
+            $dbman->add_key($table, $key);
+            // Checkmark savepoint reached.
+            upgrade_mod_savepoint(true, 2021052806, 'checkmark');
+        } catch (Exception $e) {
+            print_error('upgradekeyerror', 'checkmark', '', 'https://github.com/academic-moodle-cooperation/moodle-mod_checkmark/issues/72', $e->getTraceAsString());
+        }
     }
 
     return true;
