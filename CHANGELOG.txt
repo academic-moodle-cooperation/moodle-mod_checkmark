@@ -1,16 +1,21 @@
 CHANGELOG
 =========
 
-4.0 (2022-08-10)
+4.0.0 (2022-08-10)
 ------------------
 * [FEATURE] #7200 New activity icon matching the style of 4.0
 * [FEATURE] #7237 Adjust structure of the checkmark activity page to fit new style of 4.0
 * [FEATURE] #6995 Use resizable textareas for flexiblenaming components
+* [FEATURE] #7146 Enable sequential numbering in PDF export
+* [FEATURE] #7247 Add an option to reset overide settings
 * [CHANGED] #6991 Revised the phrasing of multiple langstrings
 * [FIXED] #7179 Use calendar event titels fitting with the ones of core plugins
 * [FIXED] #7218 Fixed view all checkmarks failing when a custom user field as set as part of show user identity
 * [FIXED] #7192/#7310 Fixed behavior of checkmark when using PHP 8.0
 * [FIXED] #7190 Use custom langstrings for activity completion strings
+* [FIXED] #7098 Fix an error when using attendence in xlsx and ods export
+' [FIXED] #7157 Show urls in calendar subscription
+
 
 3.11.6 (2022-07-05)
 ------------------
