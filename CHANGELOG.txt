@@ -14,7 +14,6 @@ CHANGELOG
 * [FIXED] #7190 Use custom langstrings for activity completion strings
 * [FIXED] #7098 Fix an error when using attendence in xlsx and ods export
 * [FIXED] #7157 Show urls in calendar subscription
-* [FIXED] #7310 Fix PHP-8.0 compatibility
 
 3.11.5 (2022-07-05)
 ------------------
