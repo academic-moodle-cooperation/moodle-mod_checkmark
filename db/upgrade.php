@@ -1258,5 +1258,19 @@ function xmldb_checkmark_upgrade($oldversion) {
         }
     }
 
+    if ($oldversion < 2022100500) {
+        // Define field calendarteachers to be added to checkmark.
+        $table = new xmldb_table('checkmark');
+        $field = new xmldb_field('calendarteachers', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'emailteachers');
+
+        // Conditionally launch add field completionsubmit.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2022100500, 'checkmark');
+    }
+
     return true;
 }
