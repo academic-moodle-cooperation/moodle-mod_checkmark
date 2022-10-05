@@ -34,6 +34,7 @@ define('CHECKMARK_PRESENTATION_ITEM', 2);
 
 /** EVENT TYPE DUE - deadline for student's submissions */
 define('CHECKMARK_EVENT_TYPE_DUE', 'due'); // Is backwards compatible to former events!
+
 /** EVENT TYPE GRADINGDUE - reminder for teachers to grade */
 define('CHECKMARK_EVENT_TYPE_GRADINGDUE', 'gradingdue');
 
@@ -2206,7 +2207,7 @@ function checkmark_page_type_list() {
  * @return bool Returns true if the event is visible to the current user, false otherwise.
  */
 function mod_checkmark_core_calendar_is_event_visible(calendar_event $event) {
-    global $CFG;
+    global $CFG, $USER;
     require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 
     $cm = get_fast_modinfo($event->courseid)->instances['checkmark'][$event->instance];
@@ -2215,7 +2216,9 @@ function mod_checkmark_core_calendar_is_event_visible(calendar_event $event) {
     $checkmark = new checkmark($cm->id, null, $cm, null);
 
     if ($event->eventtype == CHECKMARK_EVENT_TYPE_GRADINGDUE) {
-        return has_capability('mod/checkmark:grade', $context);
+        return has_capability('mod/checkmark:grade', $context, $USER->id);
+    } else if ($event->eventtype == CHECKMARK_EVENT_TYPE_DUE) {
+        return !has_capability('mod/checkmark:grade', $context, $USER->id) || $checkmark->checkmark->calendarteachers;
     } else {
         return true;
     }
@@ -2273,8 +2276,9 @@ function mod_checkmark_core_calendar_provide_event_action(calendar_event $event,
                 'edit' => 1
         ]);
         $itemcount = 1;
-
-        if (!$usersubmission) {
+        if (has_capability('mod/checkmark:grade', $context)) {
+            $name = get_string('gotoactivity', 'checkmark');
+        } else if (!$usersubmission) {
             // The user has not yet submitted anything. Show the addsubmission link.
             $name = get_string('addsubmission', 'checkmark');
         } else {

@@ -1,4 +1,4 @@
-<XMLDB xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" PATH="mod/checkmark/db" VERSION="2021052806" COMMENT="XMLDB file for Moodle mod/checkmark" xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
+<XMLDB xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" PATH="mod/checkmark/db" VERSION="2022100500" COMMENT="XMLDB file for Moodle mod/checkmark" xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
   <TABLES>
     <TABLE NAME="checkmark" COMMENT="Defines checkmarks">
       <FIELDS>
@@ -14,6 +14,7 @@
         <FIELD NAME="cutoffdate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="gradingdue" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="emailteachers" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="calendarteachers" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="exampleprefix" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="trackattendance" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

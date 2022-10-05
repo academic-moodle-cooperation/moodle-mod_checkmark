@@ -122,6 +122,8 @@ $string['cantfixevent'] = 'Couldn\'t fix event with ID {$a->id}, named {$a->name
 $string['cfg_nowarning'] = 'No warning';
 $string['cfg_pdfexampleswarning'] = 'Amount of examples to display a warning for PDF export';
 $string['cfg_pdfexampleswarning_desc'] = 'Minimum amount of examples above which a warning is displayed, that no reasonable PDF export can be guaranteed. Usually you don\'t have to change this, except you don\'t want to have it shown at all or if you want to tweak it for your installation.';
+$string['calendarteachers'] = 'Show due date in calendar of teachers';
+$string['calendarteachers_help'] = 'The due date of the checkmark can optionally be displayed in the calendar for teachers. For students, the due date is displayed in the calendar by default. Attention: If there are many checkmark exercises in the course, the calendar view can become cluttered for teachers.';
 $string['checkmark_overviewsummary'] = 'You\'ve checked {$a->checked_examples} / {$a->total_examples} examples ({$a->checked_grade} / {$a->total_grade} points)<br />{$a->grade}<br />';
 $string['checkmark_overviewsummary_nograde'] = 'You\'ve checked {$a->checked_examples} / {$a->total_examples} examples<br />{$a->grade}<br />';
 $string['checkmark_summary'] = 'You\'ve checked <span id="examples">{$a->checked_examples}</span> out of {$a->total_examples} examples.<br />(<span id="grade">{$a->checked_grade}</span> out of a maximum of {$a->total_grade} points)';
@@ -167,6 +169,7 @@ $string['flexiblenaming'] = 'Individual naming/grading';
 $string['flexiblenaming_help'] = 'If activated individual names and grades are being used for each example.';
 $string['forced'] = 'Overwritten by teacher';
 $string['format'] = 'Format';
+$string['gotoactivity'] = 'Go to activity';
 $string['grade_automatically'] = 'Grade automatically';
 $string['gradesum_mismatch'] = 'The sum of the individual grades won\'t match the chosen total grades ({$a->gradesum}/{$a->maxgrade})!';
 $string['grade_mismatch'] = 'The grade has to be an integral multiple of the amount of examples!';
