@@ -1272,5 +1272,32 @@ function xmldb_checkmark_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2022100500, 'checkmark');
     }
 
+    if ($oldversion < 2022120700) {
+        // Changing nullability of field timemodified on table checkmark_submissions to null.
+        $table = new xmldb_table('checkmark_submissions');
+        $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, '0', 'timecreated');
+
+        // Launch change of nullability for field timemodified.
+        $dbman->change_field_notnull($table, $field);
+
+        // Changing the default of field timecreated on table checkmark_overrides to 0.
+        $table = new xmldb_table('checkmark_overrides');
+        $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'cutoffdate');
+
+        // Launch change of default for field timecreated.
+        $dbman->change_field_default($table, $field);
+
+        // Changing the default of field modifierid on table checkmark_overrides to 0.
+        $table = new xmldb_table('checkmark_overrides');
+        $field = new xmldb_field('modifierid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timecreated');
+
+        // Launch change of default for field modifierid.
+        $dbman->change_field_default($table, $field);
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2022120700, 'checkmark');
+
+    }
+
     return true;
 }
