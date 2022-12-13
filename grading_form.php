@@ -165,7 +165,6 @@ class mod_checkmark_grading_form extends moodleform {
             $mform->setType('gradegroup[nullgrade]', PARAM_INT);
             $mform->addGroup($gradegroup, 'gradegroup', $name);
 
-            //$mform->addElement('text', 'xgrade', $name);
             $mform->addHelpButton('gradegroup', 'gradeoutofhelp', 'checkmark');
             $mform->setType('gradegroup[xgrade]', PARAM_INT);
             $mform->addRule('gradegroup', get_string('maxgradeviolation', 'checkmark', $this->_customdata->checkmark->grade), 'compare', '>=', 'client');
@@ -476,7 +475,7 @@ class mod_checkmark_grading_form extends moodleform {
         // Allow plugin checkmarks to do any extra validation after the form has been submitted!
         $errors = parent::validation($data, $files);
 
-        if (isset($data['xgrade']) && $data['xgrade'] > $this->_customdata->checkmark->grade && $this->_customdata->checkmark->grade > 0){
+        if (isset($data['xgrade']) && $data['xgrade'] > $this->_customdata->checkmark->grade && $this->_customdata->checkmark->grade > 0) {
             $errors['xgrade'] = get_string('maxgradeviolation', 'checkmark', $this->_customdata->checkmark->grade);
         }
         return $errors;
