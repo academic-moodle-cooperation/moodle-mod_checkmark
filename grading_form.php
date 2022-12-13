@@ -66,6 +66,8 @@ class mod_checkmark_grading_form extends moodleform {
         $mform->setType('saveuserid', PARAM_INT);
         $mform->addElement('hidden', 'filter', '0');
         $mform->setType('filter', PARAM_INT);
+        $mform->addElement('hidden', 'maxgrade', $this->_customdata->checkmark->grade);
+        $mform->setType('maxgrade', PARAM_INT);
 
         $mform->addElement('static', 'picture', $OUTPUT->user_picture($this->_customdata->user),
                            fullname($this->_customdata->user) . '<br/>' .
@@ -155,9 +157,19 @@ class mod_checkmark_grading_form extends moodleform {
         }
         if ($this->_customdata->checkmark->grade > 0) {
             $name = get_string('gradeoutof', 'checkmark', $this->_customdata->checkmark->grade);
-            $mform->addElement('text', 'xgrade', $name);
-            $mform->addHelpButton('xgrade', 'gradeoutofhelp', 'checkmark');
-            $mform->setType('xgrade', PARAM_ALPHANUM);
+            $gradegroup = [];
+            $gradegroup[] = &$mform->createElement('hidden', 'maxgrade', $this->_customdata->checkmark->grade);
+            $gradegroup[] = &$mform->createElement('text', 'xgrade', $name);
+            $gradegroup[] = &$mform->createElement('hidden', 'nullgrade', 0);
+            $mform->setType('gradegroup[maxgrade]', PARAM_INT);
+            $mform->setType('gradegroup[nullgrade]', PARAM_INT);
+            $mform->addGroup($gradegroup, 'gradegroup', $name);
+
+            //$mform->addElement('text', 'xgrade', $name);
+            $mform->addHelpButton('gradegroup', 'gradeoutofhelp', 'checkmark');
+            $mform->setType('gradegroup[xgrade]', PARAM_INT);
+            $mform->addRule('gradegroup', get_string('maxgradeviolation', 'checkmark', $this->_customdata->checkmark->grade), 'compare', '>=', 'client');
+            $mform->addGroupRule('gradegroup', get_string('maxgradeviolationneg', 'checkmark', $this->_customdata->checkmark->grade), 'regex', '/^\d+$/', 3,  'client');
         } else {
             $grademenu = array(-1 => get_string('nograde')) + make_grades_menu($this->_customdata->checkmark->grade);
 
@@ -304,7 +316,7 @@ class mod_checkmark_grading_form extends moodleform {
     }
 
     /**
-     * Adds standard grading-butons to the form.
+     * Adds standard grading-buttons to the form.
      */
     public function add_grading_buttons() {
         $mform =& $this->_form;
@@ -464,8 +476,8 @@ class mod_checkmark_grading_form extends moodleform {
         // Allow plugin checkmarks to do any extra validation after the form has been submitted!
         $errors = parent::validation($data, $files);
 
-        if ($data['xgrade'] > $this->_customdata->checkmark->grade && $this->_customdata->checkmark->grade > 0){
-            $errors['timedue'] = get_string('maxgradeviolation', 'checkmark', $this->_customdata->checkmark->grade);
+        if (isset($data['xgrade']) && $data['xgrade'] > $this->_customdata->checkmark->grade && $this->_customdata->checkmark->grade > 0){
+            $errors['xgrade'] = get_string('maxgradeviolation', 'checkmark', $this->_customdata->checkmark->grade);
         }
         return $errors;
     }

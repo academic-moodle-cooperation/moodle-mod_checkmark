@@ -187,6 +187,7 @@ $string['introattachments'] = 'Additional files';
 $string['introattachments_help'] = 'Additional files for use in the checkmark, such as answer templates, may be added. Download links for the files will then be displayed on the checkmark page under the description.';
 $string['latesubmissionwarning'] = 'Submission was rejected as it was made after the deadline';
 $string['maxgradeviolation'] = 'Grade must be less than or equal to {$a}';
+$string['maxgradeviolationneg'] = 'Grade must be a number and more than or equal to 0';
 $string['needattendanceentrycount'] = 'Needs attendance record';
 $string['nostudents'] = 'There are no users to be displayed!';
 $string['nostudentsmatching'] = 'There are no users matching the current settings!';

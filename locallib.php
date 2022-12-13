@@ -3433,7 +3433,6 @@ class checkmark {
         if (!$formdata = data_submitted() or !confirm_sesskey()) {      // No incoming data?
             return false;
         }
-
         /*
          * For save and next, we need to know the userid to save, and the userid to go
          * We use a new hidden field in the form, and set it to -1. If it's set, we use this
