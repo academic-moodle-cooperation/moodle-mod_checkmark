@@ -1272,5 +1272,65 @@ function xmldb_checkmark_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2022100500, 'checkmark');
     }
 
+    if ($oldversion < 2022120700) {
+        // Changing nullability of field timemodified on table checkmark_submissions to null.
+        $table = new xmldb_table('checkmark_submissions');
+        $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, '0', 'timecreated');
+
+        // Launch change of nullability for field timemodified.
+        $dbman->change_field_notnull($table, $field);
+
+        // Drop keys and indices while changing the default values.
+        // Define index checkmarkid-userid (not unique) to be dropped form checkmark_overrides.
+        $table = new xmldb_table('checkmark_overrides');
+        $index = new xmldb_index('checkmarkid-userid', XMLDB_INDEX_NOTUNIQUE, ['checkmarkid', 'userid', 'timecreated']);
+
+        // Conditionally launch drop index checkmarkid-userid.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Define key modifierid (foreign) to be dropped form checkmark_overrides.
+        $table = new xmldb_table('checkmark_overrides');
+        $key = new xmldb_key('modifierid', XMLDB_KEY_FOREIGN, ['modifierid'], 'user', ['id']);
+
+        // Launch drop key modifierid.
+        $dbman->drop_key($table, $key);
+
+        // Changing the default of field timecreated on table checkmark_overrides to 0.
+        $table = new xmldb_table('checkmark_overrides');
+        $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'cutoffdate');
+
+        // Launch change of default for field timecreated.
+        $dbman->change_field_default($table, $field);
+
+        // Changing the default of field modifierid on table checkmark_overrides to 0.
+        $table = new xmldb_table('checkmark_overrides');
+        $field = new xmldb_field('modifierid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timecreated');
+
+        // Launch change of default for field modifierid.
+        $dbman->change_field_default($table, $field);
+
+        // Define key modifierid (foreign) to be added to checkmark_overrides.
+        $table = new xmldb_table('checkmark_overrides');
+        $key = new xmldb_key('modifierid', XMLDB_KEY_FOREIGN, ['modifierid'], 'user', ['id']);
+
+        // Launch add key modifierid.
+        $dbman->add_key($table, $key);
+
+        // Define index checkmarkid-userid (not unique) to be added to checkmark_overrides.
+        $table = new xmldb_table('checkmark_overrides');
+        $index = new xmldb_index('checkmarkid-userid', XMLDB_INDEX_NOTUNIQUE, ['checkmarkid', 'userid', 'timecreated']);
+
+        // Conditionally launch add index checkmarkid-userid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2022120700, 'checkmark');
+
+    }
+
     return true;
 }
