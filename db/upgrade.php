@@ -1236,6 +1236,14 @@ function xmldb_checkmark_upgrade($oldversion) {
         // Delete all existing checks containing null
         $where = "state IS NULL";
         $DB->delete_records_select('checkmark_checks', $where);
+        // Delete all duplicate entries
+        $sql = "SELECT distinct mc.id as cmcid
+                      FROM {checkmark_checks} mc
+                      JOIN {checkmark_checks} mc2 ON mc.id < mc2.id
+                                                 AND mc.submissionid = mc2.submissionid
+                                                 AND mc.exampleid = mc2.exampleid
+                                                 AND mc.state = mc2.state";
+        $DB->delete_records_subquery('checkmark_checks', 'id', 'cmcid', $sql);
 
         // Changing nullability of field state on table checkmark_checks to not null.
         $table = new xmldb_table('checkmark_checks');
