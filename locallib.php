@@ -3481,7 +3481,7 @@ class checkmark {
 
         if (!($gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$formdata->userid]->locked
                 || $gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$formdata->userid]->overridden)) {
-            $feedback->grade = $formdata->xgrade;
+            $feedback->grade = $formdata->gradegroup['xgrade'];
             $feedback->feedback = $formdata->feedback_editor['text'];
             $feedback->graderid = $USER->id;
             $update = true;

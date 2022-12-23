@@ -4,7 +4,7 @@ Feature: In a checkmark, a teacher wants to grade a student.
     As a teacher
     I need to be able to acces the personal grading page of a student and change his grade
 
-  @javascript
+  @javascript @currentdev
   Scenario: Display a grade
     Given the following "courses" exist:
       | fullname | shortname | category | groupmode |
