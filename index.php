@@ -30,7 +30,7 @@ require_once($CFG->libdir.'/gradelib.php');
 $id = required_param('id', PARAM_INT);   // We need a course!
 
 if (!$course = $DB->get_record('course', array('id' => $id))) {
-    print_error('invalidcourseid');
+    throw new moodle_exception('invalidcourseid');
 }
 
 require_course_login($course);

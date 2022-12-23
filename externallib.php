@@ -220,7 +220,7 @@ class mod_checkmark_external extends external_api {
         }
 
         if (!$editable) {
-            print_error('nosubmissionallowed', 'checkmark');
+            throw new moodle_exception('nosubmissionallowed', 'checkmark');
         }
 
         // Create the submission if needed & return its id!

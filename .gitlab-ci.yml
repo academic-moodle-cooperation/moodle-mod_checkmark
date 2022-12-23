@@ -14,7 +14,7 @@ variables:
   MYSQL_ALLOW_EMPTY_PASSWORD: "true"
 
 services:
-  - postgres:11
+  - postgres:12
   - name: mysql:8.0.23
     command: ["mysqld", "--port=6033", "--default-authentication-plugin=mysql_native_password"]
   - mariadb:10.4-bionic

@@ -156,7 +156,7 @@ class submissionstable extends \table_sql {
         } else if (is_numeric($checkmarkorcmid)) {
             $this->checkmark = new \checkmark($checkmarkorcmid);
         } else {
-            print_error('invalidcoursemodule');
+            throw new moodle_exception('invalidcoursemodule');
         }
 
         $this->context = \context_module::instance($this->checkmark->cm->id);

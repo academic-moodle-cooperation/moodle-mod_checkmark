@@ -29,15 +29,15 @@ $id   = required_param('id', PARAM_INT);          // Course module ID!
 
 $PAGE->set_url('/mod/checkmark/grade.php', array('id' => $id));
 if (! $cm = get_coursemodule_from_id('checkmark', $id)) {
-    print_error('invalidcoursemodule');
+    throw new moodle_exception('invalidcoursemodule');
 }
 
 if (! $checkmark = $DB->get_record('checkmark', array('id' => $cm->instance))) {
-    print_error('invalidid', 'checkmark');
+    throw new moodle_exception('invalidid', 'checkmark');
 }
 
 if (! $course = $DB->get_record('course', array('id' => $checkmark->course))) {
-    print_error('coursemisconf', 'checkmark');
+    throw new moodle_exception('coursemisconf', 'checkmark');
 }
 
 require_login($course, false, $cm);
