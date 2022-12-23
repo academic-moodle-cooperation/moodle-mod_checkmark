@@ -299,6 +299,11 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->addHelpButton('emailteachers', 'emailteachers', 'checkmark');
         $mform->setDefault('emailteachers', 0);
 
+        $mform->addElement('select', 'calendarteachers', get_string('calendarteachers', 'checkmark'),
+            $ynoptions);
+        $mform->addHelpButton('calendarteachers', 'calendarteachers', 'checkmark');
+        $mform->setDefault('calendarteachers', 0);
+
         $mform->addElement('text', 'examplecount', get_string('numberofexamples', 'checkmark'), array('id' => 'id_examplecount'));
         // We're going to clean them by ourselves...
         $mform->setType('examplecount', PARAM_INT);

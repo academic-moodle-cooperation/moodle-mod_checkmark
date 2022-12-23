@@ -337,7 +337,7 @@ class checkmark {
      * @throws required_capability_exception
      */
     public function view() {
-        global $OUTPUT, $USER, $PAGE;
+        global $OUTPUT, $USER, $PAGE, $CFG;
 
         $edit = optional_param('edit', 0, PARAM_BOOL);
         $saved = optional_param('saved', 0, PARAM_BOOL);
@@ -436,7 +436,8 @@ class checkmark {
 
         // Print grading summary only when user has mod/checkmark:grade capability.
         if (has_capability('mod/checkmark:grade', $this->context)) {
-            echo html_writer::div($this->get_renderer()->render_checkmark_grading_summary($this->create_grading_summary()));
+            echo html_writer::div($this->get_renderer()->render_checkmark_grading_summary(
+                $this->create_grading_summary(), $this->cm));
         }
         echo $OUTPUT->container_start('studentview');
         $previewform = new MoodleQuickForm('optionspref', 'post', '#', '');
@@ -533,10 +534,6 @@ class checkmark {
         $PAGE->set_heading($this->course->fullname);
 
         echo $OUTPUT->header();
-
-        groups_print_activity_menu($this->cm,
-                $CFG->wwwroot . '/mod/checkmark/view.php?id=' . $this->cm->id);
-
     }
 
     /**

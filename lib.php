@@ -34,6 +34,7 @@ define('CHECKMARK_PRESENTATION_ITEM', 2);
 
 /** EVENT TYPE DUE - deadline for student's submissions */
 define('CHECKMARK_EVENT_TYPE_DUE', 'due'); // Is backwards compatible to former events!
+
 /** EVENT TYPE GRADINGDUE - reminder for teachers to grade */
 define('CHECKMARK_EVENT_TYPE_GRADINGDUE', 'gradingdue');
 
@@ -1435,7 +1436,7 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
     $owngroups = groups_get_user_groups($course->id);
 
     foreach ($submissions as $submission) {
-        if (!property_exists($modinfo->cms, $submission->cmid)) {
+        if (!array_key_exists($submission->cmid, $modinfo->cms)) {
             continue;
         }
         $cm = $modinfo->cms[$submission->cmid];
@@ -1452,7 +1453,7 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
          * only graders will see it if specified!
          */
         if (empty($showrecentsubs)) {
-            if (!property_exists($grader, $cm->id)) {
+            if (!array_key_exists($cm->id, $grader)) {
                 $grader[$cm->id] = has_capability('moodle/grade:viewall',
                         context_module::instance($cm->id));
             }
@@ -2116,6 +2117,17 @@ function checkmark_supports($feature) {
 function checkmark_extend_settings_navigation(settings_navigation $settings, navigation_node $checkmarknode) {
     global $PAGE, $DB, $CFG;
 
+    // We want to add these new nodes after the Edit settings node, and before the
+    // Locally assigned roles node. Of course, both of those are controlled by capabilities.
+    $keys = $checkmarknode->get_children_key_list();
+    $beforekey = null;
+    $i = array_search('modedit', $keys);
+    if ($i === false and array_key_exists(0, $keys)) {
+        $beforekey = $keys[0];
+    } else if (array_key_exists($i + 1, $keys)) {
+        $beforekey = $keys[$i + 1];
+    }
+
     $checkmarkrow = $DB->get_record('checkmark', array('id' => $PAGE->cm->instance));
     require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 
@@ -2136,7 +2148,7 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
         $key = 'viewsubmissions';
         $submissionnode = \navigation_node::create($string, $link, navigation_node::TYPE_SETTING,
             $string, $key, null);
-        $checkmarknode->add_node($submissionnode);
+        $checkmarknode->add_node($submissionnode, $beforekey);
     }
 
     // Add nodes to override dates for users/groups!
@@ -2153,7 +2165,7 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
         $icon = null;
         $groupnode = \navigation_node::create($shorttext, new moodle_url('/mod/checkmark/overrides.php',
                 array('id' => $PAGE->cm->id, 'mode' => 'group')), $type, $shorttext, $key, $icon);
-        $checkmarknode->add_node($groupnode);
+        $checkmarknode->add_node($groupnode, $beforekey);
 
         $shorttext = get_string('useroverrides', 'checkmark');
         $key = 'extendusers';
@@ -2195,7 +2207,7 @@ function checkmark_page_type_list() {
  * @return bool Returns true if the event is visible to the current user, false otherwise.
  */
 function mod_checkmark_core_calendar_is_event_visible(calendar_event $event) {
-    global $CFG;
+    global $CFG, $USER;
     require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 
     $cm = get_fast_modinfo($event->courseid)->instances['checkmark'][$event->instance];
@@ -2204,7 +2216,9 @@ function mod_checkmark_core_calendar_is_event_visible(calendar_event $event) {
     $checkmark = new checkmark($cm->id, null, $cm, null);
 
     if ($event->eventtype == CHECKMARK_EVENT_TYPE_GRADINGDUE) {
-        return has_capability('mod/checkmark:grade', $context);
+        return has_capability('mod/checkmark:grade', $context, $USER->id);
+    } else if ($event->eventtype == CHECKMARK_EVENT_TYPE_DUE) {
+        return !has_capability('mod/checkmark:grade', $context, $USER->id) || $checkmark->checkmark->calendarteachers;
     } else {
         return true;
     }
@@ -2262,8 +2276,9 @@ function mod_checkmark_core_calendar_provide_event_action(calendar_event $event,
                 'edit' => 1
         ]);
         $itemcount = 1;
-
-        if (!$usersubmission) {
+        if (has_capability('mod/checkmark:grade', $context)) {
+            $name = get_string('gotoactivity', 'checkmark');
+        } else if (!$usersubmission) {
             // The user has not yet submitted anything. Show the addsubmission link.
             $name = get_string('addsubmission', 'checkmark');
         } else {

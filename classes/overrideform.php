@@ -52,6 +52,8 @@ class overrideform extends \moodleform {
     const UP = 'UP';
     /** move down mode extend */
     const DOWN = 'DOWN';
+    /** resets entries to activity defaults */
+    const RESET = 'RESET';
 
     /** @var  \stdClass course module object */
     protected $cm;
@@ -176,11 +178,24 @@ class overrideform extends \moodleform {
         $mform->addHelpButton('cutoffdate', 'cutoffdate', 'checkmark');
         $mform->setDefault('cutoffdate', $checkmark->cutoffdate);
 
+        // Submit buttons.
+        $mform->addElement('submit', 'resetbutton',
+            get_string('reverttodefaults', 'checkmark'));
+
         $btngrp = [];
         $btngrp[] = $mform->createElement('submit', 'override', get_string('override', 'checkmark'));
         $btngrp[] = $mform->createElement('submit', 'override_and_next', get_string('override_and_next', 'checkmark'));
         $btngrp[] = $mform->createElement('cancel', 'cancel', get_string('cancel'));
         $mform->addGroup($btngrp, 'btngrp', '', ' ', false);
+    }
+
+    /**
+     * Resets the present override form
+     *
+     * @return void
+     */
+    public function reset() {
+        $this->_form->updateSubmission(null, null);
     }
 
     /**
