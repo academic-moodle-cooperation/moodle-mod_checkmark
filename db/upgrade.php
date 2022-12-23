@@ -1254,7 +1254,7 @@ function xmldb_checkmark_upgrade($oldversion) {
             // Checkmark savepoint reached.
             upgrade_mod_savepoint(true, 2021052806, 'checkmark');
         } catch (Exception $e) {
-            print_error('upgradekeyerror', 'checkmark', '', 'https://github.com/academic-moodle-cooperation/moodle-mod_checkmark/issues/72', $e->getTraceAsString());
+            throw new moodle_exception('upgradekeyerror', 'checkmark', '', 'https://github.com/academic-moodle-cooperation/moodle-mod_checkmark/issues/72', $e->getTraceAsString());
         }
     }
 

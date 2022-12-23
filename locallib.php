@@ -130,7 +130,7 @@ class checkmark {
         if ($cm) {
             $this->cm = $cm;
         } else if (!$this->cm = get_coursemodule_from_id('checkmark', $cmid)) {
-            print_error('invalidcoursemodule');
+            throw new moodle_exception('invalidcoursemodule');
         }
 
         $this->context = context_module::instance($this->cm->id);
@@ -140,13 +140,13 @@ class checkmark {
         } else if ($this->cm->course == $COURSE->id) {
             $this->course = $COURSE;
         } else if (!$this->course = $DB->get_record('course', ['id' => $this->cm->course])) {
-            print_error('invalidid', 'checkmark');
+            throw new moodle_exception('invalidid', 'checkmark');
         }
 
         if ($checkmark) {
             $this->checkmark = $checkmark;
         } else if (!$this->checkmark = $DB->get_record('checkmark', ['id' => $this->cm->instance])) {
-            print_error('invalidid', 'checkmark');
+            throw new moodle_exception('invalidid', 'checkmark');
         }
 
         // Check for overridden dates!
@@ -201,24 +201,24 @@ class checkmark {
 
         if ($id) {
             if (!$cm = get_coursemodule_from_id('checkmark', $id)) {
-                print_error('invalidcoursemodule');
+                throw new moodle_exception('invalidcoursemodule');
             }
             if (!$checkmark = $DB->get_record('checkmark', array('id' => $cm->instance))) {
-                print_error('invalidid', 'checkmark');
+                throw new moodle_exception('invalidid', 'checkmark');
             }
             if (!$course = $DB->get_record('course', array('id' => $checkmark->course))) {
-                print_error('coursemisconf', 'checkmark');
+                throw new moodle_exception('coursemisconf', 'checkmark');
             }
             $url->param('id', $id);
         } else {
             if (!$checkmark = $DB->get_record('checkmark', array('id' => $c))) {
-                print_error('invalidcoursemodule');
+                throw new moodle_exception('invalidcoursemodule');
             }
             if (!$course = $DB->get_record('course', array('id' => $checkmark->course))) {
-                print_error('coursemisconf', 'checkmark');
+                throw new moodle_exception('coursemisconf', 'checkmark');
             }
             if (!$cm = get_coursemodule_from_instance('checkmark', $checkmark->id, $course->id)) {
-                print_error('invalidcoursemodule');
+                throw new moodle_exception('invalidcoursemodule');
             }
             $url->param('id', $cm->id);
         }
@@ -822,12 +822,12 @@ class checkmark {
             $gradedby = $feedback->graderid;
             $dategraded = $feedback->timemodified;
             if (!$grader = $DB->get_record('user', array('id' => $gradedby))) {
-                print_error('cannotfindteacher');
+                throw new moodle_exception('cannotfindteacher');
             }
         } else {
             // We need the teacher info!
             if (!$grader = $DB->get_record('user', array('id' => $gradedby))) {
-                print_error('cannotfindteacher');
+                throw new moodle_exception('cannotfindteacher');
             }
             $showfeedback = true;
         }
@@ -1887,7 +1887,7 @@ class checkmark {
                                             'notifyproblem');
                                 }
                             } else {
-                                print_error('autogradegrade_error', 'checkmark');
+                                throw new moodle_exception('autogradegrade_error', 'checkmark');
                             }
                         }
                     }
@@ -2329,7 +2329,7 @@ class checkmark {
         $table = submissionstable::create_submissions_table($this->cm->id, $filter);
 
         if (!$user = $DB->get_record('user', array('id' => $userid))) {
-            print_error('nousers');
+            throw new moodle_exception('nousers');
         }
 
         if (!$submission = $this->get_submission($user->id)) {

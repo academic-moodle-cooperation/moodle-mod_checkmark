@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+4.1.0 (2022-12-07)
+------------------
+* [FEATURE] #7005 Change the grade dropdown to a text field when using numerical grades 
+* [FEATURE] #7101 Add the possibility for teachers to display the due date of a checkmark activity in their calendars
+* [UPDATE] #7402 Changelog is now shipped in the .md format
+* [FIXED] #7402 Fix differences between the db/install.xml and db/upgrade.php files
+
 4.0.0 (2022-08-10)
 ------------------
 * [FEATURE] #7200 New activity icon matching the style of 4.0

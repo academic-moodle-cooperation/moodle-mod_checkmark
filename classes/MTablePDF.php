@@ -152,7 +152,7 @@ class MTablePDF extends \pdf {
      */
     public function setcolumnformat($columnformat) {
         if (count($columnformat) != count($this->columnwidths)) {
-            print_error("Columnformat (" . count($columnformat) . ") count doesnt match " .
+            throw new moodle_exception("Columnformat (" . count($columnformat) . ") count doesnt match " .
                     "column count (" . count($this->columnwidths) . ")");
         }
 
@@ -269,7 +269,7 @@ class MTablePDF extends \pdf {
      */
     public function settitles($titles) {
         if (count($titles) != count($this->columnwidths)) {
-            print_error("Error: Title count doesnt match column count");
+            throw new moodle_exception("Error: Title count doesnt match column count");
         }
 
         $this->titles = $titles;
@@ -322,7 +322,7 @@ class MTablePDF extends \pdf {
      */
     public function addrow($row) {
         if (count($row) != count($this->columnwidths)) {
-            print_error("number of columns from row (" . count($row) . ") doenst match " .
+            throw new moodle_exception("number of columns from row (" . count($row) . ") doenst match " .
                     "the number defined (" . count($this->columnwidths) . ")");
             return false;
         }
@@ -340,7 +340,7 @@ class MTablePDF extends \pdf {
 
             foreach ($row as $idx => $value) {
                 if (is_array($value)) {
-                    print_error("Error: if you want to add a row using the fast mode, you cannot pass me an array");
+                    throw new moodle_exception("Error: if you want to add a row using the fast mode, you cannot pass me an array");
                 }
 
                 $tmp[] = ["rowspan" => 0, "data" => $value];
@@ -352,7 +352,7 @@ class MTablePDF extends \pdf {
                 if (!is_array($value)) {
                     $row[$idx] = ["rowspan" => 0, "data" => $value];
                 } else if (!isset($value["data"])) {
-                    print_error("Error: you need to set a value for [\"data\"]");
+                    throw new moodle_exception("Error: you need to set a value for [\"data\"]");
                     return false;
                 } else {
                     if (!isset($value["rowspan"])) {
@@ -465,7 +465,7 @@ class MTablePDF extends \pdf {
                 $sumrelativ += $width['value'];
                 $allfixed = false;
             } else {
-                print_error("ERROR: unvalid columnwidth format");
+                throw new moodle_exception("ERROR: unvalid columnwidth format");
                 die();
             }
         }
@@ -615,7 +615,7 @@ class MTablePDF extends \pdf {
                 $spaceonpage[1] = 28;
             }
         } else {
-            print_error("an unexpected error occured. Please report this to your administrator.");
+            throw new moodle_exception("an unexpected error occured. Please report this to your administrator.");
             die();
         }
 

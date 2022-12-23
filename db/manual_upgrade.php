@@ -28,7 +28,7 @@ require(__DIR__ . '/../../../config.php');
 require_login();
 
 if (!is_siteadmin()) {
-    print_error('cannotuseadmin');
+    throw new moodle_exception('cannotuseadmin');
     die;
 }
 
