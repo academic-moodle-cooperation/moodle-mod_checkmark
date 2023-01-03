@@ -76,6 +76,7 @@ $string['privacy:path:submission'] = 'Submission';
 $string['activitydate:due'] = 'Due:';
 $string['activitydate:open'] = 'Opens:';
 $string['activitydate:opened'] = 'Opened:';
+$string['activitydate:opens'] = 'Opens:';
 
 $string['absent'] = 'Absent';
 $string['activateindividuals'] = 'Activate individual function';
