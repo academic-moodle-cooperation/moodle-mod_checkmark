@@ -1030,7 +1030,6 @@ class MTablePDF extends \pdf {
         header('Content-Type: text/plain');
         header('Content-Length: ' . strlen($filecontent));
         header('Content-Disposition: attachment; filename="' . $filename . '"; filename*="' . rawurlencode($filename));
-        header('Content-Transfer-Encoding: binary');
         header('Content-Encoding: utf-8');
         echo $filecontent;
         die();
