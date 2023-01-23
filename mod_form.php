@@ -464,7 +464,6 @@ class mod_checkmark_mod_form extends moodleform_mod {
             $examplestart = '';
             $examplecount = count($examples);
             $flexiblenaming = checkmark::is_using_flexiblenaming_static($defaultvalues['instance']);
-
             foreach ($examples as $example) {
                 $names[] = $example->shortname;
                 $grades[] = $example->grade;

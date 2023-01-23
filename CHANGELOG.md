@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.11.7 (2023-01-04)
+------------------
+* [FIXED] #7412 Fixed that Date is not displayed with "Opened" as with other activities, but with [[activitydate:opens]]
+* [FIXED] #7410 Individual function is set when editing CM again (github #73)
+* [FIXED] #7409 Fixed broken CSV Download on some rare occasions
+
 3.11.6 (2022-09-14)
 ------------------
 * [FEATURE] #6995 Use resizable textareas for flexiblenaming components

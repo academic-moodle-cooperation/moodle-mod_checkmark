@@ -132,7 +132,6 @@ function checkmark_delete_instance($id) {
  */
 function checkmark_update_instance($checkmark) {
     global $CFG, $OUTPUT, $DB;
-
     $checkmark->timemodified = time();
 
     // Clean examplenames and examplegrades!
