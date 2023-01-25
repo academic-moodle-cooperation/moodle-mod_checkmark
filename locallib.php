@@ -2424,8 +2424,6 @@ class checkmark {
 
         if ($submitform->is_cancelled()) {
             redirect('submissions.php?id=' . $this->cm->id);
-        } else {
-            $submitform->is_validated();
         }
 
         $submitform->set_data($mformdata);
@@ -3430,6 +3428,7 @@ class checkmark {
         if (!$formdata = data_submitted() or !confirm_sesskey()) {      // No incoming data?
             return false;
         }
+
         /*
          * For save and next, we need to know the userid to save, and the userid to go
          * We use a new hidden field in the form, and set it to -1. If it's set, we use this
@@ -3478,7 +3477,7 @@ class checkmark {
 
         if (!($gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$formdata->userid]->locked
                 || $gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$formdata->userid]->overridden)) {
-            $feedback->grade = $formdata->gradegroup['xgrade'];
+            $feedback->grade = $formdata->xgrade;
             $feedback->feedback = $formdata->feedback_editor['text'];
             $feedback->graderid = $USER->id;
             $update = true;

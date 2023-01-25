@@ -4,7 +4,7 @@ Feature: In a checkmark, a teacher wants to grade a student.
     As a teacher
     I need to be able to acces the personal grading page of a student and change his grade
 
-  @javascript @currentdev
+  @javascript
   Scenario: Display a grade
     Given the following "courses" exist:
       | fullname | shortname | category | groupmode |
@@ -25,6 +25,6 @@ Feature: In a checkmark, a teacher wants to grade a student.
     When I am on the "CM1" Activity page logged in as teacher1
     And I navigate to "Submissions" in current page administration
     And I click on "Grade" "link" in the "student1" "table_row"
-    And I set the field "gradegroup[xgrade]" to "50"
+    And I set the field "xgrade" to "50"
     And I press "Save changes"
     Then "Student 1" row "Grade" column of "generaltable" table should contain "50 / 100"
