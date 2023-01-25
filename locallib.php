@@ -1561,8 +1561,8 @@ class checkmark {
         $oldgrade = null;
         foreach ($examples as $example) {
             if (($oldname != null) && ($oldgrade != null)) {
-                if ((ord($oldname) + 1 != ord($example->name))
-                        || ((int) $oldgrade != (int) $example->grade)) {
+                if ((intval(get_number_from_string($oldname))) + 1 != intval(get_number_from_string($example->name))
+                    || ((int) $oldgrade != (int) $example->grade)) {
                     return true;
                 }
             }
@@ -1571,7 +1571,6 @@ class checkmark {
         }
         return false;
     }
-
     /**
      * Any extra validation checks needed for the settings
      *
@@ -4109,4 +4108,14 @@ class checkmark {
         return $splitcheckarray;
     }
 }
-
+/**
+ * get number from exercise name
+ *
+ * @param string $str
+ * @return mixed
+ */
+function get_number_from_string($str) {
+    $matches = [];
+    preg_match('/\d+/', $str, $matches);
+    return $matches[0];
+}
