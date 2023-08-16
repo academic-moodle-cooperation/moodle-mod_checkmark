@@ -4,6 +4,7 @@ CHANGELOG
 4.2.0 (2023-07-27)
 ------------------
 * [UPDATE] #7000 Standardization of labels
+* [FIXED] #7516 Fix differences between the db/install.xml and db/upgrade.php files
 * [FIXED] #7523 Fix rogue database-index during upgrade to 4.1 issue
 * [FIXED] #7529 Loading times for privacy api
 * [FEATURE] #7557 New navigation structure
