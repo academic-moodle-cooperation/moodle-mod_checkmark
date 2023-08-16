@@ -3,51 +3,58 @@ cache:
     - .composer/cache
 
 variables:
-  TRAVIS_BUILD_DIR: "$CI_PROJECT_DIR"
-  MUSTACHE_IGNORE_NAMES: "email_html_body.mustache, email_html.mustache, email_text.mustache"
+  CI_BUILD_DIR: "$CI_PROJECT_DIR"
   COMPOSER_HOME: "$CI_PROJECT_DIR/.composer/cache"
-  DOCKER_HOST: tcp://localhost:2375
-  DOCKER_TLS_CERTDIR: ""
+  
   POSTGRES_USER: "postgres"
   POSTGRES_HOST_AUTH_METHOD: "trust"
-  MYSQL_USER: "root"
+
+  MYSQL_ROOT_HOST: "%"
   MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+  MYSQL_CHARACTER_SET_SERVER: "utf8mb4"
+  MYSQL_COLLATION_SERVER: "utf8mb4_unicode_ci"
 
-services:
-  - postgres:12
-  - name: mysql:8.0.23
-    command: ["mysqld", "--port=6033", "--default-authentication-plugin=mysql_native_password"]
-  - mariadb:10.4-bionic
-  - docker:dind
-
-test:
-  image: amcdev/moodle-plugin-ci:7.4-n.16
-  variables:
-    MOODLE_BRANCH: "MOODLE_401_STABLE"
+.job_template: &job_configuration
+  image: quay.io/amc/moodle-plugin-ci:${PHP_VERSION}-node.16
   before_script:
     - cd ../..
-    - echo $DB_HOST $DB_PORT
+    - moodle-db-isready
     - moodle-plugin-ci install --moodle="moodle-upstream-core" --db-host=$DB_HOST --db-port=$DB_PORT
   script:
-    - moodle-plugin-ci phplint
-    - moodle-plugin-ci phpcpd
-    - moodle-plugin-ci phpmd
-    - moodle-plugin-ci codechecker
-    - moodle-plugin-ci validate
-    - moodle-plugin-ci savepoints
-    - moodle-plugin-ci mustache
-#    - moodle-plugin-ci grunt
-    - moodle-plugin-ci phpdoc
-    - moodle-plugin-ci phpunit
-    - moodle-plugin-ci behat
+
+    - moodle-plugin-ci behat --profile chrome
   parallel:
     matrix:
-      - DB: pgsql
-        DB_HOST: postgres
+      - MOODLE_BRANCH: [ "MOODLE_402_STABLE" ]
+        PHP_VERSION: [ "8.0", "8.1" ]
 
-      - DB: mysqli
-        DB_HOST: mysql
-        DB_PORT: 6033
+test:postgres:
+  <<: *job_configuration
+  services:
+    - postgres:14
+    - docker:dind
+  variables:
+    DB: pgsql
+    DB_HOST: postgres
+    DB_PORT: 5432
 
-      - DB: mariadb
-        DB_HOST: mariadb
+test:mysql:
+  <<: *job_configuration
+  services:
+    - name: mysql:8.0.23
+      command: ["mysqld", "--port=6033"]
+    - docker:dind
+  variables:
+    DB: mysqli
+    DB_HOST: mysql
+    DB_PORT: 6033
+
+test:mariadb:
+  <<: *job_configuration
+  services:
+    - mariadb:10.6
+    - docker:dind
+  variables:
+    DB: "mariadb"
+    DB_HOST: "mariadb"
+    DB_PORT: 3306

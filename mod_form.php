@@ -108,7 +108,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         global $OUTPUT, $PAGE;
         $mform = $this->_form;
 
-        $mform->addElement('header', 'availability', get_string('availability', 'assign'));
+        $mform->addElement('header', 'availability', get_string('availability', 'checkmark'));
         $mform->setExpanded('availability', true);
 
         $allinfo = get_config('checkmark');
@@ -527,17 +527,17 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         if ($data['timeavailable'] && $data['timedue']) {
             if ($data['timeavailable'] > $data['timedue']) {
-                $errors['timedue'] = get_string('duedatevalidation', 'assign');
+                $errors['timedue'] = get_string('duedatevalidation', 'checkmark');
             }
         }
         if ($data['timedue'] && $data['cutoffdate']) {
             if ($data['timedue'] > $data['cutoffdate']) {
-                $errors['cutoffdate'] = get_string('cutoffdatevalidation', 'assign');
+                $errors['cutoffdate'] = get_string('cutoffdatevalidation', 'checkmark');
             }
         }
         if ($data['timeavailable'] && $data['cutoffdate']) {
             if ($data['timeavailable'] > $data['cutoffdate']) {
-                $errors['cutoffdate'] = get_string('cutoffdatefromdatevalidation', 'assign');
+                $errors['cutoffdate'] = get_string('cutoffdatefromdatevalidation', 'checkmark');
             }
         }
 

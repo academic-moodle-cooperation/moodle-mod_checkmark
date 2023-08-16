@@ -124,26 +124,6 @@ class submissions_exported extends \core\event\base {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        return [
-            $this->courseid,
-            $this->objecttable,
-            'export '.$this->data['other']['format_readable'],
-            (new \moodle_url("/mod/checkmark/export.php", [
-                'id' => $this->contextinstanceid,
-                'groupid' => $this->data['other']['groupid'],
-                'format' => $this->data['other']['format']
-            ]))->out(),
-            '',
-            $this->contextinstanceid
-        ];
-    }
-
-    /**
      * Custom validation.
      *
      * @throws \coding_exception

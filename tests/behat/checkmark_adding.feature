@@ -1,8 +1,8 @@
 @mod @mod_checkmark @amc
 Feature: In course, a teacher should be able to add a new checkmark
-    In order to add a new checkmark
-    As a teacher
-    I need to be able to add a new checkmark and save it correctly.
+  In order to add a new checkmark
+  As a teacher
+  I need to be able to add a new checkmark and save it correctly.
 
   @javascript
   Scenario: Add a checkmark instance

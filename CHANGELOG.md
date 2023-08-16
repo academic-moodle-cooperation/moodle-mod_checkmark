@@ -1,12 +1,19 @@
 CHANGELOG
 =========
 
+4.2.0 (2023-07-27)
+------------------
+* [UPDATE] #7000 Standardization of labels
+* [FIXED] #7523 Fix rogue database-index during upgrade to 4.1 issue
+* [FIXED] #7529 Loading times for privacy api
+* [FEATURE] #7557 New navigation structure
+
 4.1.0 (2022-12-07)
 ------------------
 * [FEATURE] #7005 Change the grade dropdown to a text field when using numerical grades 
 * [FEATURE] #7101 Add the possibility for teachers to display the due date of a checkmark activity in their calendars
+* [FIXED] #7324 Fix differences between the db/install.xml and db/upgrade.php files
 * [UPDATE] #7402 Changelog is now shipped in the .md format
-* [FIXED] #7402 Fix differences between the db/install.xml and db/upgrade.php files
 
 4.0.0 (2022-08-10)
 ------------------

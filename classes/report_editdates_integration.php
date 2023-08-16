@@ -89,26 +89,26 @@ extends report_editdates_mod_date_extractor {
         $errors = array();
         if ($dates['timeavailable'] && $dates['timedue']
                 && $dates['timedue'] < $dates['timeavailable']) {
-            $errors['timedue'] = get_string('duedatevalidation', 'assign');
+            $errors['timedue'] = get_string('duedatevalidation', 'checkmark');
         }
         if ($dates['timedue'] && $dates['cutoffdate']) {
             if ($dates['timedue'] > $dates['cutoffdate']) {
-                $errors['cutoffdate'] = get_string('cutoffdatevalidation', 'assign');
+                $errors['cutoffdate'] = get_string('cutoffdatevalidation', 'checkmark');
             }
         }
         if ($dates['timeavailable'] && $dates['cutoffdate']) {
             if ($dates['timeavailable'] > $dates['cutoffdate']) {
-                $errors['cutoffdate'] = get_string('cutoffdatefromdatevalidation', 'assign');
+                $errors['cutoffdate'] = get_string('cutoffdatefromdatevalidation', 'checkmark');
             }
         }
 
         if ($dates['timedue'] && $dates['gradingduedate']
                 && $dates['timedue'] > $dates['gradingduedate']) {
-            $errors['gradingduedate'] = get_string('gradingdueduedatevalidation', 'assign');
+            $errors['gradingduedate'] = get_string('gradingdueduedatevalidation', 'checkmark');
         }
         if ($dates['timeavailable'] && $dates['gradingduedate'] &&
             $dates['timeavailable'] > $dates['gradingduedate']) {
-            $errors['gradingduedate'] = get_string('gradingduefromdatevalidation', 'assign');
+            $errors['gradingduedate'] = get_string('gradingduefromdatevalidation', 'checkmark');
         }
 
         return $errors;

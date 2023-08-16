@@ -123,21 +123,6 @@ class grade_updated extends \core\event\base {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        if ($this->data['other']['type'] == 'automatic') {
-            return array($this->courseid, 'checkmark', 'update grade', $this->get_url(),
-                         'autograding '.$this->data['relateduserid'], $this->contextinstanceid);
-        } else {
-            return array($this->courseid, 'checkmark', 'update grade', $this->get_url(),
-                         $this->data['relateduserid'], $this->contextinstanceid);
-        }
-    }
-
-    /**
      * Custom validation.
      *
      * @throws \coding_exception

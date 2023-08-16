@@ -1,8 +1,8 @@
 @mod @mod_checkmark @amc
 Feature: Available From Date
-    In order to allow students to use the checkmark course after a certain date
-    As a teacher
-    I need to be able to set the beginning date for the module to the December 11.
+  In order to allow students to use the checkmark course after a certain date
+  As a teacher
+  I need to be able to set the beginning date for the module to the December 11.
 
   @javascript
   Scenario: Add a checkmark starting in the future

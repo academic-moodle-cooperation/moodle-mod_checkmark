@@ -32,6 +32,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_checkmark\output\override_actionmenu;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
@@ -163,8 +165,9 @@ class mod_checkmark_renderer extends plugin_renderer_base {
     public function render_checkmark_grading_summary($summary, $cm) {
         // Create a table for the data.
         global $CFG;
+
         $o = '';
-        $o .= $this->output->container_start('gradingsummary');
+        $o .= $this->output->container_start('header-maxwidth', 'gradingsummary');
         $o .= $this->output->heading(get_string('gradingsummary', 'checkmark'), 3);
         $o .= groups_print_activity_menu($cm,
             $CFG->wwwroot . '/mod/checkmark/view.php?id=' . $cm->id, true);
@@ -181,14 +184,23 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         $cell2content = $summary->participantcount;
         $this->add_table_row_tuple($t, $cell1content, $cell2content);
 
+        $urlbase = $CFG->wwwroot . '/mod/checkmark/submissions.php?id=';
         // Submitted for grading.
         if (time() > $summary->timeavailable) {
             $cell1content = get_string('numberofsubmittedassignments', 'checkmark');
             $cell2content = $summary->submissionssubmittedcount;
-            $this->add_table_row_tuple($t, $cell1content, $cell2content);
+            $linkcell2 = html_writer::tag('a', $cell2content, [
+                'class' => 'link',
+                'href' => $urlbase . $cm->id. '&updatepref=1' . '&filter=2',
+            ]);
+            $this->add_table_row_tuple($t, $cell1content, $linkcell2);
             $cell1content = get_string('numberofsubmissionsneedgrading', 'checkmark');
             $cell2content = $summary->submissionsneedgradingcount;
-            $this->add_table_row_tuple($t, $cell1content, $cell2content);
+            $linkcell2 = html_writer::tag('a', $cell2content, [
+                'class' => 'link',
+                'href' => $urlbase . $cm->id . '&updatepref=1' . '&filter=3',
+            ]);
+            $this->add_table_row_tuple($t, $cell1content, $linkcell2);
         } else {
             $cell1content = get_string('allowsubmissionsfromdate', 'checkmark');
             $cell2content = userdate($summary->timeavailable);
@@ -227,9 +239,9 @@ class mod_checkmark_renderer extends plugin_renderer_base {
 
                 $this->add_table_row_tuple($t, $cell1content, $cell2content);
             }
-            $this->print_attandance_info($t, $summary);
+            $this->print_attandance_info($t, $summary, $cm);
         } else {
-            $this->print_attandance_info($t, $summary);
+            $this->print_attandance_info($t, $summary, $cm);
         }
 
         // Show count of presentationgradings if presenationgrading is active.
@@ -253,7 +265,8 @@ class mod_checkmark_renderer extends plugin_renderer_base {
      * @param \mod_checkmark\gradingsummary $summary Information that should be displayed in the grading summary
      * @throws coding_exception
      */
-    private function print_attandance_info ($table, $summary) {
+    private function print_attandance_info ($table, $summary, $cm) {
+        global $CFG;
         if ($summary->attendantcount > 0) {
             $cell1content = get_string('attendance', 'checkmark');
             $cell2content = $summary->attendantcount;
@@ -267,8 +280,184 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         if ($summary->needattendanceentrycount > 0) {
             $cell1content = get_string('needattendanceentrycount', 'checkmark');
             $cell2content = $summary->needattendanceentrycount;
-            $this->add_table_row_tuple($table, $cell1content, $cell2content);
+            $linkcell2 = html_writer::tag('a', $cell2content, [
+                'class' => 'link',
+                'href' => $CFG->wwwroot . '/mod/checkmark/submissions.php?id=' . $cm->id. '&updatepref=1' . '&filter=7',
+            ]);
+            $this->add_table_row_tuple($table, $cell1content, $linkcell2);
         }
+    }
+    /**
+     * Renders the override action menu.
+     *
+     * @param \mod_checkmark\output\override_actionmenu $actionmenu The actionmenu
+     * @return string The rendered override action menu.
+     */
+    public function override_actionmenu(\mod_checkmark\output\override_actionmenu $actionmenu): string {
+        $context = $actionmenu->export_for_template($this);
+        return $this->render_from_template('mod_checkmark/override_actionmenu', $context);
+    }
+
+    /**
+     * Render a summary of the number of group and user overrides, with corresponding links.
+     *
+     * @param stdClass $checkmark the checkmark settings.
+     * @param stdClass|cm_info $cm the cm object.
+     * @param int $currentgroup currently selected group, if there is one.
+     * @return string HTML fragment for the link.
+     */
+    public function checkmark_override_summary_links(stdClass $checkmark, stdClass $cm, $currentgroup = 0): string {
+        
+        $baseurl = new moodle_url('/mod/checkmark/overrides.php', ['id' => $cm->id]);
+        $counts = checkmark_override_summary($checkmark, $cm);
+        
+        $links = [];
+        if ($counts['group']) {
+            $links[] = html_writer::link(new moodle_url($baseurl, ['mode' => 'group']),
+                get_string('overridessummarygroup', 'checkmark', $counts['group']));
+        }
+        if ($counts['user']) {
+            $links[] = html_writer::link(new moodle_url($baseurl, ['mode' => 'user']),
+                get_string('overridessummaryuser', 'checkmark', $counts['user']));
+        }
+        
+        if (!$links) {
+            return '';
+        }
+        
+        $links = implode(', ', $links);
+        switch ($counts['mode']) {
+            case 'onegroup':
+                return get_string('overridessummarythisgroup', 'checkmark', $links);
+                
+            case 'somegroups':
+                return get_string('overridessummaryyourgroups', 'checkmark', $links);
+                
+            case 'allgroups':
+                return get_string('overridessummary', 'checkmark', $links);
+                
+            default:
+                throw new coding_exception('Unexpected mode ' . $counts['mode']);
+        }
+    }
+    
+    /**
+     * Render a table containing the current status of the submission.
+     *
+     * @param array $status
+     * @return string
+     */
+    public function render_checkmark_submission_status(array $status) {
+        $o = '';
+        $o .= $this->output->container_start('header-maxwidth', 'submissionstatustable');
+        $o .= $this->output->heading(get_string('submissionstatusheading', 'checkmark'), 3);
+        $time = time();
+        
+        $o .= $this->output->box_start('boxaligncenter submissionsummarytable');
+        
+        $t = new \html_table();
+        $t->attributes['class'] = 'generaltable table-bordered';
+        
+        $warningmsg = '';
+
+        //Submission Status TODO: classes
+        $cell1content = get_string('submissionstatus', 'checkmark');
+        $cell2attributes = [];
+
+        $cell2content = get_string('nosubmissionyet', 'checkmark');
+        if ($status['submissionstatus'] == 'submitted') {
+            $cell2content = get_string('submissionstatus_submitted', 'checkmark');
+        }
+        $this->add_table_row_tuple($t, $cell1content, $cell2content, [], $cell2attributes);
+
+        // Grading status.
+        $cell1content = get_string('gradingstatus', 'checkmark');
+        if ($status['gradingstatus'] == "graded" || $status['gradingstatus'] == "notgraded") {
+                $cell2content = get_string($status['gradingstatus'], 'checkmark');
+            }
+
+        if ($status['gradingstatus'] == "graded") {
+                $cell2attributes = array('class' => 'submissiongraded');
+        } else {
+            $cell2attributes = array('class' => 'submissionnotgraded');
+        }
+        $this->add_table_row_tuple($t, $cell1content, $cell2content, [], $cell2attributes);
+
+                
+        // Time remaining.
+        // Only add the row if there is a due date, or a countdown.
+        $time = time();
+        if ($status['timedue'] > 0 || !empty($status['timecreated'])) {
+            $cell1content = get_string('timeremaining', 'checkmark');
+            [$cell2content, $cell2attributes] = [get_string('paramtimeremaining', 'checkmark', format_time($status['timedue'] - $time)), 'timeremaining'];
+            $this->add_table_row_tuple($t, $cell1content, $cell2content, [], ['class' => $cell2attributes]);
+        }
+
+        // Last modified.
+        $cell1content = get_string('timemodified', 'checkmark');
+                    
+         if (!empty($status['timecreated'])) {
+            $cell2content = userdate($status['timemodified']);
+        } else {
+            $cell2content = "-";
+        }
+        
+        $this->add_table_row_tuple($t, $cell1content, $cell2content);
+
+        // checkmark info
+        $cell1content = get_string('checkmarks', 'checkmark');
+        if (!empty($status['checkmarkinfo'])) {
+            $cell2content = get_string('submissionstatus_checkmark_summary', 'checkmark', $status['checkmarkinfo']);
+        } else {
+            $cell2content = "-";
+        }
+        $this->add_table_row_tuple($t, $cell1content, $cell2content);
+
+        $o .= $warningmsg;
+        $o .= \html_writer::table($t);
+        $o .= $this->output->box_end();
+        
+        $o .= $this->output->container_end();
+        return $o;
+    }
+    
+    /**
+     * Render a table containing all the current grades and feedback.
+     *
+     * @param \assign_feedback_status $status
+     * @return string
+     */
+    public function render_checkmark_feedback_status(array $status) {
+        $o = '';
+
+        $o .= $this->output->container_start('header-maxwidth', 'feedback');
+        $o .= $this->output->heading(get_string('feedback', 'checkmark'), 3);
+        $o .= $this->output->box_start('boxaligncenter feedbacktable');
+        $t = new \html_table();
+        $t->attributes['class'] = 'generaltable table-bordered';
+
+        // Grade.
+        if ($status['gradefordisplay']) {
+            $cell1content = get_string('gradenoun');
+            $cell2content = $status['gradefordisplay'];
+            $this->add_table_row_tuple($t, $cell1content, $cell2content);
+            
+            // Grade date.
+            $cell1content = get_string('gradedon', 'checkmark');
+            $cell2content = userdate($status['dategraded']);
+            $this->add_table_row_tuple($t, $cell1content, $cell2content);
+        }
+        
+        // feedback
+        $cell1content = get_string('feedback', 'checkmark');
+        $cell2content = $status['feedback'];
+        $this->add_table_row_tuple($t, $cell1content, $cell2content);
+
+        $o .= \html_writer::table($t);
+        $o .= $this->output->box_end();
+        
+        $o .= $this->output->container_end();
+        return $o;
     }
 }
 /**

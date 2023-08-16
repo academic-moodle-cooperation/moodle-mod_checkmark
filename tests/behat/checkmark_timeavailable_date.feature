@@ -1,8 +1,8 @@
 @mod @mod_checkmark @amc
 Feature: Change Allow submission from date
-    In order to change to start date of a checkmar
-    As a teacher
-    I need to be able change to Allow submission from date
+  In order to change to start date of a checkmar
+  As a teacher
+  I need to be able change to Allow submission from date
 
   @javascript
   Scenario: Change timeavailable
@@ -23,5 +23,5 @@ Feature: Change Allow submission from date
       | activity  | course | idnumber | name        | intro                                               | timeavailable |
       | checkmark | C1     | CM1      | Checkmark 1 | This checkmark is always available since yesterday! | ##yesterday## |
     When I am on the "CM1" Activity page logged in as teacher1
-    Then I should see "Allow submissions from"
+    Then I should see "Opened"
     And I should see "##yesterday##%A, %d %B %Y##"

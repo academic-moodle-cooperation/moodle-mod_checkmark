@@ -84,17 +84,6 @@ class submission_edited extends \core\event\base {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        $submission = $this->get_record_snapshot('checkmark_submissions', $this->objectid);
-        return array($this->courseid, 'checkmark', 'update submission', $this->get_url(),
-                $submission->checkmarkid, $this->contextinstanceid);
-    }
-
-    /**
      * Custom validation.
      *
      * @throws \coding_exception

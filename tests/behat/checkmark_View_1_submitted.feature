@@ -1,8 +1,8 @@
 @mod @mod_checkmark @amc
 Feature: In checkmark, a teacher should be able to how many students have submitted their checkmark.
-    In order to how many students have added a submission
-    As a teacher
-    In need to see "View_XX_submitted_checkmarks".
+  In order to how many students have added a submission
+  As a teacher
+  In need to see "View_XX_submitted_checkmarks".
 
   @javascript
   Scenario: View 1 submitted
@@ -22,7 +22,10 @@ Feature: In checkmark, a teacher should be able to how many students have submit
     And the following "activities" exist:
       | activity  | course | idnumber | name          | intro                  |
       | checkmark | C1     | CM1      | Kreuzerlübung | Standard-Einstellungen |
-    And I am on the "CM1" Activity page logged in as student1
+
+    And I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I follow "Kreuzerlübung"
     And I set the following fields to these values:
       | Example 1 | 1 |
       | Example 2 | 1 |
@@ -32,8 +35,10 @@ Feature: In checkmark, a teacher should be able to how many students have submit
       | Example 6 | 1 |
     And I press "Save changes"
     And I log out
-    When I am on the "CM1" Activity page logged in as teacher1
-    Then I should see "View all submissions"
+    When I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "Kreuzerlübung"
+    Then I should see "Grade"
     And the following should exist in the "generaltable" table:
       | Hidden from students  |
       | No                    |

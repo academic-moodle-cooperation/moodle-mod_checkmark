@@ -1,8 +1,8 @@
 @mod @mod_checkmark @amc
 Feature: Deactivate Allow submissions from
-    In order to have a checkmark available all the time
-    As a teacher
-    I need to able to deactivate the Allow-submission-from-date
+  In order to have a checkmark available all the time
+  As a teacher
+  I need to able to deactivate the Allow-submission-from-date
 
   @javascript
   Scenario: Deactivate timeavailable
@@ -20,12 +20,14 @@ Feature: Deactivate Allow submissions from
     # We do not need to manually create the checkmark instance again,
     # this has been testet in checkmark_adding.feature, use generators!
     And the following "activities" exist:
-      | activity  | course | idnumber | name        | timeavailable |
-      | checkmark | C1     | CM1      | Checkmark 1 | 0             |
+      | activity  | course | idnumber | name        |
+      | checkmark | C1     | CM1      | Checkmark 1 |
     When I am on the "CM1" Activity page logged in as teacher1
     Then I should not see "Allow submissions from"
     And I log out
-    When I am on the "CM1" Activity page logged in as student1
+    And I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I follow "Checkmark 1"
     Then I should not see "Allow submission from"
     And I set the following fields to these values:
       | Example 1 | 1 |
@@ -36,5 +38,4 @@ Feature: Deactivate Allow submissions from
       | Example 6 | 1 |
     And I press "Save changes"
     Then I should see "Your changes have been saved"
-    And I should see "You've checked 6 out of 10 examples."
-    And I should see "(60 out of a maximum of 100 points)"
+    And I should see "6 out of 10 examples checked."

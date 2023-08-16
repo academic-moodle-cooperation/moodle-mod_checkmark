@@ -1,8 +1,8 @@
 @mod @mod_checkmark @amc
 Feature: In checkmark, a teacher should be able to use any letters, numbers and special characters to name/describe a checkmark.
-    In order to name/describe the checkmark however I want
-    As a teacher
-    In need to able to use letters, numbers and special characters .
+  In order to name/describe the checkmark however I want
+  As a teacher
+  In need to able to use letters, numbers and special characters .
 
   @javascript
   Scenario: Use special characters in name and description

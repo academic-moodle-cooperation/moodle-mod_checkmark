@@ -78,7 +78,7 @@ class exportform extends \moodleform {
         $mform->setType('updatepref', PARAM_BOOL);
 
         $mform->addElement('header', 'data_settings_header', get_string('datasettingstitle', 'checkmark'));
-        $mform->addElement('select', 'datafilter', get_string('show'),  $filters);
+        $mform->addElement('select', 'datafilter', get_string('filter'),  $filters);
         $mform->setDefault('datafilter', $filter);
 
         $this->add_groupselect();
@@ -88,7 +88,7 @@ class exportform extends \moodleform {
 
         $summarygrp = [
             $mform->createElement('advcheckbox', 'sumabs', '', get_string('summary_abs', 'checkmark'), ['group' => 3]),
-            $mform->createElement('advcheckbox', 'sumrel', '', get_string('summary_rel', 'checkmark'), ['group' => 3])
+            $mform->createElement('advcheckbox', 'sumrel', '', get_string('summary_rel', 'checkmark'), ['group' => 3]),
         ];
         $mform->addGroup($summarygrp, 'summarygrp', get_string('checksummary', 'checkmark'), ['<br />'], false);
 

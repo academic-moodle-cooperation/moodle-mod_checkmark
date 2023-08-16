@@ -72,7 +72,6 @@ try {
     $PAGE->set_title($title);
     $PAGE->set_heading($course->fullname);
 
-
     $form = new \mod_checkmark\overrideform($type, $url, $customdata);
 
     if ($form->is_cancelled()) {
@@ -80,13 +79,13 @@ try {
     } else if ($mode === \mod_checkmark\overrideform::DELETE && $confirm) {
         $instance = new checkmark($cm->id, $checkmark, $cm, $course);
         $instance->delete_override($users, $type);
-        redirect($return, "Entry deleted", null, \core\output\notification::NOTIFY_SUCCESS);
+        redirect($return, get_string('overrideentrydeleted', 'checkmark'), null, \core\output\notification::NOTIFY_SUCCESS);
     } else if ($mode === \mod_checkmark\overrideform::UP || $mode === \mod_checkmark\overrideform::DOWN) {
         $instance = new checkmark($cm->id, $checkmark, $cm, $course);
         $groups = json_decode(urldecode(required_param('users', PARAM_RAW)));
         $groupidfrom = is_int($groups) ? $groups : $groups[0];
         $instance->reorder_group_overrides($groupidfrom, $mode === \mod_checkmark\overrideform::DOWN);
-        redirect($return, "Entry swapped", null, \core\output\notification::NOTIFY_SUCCESS);
+        redirect($return, get_string('overrideentryswapped', 'checkmark'), null, \core\output\notification::NOTIFY_SUCCESS);
     } else if ($data = $form->get_data()) {
         if (!empty($data->resetbutton)) {
             $datareset = [];
