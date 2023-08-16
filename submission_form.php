@@ -47,8 +47,17 @@ class checkmark_submission_form extends moodleform {
 
         $mform =& $this->_form; // Don't forget the underscore!
         $attr = $mform->getAttributes();
-        $attr['class'] = 'mform submissionform';
+        $attr['class'] = 'mform submissionform header-maxwidth';
         $mform->setAttributes($attr);
+
+        $buttonarray = array();
+        $buttonarray[] = &$mform->createElement('submit', 'submitbutton',
+            get_string('savechanges'));
+        $buttonarray[] = &$mform->createElement('reset', 'resetbutton', get_string('revert'),
+            array('class' => 'btn btn-secondary mr-1'));
+        $buttonarray[] = &$mform->createElement('cancel');
+        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        $mform->closeHeaderBefore('buttonar');
 
         foreach ($this->_customdata->examples as $key => $example) {
             switch ($example->grade) {
@@ -82,15 +91,6 @@ class checkmark_submission_form extends moodleform {
 
         $mform->addElement('hidden', 'edit');
         $mform->setType('edit', PARAM_INT);
-
-        $buttonarray = array();
-        $buttonarray[] = &$mform->createElement('submit', 'submitbutton',
-                                                get_string('savechanges'));
-        $buttonarray[] = &$mform->createElement('reset', 'resetbutton', get_string('revert'),
-                                                array('class' => 'btn btn-secondary mr-1'));
-        $buttonarray[] = &$mform->createElement('cancel');
-        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
-        $mform->closeHeaderBefore('buttonar');
 
         // Only preload js if the form is editable.
         if ($this->_customdata->editable) {

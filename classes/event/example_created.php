@@ -95,22 +95,6 @@ class example_created extends \core\event\base {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        return [
-            $this->courseid,
-            'checkmark',
-            'create example',
-            $this->get_url(),
-            "Name: '".$this->data['other']['name']."' Grade: '".$this->data['other']['grade']."'",
-            $this->contextinstanceid
-        ];
-    }
-
-    /**
      * Custom validation.
      *
      * @throws \coding_exception

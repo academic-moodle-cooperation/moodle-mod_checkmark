@@ -40,8 +40,10 @@ require_login($course, false, $cm);
 
 $context = context_module::instance($cm->id);
 
-// Check the user has the required capabilities to list overrides.
-require_capability('mod/checkmark:manageoverrides', $context);
+if (!is_siteadmin($USER)) {
+    // Check the user has the required capabilities to list overrides.
+    require_capability('mod/checkmark:manageoverrides', $context);
+}
 
 $cmgroupmode = groups_get_activity_groupmode($cm);
 $accessallgroups = ($cmgroupmode == NOGROUPS) || has_capability('moodle/site:accessallgroups', $context);
@@ -96,11 +98,18 @@ if ($action == 'movegroupoverride') {
 }
 
 // Display a list of overrides.
+$PAGE->activityheader->disable();
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title(get_string('overrides', 'checkmark'));
 $PAGE->set_heading($course->fullname);
+$PAGE->add_body_class('limitedwidth');
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($cm->name, true, array('context' => $context)));
+echo $OUTPUT->heading(get_string('overrides', 'checkmark'));
+
+$overridemenu =  new \mod_checkmark\output\override_actionmenu($url, $cm);
+
+$renderer = $PAGE->get_renderer('mod_checkmark');
+echo $renderer->render($overridemenu);
 
 $overrides = [];
 // Fetch all overrides.
@@ -297,6 +306,14 @@ if ($hasinactive) {
     echo $OUTPUT->notification(get_string('inactiveoverridehelp', 'checkmark'), 'dimmed_text');
 }
 
+if (!$overrides) {
+    if($groupmode) {
+        $message = get_string('nogroupoverrridemessage', 'checkmark');
+    } else {
+        $message = get_string('nouseroverrridemessage', 'checkmark');
+    }
+    echo $OUTPUT->notification($message, 'info');
+}
 echo html_writer::start_tag('div', array('class' => 'buttons'));
 $options = array();
 if ($groupmode) {
@@ -305,9 +322,6 @@ if ($groupmode) {
         echo $OUTPUT->notification(get_string('groupsnone', 'checkmark'), 'error');
         $options['disabled'] = true;
     }
-    echo $OUTPUT->single_button($overrideediturl->out(true,
-            array('type' => $type, 'id' => $cm->id)),
-            get_string('addnewgroupoverride', 'checkmark'), 'get', $options);
 } else {
     $users = array();
     // See if there are any users in the checkmark.
@@ -338,9 +352,6 @@ if ($groupmode) {
         echo $OUTPUT->notification($nousermessage, 'error');
         $options['disabled'] = true;
     }
-    echo $OUTPUT->single_button($overrideediturl->out(true,
-            array('type' => $type, 'id' => $cm->id)),
-            get_string('addnewuseroverride', 'checkmark'), 'get', $options);
 }
 echo html_writer::end_tag('div');
 echo html_writer::end_tag('div');

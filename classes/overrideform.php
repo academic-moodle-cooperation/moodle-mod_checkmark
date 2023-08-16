@@ -142,6 +142,7 @@ class overrideform extends \moodleform {
                 foreach ($users as $userid => $cur) {
                     $users[$userid] = fullname($cur);
                 }
+
                 $userel = $mform->createElement('autocomplete', 'userids', get_string('users'), $users);
                 $userel->setMultiple('userids', true);
                 $mform->addElement($userel);
@@ -210,27 +211,27 @@ class overrideform extends \moodleform {
 
         if ($data['timeavailable'] && $data['timedue']) {
             if ($data['timeavailable'] > $data['timedue']) {
-                $errors['timedue'] = get_string('duedatevalidation', 'assign');
+                $errors['timedue'] = get_string('duedatevalidation', 'checkmark');
             }
         }
         if ($data['timedue'] && $data['cutoffdate']) {
             if ($data['timedue'] > $data['cutoffdate']) {
-                $errors['cutoffdate'] = get_string('cutoffdatevalidation', 'assign');
+                $errors['cutoffdate'] = get_string('cutoffdatevalidation', 'checkmark');
             }
         }
         if ($data['timedue'] && !$data['cutoffdate'] && $data['orig_cutoffdate']) {
             if ($data['timedue'] > $data['orig_cutoffdate']) {
-                $errors['cutoffdate'] = get_string('cutoffdatevalidation', 'assign');
+                $errors['cutoffdate'] = get_string('cutoffdatevalidation', 'checkmark');
             }
         }
         if ($data['timeavailable'] && $data['cutoffdate']) {
             if ($data['timeavailable'] > $data['cutoffdate']) {
-                $errors['cutoffdate'] = get_string('cutoffdatefromdatevalidation', 'assign');
+                $errors['cutoffdate'] = get_string('cutoffdatefromdatevalidation', 'checkmark');
             }
         }
         if ($data['timeavailable'] && !$data['cutoffdate'] && $data['orig_cutoffdate']) {
             if ($data['timeavailable'] > $data['orig_cutoffdate']) {
-                $errors['cutoffdate'] = get_string('cutoffdatefromdatevalidation', 'assign');
+                $errors['cutoffdate'] = get_string('cutoffdatefromdatevalidation', 'checkmark');
             }
         }
         if ($this->_customdata['checkmark']) {

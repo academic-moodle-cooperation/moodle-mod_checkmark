@@ -130,17 +130,18 @@ class provider implements metadataprovider, pluginprovider, user_preference_prov
                 'omodifierid' => $userid
         ];
 
-        $sql = "
-   SELECT ctx.id
-     FROM {course_modules} cm
-     JOIN {modules} m ON cm.module = m.id AND m.name = :modulename
-     JOIN {checkmark} c ON cm.instance = c.id
-     JOIN {context} ctx ON cm.id = ctx.instanceid AND ctx.contextlevel = :contextlevel
-LEFT JOIN {checkmark_submissions} s ON c.id = s.checkmarkid
-LEFT JOIN {checkmark_feedbacks} f ON c.id = f.checkmarkid
-LEFT JOIN {checkmark_overrides} o ON c.id = o.checkmarkid
-    WHERE s.userid = :suserid OR f.userid = :fuserid OR f.graderid = :fgraderid
-          OR o.userid = :ouserid OR o.modifierid = :omodifierid";
+        $sql = "SELECT ctx.id
+                  FROM mdl_course_modules cm
+                  JOIN mdl_modules m ON cm.module = m.id AND m.name = :modulename
+                  JOIN mdl_context ctx ON cm.id = ctx.instanceid AND ctx.contextlevel = :contextlevel
+                  JOIN mdl_checkmark c ON cm.instance = c.id
+          WHERE EXISTS (
+                SELECT 1 FROM mdl_checkmark_submissions s WHERE s.checkmarkid = c.id AND s.userid = :suserid)
+             OR EXISTS (
+                SELECT 1 FROM mdl_checkmark_feedbacks f WHERE f.checkmarkid = c.id AND (f.userid = :fuserid OR f.graderid = :fgraderid))
+             OR EXISTS (
+                SELECT 1 FROM mdl_checkmark_overrides o WHERE o.checkmarkid = c.id AND (o.userid = :ouserid OR o.modifierid = :omodifierid))";
+
         $contextlist = new contextlist();
         $contextlist->add_from_sql($sql, $params);
 

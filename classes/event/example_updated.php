@@ -101,23 +101,6 @@ class example_updated extends \core\event\base {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        return [
-            $this->courseid,
-            'checkmark',
-            'update example',
-            $this->get_url(),
-            "'".$this->data['other']['old']['name']."'->'".$this->data['other']['new']['name']."' '"
-            .$this->data['other']['old']['grade']."'->'".$this->data['other']['new']['grade']."'",
-            $this->contextinstanceid
-        ];
-    }
-
-    /**
      * Custom validation.
      *
      * @throws \coding_exception

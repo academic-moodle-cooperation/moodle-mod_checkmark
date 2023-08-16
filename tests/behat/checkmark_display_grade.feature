@@ -1,8 +1,8 @@
 @mod @mod_checkmark @amc
 Feature: In a checkmark, a teacher wants to grade a student.
-    In order to grade a stundent manually
-    As a teacher
-    I need to be able to acces the personal grading page of a student and change his grade
+  In order to grade a stundent manually
+  As a teacher
+  I need to be able to acces the personal grading page of a student and change his grade
 
   @javascript
   Scenario: Display a grade
@@ -28,3 +28,4 @@ Feature: In a checkmark, a teacher wants to grade a student.
     And I set the field "xgrade" to "50"
     And I press "Save changes"
     Then "Student 1" row "Grade" column of "generaltable" table should contain "50 / 100"
+

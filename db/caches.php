@@ -1,12 +1,12 @@
 <?php
-// This file is part of mod_checkmark for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
-// It is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// It is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
@@ -15,19 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Defined caches used internally by the plugin.
  *
  * @package   mod_checkmark
- * @author    Daniel Binder, Philipp Hager
- * @copyright 2021 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @copyright 2021 Shamim Rezaie <shamim@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+declare(strict_types=1);
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2023072700;
-$plugin->requires  = 2023042400;
-$plugin->component = 'mod_checkmark';
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = "v4.2.0";
-
+$definitions = [
+    'overrides' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'datasource' => '\mod_checkmark\cache\overrides',
+    ],
+];

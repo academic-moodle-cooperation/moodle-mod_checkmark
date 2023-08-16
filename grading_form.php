@@ -124,7 +124,7 @@ class mod_checkmark_grading_form extends moodleform {
             $mform->addElement('static', 'disabledfeedback', '', $feedback);
         } else {
             // Visible elements!
-            $mform->addElement('editor', 'feedback_editor', get_string('feedback', 'checkmark').':', null,
+            $mform->addElement('editor', 'feedback_editor', get_string('feedback', 'checkmark'), null,
                                $this->get_editor_options() );
             $mform->setDefault('feedback_editor', $this->_customdata->feedback);
         }
@@ -139,7 +139,7 @@ class mod_checkmark_grading_form extends moodleform {
         $mform->setType('mailinfo_h', PARAM_INT);
         $mform->addElement('checkbox', 'mailinfo',
                            get_string('enablenotification', 'checkmark').
-                           $OUTPUT->help_icon('enablenotification', 'checkmark') .':' );
+                           $OUTPUT->help_icon('enablenotification', 'checkmark'));
         $mform->setType('mailinfo', PARAM_INT);
     }
 
@@ -156,7 +156,7 @@ class mod_checkmark_grading_form extends moodleform {
 
         $grademenu = array(-1 => get_string('nograde')) + make_grades_menu($this->_customdata->checkmark->grade);
 
-        $mform->addElement('select', 'xgrade', get_string('grade', 'grades').':', $grademenu, $attributes);
+        $mform->addElement('select', 'xgrade', get_string('grade', 'grades'), $grademenu, $attributes);
         if ($this->_customdata->feedbackobj !== false) {
             $mform->setDefault('xgrade', $this->_customdata->feedbackobj->grade );
         }
@@ -207,7 +207,7 @@ class mod_checkmark_grading_form extends moodleform {
             $gradeitem = $this->_customdata->grading_info->items[CHECKMARK_GRADE_ITEM];
             $grade = $gradeitem->grades[$this->_customdata->userid]->str_grade;
         }
-        $mform->addElement('static', 'finalgrade', get_string('currentgrade', 'checkmark').':' ,
+        $mform->addElement('static', 'finalgrade', get_string('currentgrade', 'checkmark'),
                            $grade);
         $mform->setType('finalgrade', PARAM_INT);
     }
@@ -230,13 +230,13 @@ class mod_checkmark_grading_form extends moodleform {
                     $attendance = $this->_customdata->attendance;
                 }
                 $symbol = checkmark_get_attendance_symbol($attendance);
-                $mform->addElement('static', 'disabledattendance', get_string('attendance', 'checkmark').':', $symbol);
+                $mform->addElement('static', 'disabledattendance', get_string('attendance', 'checkmark'), $symbol);
             } else {
                 // TODO: if there's time, we add JS to show a beautiful select with symbols!
                 $options = array(-1 => '? '.strtolower(get_string('unknown', 'checkmark')),
                                  1  => '✓ '.strtolower(get_string('attendant', 'checkmark')),
                                  0  => '✗ '.strtolower(get_string('absent', 'checkmark')));
-                $mform->addElement('select', 'attendance', get_string('attendance', 'checkmark').':', $options);
+                $mform->addElement('select', 'attendance', get_string('attendance', 'checkmark'), $options);
                 $mform->setType('attendance', PARAM_INT); // To be cleaned before display!
                 $mform->setDefault('attendance', $this->_customdata->attendance);
             }
@@ -268,12 +268,12 @@ class mod_checkmark_grading_form extends moodleform {
             }
             if ($this->_customdata->presentationgradebook &&
                     ($this->_customdata->presgradedisabled || !has_capability('mod/checkmark:gradepresentation', $context))) {
-                $mform->addElement('static', 'presentationgrade', get_string('presentationgrade', 'checkmark').':',
+                $mform->addElement('static', 'presentationgrade', get_string('presentationgrade', 'checkmark'),
                                    $presentationitem->grades[$this->_customdata->userid]->str_long_grade);
                 if ($presentationfeedback == '') {
                     $presentationfeedback = '-';
                 }
-                $mform->addElement('static', 'disabledpresentationfeedback', get_string('presentationfeedback', 'checkmark').':',
+                $mform->addElement('static', 'disabledpresentationfeedback', get_string('presentationfeedback', 'checkmark'),
                                    $presentationfeedback);
             } else if ($this->_customdata->instance_presentationgrade) {
                 $grademenu = array(-1 => get_string('nograde'));
@@ -281,16 +281,16 @@ class mod_checkmark_grading_form extends moodleform {
                 if ($presentationgrade == '') {
                     $presentationgrade = -1;
                 }
-                $mform->addElement('select', 'presentationgrade', get_string('presentationgrade', 'checkmark').':', $grademenu);
+                $mform->addElement('select', 'presentationgrade', get_string('presentationgrade', 'checkmark'), $grademenu);
                 $mform->setType('presentationgrade', PARAM_INT);
                 $mform->setDefault('presentationgrade', $presentationgrade);
 
-                $mform->addElement('editor', 'presentationfeedback_editor', get_string('presentationfeedback', 'checkmark').':',
+                $mform->addElement('editor', 'presentationfeedback_editor', get_string('presentationfeedback', 'checkmark'),
                                    null, $this->get_editor_options($this->_customdata->cm, 'presentationfeedback') );
                 $mform->setDefault('presentationfeedback_editor', $presentationfeedback);
             } else if ($this->_customdata->instance_presentationgrade == 0) {
                 // Print only the presentationfeedback field in case grading is set to 'none'.
-                $mform->addElement('editor', 'presentationfeedback_editor', get_string('presentationfeedback', 'checkmark').':',
+                $mform->addElement('editor', 'presentationfeedback_editor', get_string('presentationfeedback', 'checkmark'),
                         null, $this->get_editor_options($this->_customdata->cm, 'presentationfeedback') );
                 $mform->setDefault('presentationfeedback_editor', $presentationfeedback);
             }

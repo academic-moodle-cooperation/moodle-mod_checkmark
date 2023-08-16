@@ -1284,13 +1284,28 @@ function xmldb_checkmark_upgrade($oldversion) {
         // Changing nullability of field timemodified on table checkmark_submissions to null.
         $table = new xmldb_table('checkmark_submissions');
         $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, '0', 'timecreated');
-
+        
         // Launch change of nullability for field timemodified.
         $dbman->change_field_notnull($table, $field);
+        
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2022120700, 'checkmark');
+    }
 
+    if ($oldversion < 2022120701) {
         // Drop keys and indices while changing the default values.
-        // Define index checkmarkid-userid (not unique) to be dropped form checkmark_overrides.
         $table = new xmldb_table('checkmark_overrides');
+        //Drop old 'checkmarkid-userid-timecreated' index added 2017
+        $index = new xmldb_index('checkmarkid-userid-timecreated', XMLDB_INDEX_NOTUNIQUE, ['checkmarkid', 'userid', 'timecreated']);
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+        //Drop potential index only on timecreated if exists
+        $index = new xmldb_index('timecreated', XMLDB_INDEX_NOTUNIQUE, ['timecreated']);
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+        // Define index checkmarkid-userid (not unique) to be dropped form checkmark_overrides.
         $index = new xmldb_index('checkmarkid-userid', XMLDB_INDEX_NOTUNIQUE, ['checkmarkid', 'userid', 'timecreated']);
 
         // Conditionally launch drop index checkmarkid-userid.
@@ -1311,6 +1326,13 @@ function xmldb_checkmark_upgrade($oldversion) {
 
         // Launch change of default for field timecreated.
         $dbman->change_field_default($table, $field);
+
+        //just in case check for null values and replace them with 0
+        $nullrecords = $DB->get_records('checkmark_overrides', ['timecreated' => null]);
+        foreach ($nullrecords as $nullrecord) {
+            $nullrecord->timecreated = 0;
+            $DB->update_record('checkmark_overrides', $nullrecord);
+        }
 
         // Changing the default of field modifierid on table checkmark_overrides to 0.
         $table = new xmldb_table('checkmark_overrides');
@@ -1336,8 +1358,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         }
 
         // Checkmark savepoint reached.
-        upgrade_mod_savepoint(true, 2022120700, 'checkmark');
-
+        upgrade_mod_savepoint(true, 2022120701, 'checkmark');
     }
 
     return true;

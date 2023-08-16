@@ -1,3 +1,4 @@
+
 @mod @mod_checkmark @amc
 Feature: In course, a teacher should be able to add files to a checkmark
   In order to add a new checkmark with additional files

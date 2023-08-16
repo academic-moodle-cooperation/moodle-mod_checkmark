@@ -636,7 +636,7 @@ function checkmark_get_user_grades($checkmark, $userid = 0) {
     global $DB;
 
     if ($userid) {
-        $user = 'AND u.id = :userid';
+        $user = ' AND u.id = :userid'; //leading space to avoid 'trailing junk' error i postgreSQL
         $params = array('userid' => $userid);
     } else {
         $user = '';
@@ -686,7 +686,7 @@ function checkmark_get_user_attendances($checkmark, $userid = 0) {
     global $DB;
 
     if ($userid) {
-        $user = 'AND u.id = :userid';
+        $user = ' AND u.id = :userid';
         $params = array('userid' => $userid);
     } else {
         $user = '';
@@ -712,7 +712,7 @@ function checkmark_get_user_presentation_grades($checkmark, $userid = 0) {
     global $DB;
 
     if ($userid) {
-        $user = 'AND u.id = :userid';
+        $user = ' AND u.id = :userid';
         $params = array('userid' => $userid);
     } else {
         $user = '';
@@ -1531,14 +1531,14 @@ function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $c
 
     $params = array();
     if ($userid) {
-        $userselect = 'AND u.id = :userid';
+        $userselect = ' AND u.id = :userid';
         $params['userid'] = $userid;
     } else {
         $userselect = '';
     }
 
     if ($groupid) {
-        $groupselect = 'AND gm.groupid = :groupid';
+        $groupselect = ' AND gm.groupid = :groupid';
         $groupjoin = 'JOIN {groups_members} gm ON  gm.userid=u.id';
         $params['groupid'] = $groupid;
     } else {
@@ -1560,7 +1560,7 @@ function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $c
             ' WHERE asb.timemodified > :timestart
                                                    AND a.id = :cminstance' .
             $userselect . ' ' . $groupselect .
-            'ORDER BY asb.timemodified ASC', $params)) {
+            ' ORDER BY asb.timemodified ASC', $params)) {
         return;
     }
 
@@ -2151,28 +2151,13 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
         $checkmarknode->add_node($submissionnode, $beforekey);
     }
 
-    // Add nodes to override dates for users/groups!
-    if (has_capability('mod/checkmark:manageoverrides', $PAGE->cm->context)) {
-        $keys = $checkmarknode->get_children_key_list();
-        // Insert nodes on position 2 and 3 in the list!
-        $url = new moodle_url('/mod/checkmark/extend.php', [
-                'id' => $PAGE->cm->id,
-                'return' => urlencode($PAGE->url->out())
-        ]);
-        $type = \navigation_node::TYPE_CUSTOM;
-        $shorttext = get_string('groupoverrides', 'checkmark');
-        $key = 'extendgroups';
-        $icon = null;
-        $groupnode = \navigation_node::create($shorttext, new moodle_url('/mod/checkmark/overrides.php',
-                array('id' => $PAGE->cm->id, 'mode' => 'group')), $type, $shorttext, $key, $icon);
-        $checkmarknode->add_node($groupnode, $beforekey);
-
-        $shorttext = get_string('useroverrides', 'checkmark');
-        $key = 'extendusers';
-        $icon = null;
-        $usernode = \navigation_node::create($shorttext, new moodle_url('/mod/checkmark/overrides.php',
-                array('id' => $PAGE->cm->id, 'mode' => 'user')), $type, $shorttext, $key, $icon);
-        $checkmarknode->add_node($usernode, 'extendgroups');
+        if (has_capability('mod/checkmark:manageoverrides', $settings->get_page()->cm->context)) {
+            $url = new moodle_url('/mod/checkmark/overrides.php', ['id' => $settings->get_page()->cm->id, 'mode' => 'user']);
+        
+        $node = navigation_node::create(get_string('overrides', 'checkmark'),
+            $url,
+            navigation_node::TYPE_SETTING, null, 'mod_checkmark_useroverrides');
+        $checkmarknode->add_node($node, $beforekey);
     }
 }
 
@@ -2356,4 +2341,125 @@ function mod_checkmark_get_completion_active_rule_descriptions($cm) {
         }
     }
     return $descriptions;
+}
+
+/**
+ * This function updates the events associated to the assign.
+ * If $override is non-zero, then it updates only the events
+ * associated with the specified override.
+ *
+ * @param assign $checkmark the assign object.
+ * @param object $override (optional) limit to a specific override
+ */
+function checkmark_update_events($checkmark, $override = null) {
+    global $CFG, $DB;
+    
+    require_once($CFG->dirroot . '/calendar/lib.php');
+    
+    $checkmarkinstance = $checkmark->get_instance();
+    
+    // Load the old events relating to this assign.
+    $conds = array('modulename' => 'checkmark', 'instance' => $checkmarkinstance->id);
+    if (!empty($override)) {
+        // Only load events for this override.
+        if (isset($override->userid)) {
+            $conds['userid'] = $override->userid;
+        } else if (isset($override->groupid)) {
+            $conds['groupid'] = $override->groupid;
+        } else {
+            // This is not a valid override, it may have been left from a bad import or restore.
+            $conds['groupid'] = $conds['userid'] = 0;
+        }
+    }
+    $oldevents = $DB->get_records('event', $conds, 'id ASC');
+    
+    // Now make a to-do list of all that needs to be updated.
+    if (empty($override)) {
+        // We are updating the primary settings for the assignment, so we need to add all the overrides.
+        $overrides = $DB->get_records('checkmark_overrides', array('checkmarkid' => $checkmarkinstance->id), 'id ASC');
+        // It is necessary to add an empty stdClass to the beginning of the array as the $oldevents
+        // list contains the original (non-override) event for the module. If this is not included
+        // the logic below will end up updating the wrong row when we try to reconcile this $overrides
+        // list against the $oldevents list.
+        array_unshift($overrides, new stdClass());
+    } else {
+        // Just do the one override.
+        $overrides = array($override);
+    }
+    
+    if (!empty($checkmark->get_course_module())) {
+        $cmid = $checkmark->get_course_module()->id;
+    } else {
+        $cmid = get_coursemodule_from_instance('checkmark', $checkmarkinstance->id, $checkmarkinstance->course)->id;
+    }
+    
+    foreach ($overrides as $current) {
+        $groupid   = isset($current->groupid) ? $current->groupid : 0;
+        $userid    = isset($current->userid) ? $current->userid : 0;
+        $duedate = isset($current->timedue) ? $current->timedue : $checkmarkinstance->timedue;
+        $timelimit = isset($current->timelimit) ? $current->timelimit : 0;
+        
+        // Only add 'due' events for an override if they differ from the assign default.
+        $addclose = empty($current->id) || !empty($current->duedate);
+        
+        $event = new stdClass();
+        $event->type = CALENDAR_EVENT_TYPE_ACTION;
+        $event->description = format_module_intro('checkmark', $checkmarkinstance, $cmid, false);
+        $event->format = FORMAT_HTML;
+        // Events module won't show user events when the courseid is nonzero.
+        $event->courseid    = ($userid) ? 0 : $checkmarkinstance->course;
+        $event->groupid     = $groupid;
+        $event->userid      = $userid;
+        $event->modulename  = 'checkmark';
+        $event->instance    = $checkmarkinstance->id;
+        $event->timestart   = $duedate;
+        $event->timeduration = $timelimit;
+        $event->timesort    = $event->timestart + $event->timeduration;
+        $event->visible     = instance_is_visible('chackmark', $checkmarkinstance);
+        $event->eventtype   = ASSIGN_EVENT_TYPE_DUE;
+        $event->priority    = null;
+        
+        // Determine the event name and priority.
+        if ($groupid) {
+            // Group override event.
+            $params = new stdClass();
+            $params->checkmark = $checkmarkinstance->name;
+            $params->group = groups_get_group_name($groupid);
+            if ($params->group === false) {
+                // Group doesn't exist, just skip it.
+                continue;
+            }
+            $eventname = get_string('overridegroupeventname', 'checkmark', $params);
+            // Set group override priority.
+            if (isset($current->sortorder)) {
+                $event->priority = $current->sortorder;
+            }
+        } else if ($userid) {
+            // User override event.
+            $params = new stdClass();
+            $params->checkmark = $checkmarkinstance->name;
+            $eventname = get_string('overrideusereventname', 'checkmark', $params);
+            // Set user override priority.
+            $event->priority = CALENDAR_EVENT_USER_OVERRIDE_PRIORITY;
+        } else {
+            // The parent event.
+            $eventname = $checkmarkinstance->name;
+        }
+        
+        if ($duedate && $addclose) {
+            if ($oldevent = array_shift($oldevents)) {
+                $event->id = $oldevent->id;
+            } else {
+                unset($event->id);
+            }
+            $event->name      = $eventname.' ('.get_string('duedate', 'checkmark').')';
+            calendar_event::create($event, false);
+        }
+    }
+    
+    // Delete any leftover events.
+    foreach ($oldevents as $badevent) {
+        $badevent = calendar_event::load($badevent);
+        $badevent->delete();
+    }
 }

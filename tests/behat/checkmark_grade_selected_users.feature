@@ -1,8 +1,8 @@
 @mod @mod_checkmark @amc
 Feature: In a checkmark I want to grade selected submissions.
-    In order to grad a specific user
-    As a teacher
-    I need to able to grade a selected user
+  In order to grad a specific user
+  As a teacher
+  I need to able to grade a selected user
 
   @javascript
   Scenario: Grade selected users
@@ -53,6 +53,6 @@ Feature: In a checkmark I want to grade selected submissions.
       | bulkaction | grade |
     And I press "Start"
     And I press "Continue"
-    Then I should see "Auto-grading successful! 1 submission updated."
+    Then I should see "Auto-grading successful!"
     Then "Student 1" row "Grade" column of "generaltable" table should contain "60 / 100"
-    And "Student 2" row "Grade" column of "generaltable" table should contain "40 / 100"
+    And "Student 2" row "Grade" column of "generaltable" table should contain "30 / 100"

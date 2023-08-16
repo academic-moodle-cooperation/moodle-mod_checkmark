@@ -1,4 +1,4 @@
-<XMLDB xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" PATH="mod/checkmark/db" VERSION="2022100500" COMMENT="XMLDB file for Moodle mod/checkmark" xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
+<XMLDB xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" PATH="mod/checkmark/db" VERSION="2022120701" COMMENT="XMLDB file for Moodle mod/checkmark" xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
   <TABLES>
     <TABLE NAME="checkmark" COMMENT="Defines checkmarks">
       <FIELDS>
@@ -100,7 +100,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="exampleid" TYPE="foreign" FIELDS="exampleid" REFTABLE="checkmark_examples" REFFIELDS="id"/>
         <KEY NAME="submissionid" TYPE="foreign" FIELDS="submissionid" REFTABLE="checkmark_submissions" REFFIELDS="id"/>
-        <KEY NAME="submission_check_key" TYPE="unique" FIELDS="exampleid, submissionid, state"/>
+        <KEY NAME="submission_check_key" TYPE="unique" FIELDS="exampleid, submissionid"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="checkmark_overrides" COMMENT="Table containing user-specific overrides for available-, due- and cutoff-dates for users.">

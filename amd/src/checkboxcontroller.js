@@ -92,6 +92,14 @@ define(['jquery', 'core/log'], function($, log) {
             instance.id = '';
         }
 
+        $('#chmrk_selectallcb').click(function() {
+          if ($("#chmrk_selectallcb").is(':checked')) {
+            $(' input[type="checkbox"].checkboxgroup1').prop('checked', true);
+          } else {
+            $(' input[type="checkbox"].checkboxgroup1').prop('checked', false);
+          }
+       });
+
         $('#' + instance.id + ' a.all').on('click', null, {inst: this, type: 'all'}, this.updateCheckboxes);
         $('#' + instance.id + ' a.none').on('click', null, {inst: this, type: 'none'}, this.updateCheckboxes);
         $('#' + instance.id + ' a.graded').on('click', null, {inst: this, type: 'graded'}, this.updateCheckboxes);

@@ -67,6 +67,7 @@ if (!isset($SESSION->checkmark)) {
 
 echo $OUTPUT->header();
 
-echo $checkmarkinstance->print_submission_tabs('export');
+
+//echo $checkmarkinstance->print_submission_tabs('export');
 
 $checkmarkinstance->view_export();   // Display or process the submissions!

@@ -1,8 +1,8 @@
 @mod @mod_checkmark @amc
 Feature: In a course, a student should be able to add a submission
-    In order to add a submission
-    As a student
-    I need to be able to change the submission and save it.
+  In order to add a submission
+  As a student
+  I need to be able to change the submission and save it.
 
   @javascript
   Scenario: Add a submission
@@ -20,9 +20,11 @@ Feature: In a course, a student should be able to add a submission
     # We do not need to manually create the checkmark instance again,
     # this has been testet in checkmark_adding.feature, use generators!
     And the following "activities" exist:
-      | activity  | course | idnumber | name        | intro         |
-      | checkmark | C1     | CM1      | Checkmark 1 | Description 1 |
-    When I am on the "CM1" Activity page logged in as student1
+      | activity  | course | idnumber | name          | intro                  |
+      | checkmark | C1     | CM1      | Kreuzerlübung | Standard-Einstellungen |
+    And I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I follow "Kreuzerlübung"
     And I set the following fields to these values:
       | Example 1 | 1 |
       | Example 2 | 1 |
@@ -31,6 +33,5 @@ Feature: In a course, a student should be able to add a submission
       | Example 5 | 1 |
       | Example 6 | 1 |
     And I press "Save changes"
-    Then I should see "Your changes have been saved"
-    And I should see "You've checked 6 out of 10 examples."
-    And I should see "(60 out of a maximum of 100 points)"
+    Then I should see "Submitted for grading"
+    Then I should see "6 out of 10 examples checked."
