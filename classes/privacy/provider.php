@@ -131,16 +131,16 @@ class provider implements metadataprovider, pluginprovider, user_preference_prov
         ];
 
         $sql = "SELECT ctx.id
-                  FROM mdl_course_modules cm
-                  JOIN mdl_modules m ON cm.module = m.id AND m.name = :modulename
-                  JOIN mdl_context ctx ON cm.id = ctx.instanceid AND ctx.contextlevel = :contextlevel
-                  JOIN mdl_checkmark c ON cm.instance = c.id
+                  FROM {course_modules} cm
+                  JOIN {modules} m ON cm.module = m.id AND m.name = :modulename
+                  JOIN {context} ctx ON cm.id = ctx.instanceid AND ctx.contextlevel = :contextlevel
+                  JOIN {checkmark} c ON cm.instance = c.id
           WHERE EXISTS (
-                SELECT 1 FROM mdl_checkmark_submissions s WHERE s.checkmarkid = c.id AND s.userid = :suserid)
+                SELECT 1 FROM {checkmark_submissions} s WHERE s.checkmarkid = c.id AND s.userid = :suserid)
              OR EXISTS (
-                SELECT 1 FROM mdl_checkmark_feedbacks f WHERE f.checkmarkid = c.id AND (f.userid = :fuserid OR f.graderid = :fgraderid))
+                SELECT 1 FROM {checkmark_feedbacks} f WHERE f.checkmarkid = c.id AND (f.userid = :fuserid OR f.graderid = :fgraderid))
              OR EXISTS (
-                SELECT 1 FROM mdl_checkmark_overrides o WHERE o.checkmarkid = c.id AND (o.userid = :ouserid OR o.modifierid = :omodifierid))";
+                SELECT 1 FROM {checkmark_overrides} o WHERE o.checkmarkid = c.id AND (o.userid = :ouserid OR o.modifierid = :omodifierid))";
 
         $contextlist = new contextlist();
         $contextlist->add_from_sql($sql, $params);
