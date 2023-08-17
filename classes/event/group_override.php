@@ -24,8 +24,6 @@
  */
 namespace mod_checkmark\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The parent class for mod_checkmark_group_override events.
  *

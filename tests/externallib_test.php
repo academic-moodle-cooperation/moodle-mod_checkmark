@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/mod/checkmark/externallib.php');
  *
  * @package   mod_checkmark
  */
-class mod_checkmark_external_testcase extends externallib_advanced_testcase {
+class externallib_test extends externallib_advanced_testcase {
 
     /** @var stdClass Variable that holds instance of the current course */
     private $_course;

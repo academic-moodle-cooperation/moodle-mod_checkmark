@@ -636,7 +636,7 @@ function checkmark_get_user_grades($checkmark, $userid = 0) {
     global $DB;
 
     if ($userid) {
-        $user = ' AND u.id = :userid'; //leading space to avoid 'trailing junk' error i postgreSQL
+        $user = ' AND u.id = :userid'; // Leading space to avoid 'trailing junk' error i postgreSQL.
         $params = array('userid' => $userid);
     } else {
         $user = '';
@@ -2151,9 +2151,9 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
         $checkmarknode->add_node($submissionnode, $beforekey);
     }
 
-        if (has_capability('mod/checkmark:manageoverrides', $settings->get_page()->cm->context)) {
-            $url = new moodle_url('/mod/checkmark/overrides.php', ['id' => $settings->get_page()->cm->id, 'mode' => 'user']);
-        
+    if (has_capability('mod/checkmark:manageoverrides', $settings->get_page()->cm->context)) {
+        $url = new moodle_url('/mod/checkmark/overrides.php', ['id' => $settings->get_page()->cm->id, 'mode' => 'user']);
+
         $node = navigation_node::create(get_string('overrides', 'checkmark'),
             $url,
             navigation_node::TYPE_SETTING, null, 'mod_checkmark_useroverrides');
@@ -2353,11 +2353,11 @@ function mod_checkmark_get_completion_active_rule_descriptions($cm) {
  */
 function checkmark_update_events($checkmark, $override = null) {
     global $CFG, $DB;
-    
+
     require_once($CFG->dirroot . '/calendar/lib.php');
-    
+
     $checkmarkinstance = $checkmark->get_instance();
-    
+
     // Load the old events relating to this assign.
     $conds = array('modulename' => 'checkmark', 'instance' => $checkmarkinstance->id);
     if (!empty($override)) {
@@ -2372,7 +2372,7 @@ function checkmark_update_events($checkmark, $override = null) {
         }
     }
     $oldevents = $DB->get_records('event', $conds, 'id ASC');
-    
+
     // Now make a to-do list of all that needs to be updated.
     if (empty($override)) {
         // We are updating the primary settings for the assignment, so we need to add all the overrides.
@@ -2386,22 +2386,22 @@ function checkmark_update_events($checkmark, $override = null) {
         // Just do the one override.
         $overrides = array($override);
     }
-    
+
     if (!empty($checkmark->get_course_module())) {
         $cmid = $checkmark->get_course_module()->id;
     } else {
         $cmid = get_coursemodule_from_instance('checkmark', $checkmarkinstance->id, $checkmarkinstance->course)->id;
     }
-    
+
     foreach ($overrides as $current) {
         $groupid   = isset($current->groupid) ? $current->groupid : 0;
         $userid    = isset($current->userid) ? $current->userid : 0;
         $duedate = isset($current->timedue) ? $current->timedue : $checkmarkinstance->timedue;
         $timelimit = isset($current->timelimit) ? $current->timelimit : 0;
-        
+
         // Only add 'due' events for an override if they differ from the assign default.
         $addclose = empty($current->id) || !empty($current->duedate);
-        
+
         $event = new stdClass();
         $event->type = CALENDAR_EVENT_TYPE_ACTION;
         $event->description = format_module_intro('checkmark', $checkmarkinstance, $cmid, false);
@@ -2418,7 +2418,7 @@ function checkmark_update_events($checkmark, $override = null) {
         $event->visible     = instance_is_visible('chackmark', $checkmarkinstance);
         $event->eventtype   = ASSIGN_EVENT_TYPE_DUE;
         $event->priority    = null;
-        
+
         // Determine the event name and priority.
         if ($groupid) {
             // Group override event.
@@ -2445,7 +2445,7 @@ function checkmark_update_events($checkmark, $override = null) {
             // The parent event.
             $eventname = $checkmarkinstance->name;
         }
-        
+
         if ($duedate && $addclose) {
             if ($oldevent = array_shift($oldevents)) {
                 $event->id = $oldevent->id;
@@ -2456,7 +2456,7 @@ function checkmark_update_events($checkmark, $override = null) {
             calendar_event::create($event, false);
         }
     }
-    
+
     // Delete any leftover events.
     foreach ($oldevents as $badevent) {
         $badevent = calendar_event::load($badevent);

@@ -26,8 +26,6 @@ namespace mod_checkmark;
 use \mod_checkmark\submissionstable as submissionstable;
 use \mod_checkmark\MTablePDF as MTablePDF;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Template table-class exported with specific settings!
  *

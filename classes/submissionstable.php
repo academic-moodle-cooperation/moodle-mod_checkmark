@@ -8,11 +8,11 @@
 //
 // It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * submissionstable.php
@@ -36,8 +36,8 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
-require_once ($CFG->libdir . '/tablelib.php');
-require_once ($CFG->libdir . '/gradelib.php');
+require_once($CFG->libdir . '/tablelib.php');
+require_once($CFG->libdir . '/gradelib.php');
 
 /**
  * submissionstable class handles display of submissions for print preview and submissions view...
@@ -47,8 +47,7 @@ require_once ($CFG->libdir . '/gradelib.php');
  * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class submissionstable extends \table_sql
-{
+class submissionstable extends \table_sql {
 
     /**
      * formated cells contain tags for colors
@@ -183,8 +182,7 @@ class submissionstable extends \table_sql
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function __construct($uniqueid, $checkmarkorcmid = null)
-    {
+    public function __construct($uniqueid, $checkmarkorcmid = null) {
         global $CFG, $DB, $PAGE;
         $PAGE->requires->js_call_amd('mod_checkmark/utils', 'init');
 
@@ -237,8 +235,7 @@ class submissionstable extends \table_sql
      *            will only be used if there is a fullname column defined for the table.
      * @throws dml_exception
      */
-    public function query_db($pagesize, $useinitialsbar = true)
-    {
+    public function query_db($pagesize, $useinitialsbar = true) {
         global $DB;
         if (! $this->is_downloading()) {
             if ($this->countsql === null) {
@@ -302,8 +299,7 @@ class submissionstable extends \table_sql
      * @throws coding_exception ;
      * @throws dml_exception
      */
-    public function get_data($type = self::FORMAT_DOWNLOAD)
-    {
+    public function get_data($type = self::FORMAT_DOWNLOAD) {
         global $SESSION;
 
         if (! $this->setup) {
@@ -393,8 +389,7 @@ class submissionstable extends \table_sql
      * @param mixed[] $helpicons
      *            array of help icons and nulls
      */
-    private function addexamplecolumns(&$tablecolumns, &$tableheaders, &$helpicons)
-    {
+    private function addexamplecolumns(&$tablecolumns, &$tableheaders, &$helpicons) {
         // Dynamically add examples!
         $middle = count($this->checkmark->checkmark->examples) / 2;
         $count = 0;
@@ -427,8 +422,7 @@ class submissionstable extends \table_sql
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public static function create_submissions_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL)
-    {
+    public static function create_submissions_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL) {
         global $CFG, $DB;
         // We need to have the same ID to ensure the columns are collapsed if their collapsed in the other table!
         $table = new submissionstable('mod-checkmark-submissions', $checkmarkorcmid);
@@ -551,7 +545,7 @@ class submissionstable extends \table_sql
         $table->column_class('grade', 'grade');
         $table->column_class('feedback', 'feedback');
         $table->column_class('timesubmitted', 'timesubmitted');
-        
+
         foreach ($table->checkmark->checkmark->examples as $key => $example) {
             $table->column_class('example' . $key, 'example' . $key . ' colexample');
             $table->no_sorting('example' . $key);
@@ -666,8 +660,7 @@ class submissionstable extends \table_sql
      *         those don't exist)
      * @throws dml_exception
      */
-    public function get_triple($userid)
-    {
+    public function get_triple($userid) {
         if (! $this->setup) {
             $this->setup();
         }
@@ -729,8 +722,7 @@ class submissionstable extends \table_sql
      * @param string $groupby
      *            (optional) groupby clause (SQL snippet)
      */
-    public function set_sql($fields, $from, $where, array $params = null, $groupby = '')
-    {
+    public function set_sql($fields, $from, $where, array $params = null, $groupby = '') {
         parent::set_sql($fields, $from, $where, $params);
         $this->sql->groupby = $groupby;
     }
@@ -749,8 +741,7 @@ class submissionstable extends \table_sql
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public static function create_export_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL, $ids = [])
-    {
+    public static function create_export_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL, $ids = []) {
         global $CFG, $DB;
         // We need to have the same ID to ensure the columns are collapsed if their collapsed in the other table!
         $table = new submissionstable('mod-checkmark-submissions', $checkmarkorcmid);
@@ -1098,8 +1089,7 @@ class submissionstable extends \table_sql
      * @param int $span
      *            how many cols the group should span
      */
-    protected function add_colgroup($class, $span = 1)
-    {
+    protected function add_colgroup($class, $span = 1) {
         $colgrp = new \stdClass();
         $colgrp->span = $span;
         $colgrp->class = $class;
@@ -1110,8 +1100,7 @@ class submissionstable extends \table_sql
     /**
      * Here we extend the moodle sql_table with the ability to output colgroups!
      */
-    public function start_html()
-    {
+    public function start_html() {
         global $PAGE;
 
         if ($this->hasoverrides) {
@@ -1144,11 +1133,9 @@ class submissionstable extends \table_sql
      * Set or determine if initials bar output should be suppressed
      *
      * @return bool false
-     *        
      * @deprecated since Moodle 3.3 TODO remove in Moodle 3.7
      */
-    public function suppress_initials_output()
-    {
+    public function suppress_initials_output() {
         debugging('Suppression of initials output has been deprecated, due to changes in Moodle core!', DEBUG_DEVELOPER);
 
         return false;
@@ -1165,8 +1152,7 @@ class submissionstable extends \table_sql
      * @throws dml_exception
      * @throws coding_exception
      */
-    public function get_userids($filter, $ids = [])
-    {
+    public function get_userids($filter, $ids = []) {
         return self::get_userids_static($this->context, $this->checkmark->checkmark->id, $this->currentgroup, $filter, $ids);
     }
 
@@ -1187,8 +1173,7 @@ class submissionstable extends \table_sql
      * @throws coding_exception
      * @throws dml_exception
      */
-    public static function get_userids_static($context, $checkmarkid, $currentgroup, $filter, $ids = [])
-    {
+    public static function get_userids_static($context, $checkmarkid, $currentgroup, $filter, $ids = []) {
         global $DB;
 
         // Get all ppl that are allowed to submit checkmarks!
@@ -1274,8 +1259,7 @@ class submissionstable extends \table_sql
      *            (optional) Array of userids to filter for
      * @return array|int[] Array of found userids. [-1] if none are found
      */
-    public static function count_userids($context, $checkmarkid, $currentgroup, $filter, $ids = [])
-    {
+    public static function count_userids($context, $checkmarkid, $currentgroup, $filter, $ids = []) {
         $idsres = self::get_userids_static($context, $checkmarkid, $currentgroup, $filter, $ids);
         if (empty($idsres) || $idsres[0] === - 1) {
             return 0;
@@ -1292,8 +1276,7 @@ class submissionstable extends \table_sql
      * @return string HTML snippet to output in page
      * @throws moodle_exception
      */
-    public function checkbox_controller($returnonlylinks = true)
-    {
+    public function checkbox_controller($returnonlylinks = true) {
         global $PAGE;
 
         $baseurl = $PAGE->url;
@@ -1328,23 +1311,23 @@ class submissionstable extends \table_sql
             $params
         ]);
 
-        //return \html_writer::checkbox('selected[]', 1, false, null, ['id' => "chmrk_selectallcb"]);
+        // return \html_writer::checkbox('selected[]', 1, false, null, ['id' => "chmrk_selectallcb"]);
         return \html_writer::tag('div', \html_writer::checkbox('selected[]', 1, false, null, ['id' => "chmrk_selectallcb"]), [
             'id' => $randomid
         ]);
-//         return \html_writer::tag('div', $title . \html_writer::link($allurl, get_string('all'), [
-//             'class' => 'all'
-//         ]) . ' / ' . \html_writer::link($noneurl, get_string('none'), [
-//             'class' => 'none'
-//         ]) . ' / ' . \html_writer::link($gradedurl, get_string('graded', 'checkmark'), [
-//             'class' => 'graded'
-//         ]) . ' / ' . \html_writer::link($reqgradingurl, get_string('ungraded', 'checkmark'), [
-//             'class' => 'ungraded'
-//         ]) . ' / ' . \html_writer::link($submittedurl, get_string('submitted', 'checkmark'), [
-//             'class' => 'submitted'
-//         ]), [
-//             'id' => $randomid
-//         ]);
+        // return \html_writer::tag('div', $title . \html_writer::link($allurl, get_string('all'), [
+        // 'class' => 'all'
+        // ]) . ' / ' . \html_writer::link($noneurl, get_string('none'), [
+        // 'class' => 'none'
+        // ]) . ' / ' . \html_writer::link($gradedurl, get_string('graded', 'checkmark'), [
+        // 'class' => 'graded'
+        // ]) . ' / ' . \html_writer::link($reqgradingurl, get_string('ungraded', 'checkmark'), [
+        // 'class' => 'ungraded'
+        // ]) . ' / ' . \html_writer::link($submittedurl, get_string('submitted', 'checkmark'), [
+        // 'class' => 'submitted'
+        // ]), [
+        // 'id' => $randomid
+        // ]);
     }
 
     /**
@@ -1362,8 +1345,7 @@ class submissionstable extends \table_sql
      * @return string Return XXX.
      * @throws coding_exception
      */
-    public function col_selection($values)
-    {
+    public function col_selection($values) {
         // If the data is being downloaded than we don't want to show HTML.
         if ($this->use_no_html()) {
             return '';
@@ -1421,8 +1403,7 @@ class submissionstable extends \table_sql
      *            Contains object with all the values of record.
      * @return string Return user fullname.
      */
-    public function col_fullname($values)
-    {
+    public function col_fullname($values) {
         if ($this->use_no_html()) {
             return strip_tags(parent::col_fullname($values));
         } else {
@@ -1439,8 +1420,7 @@ class submissionstable extends \table_sql
      *            Contains object with all the values of record.
      * @return string Return user picture markup.
      */
-    public function col_picture($values)
-    {
+    public function col_picture($values) {
         global $OUTPUT;
         // If the data is being downloaded than we don't want to show HTML.
         if ($this->use_no_html()) {
@@ -1458,8 +1438,7 @@ class submissionstable extends \table_sql
      *            Contains object with all the values of record.
      * @return string Return user groups.
      */
-    public function col_groups($values)
-    {
+    public function col_groups($values) {
         if (isset($values->groupname)) {
             $groups = groups_get_all_groups($this->checkmark->course->id, $values->id, 0, 'g.name');
             $values->groupname = '';
@@ -1494,8 +1473,7 @@ class submissionstable extends \table_sql
      * @return string Return user's grade.
      * @throws coding_exception
      */
-    public function col_grade($values)
-    {
+    public function col_grade($values) {
         $finalgrade = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$values->id];
         $finalgrade->formatted_grade = $this->checkmark->display_grade($finalgrade->grade, CHECKMARK_GRADE_ITEM);
         $lockedoroverridden = 'locked';
@@ -1587,8 +1565,7 @@ class submissionstable extends \table_sql
      *            Contains object with all the values of record.
      * @return string Return user's feedback.
      */
-    public function col_feedback($values)
-    {
+    public function col_feedback($values) {
         $finalgrade = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$values->id];
         if ($values->feedbackid) {
             // Print Comment!
@@ -1679,8 +1656,7 @@ class submissionstable extends \table_sql
      * @return string Return user time of submission.
      * @throws coding_exception
      */
-    public function col_timesubmitted($values)
-    {
+    public function col_timesubmitted($values) {
         if ($this->use_no_html()) {
             $timeformat = get_string('strftimedatetimeshort');
         } else {
@@ -1726,8 +1702,7 @@ class submissionstable extends \table_sql
      * @return string Return user's time of grading.
      * @throws coding_exception
      */
-    public function col_timemarked($values)
-    {
+    public function col_timemarked($values) {
         if ($this->use_no_html()) {
             $timeformat = get_string('strftimedatetimeshort');
         } else {
@@ -1772,8 +1747,7 @@ class submissionstable extends \table_sql
      * @return string Return user's grading button.
      * @throws coding_exception
      */
-    public function col_status($values)
-    {
+    public function col_status($values) {
         global $OUTPUT;
 
         $o = '';
@@ -1783,7 +1757,7 @@ class submissionstable extends \table_sql
         $submission = false;
 
         $timesubmitted = $values->timesubmitted;
-        
+
         $status = 'new';
         $statusstring = '';
         if ($values->timesubmitted || $values->timemarked) {
@@ -1793,7 +1767,7 @@ class submissionstable extends \table_sql
         if ($values->timemarked) {
             $statusstring = 'marked';
         }
-        
+
         $displaystatus = $status;
         if ($displaystatus == 'new') {
             $displaystatus = '';
@@ -1801,76 +1775,76 @@ class submissionstable extends \table_sql
 
         $o .= $OUTPUT->container(get_string('submissionstatus_' . $statusstring, 'checkmark'),
                 array('class' => 'submissionstatus' .$displaystatus));
-            if ($due && ($timesubmitted > $due) && $status != 'new') {
-                $usertime = format_time($timesubmitted - $due);
-                $latemessage = get_string('submittedlateshort',
-                    'checkmark',
-                    $usertime);
-                $o .= $OUTPUT->container($latemessage, array('class' => 'latesubmission'));
-            } 
+        if ($due && ($timesubmitted > $due) && $status != 'new') {
+            $usertime = format_time($timesubmitted - $due);
+            $latemessage = get_string('submittedlateshort',
+                'checkmark',
+                $usertime);
+            $o .= $OUTPUT->container($latemessage, array('class' => 'latesubmission'));
+        }
 
-            // If overridden dates are present for this user, we display an icon with popup!
-            if ($this->hasoverrides && $overrides = checkmark_get_overridden_dates($this->checkmark->cm->instance, $values->id, $this->checkmark->course->id)) {
-                $context = new stdClass();
-                $overrideediturl = new moodle_url('/mod/checkmark/extend.php');
-                $returnurl = new moodle_url('/mod/checkmark/submissions.php');
-                $returnurl = $returnurl->out(true, array(
-                    'id' => $this->checkmark->cm->id
+        // If overridden dates are present for this user, we display an icon with popup!
+        if ($this->hasoverrides && $overrides = checkmark_get_overridden_dates($this->checkmark->cm->instance, $values->id, $this->checkmark->course->id)) {
+            $context = new stdClass();
+            $overrideediturl = new moodle_url('/mod/checkmark/extend.php');
+            $returnurl = new moodle_url('/mod/checkmark/submissions.php');
+            $returnurl = $returnurl->out(true, array(
+                'id' => $this->checkmark->cm->id
+            ));
+            if (! empty($overrides->userid)) {
+                $context->isgroupoverride = false;
+                $context->editurlstr = $overrideediturl->out(true, array(
+                    'id' => $this->checkmark->cm->id,
+                    'type' => \mod_checkmark\overrideform::USER,
+                    'mode' => \mod_checkmark\overrideform::EDIT,
+                    'users' => $overrides->userid,
+                    'return' => $returnurl
                 ));
-                if (! empty($overrides->userid)) {
-                    $context->isgroupoverride = false;
-                    $context->editurlstr = $overrideediturl->out(true, array(
-                        'id' => $this->checkmark->cm->id,
-                        'type' => \mod_checkmark\overrideform::USER,
-                        'mode' => \mod_checkmark\overrideform::EDIT,
-                        'users' => $overrides->userid,
-                        'return' => $returnurl
-                    ));
-                } else if (! empty($overrides->groupid)) {
-                    $context->isgroupoverride = true;
-                    $context->groupname = groups_get_group_name($overrides->groupid);
-                    $context->addurlstr = $overrideediturl->out(true, array(
-                        'id' => $this->checkmark->cm->id,
-                        'type' => \mod_checkmark\overrideform::USER,
-                        'mode' => \mod_checkmark\overrideform::ADD,
-                        'users' => $values->id,
-                        'return' => $returnurl
-                    ));
-                    $context->editurlstr = $overrideediturl->out(true, array(
-                        'id' => $this->checkmark->cm->id,
-                        'type' => \mod_checkmark\overrideform::GROUP,
-                        'mode' => \mod_checkmark\overrideform::EDIT,
-                        'users' => $overrides->groupid,
-                        'return' => $returnurl
-                    ));
-                }
-                
-                if ($overrides->timeavailable === null) {
-                    $context->timeavailable = false;
-                } else if ($overrides->timeavailable == 0) {
-                    $context->timeavailable = get_string('noopen', 'checkmark');
-                } else {
-                    $context->timeavailable = userdate($overrides->timeavailable, get_string('strftimerecentfull'));
-                }
-                
-                if ($overrides->timedue === null) {
-                    $context->timedue = false;
-                } else if ($overrides->timedue == 0) {
-                    $context->timedue = get_string('noclose', 'checkmark');
-                } else {
-                    $context->timedue = userdate($overrides->timedue, get_string('strftimerecentfull'));
-                }
-                
-                if ($overrides->cutoffdate === null) {
-                    $context->cutoffdate = false;
-                } else if ($overrides->cutoffdate == 0) {
-                    $context->cutoffdate = get_string('noclose', 'checkmark');
-                } else {
-                    $context->cutoffdate = userdate($overrides->cutoffdate, get_string('strftimerecentfull'));
-                }
-                $o .= $OUTPUT->render_from_template('mod_checkmark/overridetooltip', $context);
+            } else if (! empty($overrides->groupid)) {
+                $context->isgroupoverride = true;
+                $context->groupname = groups_get_group_name($overrides->groupid);
+                $context->addurlstr = $overrideediturl->out(true, array(
+                    'id' => $this->checkmark->cm->id,
+                    'type' => \mod_checkmark\overrideform::USER,
+                    'mode' => \mod_checkmark\overrideform::ADD,
+                    'users' => $values->id,
+                    'return' => $returnurl
+                ));
+                $context->editurlstr = $overrideediturl->out(true, array(
+                    'id' => $this->checkmark->cm->id,
+                    'type' => \mod_checkmark\overrideform::GROUP,
+                    'mode' => \mod_checkmark\overrideform::EDIT,
+                    'users' => $overrides->groupid,
+                    'return' => $returnurl
+                ));
             }
-            
+
+            if ($overrides->timeavailable === null) {
+                $context->timeavailable = false;
+            } else if ($overrides->timeavailable == 0) {
+                $context->timeavailable = get_string('noopen', 'checkmark');
+            } else {
+                $context->timeavailable = userdate($overrides->timeavailable, get_string('strftimerecentfull'));
+            }
+
+            if ($overrides->timedue === null) {
+                $context->timedue = false;
+            } else if ($overrides->timedue == 0) {
+                $context->timedue = get_string('noclose', 'checkmark');
+            } else {
+                $context->timedue = userdate($overrides->timedue, get_string('strftimerecentfull'));
+            }
+
+            if ($overrides->cutoffdate === null) {
+                $context->cutoffdate = false;
+            } else if ($overrides->cutoffdate == 0) {
+                $context->cutoffdate = get_string('noclose', 'checkmark');
+            } else {
+                $context->cutoffdate = userdate($overrides->cutoffdate, get_string('strftimerecentfull'));
+            }
+            $o .= $OUTPUT->render_from_template('mod_checkmark/overridetooltip', $context);
+        }
+
         if ($this->is_downloading()) {
             $o = strip_tags(rtrim(str_replace('</div>', ' - ', $o), '- '));
         }
@@ -1886,8 +1860,7 @@ class submissionstable extends \table_sql
      *            Contains object with all the values of record.
      * @return string Return user's final grade.
      */
-    public function col_finalgrade($values)
-    {
+    public function col_finalgrade($values) {
         $finalgrade = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$values->id];
         if ($this->use_no_html()) {
             return $finalgrade->str_grade;
@@ -1907,8 +1880,7 @@ class submissionstable extends \table_sql
      * @return string Return user's outcomes.
      * @throws coding_exception
      */
-    public function col_outcome($values)
-    {
+    public function col_outcome($values) {
         $outcomes = '';
         foreach ($this->gradinginfo->outcomes as $n => $outcome) {
             $options = make_grades_menu(- $outcome->scaleid);
@@ -1947,8 +1919,7 @@ class submissionstable extends \table_sql
      *            Contains object with all the values of record.
      * @return string Return user's summary.
      */
-    public function col_summary($values)
-    {
+    public function col_summary($values) {
         if (! empty($this->sumabs) && ! empty($this->sumrel)) {
             // Both values!
             $summary = $values->checks . '/' . $this->examplecount . ' (' . round($values->summary, 2) . '%)';
@@ -1977,8 +1948,7 @@ class submissionstable extends \table_sql
      * @return string Return user's signature column (empty).
      * @throws coding_exception
      */
-    public function col_attendance($values)
-    {
+    public function col_attendance($values) {
         // Print attendance symbol or quickgrading checkboxes!
         if (! empty($this->checkmark->checkmark->attendancegradebook)) {
             $finalgrade = $this->gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM]->grades[$values->id];
@@ -2050,8 +2020,7 @@ class submissionstable extends \table_sql
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function col_presentationgrade($values)
-    {
+    public function col_presentationgrade($values) {
         if (! $this->checkmark->checkmark->presentationgrading || ! $this->checkmark->checkmark->presentationgrade) {
             return '';
         }
@@ -2126,8 +2095,7 @@ class submissionstable extends \table_sql
      *            Contains object with all the values of record.
      * @return string Return user's feedback.
      */
-    public function col_presentationfeedback($values)
-    {
+    public function col_presentationfeedback($values) {
         if (! $this->checkmark->checkmark->presentationgrading) {
             return '';
         }
@@ -2196,8 +2164,7 @@ class submissionstable extends \table_sql
      *
      * @return string Return user's signature column (empty).
      */
-    public function col_signature()
-    {
+    public function col_signature() {
         // Print empty signature-cell!
         return '';
     }
@@ -2213,8 +2180,7 @@ class submissionstable extends \table_sql
      * @return string return processed value. Return NULL if no change has been made.
      * @throws dml_exception
      */
-    public function other_cols($colname, $values)
-    {
+    public function other_cols($colname, $values) {
         // Process examples!
         if (preg_match("/example([0-9]+)/i", $colname, $match)) {
             if (! empty($values->submissionid)) {
@@ -2300,8 +2266,7 @@ class submissionstable extends \table_sql
      *            Text to convert
      * @return string|null Converted text
      */
-    public static function convert_html_to_text($html)
-    {
+    public static function convert_html_to_text($html) {
         if (empty($html)) {
             return null;
         }
@@ -2318,8 +2283,7 @@ class submissionstable extends \table_sql
      *
      * @return bool
      */
-    public function use_no_html()
-    {
+    public function use_no_html() {
         return $this->is_downloading() || $this->format == self::FORMAT_DOWNLOAD || $this->format == self::FORMAT_COLORS;
     }
 
@@ -2330,8 +2294,7 @@ class submissionstable extends \table_sql
      *            Text to convert
      * @return string|null Converted text
      */
-    public static function convert_text_to_html($text)
-    {
+    public static function convert_text_to_html($text) {
         if (empty($text)) {
             return null;
         }
@@ -2349,8 +2312,7 @@ class submissionstable extends \table_sql
      * @return array Array with all name fields. Sorted by the order given in the display string;
      * @throws coding_exception
      */
-    public static function get_name_fields($context)
-    {
+    public static function get_name_fields($context) {
         global $CFG;
         if (has_capability('moodle/site:viewfullnames', $context)) {
             $nameformat = $CFG->alternativefullnameformat;
@@ -2377,13 +2339,12 @@ class submissionstable extends \table_sql
      * This function is called for each data row to allow processing of the
      * user's grading button.
      *
-     * @param object $values
-     *            Contains object with all the values of record.
+     * @param object $values Contains object with all the values of record.
+     * @param boolean $isprimary
      * @return string Return user's grading button.
      * @throws coding_exception
      */
-    public function get_grade_button($values, $isprimary)
-    {
+    public function get_grade_button($values, $isprimary) {
         global $OUTPUT, $CFG;
 
         $btntype = 'secondary';
@@ -2467,7 +2428,7 @@ class submissionstable extends \table_sql
                 } else {
                     $context->cutoffdate = userdate($overrides->cutoffdate, get_string('strftimerecentfull'));
                 }
-                 //$button .= $OUTPUT->render_from_template('mod_checkmark/overridetooltip', $context);
+                 // $button .= $OUTPUT->render_from_template('mod_checkmark/overridetooltip', $context);
             }
             return $button;
         }

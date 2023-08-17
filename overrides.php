@@ -106,7 +106,7 @@ $PAGE->add_body_class('limitedwidth');
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('overrides', 'checkmark'));
 
-$overridemenu =  new \mod_checkmark\output\override_actionmenu($url, $cm);
+$overridemenu = new \mod_checkmark\output\override_actionmenu($url, $cm);
 
 $renderer = $PAGE->get_renderer('mod_checkmark');
 echo $renderer->render($overridemenu);
@@ -307,7 +307,7 @@ if ($hasinactive) {
 }
 
 if (!$overrides) {
-    if($groupmode) {
+    if ($groupmode) {
         $message = get_string('nogroupoverrridemessage', 'checkmark');
     } else {
         $message = get_string('nouseroverrridemessage', 'checkmark');
