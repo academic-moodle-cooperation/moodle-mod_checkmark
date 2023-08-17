@@ -8,6 +8,7 @@ CHANGELOG
 * [FIXED] #7523 Fix rogue database-index during upgrade to 4.1 issue
 * [FIXED] #7529 Loading times for privacy api
 * [FEATURE] #7557 New navigation structure
+* [UPDATE] #7650 Update behat tests to ensure with new navigation structure
 
 4.1.0 (2022-12-07)
 ------------------
