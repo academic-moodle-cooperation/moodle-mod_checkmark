@@ -48,7 +48,7 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php'); // Include the code
  * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class checkmark_overridedates_test extends advanced_testcase {
+class overridedates_test extends advanced_testcase {
 
     /**
      * @var checkmark Checkmark object used for testing

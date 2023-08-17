@@ -25,8 +25,6 @@
 namespace mod_checkmark\event;
 use mod_checkmark\overrideform;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Event for when a group date override has been deleted by a teacher.
  *

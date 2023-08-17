@@ -25,8 +25,6 @@
 namespace mod_checkmark\event;
 use mod_checkmark\overrideform;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Event for when a user date override has been updated by a teacher.
  *

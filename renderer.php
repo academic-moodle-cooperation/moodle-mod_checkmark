@@ -90,7 +90,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         $yuiconfig = array();
         $yuiconfig['type'] = 'html';
 
-        if (empty($dir['subdirs']) and empty($dir['files'])) {
+        if (empty($dir['subdirs']) && empty($dir['files'])) {
             return '';
         }
 
@@ -263,6 +263,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
      *
      * @param html_table $table  Table to add rows to
      * @param \mod_checkmark\gradingsummary $summary Information that should be displayed in the grading summary
+     * @param stdClass $cm
      * @throws coding_exception
      */
     private function print_attandance_info ($table, $summary, $cm) {
@@ -302,15 +303,17 @@ class mod_checkmark_renderer extends plugin_renderer_base {
      * Render a summary of the number of group and user overrides, with corresponding links.
      *
      * @param stdClass $checkmark the checkmark settings.
-     * @param stdClass|cm_info $cm the cm object.
+     * @param stdClass $cm the cm object.
      * @param int $currentgroup currently selected group, if there is one.
      * @return string HTML fragment for the link.
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function checkmark_override_summary_links(stdClass $checkmark, stdClass $cm, $currentgroup = 0): string {
-        
         $baseurl = new moodle_url('/mod/checkmark/overrides.php', ['id' => $cm->id]);
         $counts = checkmark_override_summary($checkmark, $cm);
-        
+
         $links = [];
         if ($counts['group']) {
             $links[] = html_writer::link(new moodle_url($baseurl, ['mode' => 'group']),
@@ -320,27 +323,24 @@ class mod_checkmark_renderer extends plugin_renderer_base {
             $links[] = html_writer::link(new moodle_url($baseurl, ['mode' => 'user']),
                 get_string('overridessummaryuser', 'checkmark', $counts['user']));
         }
-        
+
         if (!$links) {
             return '';
         }
-        
+
         $links = implode(', ', $links);
         switch ($counts['mode']) {
             case 'onegroup':
                 return get_string('overridessummarythisgroup', 'checkmark', $links);
-                
             case 'somegroups':
                 return get_string('overridessummaryyourgroups', 'checkmark', $links);
-                
             case 'allgroups':
                 return get_string('overridessummary', 'checkmark', $links);
-                
             default:
                 throw new coding_exception('Unexpected mode ' . $counts['mode']);
         }
     }
-    
+
     /**
      * Render a table containing the current status of the submission.
      *
@@ -352,15 +352,15 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         $o .= $this->output->container_start('header-maxwidth', 'submissionstatustable');
         $o .= $this->output->heading(get_string('submissionstatusheading', 'checkmark'), 3);
         $time = time();
-        
+
         $o .= $this->output->box_start('boxaligncenter submissionsummarytable');
-        
+
         $t = new \html_table();
         $t->attributes['class'] = 'generaltable table-bordered';
-        
+
         $warningmsg = '';
 
-        //Submission Status TODO: classes
+        // Submission Status TODO: classes
         $cell1content = get_string('submissionstatus', 'checkmark');
         $cell2attributes = [];
 
@@ -373,8 +373,8 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         // Grading status.
         $cell1content = get_string('gradingstatus', 'checkmark');
         if ($status['gradingstatus'] == "graded" || $status['gradingstatus'] == "notgraded") {
-                $cell2content = get_string($status['gradingstatus'], 'checkmark');
-            }
+            $cell2content = get_string($status['gradingstatus'], 'checkmark');
+        }
 
         if ($status['gradingstatus'] == "graded") {
                 $cell2attributes = array('class' => 'submissiongraded');
@@ -383,7 +383,6 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         }
         $this->add_table_row_tuple($t, $cell1content, $cell2content, [], $cell2attributes);
 
-                
         // Time remaining.
         // Only add the row if there is a due date, or a countdown.
         $time = time();
@@ -395,13 +394,13 @@ class mod_checkmark_renderer extends plugin_renderer_base {
 
         // Last modified.
         $cell1content = get_string('timemodified', 'checkmark');
-                    
-         if (!empty($status['timecreated'])) {
+
+        if (!empty($status['timecreated'])) {
             $cell2content = userdate($status['timemodified']);
         } else {
             $cell2content = "-";
         }
-        
+
         $this->add_table_row_tuple($t, $cell1content, $cell2content);
 
         // checkmark info
@@ -416,15 +415,15 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         $o .= $warningmsg;
         $o .= \html_writer::table($t);
         $o .= $this->output->box_end();
-        
+
         $o .= $this->output->container_end();
         return $o;
     }
-    
+
     /**
      * Render a table containing all the current grades and feedback.
      *
-     * @param \assign_feedback_status $status
+     * @param array $status
      * @return string
      */
     public function render_checkmark_feedback_status(array $status) {
@@ -441,13 +440,13 @@ class mod_checkmark_renderer extends plugin_renderer_base {
             $cell1content = get_string('gradenoun');
             $cell2content = $status['gradefordisplay'];
             $this->add_table_row_tuple($t, $cell1content, $cell2content);
-            
+
             // Grade date.
             $cell1content = get_string('gradedon', 'checkmark');
             $cell2content = userdate($status['dategraded']);
             $this->add_table_row_tuple($t, $cell1content, $cell2content);
         }
-        
+
         // feedback
         $cell1content = get_string('feedback', 'checkmark');
         $cell2content = $status['feedback'];
@@ -455,7 +454,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
 
         $o .= \html_writer::table($t);
         $o .= $this->output->box_end();
-        
+
         $o .= $this->output->container_end();
         return $o;
     }

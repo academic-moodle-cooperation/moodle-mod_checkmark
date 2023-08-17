@@ -28,4 +28,3 @@ Feature: In a checkmark, a teacher wants to grade a student.
     And I set the field "xgrade" to "50"
     And I press "Save changes"
     Then "Student 1" row "Grade" column of "generaltable" table should contain "50 / 100"
-

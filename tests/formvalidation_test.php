@@ -39,7 +39,7 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php'); // Include the code
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class checkmark_formvalidation_test extends basic_testcase {
+class formvalidation_test extends basic_testcase {
     /**
      * Tests if there is an proper error for different amounts of examples and example-gradesum
      */
@@ -178,4 +178,3 @@ class checkmark_formvalidation_test extends basic_testcase {
         $checkmark = null;
     }
 }
-

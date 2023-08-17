@@ -25,8 +25,6 @@
 namespace mod_checkmark\event;
 use mod_checkmark\overrideform;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Event for when a user date override has been created by a teacher.
  *
@@ -81,4 +79,3 @@ class user_override_created extends user_override {
                 'users' => $this->relateduserid, 'id' => $this->contextinstanceid));
     }
 }
-

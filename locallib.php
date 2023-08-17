@@ -329,18 +329,17 @@ class checkmark {
         // Wrapper!
         return html_writer::tag('div', $output, array('class' => 'examplelist'));
     }
-    
+
     /**
      * Echo the print preview tab including a optional message!
      *
-     * @param string $message The message to display in the tab!
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
     public function preview() {
         global $CFG, $OUTPUT, $PAGE, $USER;
-        
+
         $context = context_module::instance($this->cm->id);
         require_capability('mod/checkmark:view', $context);
 
@@ -367,14 +366,14 @@ class checkmark {
         ]);
         echo html_writer::end_div();
 
-        //Studentview Container start
+        // Studentview Container start.
         echo $OUTPUT->container_start('studentview');
         $previewform = new MoodleQuickForm('optionspref', 'post', '#', '');
 
         $content = '';
         $content .= $this->get_attendancehint();
         $content .= "\n";
-        
+
         if ($editable && has_capability('mod/checkmark:submit', $context, $USER, false) && !empty($mform)) {
             $content .= $OUTPUT->box_start('generalbox boxaligncenter header-maxwidth', 'checkmarkform');
             $content .= $this->print_summary();
@@ -386,33 +385,31 @@ class checkmark {
             // Display overview!
             if (has_capability('mod/checkmark:view_preview', $context) ||
                 has_capability('mod/checkmark:submit', $context, $USER, false)) {
-                    //$content .= $this->print_summary();
-                    $content .= html_writer::start_tag('div', array('class' => 'mform'));
-                    $content .= html_writer::start_tag('div', array('class' => 'clearfix'));
-                    $content .= $this->print_user_submission($USER->id, true);
-                    $content .= html_writer::end_tag('div');
-                    $content .= html_writer::end_tag('div');
-                    
-                }
-                $content .= $OUTPUT->box_end();
-                $content .= "\n";
+                // $content .= $this->print_summary();
+                $content .= html_writer::start_tag('div', array('class' => 'mform'));
+                $content .= html_writer::start_tag('div', array('class' => 'clearfix'));
+                $content .= $this->print_user_submission($USER->id, true);
+                $content .= html_writer::end_tag('div');
+                $content .= html_writer::end_tag('div');
+            }
+            $content .= $OUTPUT->box_end();
+            $content .= "\n";
         }
 
         if (has_capability('mod/checkmark:grade', $this->context)) {
-//             $previewform->addElement('header', 'studentpreview',
-//                 get_string('studentpreview', 'checkmark'));
+            // $previewform->addElement('header', 'studentpreview',
+            // get_string('studentpreview', 'checkmark'));
             $previewform->addElement('html', $content);
-               $previewform->display();
+            $previewform->display();
         } else {
             echo $content;
         }
-        
-        echo $this->view_student_summary($USER, true);
 
+        echo $this->view_student_summary($USER, true);
         echo $OUTPUT->container_end();
         echo $OUTPUT->footer();
     }
-    
+
     /**
      * Every view for checkmark (teacher/student/etc.)
      *
@@ -423,11 +420,11 @@ class checkmark {
      */
     public function view() {
         global $OUTPUT, $USER, $PAGE, $CFG;
-        
+
         $edit = optional_param('edit', 0, PARAM_BOOL);
         $saved = optional_param('saved', 0, PARAM_BOOL);
         $late = optional_param('late', 0, PARAM_BOOL);
-        
+
         $context = context_module::instance($this->cm->id);
         require_capability('mod/checkmark:view', $context);
 
@@ -527,7 +524,7 @@ class checkmark {
         $gradingsummery = $this->create_grading_summary();
         echo html_writer::tag('div', $this->buttongroup($gradingsummery), array('class' => 'tertiary-navigation pl-0 header-maxwidth'));
 
-        //Print override info
+        // Print override info.
         if (has_capability('mod/checkmark:manageoverrides', $context)) {
             echo html_writer::div($this->get_renderer()->checkmark_override_summary_links($this->get_instance(), $this->cm), 'header-maxwidth mb-3');
         }
@@ -536,9 +533,8 @@ class checkmark {
             echo html_writer::div($this->get_renderer()->render_checkmark_grading_summary(
                 $gradingsummery, $this->cm));
         }
-        
 
-        //Studentview Container start
+        // Studentview Container start.
         echo $OUTPUT->container_start('studentview');
         $previewform = new MoodleQuickForm('optionspref', 'post', '#', '');
 
@@ -644,7 +640,6 @@ class checkmark {
      * @return string - the html summary
      */
     public function view_student_summary($user, $showlinks) {
-        
         $o = '';
 
         if ($this->can_view_submission($user->id)) {
@@ -652,14 +647,14 @@ class checkmark {
                 // The user can view the submission summary.
                 list($submissionstatus, $feedbackstatus) = $this->get_checkmark_submission_status_renderable($user->id, $showlinks);
                 $o .= $this->get_renderer()->render_checkmark_submission_status($submissionstatus);
-                if(array_key_exists('grade', $feedbackstatus)) { //$feedbackstatus['grade']
+                if (array_key_exists('grade', $feedbackstatus)) { // $feedbackstatus['grade'].
                     $o .= $this->get_renderer()->render_checkmark_feedback_status($feedbackstatus);
                 }
             }
         }
         return $o;
     }
-    
+
     /**
      * Perform an access check to see if the current $USER can view this users submission.
      *
@@ -675,13 +670,13 @@ class checkmark {
         if (has_any_capability(array('mod/checkmark:view_preview', 'mod/checkmark:grade'), $this->context)) {
             return true;
         }
-        
+
         if ($userid == $USER->id) {
             return true;
         }
         return false;
     }
-    
+
     /**
      * Perform an access check to see if the current $USER can view this users submission.
      *
@@ -703,9 +698,9 @@ class checkmark {
 
         $item = $gradinginfo->items[CHECKMARK_GRADE_ITEM];
         $grade = $item->grades[$userid];
-        
+
         $status['gradingstatus'] = 'notgraded';
-        $status['feedback']= null;;
+        $status['feedback'] = null;
         if ($grade->grade) {
             $status['gradingstatus'] = 'graded';
             $forfeedback = (array)$grade;
@@ -813,41 +808,40 @@ class checkmark {
      * @throws coding_exception
      */
     public function get_avail_due_times() {
-
         if (!$this->checkmark->timeavailable && !$this->checkmark->timedue && (!$this->overrides ||
             ($this->overrides && !$this->overrides->timeavailable && !$this->overrides->timedue))) {
-                return;
-            }
+            return;
+        }
 
-            if (($this->checkmark->timeavailable || ($this->overrides && $this->overrides->timeavailable &&
-                ($this->overrides->timeavailable !== $this->checkmark->timeavailable))) &&
-                (!$this->overrides || $this->overrides->timeavailable !== 0)) {
-                    if ($this->checkmark->timeavailable) {
-                        $timeavailable = $this->checkmark->timeavailable;
-                        if ($this->overrides && $this->overrides->timeavailable) {
-                            $timeavailable = $this->overrides->timeavailable;
-                        }
-                    } else {
-                        $timeavailable = $this->overrides->timeavailable;
-                    }
+        if (($this->checkmark->timeavailable || ($this->overrides && $this->overrides->timeavailable &&
+            ($this->overrides->timeavailable !== $this->checkmark->timeavailable))) &&
+            (!$this->overrides || $this->overrides->timeavailable !== 0)) {
+            if ($this->checkmark->timeavailable) {
+                $timeavailable = $this->checkmark->timeavailable;
+                if ($this->overrides && $this->overrides->timeavailable) {
+                    $timeavailable = $this->overrides->timeavailable;
                 }
-            if (($this->checkmark->timedue || ($this->overrides && $this->overrides->timedue &&
-                ($this->overrides->timedue !== $this->checkmark->timedue))) &&
-                (!$this->overrides || $this->overrides->timedue !== 0)) {
-                    if ($this->checkmark->timedue) {
-                        $due = $this->checkmark->timedue;
-                        if ($this->overrides && $this->overrides->timedue) {
-                            $due = $this->overrides->timedue;
-                        }
-                    } else {
-                        $due = $this->overrides->timedue;
-                    }
+            } else {
+                $timeavailable = $this->overrides->timeavailable;
             }
-    
-            $overridetimes = [$timeavailable, $due];
-            return $overridetimes;
+        }
+        if (($this->checkmark->timedue || ($this->overrides && $this->overrides->timedue &&
+            ($this->overrides->timedue !== $this->checkmark->timedue))) &&
+            (!$this->overrides || $this->overrides->timedue !== 0)) {
+            if ($this->checkmark->timedue) {
+                $due = $this->checkmark->timedue;
+                if ($this->overrides && $this->overrides->timedue) {
+                    $due = $this->overrides->timedue;
+                }
+            } else {
+                $due = $this->overrides->timedue;
+            }
+        }
+
+        $overridetimes = [$timeavailable, $due];
+        return $overridetimes;
     }
- 
+
     /**
      * Display the checkmark dates
      *
@@ -860,43 +854,45 @@ class checkmark {
         $content = '';
         if (!$this->checkmark->timeavailable && !$this->checkmark->timedue && (!$this->overrides ||
             ($this->overrides && !$this->overrides->timeavailable && !$this->overrides->timedue))) {
-                return;
-            }
+            return;
+        }
 
+        $content .= $OUTPUT->box_start('generalbox boxaligncenter header-maxwidth activity-header', 'dates');
         $now = time();
+
         if (($this->checkmark->timeavailable || ($this->overrides && $this->overrides->timeavailable &&
             ($this->overrides->timeavailable !== $this->checkmark->timeavailable))) &&
             (!$this->overrides || $this->overrides->timeavailable !== 0)) {
-                if ($this->checkmark->timeavailable) {
-                    $timeavailable = userdate($this->checkmark->timeavailable);
-                    if ($this->overrides && $this->overrides->timeavailable) {
-                        $timeavailable = userdate($this->overrides->timeavailable);
-                    }
-                } else {
+            if ($this->checkmark->timeavailable) {
+                $timeavailable = userdate($this->checkmark->timeavailable);
+                if ($this->overrides && $this->overrides->timeavailable) {
                     $timeavailable = userdate($this->overrides->timeavailable);
                 }
-                $openlabelid = $timeavailable > $now ? 'activitydate:opens' : 'activitydate:opened';
+            } else {
+                $timeavailable = userdate($this->overrides->timeavailable);
             }
-            if (($this->checkmark->timedue || ($this->overrides && $this->overrides->timedue &&
-                ($this->overrides->timedue !== $this->checkmark->timedue))) &&
-                (!$this->overrides || $this->overrides->timedue !== 0)) {
-                    if ($this->checkmark->timedue) {
-                        $due = userdate($this->checkmark->timedue);
-                        if ($this->overrides && $this->overrides->timedue) {
-                            $due = userdate($this->overrides->timedue);
-                        }
-                    } else {
-                        $due = userdate($this->overrides->timedue);
-                    }
-                }
-
-            $content .= $OUTPUT->box_start('generalbox boxaligncenter header-maxwidth activity-header', 'dates');
+            $openlabelid = $timeavailable > $now ? 'activitydate:opens' : 'activitydate:opened';
             $starttime = html_writer::tag('strong', get_string($openlabelid, 'checkmark')) . ' ' . $timeavailable;
             $content .= html_writer::div($starttime);
-            $endtime = html_writer::tag('strong',get_string('activitydate:due', 'checkmark')) . ' ' . $due;
+        }
+
+        if (($this->checkmark->timedue || ($this->overrides && $this->overrides->timedue &&
+            ($this->overrides->timedue !== $this->checkmark->timedue))) &&
+            (!$this->overrides || $this->overrides->timedue !== 0)) {
+            if ($this->checkmark->timedue) {
+                $due = userdate($this->checkmark->timedue);
+                if ($this->overrides && $this->overrides->timedue) {
+                    $due = userdate($this->overrides->timedue);
+                }
+            } else {
+                $due = userdate($this->overrides->timedue);
+            }
+            $endtime = html_writer::tag('strong', get_string('activitydate:due', 'checkmark')) . ' ' . $due;
             $content .= html_writer::div($endtime);
-            $content .= $OUTPUT->box_end();
-            return $content;
+        }
+
+        $content .= $OUTPUT->box_end();
+        return $content;
     }
 
     /**
@@ -1136,6 +1132,7 @@ class checkmark {
      * For teachers it gives the number of submitted checkmarks with a link
      * For students it gives the time of their submission.
      *
+     * @param object $summary
      * @param bool $allgroups print all groups info if user can access all groups, suitable for index.php
      * @return string
      * @throws coding_exception
@@ -1143,10 +1140,10 @@ class checkmark {
      */
     public function buttongroup($summary, $allgroups = false) {
         global $USER, $CFG;
-        
+
         $submitted = '';
         $urlbase = $CFG->wwwroot . '/mod/checkmark/';
-        
+
         $gradebtntype = 'btn-secondary';
         if ($summary->submissionssubmittedcount > 0) {
             $gradebtntype = 'btn-primary';
@@ -1164,7 +1161,7 @@ class checkmark {
                 'id' => 'preview'
             ]);
         }
-        
+
         return $submitted;
     }
     /**
@@ -2768,7 +2765,6 @@ class checkmark {
             $SESSION->checkmark = new stdClass();
         }
 
-
         echo $OUTPUT->header();
 
         /*
@@ -2822,7 +2818,7 @@ class checkmark {
             'href' => $urlbase . 'submissions.php?id=' . $this->cm->id,
             'id' => 'submissions'
         ]);
-        
+
         echo html_writer::start_tag('div', array('class' => 'usersubmissions'));
 
         $coursecontext = context_course::instance($course->id);
@@ -2830,14 +2826,15 @@ class checkmark {
         $links = array();
         if (has_capability('gradereport/grader:view', $coursecontext) &&
             has_capability('moodle/grade:viewall', $coursecontext)) {
-                $gradebookurl = $CFG->wwwroot . '/grade/report/grader/index.php?id=' . $course->id;
-                $links[$gradebookurl] = get_string('viewgradebook', 'checkmark');
-            }
-            $gradingactions = new url_select($links);
-            $gradingactions->set_label(get_string('choosegradingaction', 'checkmark'));
-            $gradingactions->class .= ' mb-1';
-            echo $this->get_renderer()->render($gradingactions);
-        
+            $gradebookurl = $CFG->wwwroot . '/grade/report/grader/index.php?id=' . $course->id;
+            $links[$gradebookurl] = get_string('viewgradebook', 'checkmark');
+        }
+
+        $gradingactions = new url_select($links);
+        $gradingactions->set_label(get_string('choosegradingaction', 'checkmark'));
+        $gradingactions->class .= ' mb-1';
+        echo $this->get_renderer()->render($gradingactions);
+
         if (!empty($message)) {
             echo $message;   // Display messages here if any!
         }
@@ -2977,7 +2974,7 @@ class checkmark {
         ]);
         $mform->setDefault('perpage', $perpage);
 
-        $mform->addElement('checkbox', 'quickgrade', get_string('quickgrade', 'checkmark'), 0,['onchange' => "this.form.submit();"]);
+        $mform->addElement('checkbox', 'quickgrade', get_string('quickgrade', 'checkmark'), 0, ['onchange' => "this.form.submit();"]);
 
         $mform->setDefault('quickgrade', $quickgrade);
         $mform->addHelpButton('quickgrade', 'quickgrade', 'checkmark');
@@ -3222,14 +3219,13 @@ class checkmark {
         $PAGE->set_title(format_string($this->checkmark->name, true));
         $PAGE->set_heading($this->course->fullname);
 
-        
         $urlbase = $CFG->wwwroot . '/mod/checkmark/submissions.php?id=' . $this->cm->id;
         echo html_writer::tag('a', get_string('back'), [
             'class' => 'btn btn-secondary',
             'href' => $urlbase . 'submissions.php?id=' . $this->cm->id,
             'id' => 'submissions'
         ]);
-        
+
         // Form to manage print-settings!
         echo html_writer::start_tag('div', array('class' => 'usersubmissions'));
 
@@ -4380,7 +4376,7 @@ class checkmark {
         }
         return $splitcheckarray;
     }
-    
+
     /**
      * Get the settings for the current instance of this assignment
      * @param int|null $userid the id of the user to load the assign instance for.
@@ -4389,14 +4385,14 @@ class checkmark {
     public function get_instance(int $userid = null) : stdClass {
         global $USER;
         $userid = $userid ?? $USER->id;
-        
+
         $this->instance = $this->get_default_instance();
-        
+
         // If we have the user instance already, just return it.
         if (isset($this->userinstances[$userid])) {
             return $this->userinstances[$userid];
         }
-        
+
         // Calculate properties which vary per user.
         $this->userinstances[$userid] = $this->calculate_properties($this->instance, $userid);
         return $this->userinstances[$userid];
@@ -4412,7 +4408,7 @@ class checkmark {
         if (!$this->instance && $this->cm) {
             $params = array('id' => $this->cm->instance);
             $this->instance = $DB->get_record('checkmark', $params, '*', MUST_EXIST);
-            
+
             $this->userinstances = [];
         }
         return $this->instance;
@@ -4429,7 +4425,7 @@ class checkmark {
         if (!$this->context) {
             return null;
         }
-        
+
         if ($this->context->contextlevel == CONTEXT_MODULE) {
             $modinfo = get_fast_modinfo($this->course);
             $this->cm = $modinfo->get_cm($this->context->instanceid);
@@ -4446,7 +4442,7 @@ class checkmark {
      */
     private function calculate_properties(\stdClass $record, int $userid) : \stdClass {
         $record = clone ($record);
-        
+
         // Relative dates.
         if (!empty($record->duedate)) {
             $course = $this->get_course();
@@ -4467,16 +4463,18 @@ class checkmark {
  * quiz renderer method.
  *
  * @param stdClass $checkmark the quiz settings. Only $quiz->id is used at the moment.
- * @param stdClass|cm_info $cm the cm object. Only $cm->course, $cm->groupmode and
+ * @param stdClass $cm the cm object. Only $cm->course, $cm->groupmode and
  *      $cm->groupingid fields are used at the moment.
  * @param int $currentgroup if there is a concept of current group where this method is being called
  *      (e.g. a report) pass it in here. Default 0 which means no current group.
  * @return array like 'group' => 3, 'user' => 12] where 3 is the number of group overrides,
  *      and 12 is the number of user ones.
+ * @throws coding_exception
+ * @throws dml_exception
  */
 function checkmark_override_summary(stdClass $checkmark, stdClass $cm, int $currentgroup = 0): array {
     global $DB;
-    
+
     if ($currentgroup) {
         // Currently only interested in one group.
         $groupcount = $DB->count_records('checkmark_overrides', ['checkmarkid' => $checkmark->id, 'groupid' => $currentgroup]);
@@ -4489,11 +4487,11 @@ function checkmark_override_summary(stdClass $checkmark, stdClass $cm, int $curr
                     ", [$checkmark->id, $currentgroup]);
         return ['group' => $groupcount, 'user' => $usercount, 'mode' => 'onegroup'];
     }
-    
+
     $quizgroupmode = groups_get_activity_groupmode($cm);
     $accessallgroups = ($quizgroupmode == NOGROUPS) ||
     has_capability('moodle/site:accessallgroups', context_module::instance($cm->id));
-    
+
     if ($accessallgroups) {
         // User can see all groups.
         $groupcount = $DB->count_records_select('checkmark_overrides',
@@ -4501,17 +4499,17 @@ function checkmark_override_summary(stdClass $checkmark, stdClass $cm, int $curr
         $usercount = $DB->count_records_select('checkmark_overrides',
             'checkmarkid = ? AND userid IS NOT NULL', [$checkmark->id]);
         return ['group' => $groupcount, 'user' => $usercount, 'mode' => 'allgroups'];
-        
+
     } else {
         // User can only see groups they are in.
         $groups = groups_get_activity_allowed_groups($cm);
         if (!$groups) {
             return ['group' => 0, 'user' => 0, 'mode' => 'somegroups'];
         }
-        
+
         list($groupidtest, $params) = $DB->get_in_or_equal(array_keys($groups));
         $params[] = $checkmark->id;
-        
+
         $groupcount = $DB->count_records_select('checkmark_overrides',
             "groupid $groupidtest AND quiz = ?", $params);
         $usercount = $DB->count_records_sql("
@@ -4521,7 +4519,7 @@ function checkmark_override_summary(stdClass $checkmark, stdClass $cm, int $curr
                  WHERE gm.groupid $groupidtest
                    AND o.checkmarkid = ?
                ", $params);
-        
+
         return ['group' => $groupcount, 'user' => $usercount, 'mode' => 'somegroups'];
     }
 }
