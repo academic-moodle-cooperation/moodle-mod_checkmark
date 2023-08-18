@@ -1,5 +1,8 @@
 CHANGELOG
 =========
+4.1.1 (2022-07-28)
+------------------
+* [FIXED] #7523 Fix rogue database-index during upgrade to 4.1 issue
 
 4.1.0 (2022-12-07)
 ------------------
