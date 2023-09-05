@@ -22,7 +22,7 @@ variables:
     - moodle-plugin-ci install --moodle="moodle-upstream-core" --db-host=$DB_HOST --db-port=$DB_PORT
   script:
     - moodle-plugin-ci phplint
-    #- moodle-plugin-ci phpcpd
+    - moodle-plugin-ci phpcpd
     - moodle-plugin-ci phpmd
     - moodle-plugin-ci codechecker
     - moodle-plugin-ci validate
@@ -30,7 +30,7 @@ variables:
     - moodle-plugin-ci mustache
     - moodle-plugin-ci grunt
     - moodle-plugin-ci phpdoc
-    #- moodle-plugin-ci phpunit
+    - moodle-plugin-ci phpunit
     - moodle-plugin-ci behat --profile chrome
   parallel:
     matrix:
