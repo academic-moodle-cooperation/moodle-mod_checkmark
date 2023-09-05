@@ -374,28 +374,7 @@ class checkmark {
         $content .= $this->get_attendancehint();
         $content .= "\n";
 
-        if ($editable && has_capability('mod/checkmark:submit', $context, $USER, false) && !empty($mform)) {
-            $content .= $OUTPUT->box_start('generalbox boxaligncenter header-maxwidth', 'checkmarkform');
-            $content .= $this->print_summary();
-            $content .= $mform->render();
-            $content .= $OUTPUT->box_end();
-            $content .= "\n";
-        } else {
-            $content .= $OUTPUT->box_start('generalbox boxaligncenter header-maxwidth', 'checkmark');
-            // Display overview!
-            if (has_capability('mod/checkmark:view_preview', $context) ||
-                has_capability('mod/checkmark:submit', $context, $USER, false)) {
-                // $content .= $this->print_summary();
-                $content .= html_writer::start_tag('div', array('class' => 'mform'));
-                $content .= html_writer::start_tag('div', array('class' => 'clearfix'));
-                $content .= $this->print_user_submission($USER->id, true);
-                $content .= html_writer::end_tag('div');
-                $content .= html_writer::end_tag('div');
-            }
-            $content .= $OUTPUT->box_end();
-            $content .= "\n";
-        }
-
+        $content = $this->checkmark_get_content($content, $context);
         if (has_capability('mod/checkmark:grade', $this->context)) {
             // $previewform->addElement('header', 'studentpreview',
             // get_string('studentpreview', 'checkmark'));
@@ -410,6 +389,30 @@ class checkmark {
         echo $OUTPUT->footer();
     }
 
+    /**
+     * get content
+     *
+     * @param string $content
+     * @param object $context
+     * @return string
+     */
+    public function checkmark_get_content($content, $context) {
+        global $USER, $OUTPUT;
+
+        $content .= $OUTPUT->box_start('generalbox boxaligncenter header-maxwidth', 'checkmark');
+        // Display overview!
+        if (has_capability('mod/checkmark:view_preview', $context) ||
+            has_capability('mod/checkmark:submit', $context, $USER, false)) {
+            $content .= html_writer::start_tag('div', array('class' => 'mform'));
+            $content .= html_writer::start_tag('div', array('class' => 'clearfix'));
+            $content .= $this->print_user_submission($USER->id, true);
+            $content .= html_writer::end_tag('div');
+            $content .= html_writer::end_tag('div');
+            $content .= $OUTPUT->box_end();
+            $content .= "\n";
+        }
+        return $content;
+    }
     /**
      * Every view for checkmark (teacher/student/etc.)
      *

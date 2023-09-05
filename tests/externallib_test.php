@@ -23,17 +23,20 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core_external\external_api;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
-require_once($CFG->dirroot . '/mod/checkmark/externallib.php');
 
 /**
  * External mod checkmark functions unit tests
  *
  * @package   mod_checkmark
+ * @runTestsInSeparateProcesses
+ *
  */
 class externallib_test extends externallib_advanced_testcase {
 
@@ -42,12 +45,17 @@ class externallib_test extends externallib_advanced_testcase {
     /**  @var checkmark Variable that holds instance of the current checkmark */
     private $_checkmark;
 
+    public function setUp(): void {
+        global $CFG;
+        parent::setUp();
+        require_once($CFG->dirroot . '/mod/checkmark/externallib.php');
+    }
+
     /**
      * Test if the user only gets checkmarks for enrolled courses
      */
     public function test_get_checkmarks_by_courses() {
         global $CFG, $DB, $USER;
-
         $this->resetAfterTest(true);
 
         $user = $this->getDataGenerator()->create_user();
@@ -105,10 +113,10 @@ class externallib_test extends externallib_advanced_testcase {
 
     /**
      * Test if the user gets a valid checkmark from the endpoint
+     * @runInSeparateProcess
      */
     public function test_get_checkmark() {
         global $CFG, $DB, $USER;
-
         $result = $this->init_test_suite_one_course();
 
         // Checkmark name should be equal to 'Checkmark Module'.
@@ -241,7 +249,6 @@ class externallib_test extends externallib_advanced_testcase {
      */
     public function init_test_suite_one_course() {
         $this->resetAfterTest(true);
-
         $user = $this->getDataGenerator()->create_user();
 
         $course = $this->getDataGenerator()->create_course([

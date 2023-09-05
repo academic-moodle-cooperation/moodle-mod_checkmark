@@ -1148,18 +1148,7 @@ function checkmark_refresh_override_events($checkmark, $override = null) {
     $checkmarkinstance = $checkmark->checkmark;
 
     // Load the old events relating to this checkmark.
-    $conds = array('modulename' => 'checkmark', 'instance' => $checkmarkinstance->id);
-    if (!empty($override)) {
-        // Only load events for this override.
-        if (isset($override->userid)) {
-            $conds['userid'] = $override->userid;
-        } else if (isset($override->groupid)) {
-            $conds['groupid'] = $override->groupid;
-        } else {
-            // This is not a valid override, it may have been left from a bad import or restore.
-            $conds['groupid'] = $conds['userid'] = 0;
-        }
-    }
+    $conds = checkmark_conds($checkmarkinstance, $override);
     $oldevents = $DB->get_records('event', $conds, 'id ASC');
 
     // Now make a to-do list of all that needs to be updated.
@@ -1247,6 +1236,29 @@ function checkmark_refresh_override_events($checkmark, $override = null) {
     }
 }
 
+/**
+ * get conds
+ *
+ * @param object $checkmarkinstance
+ * @param array $override
+ * @return string[]|NULL[]|number[]
+ */
+function checkmark_conds($checkmarkinstance, $override = null) {
+    // Load the old events relating to this checkmark.
+    $conds = array('modulename' => 'checkmark', 'instance' => $checkmarkinstance->id);
+    if (!empty($override)) {
+        // Only load events for this override.
+        if (isset($override->userid)) {
+            $conds['userid'] = $override->userid;
+        } else if (isset($override->groupid)) {
+            $conds['groupid'] = $override->groupid;
+        } else {
+            // This is not a valid override, it may have been left from a bad import or restore.
+            $conds['groupid'] = $conds['userid'] = 0;
+        }
+    }
+    return $conds;
+}
 /**
  * Make sure up-to-date events are created for all checkmark instances
  *
@@ -2359,18 +2371,7 @@ function checkmark_update_events($checkmark, $override = null) {
     $checkmarkinstance = $checkmark->get_instance();
 
     // Load the old events relating to this assign.
-    $conds = array('modulename' => 'checkmark', 'instance' => $checkmarkinstance->id);
-    if (!empty($override)) {
-        // Only load events for this override.
-        if (isset($override->userid)) {
-            $conds['userid'] = $override->userid;
-        } else if (isset($override->groupid)) {
-            $conds['groupid'] = $override->groupid;
-        } else {
-            // This is not a valid override, it may have been left from a bad import or restore.
-            $conds['groupid'] = $conds['userid'] = 0;
-        }
-    }
+    $conds = checkmark_conds($override);
     $oldevents = $DB->get_records('event', $conds, 'id ASC');
 
     // Now make a to-do list of all that needs to be updated.
