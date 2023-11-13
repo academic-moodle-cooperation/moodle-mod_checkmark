@@ -841,6 +841,12 @@ class checkmark {
             }
         }
 
+        if (!isset($timeavailable)) {
+            $timeavailable = '';
+        }
+        if (!isset($due)) {
+            $due = '';
+        }
         $overridetimes = [$timeavailable, $due];
         return $overridetimes;
     }
