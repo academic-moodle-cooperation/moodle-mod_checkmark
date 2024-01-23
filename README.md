@@ -1,11 +1,11 @@
-Checkmark Module
+Checkmark
 ================
 
 This file is part of the mod_checkmark plugin for Moodle - <http://moodle.org/>
 
 *Author:*    Daniel Binder, Philipp Hager, Katarzyna Potocka, Alexander Melem
 
-*Copyright:* 2021 [Academic Moodle Cooperation](http://www.academic-moodle-cooperation.org)
+*Copyright:* [Academic Moodle Cooperation](http://www.academic-moodle-cooperation.org)
 
 *License:*   [GNU GPL v3 or later](http://www.gnu.org/copyleft/gpl.html)
 
@@ -13,27 +13,13 @@ This file is part of the mod_checkmark plugin for Moodle - <http://moodle.org/>
 Description
 -----------
 
-The Checkmark module allows teachers to obtain information about the assignments completed by the
-students prior to a lesson.
+In the checkmark activity, students announce in advance which of the given examples or tasks they have prepared for a classroom unit and can present if necessary. Teachers can assess students in the activity based on their ticks as well as on the actual presentation and also record attendance/absence.
 
 
-Example
+Usage
 -------
 
-A lecture with 500 students is accompanied by a training session. Teachers publish the assignment
-names and the number of achievable points per assignment. Each week the students work on the
-assignments and use the checkmark module to inform the teacher in advance about the assignments
-that they managed to complete.
-
-In the classroom session where individual students present their solutions, teachers can use a
-printed copy of the tabular overview to verify the indicated performance. After the training
-session there is the option of automatic grading on the basis of the assignments checked.
-
-
-Requirements
-------------
-
-The plugin is available for Moodle 2.5+.
+A possible teaching scenario could look like this: In a weekly recurring exercise, each unit is accompanied by practical examples. Teachers publish the respective examples and achievable points in advance via the checkmark activity. Each week, students prepare the planned exercise examples and tick in the checkmark activity which of them they can solve and present on the blackboard. During the classroom session, individual students are selected on the basis of their ticks to present solutions to the exercise examples. At the end of the unit, teachers can assess all students in the checkmark activity and also award points for their presentation and record their presence/absence.
 
 
 Installation
@@ -47,40 +33,16 @@ Installation
   automatically.
 
 
-Admin Settings
---------------
+Privacy API
+-------------
 
-As an administrator you can set the default values instance-wide on the settings page for
-administrators in the checkmark module:
+The plugin fully implements the Moodle Privacy API.
 
-* number of assignments (text field)
-* starting number of assignments (text field)
-* individual names (text field)
-* default grades (text field)
-* expiration date for messages (text field)
-* Show recent submissions
-* Amount of examples to display a warning for PDF export
-
-Default checkmark settings
-* Always show description
-* Allow submission from
-* Due date
-* Cut-off date
-* Remind me to grade by
-  
-
-Webservices
------------
-* mod_checkmark_get_checkmarks_by_courses
-* mod_checkmark_get_checkmark
-* mod_checkmark_submit
 
 Documentation
 -------------
 
-You can find a cheat sheet for the plugin on the [AMC
-website](https://www.academic-moodle-cooperation.org/en/module/checkmark/) and a video tutorial in
-german only in the [AMC YouTube Channel](https://www.youtube.com/c/AMCAcademicMoodleCooperation).
+You can find a documentation for the plugin on the [AMC website](https://academic-moodle-cooperation.org/mod_checkmark/)
 
 
 Bug Reports / Support
