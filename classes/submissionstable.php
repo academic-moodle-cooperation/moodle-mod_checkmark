@@ -1567,6 +1567,7 @@ class submissionstable extends \table_sql {
      */
     public function col_feedback($values) {
         $finalgrade = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$values->id];
+
         if ($values->feedbackid) {
             // Print Comment!
             if ($finalgrade->locked || $finalgrade->overridden) {
@@ -1597,7 +1598,12 @@ class submissionstable extends \table_sql {
                 ]);
             } else {
                 if ($this->use_no_html()) {
-                    return $values->feedback;
+                    // replace NULL string with empty string to avoid problems with MTablePDF
+                    if (is_null($values->feedback)) {
+                        return '';
+                    } else {
+                        return $values->feedback;
+                    }
                 } else {
                     return \html_writer::tag('div', $values->feedback, [
                         'id' => 'com' . $values->id
