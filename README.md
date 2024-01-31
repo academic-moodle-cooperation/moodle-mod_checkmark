@@ -32,6 +32,8 @@ Installation
 * Open the administration area (http://your-moodle-site/admin) to start the installation
   automatically.
 
+Furthermore there is an additional report available [Checkmark report](https://moodle.org/plugins/local_checkmarkreport), which provides teachers and students with an overview of the details of all checkmark activites in a course.
+
 
 Privacy API
 -------------
