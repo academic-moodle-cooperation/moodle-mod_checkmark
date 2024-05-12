@@ -6,6 +6,11 @@ CHANGELOG
 * [FIXED] #7783 Fix data bug for export of .txt, .ods and .xlsx
 * [FIXED] #7832 Fix course completion bug
 
+4.2.1 (2023-11-11)
+------------------
+* [FIXED] #7713 Fix status column sorting problem
+* [FIXED] #7715 Fix warning for "allow submission from" and "due date" fields
+
 4.2.0 (2023-07-27)
 ------------------
 * [UPDATE] #7000 Standardization of labels
