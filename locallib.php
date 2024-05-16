@@ -434,9 +434,9 @@ class checkmark {
         $PAGE->set_title(format_string($this->checkmark->name, true));
         $PAGE->set_heading($this->course->fullname);
         $PAGE->add_body_class('limitedwidth');
-        if (!has_capability('mod/checkmark:grade', $this->context)) {
-            $PAGE->activityheader->disable();
-        }
+        //if (!has_capability('mod/checkmark:grade', $this->context)) {
+        //    $PAGE->activityheader->disable();
+        //}
         /* TRIGGER THE VIEW EVENT */
         $event = \mod_checkmark\event\course_module_viewed::create(array(
                 'objectid' => $this->cm->instance,
@@ -542,10 +542,10 @@ class checkmark {
         $previewform = new MoodleQuickForm('optionspref', 'post', '#', '');
 
         $content = '';
-        if (!has_capability('mod/checkmark:grade', $this->context)) {
-            $content .= $this->get_dates();
-            $content .= "\n";
-        }
+        // if (!has_capability('mod/checkmark:grade', $this->context)) {
+        //     $content .= $this->get_dates();
+        //     $content .= "\n";
+        // }
         $content .= $this->get_attendancehint();
         $content .= "\n";
 
@@ -841,12 +841,6 @@ class checkmark {
             }
         }
 
-        if (!isset($timeavailable)) {
-            $timeavailable = '';
-        }
-        if (!isset($due)) {
-            $due = '';
-        }
         $overridetimes = [$timeavailable, $due];
         return $overridetimes;
     }
