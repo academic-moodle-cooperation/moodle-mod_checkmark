@@ -61,8 +61,8 @@ class send_notifications extends \core\task\scheduled_task {
          */
 
         $timenow   = time();
-        $endtime   = $timenow - $CFG->maxeditingtime;
-        $validmsgtime = get_config('checkmark', 'validmsgtime');
+        $endtime   = $timenow - $CFG->maxeditingtime; // maxeditingtime is 1800 in config table.
+        $validmsgtime = get_config('checkmark', 'validmsgtime'); // validmsgtime is 2 in config_plugins table.
         if (false !== $validmsgtime) {
             $starttime = $endtime - $validmsgtime * 24 * 3600;   // Two days earlier?
         } else {
@@ -90,7 +90,7 @@ class send_notifications extends \core\task\scheduled_task {
                  * Override the language and timezone of the 'current' user, so that
                  * mail is customised for the receiver.
                  */
-                \cron_setup_user($user, $course);
+                \core\cron::setup_user($user, $course);
 
                 if (!\is_enrolled(\context_course::instance($feedback->course), $user->id)) {
                     echo fullname($user).' isn\'t an active participant in ' .
@@ -161,7 +161,7 @@ class send_notifications extends \core\task\scheduled_task {
                 $DB->set_field('checkmark_feedbacks', 'mailed', '1', array('id' => $feedback->id));
             }
 
-            \cron_setup_user();
+            \core\cron::setup_user();
         } else {
             echo "\nNo unmailed Submissions!\n";
         }
