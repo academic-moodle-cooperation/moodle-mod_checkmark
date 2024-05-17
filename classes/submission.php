@@ -24,8 +24,6 @@
  */
 namespace mod_checkmark;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * This class contains a submission definition
  *
@@ -63,7 +61,7 @@ class submission {
 
         if (!empty($this->id)) {
             if ($submission === null) {
-                $submission = $DB->get_record('checkmark_submission', ['id' => $this->id]);
+                $submission = $DB->get_record('checkmark_submissions', ['id' => $this->id]);
             }
             $this->checkmarkid = $submission->checkmarkid;
             $this->userid = $submission->userid;
@@ -99,8 +97,7 @@ class submission {
     public static function get_submission($checkmarkid, $userid) {
         global $DB;
 
-        if (!$submission = $DB->get_record('checkmark_submissions', ['checkmarkid' => $checkmarkid,
-                                                                'userid'      => $userid])) {
+        if (!$submission = $DB->get_record('checkmark_submissions', ['checkmarkid' => $checkmarkid, 'userid' => $userid])) {
             return false;
         }
 

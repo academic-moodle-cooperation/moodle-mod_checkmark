@@ -75,7 +75,11 @@ class user_override_created extends user_override {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/checkmark/extend.php', array('type' => overrideform::USER, 'mode' => overrideform::EDIT,
-                'users' => $this->relateduserid, 'id' => $this->contextinstanceid));
+        return new \moodle_url('/mod/checkmark/extend.php', [
+            'type' => overrideform::USER,
+            'mode' => overrideform::EDIT,
+            'users' => $this->relateduserid,
+            'id' => $this->contextinstanceid,
+        ]);
     }
 }

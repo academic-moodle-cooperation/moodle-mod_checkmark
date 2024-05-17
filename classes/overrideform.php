@@ -25,8 +25,6 @@
 namespace mod_checkmark;
 use coding_exception;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * This class contains the form for overriding deadlines
  *
@@ -165,17 +163,17 @@ class overrideform extends \moodleform {
         }
 
         $name = get_string('availabledate', 'checkmark');
-        $mform->addElement('date_time_selector', 'timeavailable', $name, array('optional' => true));
+        $mform->addElement('date_time_selector', 'timeavailable', $name, ['optional' => true]);
         $mform->addHelpButton('timeavailable', 'availabledate', 'checkmark');
         $mform->setDefault('timeavailable', $checkmark->timeavailable);
 
         $name = get_string('duedate', 'checkmark');
-        $mform->addElement('date_time_selector', 'timedue', $name, array('optional' => true));
+        $mform->addElement('date_time_selector', 'timedue', $name, ['optional' => true]);
         $mform->addHelpButton('timedue', 'duedate', 'checkmark');
         $mform->setDefault('timedue', $checkmark->timedue);
 
         $name = get_string('cutoffdate', 'checkmark');
-        $mform->addElement('date_time_selector', 'cutoffdate', $name, array('optional' => true));
+        $mform->addElement('date_time_selector', 'cutoffdate', $name, ['optional' => true]);
         $mform->addHelpButton('cutoffdate', 'cutoffdate', 'checkmark');
         $mform->setDefault('cutoffdate', $checkmark->cutoffdate);
 

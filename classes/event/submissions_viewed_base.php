@@ -60,8 +60,10 @@ abstract class submissions_viewed_base extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/submissions.php", array('id'  => $this->contextinstanceid,
-                                                                                'tab' => $this->data['other']));
+        return new \moodle_url("/mod/$this->objecttable/submissions.php", [
+            'id' => $this->contextinstanceid,
+            'tab' => $this->data['other'],
+        ]);
     }
 
     /**

@@ -108,7 +108,7 @@ class submissions_exported extends \core\event\base {
             'format' => $this->data['other']['format'],
             'groupmode' => $this->data['other']['groupmode'],
             'groupid' => $this->data['other']['groupid'],
-            'datafilter' => $this->data['other']['filter']
+            'datafilter' => $this->data['other']['filter'],
         ];
         foreach ($this->data['other']['selected'] as $cur) {
             $params['selected['.$cur.']'] = $cur;

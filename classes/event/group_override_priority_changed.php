@@ -56,11 +56,11 @@ class group_override_priority_changed extends group_override {
      * Get other mapping
      */
     public static function get_other_mapping() {
-        $othermapped = array();
-        $othermapped['checkmarkid'] = array('db' => 'checkmark', 'restore' => 'checkmark');
-        $othermapped['groupid'] = array('db' => 'groups', 'restore' => 'group');
-        $othermapped['groupidswap'] = array('db' => 'groups', 'restore' => 'group');
-        $othermapped['objectidswap'] = array('db' => 'groups', 'restore' => 'group');
+        $othermapped = [];
+        $othermapped['checkmarkid'] = ['db' => 'checkmark', 'restore' => 'checkmark'];
+        $othermapped['groupid'] = ['db' => 'groups', 'restore' => 'group'];
+        $othermapped['groupidswap'] = ['db' => 'groups', 'restore' => 'group'];
+        $othermapped['objectidswap'] = ['db' => 'groups', 'restore' => 'group'];
 
         return $othermapped;
     }
@@ -110,8 +110,10 @@ class group_override_priority_changed extends group_override {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/checkmark/overrides.php', array('id' => $this->contextinstanceid,
-                'mode' => overrideform::GROUP));
+        return new \moodle_url('/mod/checkmark/overrides.php', [
+            'id' => $this->contextinstanceid,
+            'mode' => overrideform::GROUP,
+        ]);
     }
 }
 

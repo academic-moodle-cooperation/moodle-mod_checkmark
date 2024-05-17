@@ -84,7 +84,7 @@ class custom_completion extends activity_custom_completion {
      */
     public function get_custom_rule_descriptions(): array {
         return [
-            'completionsubmit' => get_string('completiondetail:submit', 'checkmark')
+            'completionsubmit' => get_string('completiondetail:submit', 'checkmark'),
         ];
     }
 

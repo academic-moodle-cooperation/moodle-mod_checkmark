@@ -76,7 +76,11 @@ class group_override_created extends group_override {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/checkmark/extend.php', array('type' => overrideform::GROUP, 'mode' => overrideform::EDIT,
-                'users' => $this->other['groupid'], 'id' => $this->contextinstanceid));
+        return new \moodle_url('/mod/checkmark/extend.php', [
+            'type' => overrideform::GROUP,
+            'mode' => overrideform::EDIT,
+            'users' => $this->other['groupid'],
+            'id' => $this->contextinstanceid,
+        ]);
     }
 }
