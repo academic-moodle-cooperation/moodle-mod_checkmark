@@ -363,7 +363,18 @@ class submissionstable extends \table_sql {
         $returndata = [];
         $this->format = $type;
         foreach ($this->rawdata as $key => $row) {
-            $returndata[$key] = $this->format_row($row);
+            // Format the feedback field, so that ';' is not seperated for CSV export.
+            $formattedrow = new stdClass();
+            foreach ($row as $fieldkey => $fieldvalue) {
+                if ($fieldkey == 'feedback') {
+                    $formattedfieldvalue = "\"" . $fieldvalue . "\"";
+                    $formattedfieldvalue = $this->convert_html_to_text($formattedfieldvalue);
+                $formattedrow->$fieldkey = $formattedfieldvalue;
+                } else {
+                    $formattedrow->$fieldkey = $fieldvalue;
+                }
+            }
+            $returndata[$key] = $this->format_row($formattedrow);
         }
 
         if ($this->rawdata instanceof recordset_walk || $this->rawdata instanceof moodle_recordset) {
