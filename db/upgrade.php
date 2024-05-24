@@ -75,7 +75,7 @@ function xmldb_checkmark_upgrade($oldversion) {
 
     if ($oldversion < 2011122100) {
         $table = new xmldb_table('checkmark');
-        $fieldstodrop = array('assignmenttype', 'var3', 'var4', 'var5', 'maxbytes');
+        $fieldstodrop = ['assignmenttype', 'var3', 'var4', 'var5', 'maxbytes'];
         echo '<hr />dropping fields in table: checkmark<br />';
         foreach ($fieldstodrop as $fieldname) {
             $field = new xmldb_field($fieldname);
@@ -87,10 +87,11 @@ function xmldb_checkmark_upgrade($oldversion) {
                 echo 'field: '.$fieldname.' in table: checkmark doesn\'t exists!<br />';
             }
         }
-        $fieldstorename = array(
+        $fieldstorename = [
             'course' => 'course_id',
             'var1' => 'examplecount',
-            'var2' => 'examplestart');
+            'var2' => 'examplestart',
+        ];
         echo '<hr />renaming fields in table: checkmark<br />';
         foreach ($fieldstorename as $oldname => $newname) {
             switch ($oldname) {
@@ -119,7 +120,7 @@ function xmldb_checkmark_upgrade($oldversion) {
 
         // Define index course_id (not unique) to be dropped form checkmark!
         $table = new xmldb_table('checkmark');
-        $index = new xmldb_index('course', XMLDB_INDEX_NOTUNIQUE, array('course'));
+        $index = new xmldb_index('course', XMLDB_INDEX_NOTUNIQUE, ['course']);
 
         // Conditionally launch drop index course!
         if ($dbman->index_exists($table, $index)) {
@@ -128,7 +129,7 @@ function xmldb_checkmark_upgrade($oldversion) {
 
         // Define index course_id (not unique) to be added to checkmark!
         $table = new xmldb_table('checkmark');
-        $index = new xmldb_index('course_id', XMLDB_INDEX_NOTUNIQUE, array('course_id'));
+        $index = new xmldb_index('course_id', XMLDB_INDEX_NOTUNIQUE, ['course_id']);
 
         // Conditionally launch add index course_id!
         if (!$dbman->index_exists($table, $index)) {
@@ -136,7 +137,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         }
         // Now take care of checkmark_submissions!
         $table = new xmldb_table('checkmark_submissions');
-        $fieldstodrop = array('numfiles', 'data2');
+        $fieldstodrop = ['numfiles', 'data2'];
         echo '<hr />dropping fields in table: checkmark_submissions<br />';
         foreach ($fieldstodrop as $fieldname) {
             $field = new xmldb_field($fieldname);
@@ -148,11 +149,12 @@ function xmldb_checkmark_upgrade($oldversion) {
                 echo 'field: '.$fieldname.' in table: checkmark_submissions doesn\'t exists!<br />';
             }
         }
-        $fieldstorename = array(
+        $fieldstorename = [
             'assignment' => 'checkmark_id',
             'userid' => 'user_id',
             'data1' => 'checked',
-            'teacher' => 'teacher_id');
+            'teacher' => 'teacher_id',
+        ];
         echo '<hr />renaming fields in table: checkmark_submissions<br />';
         foreach ($fieldstorename as $oldname => $newname) {
             switch ($oldname) {
@@ -184,21 +186,21 @@ function xmldb_checkmark_upgrade($oldversion) {
         }
 
         // Define key checkmark (foreign) to be dropped form checkmark_submissions!
-        $key = new xmldb_key('assignment', XMLDB_KEY_FOREIGN, array('assignment'), 'assignment',
-                             array('id'));
+        $key = new xmldb_key('assignment', XMLDB_KEY_FOREIGN, ['assignment'], 'assignment',
+                             ['id']);
 
         // Launch drop key checkmark_id!
         $dbman->drop_key($table, $key);
 
         // Define key checkmark_id (foreign) to be added to checkmark_submissions!
-        $key = new xmldb_key('checkmark_id', XMLDB_KEY_FOREIGN, array('checkmark_id'), 'checkmark',
-                             array('id'));
+        $key = new xmldb_key('checkmark_id', XMLDB_KEY_FOREIGN, ['checkmark_id'], 'checkmark',
+                             ['id']);
 
         // Launch add key checkmark_id!
         $dbman->add_key($table, $key);
 
         // Define index user_id (not unique) to be dropped form checkmark_submissions!
-        $index = new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, array('userid'));
+        $index = new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, ['userid']);
 
         // Conditionally launch drop index user_id!
         if ($dbman->index_exists($table, $index)) {
@@ -206,7 +208,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         }
 
         // Define index user_id (not unique) to be added to checkmark_submissions!
-        $index = new xmldb_index('user_id', XMLDB_INDEX_NOTUNIQUE, array('user_id'));
+        $index = new xmldb_index('user_id', XMLDB_INDEX_NOTUNIQUE, ['user_id']);
 
         // Conditionally launch add index user_id!
         if (!$dbman->index_exists($table, $index)) {
@@ -231,7 +233,7 @@ function xmldb_checkmark_upgrade($oldversion) {
 
         // Define index course_id (not unique) to be dropped form checkmark!
         $table = new xmldb_table('checkmark');
-        $index = new xmldb_index('course_id', XMLDB_INDEX_NOTUNIQUE, array('course_id'));
+        $index = new xmldb_index('course_id', XMLDB_INDEX_NOTUNIQUE, ['course_id']);
 
         // Conditionally launch drop index course!
         if ($dbman->index_exists($table, $index)) {
@@ -240,7 +242,7 @@ function xmldb_checkmark_upgrade($oldversion) {
 
         // Define index course (not unique) to be added to checkmark!
         $table = new xmldb_table('checkmark');
-        $index = new xmldb_index('course', XMLDB_INDEX_NOTUNIQUE, array('course'));
+        $index = new xmldb_index('course', XMLDB_INDEX_NOTUNIQUE, ['course']);
 
         // Conditionally launch add index course!
         if (!$dbman->index_exists($table, $index)) {
@@ -291,8 +293,8 @@ function xmldb_checkmark_upgrade($oldversion) {
         $table->add_field('grade', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '10');
 
         // Adding keys to table checkmark_examples!
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('checkmarkid', XMLDB_KEY_FOREIGN, array('checkmarkid'), 'checkmark', array('id'));
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('checkmarkid', XMLDB_KEY_FOREIGN, ['checkmarkid'], 'checkmark', ['id']);
 
         // Conditionally launch create table for checkmark_examples!
         if (!$dbman->table_exists($table)) {
@@ -309,9 +311,9 @@ function xmldb_checkmark_upgrade($oldversion) {
         $table->add_field('state', XMLDB_TYPE_INTEGER, '4', null, null, null, null);
 
         // Adding keys to table checkmark_checks!
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('exampleid', XMLDB_KEY_FOREIGN, array('exampleid'), 'checkmark_examples', array('id'));
-        $table->add_key('submissionid', XMLDB_KEY_FOREIGN, array('submissionid'), 'checkmark_submissions', array('id'));
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('exampleid', XMLDB_KEY_FOREIGN, ['exampleid'], 'checkmark_examples', ['id']);
+        $table->add_key('submissionid', XMLDB_KEY_FOREIGN, ['submissionid'], 'checkmark_submissions', ['id']);
 
         // Conditionally launch create table for checkmark_checks!
         if (!$dbman->table_exists($table)) {
@@ -322,21 +324,21 @@ function xmldb_checkmark_upgrade($oldversion) {
         $table = new xmldb_table('checkmark_submissions');
         $field = new xmldb_field('checkmark_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
         // Define key checkmarkid (foreign) to be dropped form checkmark_submissions!
-        $key = new xmldb_key('checkmark_id', XMLDB_KEY_FOREIGN, array('checkmark_id'), 'checkmark', array('id'));
+        $key = new xmldb_key('checkmark_id', XMLDB_KEY_FOREIGN, ['checkmark_id'], 'checkmark', ['id']);
         // Launch drop key checkmarkid!
         $dbman->drop_key($table, $key);
         // Launch rename field checkmarkid!
         if ($dbman->field_exists($table, $field)) {
             $dbman->rename_field($table, $field, 'checkmarkid');
         }
-        $key = new xmldb_key('checkmarkid', XMLDB_KEY_FOREIGN, array('checkmarkid'), 'checkmark', array('id'));
+        $key = new xmldb_key('checkmarkid', XMLDB_KEY_FOREIGN, ['checkmarkid'], 'checkmark', ['id']);
         // Launch add key checkmarkid!
         $dbman->add_key($table, $key);
 
         // Rename field userid on table checkmark_submissions to userid!
         $field = new xmldb_field('user_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'checkmarkid');
         // Define index user_id (not unique) to be dropped form checkmark_submissions!
-        $index = new xmldb_index('user_id', XMLDB_INDEX_NOTUNIQUE, array('user_id'));
+        $index = new xmldb_index('user_id', XMLDB_INDEX_NOTUNIQUE, ['user_id']);
         // Conditionally launch drop index mailed!
         if ($dbman->index_exists($table, $index)) {
             $dbman->drop_index($table, $index);
@@ -345,7 +347,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         if ($dbman->field_exists($table, $field)) {
             $dbman->rename_field($table, $field, 'userid');
         }
-        $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+        $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
         // Launch add key userid!
         $dbman->add_key($table, $key);
 
@@ -356,7 +358,7 @@ function xmldb_checkmark_upgrade($oldversion) {
             $dbman->rename_field($table, $field, 'teacherid');
         }
         // Define key teacherid (foreign) to be added to checkmark_submissions!
-        $key = new xmldb_key('teacherid', XMLDB_KEY_FOREIGN, array('teacherid'), 'user', array('id'));
+        $key = new xmldb_key('teacherid', XMLDB_KEY_FOREIGN, ['teacherid'], 'user', ['id']);
         // Launch add key teacherid!
         $dbman->add_key($table, $key);
 
@@ -369,16 +371,16 @@ function xmldb_checkmark_upgrade($oldversion) {
         $pbar2 = new progress_bar('checkmarkupgradeSubmissions', 500, true);
         $instancecount = 0;
         $countinstances = count($checkmarks);
-        $ids = array();
-        $params = array();
+        $ids = [];
+        $params = [];
         unset($sql);
         foreach ($checkmarks as $checkmarkid => $checkmark) {
             // Create entries for checkmark examples!
-            $ids[$checkmarkid] = array();
+            $ids[$checkmarkid] = [];
             $pbar->update($instancecount, $countinstances, 'migrate instance '.$checkmark->name);
             $present = $DB->get_fieldset_select('checkmark_examples', 'name',
                                                 'checkmarkid = :checkmarkid',
-                                                array('checkmarkid' => $checkmark->id));
+                                                ['checkmarkid' => $checkmark->id]);
             if ($checkmark->flexiblenaming) {
                 // Flexible naming?
                 $names = explode(',', $checkmark->examplenames);
@@ -428,17 +430,17 @@ function xmldb_checkmark_upgrade($oldversion) {
             if (isset($sql)) {
                 $DB->execute($sql, $params);
                 unset($sql);
-                $params = array();
+                $params = [];
             }
 
             $instancecount++;
             $ids = $DB->get_fieldset_sql('SELECT id
                                             FROM {checkmark_examples}
                                            WHERE checkmarkid = :checkmarkid',
-                                         array('checkmarkid' => $checkmark->id));
+                                         ['checkmarkid' => $checkmark->id]);
             $examplecount = count($ids);
             // Get all submissions for this instance!
-            $submissions = $DB->get_records('checkmark_submissions', array('checkmarkid' => $checkmark->id));
+            $submissions = $DB->get_records('checkmark_submissions', ['checkmarkid' => $checkmark->id]);
             $subcounter = 1;
             $submissionscount = count($submissions);
             $pbar2->update(0, $submissionscount, "migrate submissions for instance ".$checkmark->name);
@@ -447,7 +449,7 @@ function xmldb_checkmark_upgrade($oldversion) {
                         "migrate submission ".$subcounter." for instance ".$checkmark->name);
                 $subcounter++;
                 $checkedexamples = explode(',', $submission->checked);
-                $present = $DB->get_fieldset_select('checkmark_checks', 'exampleid', 'submissionid = ?', array($submission->id));
+                $present = $DB->get_fieldset_select('checkmark_checks', 'exampleid', 'submissionid = ?', [$submission->id]);
                 for ($k = 1; $k <= $examplecount; $k++) {
                     if (in_array($ids[$k - 1], $present)) {
                         continue;   // Skip allready migrated!
@@ -473,7 +475,7 @@ function xmldb_checkmark_upgrade($oldversion) {
                 if (!empty($sql)) {
                     $DB->execute($sql, $params);
                     unset($sql);
-                    $params = array();
+                    $params = [];
                 }
             }
         }
@@ -537,7 +539,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         }
 
         // Get a list with future cut-off-dates of positive preventlate-stati of all checkmarks!
-        $cutoffs = $DB->get_records_menu('checkmark', array('preventlate' => 1),
+        $cutoffs = $DB->get_records_menu('checkmark', ['preventlate' => 1],
                                          'id ASC', 'id, timedue');
 
         // Rename field preventlate on table checkmark to cutoffdate.
@@ -552,7 +554,7 @@ function xmldb_checkmark_upgrade($oldversion) {
 
         // Set Cut-Off-Date for all Instances right (those with no cut-off-date are already allright).
         foreach ($cutoffs as $id => $cutoff) {
-            $DB->set_field('checkmark', 'cutoffdate', $cutoff, array('id' => $id));
+            $DB->set_field('checkmark', 'cutoffdate', $cutoff, ['id' => $id]);
         }
         // Checkmark savepoint reached.
         upgrade_mod_savepoint(true, 2013112500, 'checkmark');
@@ -560,15 +562,19 @@ function xmldb_checkmark_upgrade($oldversion) {
 
     if ($oldversion < 2014052104) {
         // Upgrade old events!
-        $events = $DB->get_records('event', array('eventtype'  => 'course',
-                                                  'modulename' => 'checkmark'));
+        $events = $DB->get_records('event', [
+            'eventtype' => 'course',
+            'modulename' => 'checkmark',
+        ]);
         $eventcount = count($events);
         $i = 0;
         $pbar = new progress_bar('CheckmarkFixEvents', 500, true);
         foreach ($events as $id => $event) {
             // Find related instance via courseid and duedate!
-            $cond = array('course'  => $event->courseid,
-                          'timedue' => $event->timestart);
+            $cond = [
+                'course' => $event->courseid,
+                'timedue' => $event->timestart,
+            ];
             $matches = $DB->count_records('checkmark', $cond);
             if ($matches == 1) {
                 // Only 1 record found, we can fix it!
@@ -581,9 +587,11 @@ function xmldb_checkmark_upgrade($oldversion) {
                                            'notifysuccess');
                 $pbar->update($i, $eventcount, get_string('couldfixevent', 'checkmark', $event));
             } else {
-                $cond2 = array('course'  => $event->courseid,
-                               'timedue' => $event->timestart,
-                               'name'    => $event->name);
+                $cond2 = [
+                    'course' => $event->courseid,
+                    'timedue' => $event->timestart,
+                    'name' => $event->name,
+                ];
                 $matches2 = $DB->count_records('checkmark', $cond2);
                 if ($matches2 == 1) {
                     // Only 1 record found, we can fix it!
@@ -622,17 +630,18 @@ function xmldb_checkmark_upgrade($oldversion) {
                                                                  AND event.modulename LIKE 'checkmark'
                                           GROUP BY checkmark.id
                                             HAVING COUNT( event.id ) = 0 AND checkmark.timedue <> 0");
-        $repairedids = array();
+        $repairedids = [];
         $i = 0;
         $max = count($checkmarks);
         // Process each of these checkmarks alone!
         foreach ($checkmarks as $checkmark) {
-            $params = array('name'       => '%'.$checkmark->name.'%',
+            $params = ['name'       => '%'.$checkmark->name.'%',
                             'intro'      => '%'.$checkmark->intro.'%',
                             'courseid'   => $checkmark->course,
                             'timedue'    => $checkmark->timedue,
                             'modulename' => 'checkmark',
-                            'eventtype'  => 'course');
+                            'eventtype'  => 'course',
+                        ];
             $events = $DB->get_records_sql("SELECT *
                                               FROM {event} event
                                              WHERE event.timestart = :timedue
@@ -715,9 +724,10 @@ function xmldb_checkmark_upgrade($oldversion) {
         }
 
         // Remove other event-stubs...
-        $events = $DB->get_records('event', array('modulename' => 'checkmark',
+        $events = $DB->get_records('event', ['modulename' => 'checkmark',
                                                   'instance' => 0,
-                                                  'eventtype' => 'course'));
+                                                  'eventtype' => 'course',
+                                                ]);
         $i = 0;
         $max = count($events);
         if (!empty($max)) {
@@ -738,41 +748,41 @@ function xmldb_checkmark_upgrade($oldversion) {
         if (isset($CFG->checkmark_requiremodintro)) {
             set_config('requiremodintro', $CFG->checkmark_requiremodintro, 'checkmark');
             unset($CFG->checkmark_requiremodintro);
-            $DB->delete_records('config', array('name' => 'checkmark_requiremodintro'));
+            $DB->delete_records('config', ['name' => 'checkmark_requiremodintro']);
         } else {
             set_config('requiremodintro', 1, 'mod_checkmark');
         }
 
         if (isset($CFG->checkmark_stdexamplecount)) {
             set_config('stdexamplecount', $CFG->checkmark_stdexamplecount, 'checkmark');
-            $DB->delete_records('config', array('name' => 'checkmark_stdexamplecount'));
+            $DB->delete_records('config', ['name' => 'checkmark_stdexamplecount']);
         } else {
             set_config('stdexamplecount', 10, 'mod_checkmark');
         }
 
         if (isset($CFG->checkmark_stdexamplestart)) {
             set_config('stdexamplestart', $CFG->checkmark_stdexamplestart, 'checkmark');
-            $DB->delete_records('config', array('name' => 'checkmark_stdexamplestart'));
+            $DB->delete_records('config', ['name' => 'checkmark_stdexamplestart']);
         } else {
             set_config('stdexamplestart', 1, 'checkmark');
         }
 
         if (isset($CFG->checkmark_stdnames)) {
             set_config('stdnames', $CFG->checkmark_stdnames, 'checkmark');
-            $DB->delete_records('config', array('name' => 'checkmark_stdnames'));
+            $DB->delete_records('config', ['name' => 'checkmark_stdnames']);
         } else {
             set_config('stdnames', 'a,b,c,d,e,f', 'checkmark');
         }
 
         if (isset($CFG->checkmark_stdgrades)) {
             set_config('stdgrades', $CFG->checkmark_stdgrades, 'checkmark');
-            $DB->delete_records('config', array('name' => 'checkmark_stdgrades'));
+            $DB->delete_records('config', ['name' => 'checkmark_stdgrades']);
         } else {
             set_config('stdgrades', '10,10,20,20,20,20', 'checkmark');
         }
         if (isset($CFG->checkmark_validmsgtime)) {
             set_config('validmsgtime', $CFG->checkmark_validmsgtime, 'checkmark');
-            $DB->delete_records('config', array('name' => 'checkmark_validmsgtime'));
+            $DB->delete_records('config', ['name' => 'checkmark_validmsgtime']);
         } else {
             set_config('validmsgtime', 2, 'checkmark');
         }
@@ -782,12 +792,15 @@ function xmldb_checkmark_upgrade($oldversion) {
 
     if ($oldversion < 2015111201) {
         // Remove not used settings (requiremodintro and duplicates of stdexamplecount and requiremodintro)!
-        $DB->delete_records('config_plugins', array('plugin' => 'checkmark',
-                                                    'name'   => 'requiremodintro'));
-        $DB->delete_records('config_plugins', array('plugin' => 'mod_checkmark',
-                                                    'name'   => 'requiremodintro'));
-        $DB->delete_records('config_plugins', array('plugin' => 'mod_checkmark',
-                                                    'name'   => 'stdexamplecount'));
+        $DB->delete_records('config_plugins', ['plugin' => 'checkmark',
+                                                    'name'   => 'requiremodintro',
+                                                ]);
+        $DB->delete_records('config_plugins', ['plugin' => 'mod_checkmark',
+                                                    'name'   => 'requiremodintro',
+                                                ]);
+        $DB->delete_records('config_plugins', ['plugin' => 'mod_checkmark',
+                                                    'name'   => 'stdexamplecount',
+                                                ]);
 
         upgrade_mod_savepoint(true, 2015111201, 'checkmark');
     }
@@ -802,7 +815,7 @@ function xmldb_checkmark_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        $DB->set_field('checkmark', 'exampleprefix', get_string('strexample', 'checkmark').' ', array());
+        $DB->set_field('checkmark', 'exampleprefix', get_string('strexample', 'checkmark').' ', []);
 
         // Checkmark savepoint reached.
         upgrade_mod_savepoint(true, 2015122100, 'checkmark');
@@ -825,13 +838,13 @@ function xmldb_checkmark_upgrade($oldversion) {
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         // Adding keys to table checkmark_feedbacks.
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('checkmarkid', XMLDB_KEY_FOREIGN, array('checkmarkid'), 'checkmark', array('id'));
-        $table->add_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
-        $table->add_key('graderid', XMLDB_KEY_FOREIGN, array('graderid'), 'user', array('id'));
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('checkmarkid', XMLDB_KEY_FOREIGN, ['checkmarkid'], 'checkmark', ['id']);
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+        $table->add_key('graderid', XMLDB_KEY_FOREIGN, ['graderid'], 'user', ['id']);
         // Adding indexes to table checkmark_feedbacks.
-        $table->add_index('mailed', XMLDB_INDEX_NOTUNIQUE, array('mailed'));
-        $table->add_index('timemodified', XMLDB_INDEX_NOTUNIQUE, array('timemodified'));
+        $table->add_index('mailed', XMLDB_INDEX_NOTUNIQUE, ['mailed']);
+        $table->add_index('timemodified', XMLDB_INDEX_NOTUNIQUE, ['timemodified']);
         // Conditionally launch create table for checkmark_feedbacks.
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
@@ -841,7 +854,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         $rs = $DB->get_recordset_sql("
         SELECT checkmarkid, userid, grade, submissioncomment, format, teacherid, mailed, timemarked
           FROM {checkmark_submissions}
-         WHERE timemarked > 0", array());
+         WHERE timemarked > 0", []);
 
          // And enough memory too!
         raise_memory_limit(MEMORY_UNLIMITED);
@@ -865,8 +878,10 @@ function xmldb_checkmark_upgrade($oldversion) {
 
         // Step No. 3: delete old unused fields!
         $table = new xmldb_table('checkmark_submissions');
-        $indices = array(new xmldb_index('timemarked', XMLDB_INDEX_NOTUNIQUE, array('timemarked')),
-                         new xmldb_index('mailed', XMLDB_INDEX_NOTUNIQUE, array('mailed')));
+        $indices = [
+            new xmldb_index('timemarked', XMLDB_INDEX_NOTUNIQUE, ['timemarked']),
+            new xmldb_index('mailed', XMLDB_INDEX_NOTUNIQUE, ['mailed']),
+        ];
         // Conditionally launch drop indices timemarked and mailed.
         foreach ($indices as $index) {
             if ($dbman->index_exists($table, $index)) {
@@ -875,18 +890,19 @@ function xmldb_checkmark_upgrade($oldversion) {
         }
 
         // Define key teacherid (foreign) to be dropped form checkmark_submissions.
-        $key = new xmldb_key('teacherid', XMLDB_KEY_FOREIGN, array('teacherid'), 'user', array('id'));
+        $key = new xmldb_key('teacherid', XMLDB_KEY_FOREIGN, ['teacherid'], 'user', ['id']);
         // Launch drop key teacherid.
         $dbman->drop_key($table, $key);
 
         // Define field checked to be dropped from checkmark_submissions.
-        $fields = array(new xmldb_field('checked'),
+        $fields = [new xmldb_field('checked'),
                         new xmldb_field('grade'),
                         new xmldb_field('submissioncomment'),
                         new xmldb_field('format'),
                         new xmldb_field('teacherid'),
                         new xmldb_field('timemarked'),
-                        new xmldb_field('mailed'));
+                        new xmldb_field('mailed'),
+                    ];
         // Conditionally launch drop fields: checked, grade, submissioncomment, format, teacherid, timemarked and mailed.
         foreach ($fields as $field) {
             if ($dbman->field_exists($table, $field)) {
@@ -913,12 +929,12 @@ function xmldb_checkmark_upgrade($oldversion) {
 
         // Define field trackattendance to be added to checkmark.
         $table = new xmldb_table('checkmark');
-        $fields = array(
+        $fields = [
                 new xmldb_field('trackattendance', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'exampleprefix'),
                 new xmldb_field('attendancegradelink', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'trackattendance'),
                 new xmldb_field('attendancegradebook', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0',
-                                'attendancegradelink')
-                );
+                                'attendancegradelink'),
+                ];
 
         // Conditionally launch add field trackattendance.
         foreach ($fields as $field) {
@@ -936,7 +952,7 @@ function xmldb_checkmark_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        $index = new xmldb_index('attendance', XMLDB_INDEX_NOTUNIQUE, array('attendance'));
+        $index = new xmldb_index('attendance', XMLDB_INDEX_NOTUNIQUE, ['attendance']);
 
         // Conditionally launch add index attendance.
         if (!$dbman->index_exists($table, $index)) {
@@ -953,12 +969,13 @@ function xmldb_checkmark_upgrade($oldversion) {
         try {
             // Define field presentationgrading, presentationgrade and presentationgradebook to be added to checkmark.
             $table = new xmldb_table('checkmark');
-            $fields = array(new xmldb_field('presentationgrading', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0',
+            $fields = [new xmldb_field('presentationgrading', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0',
                                             'attendancegradelink'),
                             new xmldb_field('presentationgrade', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0',
                                             'presentationgrading'),
                             new xmldb_field('presentationgradebook', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0',
-                                            'presentationgrade'));
+                                            'presentationgrade'),
+                                        ];
 
             // Conditionally launch add field presentationgrading.
             foreach ($fields as $field) {
@@ -969,11 +986,12 @@ function xmldb_checkmark_upgrade($oldversion) {
 
             // Define field presentationgrade to be added to checkmark_feedbacks.
             $table = new xmldb_table('checkmark_feedbacks');
-            $fields = array(new xmldb_field('presentationgrade', XMLDB_TYPE_NUMBER, '10, 5', null, null, null, null, 'attendance'),
+            $fields = [new xmldb_field('presentationgrade', XMLDB_TYPE_NUMBER, '10, 5', null, null, null, null, 'attendance'),
                             new xmldb_field('presentationfeedback', XMLDB_TYPE_TEXT, null, null, null, null, null,
                                             'presentationgrade'),
                             new xmldb_field('presentationformat', XMLDB_TYPE_INTEGER, '4', null, null, null, null,
-                                            'presentationfeedback'));
+                                            'presentationfeedback'),
+                                        ];
 
             // Conditionally launch add field presentationgrade.
             foreach ($fields as $field) {
@@ -1021,18 +1039,20 @@ function xmldb_checkmark_upgrade($oldversion) {
         }
 
         // Set all former calendar events from CALENDAR_EVENT_TYPE_STANDARD to CALENDAR_EVENT_TYPE_ACTION!
-        $count = $DB->count_records('event', array('modulename' => 'checkmark',
-                                                   'eventtype'  => 'due'));
-        $rs = $DB->get_recordset('event', array('modulename' => 'checkmark',
-                                                'eventtype'  => 'due'));
+        $count = $DB->count_records('event', ['modulename' => 'checkmark',
+                                                   'eventtype'  => 'due',
+                                                ]);
+        $rs = $DB->get_recordset('event', ['modulename' => 'checkmark',
+                                                'eventtype'  => 'due',
+                                            ]);
         $i = 0;
-        $cmnames = array();
+        $cmnames = [];
         $pbar = new progress_bar('UpdateEvents', 500, true);
         $pbar->update($i, $count, 'Update events...');
         foreach ($rs as $cur) {
             $calendarevent = calendar_event::load($cur->id);
             if (!property_exists($cmnames, $cur->instance)) {
-                $cmnames[$cur->instance] = $DB->get_field('checkmark', 'name', array('id' => $cur->instance));
+                $cmnames[$cur->instance] = $DB->get_field('checkmark', 'name', ['id' => $cur->instance]);
             }
             $cur->name = $cmnames[$cur->instance];
             $cur->type = CALENDAR_EVENT_TYPE_ACTION;
@@ -1062,13 +1082,13 @@ function xmldb_checkmark_upgrade($oldversion) {
         $table->add_field('modifierid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
 
         // Adding keys to table checkmark_overrides.
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('checkmarkid', XMLDB_KEY_FOREIGN, array('checkmarkid'), 'checkmark', array('id'));
-        $table->add_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
-        $table->add_key('modifierid', XMLDB_KEY_FOREIGN, array('modifierid'), 'user', array('id'));
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('checkmarkid', XMLDB_KEY_FOREIGN, ['checkmarkid'], 'checkmark', ['id']);
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+        $table->add_key('modifierid', XMLDB_KEY_FOREIGN, ['modifierid'], 'user', ['id']);
 
         // Adding indexes to table checkmark_overrides.
-        $table->add_index('checkmarkid-userid-timecreated', XMLDB_INDEX_NOTUNIQUE, array('checkmarkid', 'userid', 'timecreated'));
+        $table->add_index('checkmarkid-userid-timecreated', XMLDB_INDEX_NOTUNIQUE, ['checkmarkid', 'userid', 'timecreated']);
 
         // Conditionally launch create table for checkmark_overrides.
         if (!$dbman->table_exists($table)) {
@@ -1233,10 +1253,10 @@ function xmldb_checkmark_upgrade($oldversion) {
 
     if ($oldversion < 2021052806) {
 
-        // Delete all existing checks containing null
+        // Delete all existing checks containing null.
         $where = "state IS NULL";
         $DB->delete_records_select('checkmark_checks', $where);
-        // Delete all duplicate entries
+        // Delete all duplicate entries.
         $sql = "SELECT distinct mc.id as cmcid
                       FROM {checkmark_checks} mc
                       JOIN {checkmark_checks} mc2 ON mc.id < mc2.id
@@ -1262,7 +1282,8 @@ function xmldb_checkmark_upgrade($oldversion) {
             // Checkmark savepoint reached.
             upgrade_mod_savepoint(true, 2021052806, 'checkmark');
         } catch (Exception $e) {
-            throw new moodle_exception('upgradekeyerror', 'checkmark', '', 'https://github.com/academic-moodle-cooperation/moodle-mod_checkmark/issues/72', $e->getTraceAsString());
+            throw new moodle_exception('upgradekeyerror', 'checkmark', '',
+                'https://github.com/academic-moodle-cooperation/moodle-mod_checkmark/issues/72', $e->getTraceAsString());
         }
     }
 

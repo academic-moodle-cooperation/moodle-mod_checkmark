@@ -24,14 +24,14 @@
  */
 defined('MOODLE_INTERNAL') || die;
 
-$tasks = array(
-    array(
+$tasks = [
+    [
         'classname' => 'mod_checkmark\task\send_notifications',
         'blocking' => 0,
         'minute' => '0',
         'hour' => '*',
         'day' => '*',
         'dayofweek' => '*',
-        'month' => '*'
-    )
-);
+        'month' => '*',
+    ],
+];
