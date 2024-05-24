@@ -578,7 +578,7 @@ class submissionstable extends \table_sql {
         $table->no_sorting('selection');
         $table->no_sorting('finalgrade');
         $table->no_sorting('outcome');
-        $table->no_sorting('status');
+        $table->no_sorting('status');   
 
         // Create and set the SQL!
         $params = [];
