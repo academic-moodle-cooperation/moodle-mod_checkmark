@@ -29,7 +29,7 @@ require_once($CFG->libdir.'/gradelib.php');
 
 $id = required_param('id', PARAM_INT);   // We need a course!
 
-if (!$course = $DB->get_record('course', array('id' => $id))) {
+if (!$course = $DB->get_record('course', ['id' => $id])) {
     throw new moodle_exception('invalidcourseid');
 }
 
@@ -37,9 +37,9 @@ require_course_login($course);
 $PAGE->set_pagelayout('incourse');
 
 /* TRIGGER THE VIEW ALL EVENT */
-$event = \mod_checkmark\event\course_module_instance_list_viewed::create(array(
-    'context' => context_course::instance($course->id)
-));
+$event = \mod_checkmark\event\course_module_instance_list_viewed::create([
+    'context' => context_course::instance($course->id),
+]);
 $event->trigger();
 /* END OF VIEW ALL EVENT */
 
@@ -52,7 +52,7 @@ $strsubmitted = get_string('submitted', 'checkmark');
 $strgrade = get_string('grade', 'grades');
 
 
-$PAGE->set_url('/mod/checkmark/index.php', array('id' => $course->id));
+$PAGE->set_url('/mod/checkmark/index.php', ['id' => $course->id]);
 $PAGE->navbar->add($strcheckmarks);
 $PAGE->set_title($strcheckmarks);
 $PAGE->set_heading($course->fullname);
@@ -73,9 +73,9 @@ $timenow = time();
 $table = new html_table();
 
 if ($usesections) {
-    $table->head  = array($strsectionname, $strname, $strduedate, $strsubmitted, $strgrade);
+    $table->head  = [$strsectionname, $strname, $strduedate, $strsubmitted, $strgrade];
 } else {
-    $table->head  = array($strname, $strduedate, $strsubmitted, $strgrade);
+    $table->head  = [$strname, $strduedate, $strsubmitted, $strgrade];
 }
 
 $currentsection = '';
@@ -89,8 +89,9 @@ foreach ($modinfo->instances['checkmark'] as $cm) {
     // Show dimmed if the mod is hidden!
     $class = $cm->visible ? '' : 'dimmed';
 
-    $link = html_writer::tag('a', format_string($cm->name), array('href'  => 'view.php?id='.$cm->id,
-                                                                  'class' => $class));
+    $link = html_writer::tag('a', format_string($cm->name), ['href'  => 'view.php?id='.$cm->id,
+                                                                  'class' => $class,
+                                                                ]);
 
     $printsection = '';
     if ($usesections) {
@@ -126,9 +127,9 @@ foreach ($modinfo->instances['checkmark'] as $cm) {
 
 
     if ($usesections) {
-        $table->data[] = array ($printsection, $link, $due, $submitted, $grade);
+        $table->data[] = [$printsection, $link, $due, $submitted, $grade];
     } else {
-        $table->data[] = array ($link, $due, $submitted, $grade);
+        $table->data[] = [$link, $due, $submitted, $grade];
     }
 }
 

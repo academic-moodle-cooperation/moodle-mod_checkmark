@@ -50,13 +50,13 @@ class checkmark_submission_form extends moodleform {
         $attr['class'] = 'mform submissionform header-maxwidth';
         $mform->setAttributes($attr);
 
-        $buttonarray = array();
+        $buttonarray = [];
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton',
             get_string('savechanges'));
         $buttonarray[] = &$mform->createElement('reset', 'resetbutton', get_string('revert'),
-            array('class' => 'btn btn-secondary mr-1'));
+            ['class' => 'btn btn-secondary mr-1']);
         $buttonarray[] = &$mform->createElement('cancel');
-        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        $mform->addGroup($buttonarray, 'buttonar', '', ' ', false);
         $mform->closeHeaderBefore('buttonar');
 
         foreach ($this->_customdata->examples as $key => $example) {
@@ -75,7 +75,7 @@ class checkmark_submission_form extends moodleform {
                 'group' => '1',
                 'data-grade' => $example->grade,
                 'data-name' => $example->shortname,
-                'data-example' => $example->id
+                'data-example' => $example->id,
             ];
             $mform->addElement('advcheckbox',
                     $key, null, $example->prefix . $example->name.' ('.$example->grade.' '.$pointsstring.')',
