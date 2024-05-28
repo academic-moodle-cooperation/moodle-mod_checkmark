@@ -578,7 +578,6 @@ class submissionstable extends \table_sql {
         $table->no_sorting('selection');
         $table->no_sorting('finalgrade');
         $table->no_sorting('outcome');
-        $table->no_sorting('status');
 
         // Create and set the SQL!
         $params = [];
@@ -599,9 +598,18 @@ class submissionstable extends \table_sql {
         } else {
             $groupssql = '';
         }
+
+        $stringgraded = get_string('submissionstatus_marked', 'checkmark');
+        $stringnew = get_string('submissionstatus_submitted', 'checkmark');
+        // Case statement to determine the status of the submission. With this the status column can be sorted.
         $fields = "u.id, ' ' AS selection, ' ' AS picture " . $ufields . " " . $useridentity->selects . ",
-                  s.id AS submissionid, f.id AS feedbackid, f.grade, f.feedback,
-                  s.timemodified AS timesubmitted, f.timemodified AS timemarked";
+                    s.id AS submissionid, f.id AS feedbackid, f.grade, f.feedback,
+                    s.timemodified AS timesubmitted, f.timemodified AS timemarked,
+                    CASE
+                        WHEN f.timemodified IS NOT NULL
+                            THEN '$stringgraded'
+                        ELSE '$stringnew'
+                    END AS status";
         if ($table->checkmark->checkmark->trackattendance) {
             $fields .= ", f.attendance AS attendance";
         }
@@ -1757,11 +1765,10 @@ class submissionstable extends \table_sql {
 
     /**
      * This function is called for each data row to allow processing of the
-     * user's grading button.
+     * user's grading status.
      *
-     * @param object $values
-     *            Contains object with all the values of record.
-     * @return string Return user's grading button.
+     * @param object $values Contains object with all the values of record. The status of the submission comes from the SQL query.
+     * @return string Return grading status for each row.
      * @throws coding_exception
      */
     public function col_status($values) {
@@ -1769,35 +1776,17 @@ class submissionstable extends \table_sql {
 
         $o = '';
         $due = $this->checkmark->checkmark->timedue;
-
-        $group = false;
-        $submission = false;
-
         $timesubmitted = $values->timesubmitted;
 
-        $status = 'new';
-        $statusstring = '';
-        if ($values->timesubmitted || $values->timemarked) {
-            $status = 'submitted';
-            $statusstring = $status;
-        }
-        if ($values->timemarked) {
-            $statusstring = 'marked';
-        }
+        $status = $values->status;
 
-        $displaystatus = $status;
-        if ($displaystatus == 'new') {
-            $displaystatus = '';
-        }
-
-        $o .= $OUTPUT->container(get_string('submissionstatus_' . $statusstring, 'checkmark'),
-                array('class' => 'submissionstatus' .$displaystatus));
-        if ($due && ($timesubmitted > $due) && $status != 'new') {
+        $o .= $OUTPUT->container($values->status, 'submissionstatussubmitted');
+        if ($due && ($timesubmitted > $due) && $status != get_string('submissionstatus_submitted', 'checkmark')) {
             $usertime = format_time($timesubmitted - $due);
             $latemessage = get_string('submittedlateshort',
                 'checkmark',
                 $usertime);
-            $o .= $OUTPUT->container($latemessage, array('class' => 'latesubmission'));
+            $o .= $OUTPUT->container($latemessage, 'latesubmission');
         }
 
         // If overridden dates are present for this user, we display an icon with popup!
