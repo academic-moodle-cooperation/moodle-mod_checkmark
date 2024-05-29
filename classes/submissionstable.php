@@ -1778,19 +1778,23 @@ class submissionstable extends \table_sql {
         $due = $this->checkmark->checkmark->timedue;
         $timesubmitted = $values->timesubmitted;
 
-        $status = $values->status;
+        $overrides = checkmark_get_overridden_dates($this->checkmark->cm->instance, $values->id, $this->checkmark->course->id);
 
         $o .= $OUTPUT->container($values->status, 'submissionstatussubmitted');
-        if ($due && ($timesubmitted > $due) && $status != get_string('submissionstatus_submitted', 'checkmark')) {
-            $usertime = format_time($timesubmitted - $due);
-            $latemessage = get_string('submittedlateshort',
-                'checkmark',
-                $usertime);
-            $o .= $OUTPUT->container($latemessage, 'latesubmission');
-        }
 
         // If overridden dates are present for this user, we display an icon with popup!
-        if ($this->hasoverrides && $overrides = checkmark_get_overridden_dates($this->checkmark->cm->instance, $values->id, $this->checkmark->course->id)) {
+        if ($this->hasoverrides && $overrides) {
+            // If the user has an override, we have to check if it was still a late submission!
+            if ($overrides->timedue && ($timesubmitted > $overrides->timedue)) {
+                $usertime = format_time($timesubmitted - $overrides->timedue);
+                $latemessage = get_string(
+                    'submittedlateshort',
+                    'checkmark',
+                    $usertime
+                );
+                $o .= $OUTPUT->container($latemessage, 'latesubmission');
+            }
+
             $context = new stdClass();
             $overrideediturl = new moodle_url('/mod/checkmark/extend.php');
             $returnurl = new moodle_url('/mod/checkmark/submissions.php');
@@ -1849,6 +1853,16 @@ class submissionstable extends \table_sql {
                 $context->cutoffdate = userdate($overrides->cutoffdate, get_string('strftimerecentfull'));
             }
             $o .= $OUTPUT->render_from_template('mod_checkmark/overridetooltip', $context);
+        } else {
+            if ($due && ($timesubmitted > $due)) {
+                $usertime = format_time($timesubmitted - $due);
+                $latemessage = get_string(
+                    'submittedlateshort',
+                    'checkmark',
+                    $usertime
+                );
+                $o .= $OUTPUT->container($latemessage, 'latesubmission');
+            }
         }
 
         if ($this->is_downloading()) {
