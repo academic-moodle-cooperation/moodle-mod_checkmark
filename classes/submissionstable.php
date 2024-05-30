@@ -361,7 +361,18 @@ class submissionstable extends \table_sql {
         $returndata = [];
         $this->format = $type;
         foreach ($this->rawdata as $key => $row) {
-            $returndata[$key] = $this->format_row($row);
+            // Format the feedback field, so that ';' is not seperated for CSV export.
+            $formattedrow = new stdClass();
+            foreach ($row as $fieldkey => $fieldvalue) {
+                if ($fieldkey == 'feedback') {
+                    $formattedfieldvalue = "\"" . $fieldvalue . "\"";
+                    $formattedfieldvalue = $this->convert_html_to_text($formattedfieldvalue);
+                $formattedrow->$fieldkey = $formattedfieldvalue;
+                } else {
+                    $formattedrow->$fieldkey = $fieldvalue;
+                }
+            }
+            $returndata[$key] = $this->format_row($formattedrow);
         }
 
         if ($this->rawdata instanceof recordset_walk || $this->rawdata instanceof moodle_recordset) {
@@ -566,7 +577,6 @@ class submissionstable extends \table_sql {
         $table->no_sorting('selection');
         $table->no_sorting('finalgrade');
         $table->no_sorting('outcome');
-        $table->no_sorting('status');
 
         // Create and set the SQL!
         $params = [];
@@ -587,9 +597,18 @@ class submissionstable extends \table_sql {
         } else {
             $groupssql = '';
         }
+
+        $stringgraded = get_string('submissionstatus_marked', 'checkmark');
+        $stringnew = get_string('submissionstatus_submitted', 'checkmark');
+        // Case statement to determine the status of the submission. With this the status column can be sorted.
         $fields = "u.id, ' ' AS selection, ' ' AS picture " . $ufields . " " . $useridentity->selects . ",
-                  s.id AS submissionid, f.id AS feedbackid, f.grade, f.feedback,
-                  s.timemodified AS timesubmitted, f.timemodified AS timemarked";
+                    s.id AS submissionid, f.id AS feedbackid, f.grade, f.feedback,
+                    s.timemodified AS timesubmitted, f.timemodified AS timemarked,
+                    CASE
+                        WHEN f.timemodified IS NOT NULL
+                            THEN '$stringgraded'
+                        ELSE '$stringnew'
+                    END AS status";
         if ($table->checkmark->checkmark->trackattendance) {
             $fields .= ", f.attendance AS attendance";
         }
@@ -1749,11 +1768,10 @@ class submissionstable extends \table_sql {
 
     /**
      * This function is called for each data row to allow processing of the
-     * user's grading button.
+     * user's grading status.
      *
-     * @param object $values
-     *            Contains object with all the values of record.
-     * @return string Return user's grading button.
+     * @param object $values Contains object with all the values of record. The status of the submission comes from the SQL query.
+     * @return string Return grading status for each row.
      * @throws coding_exception
      */
     public function col_status($values) {
@@ -1761,40 +1779,25 @@ class submissionstable extends \table_sql {
 
         $o = '';
         $due = $this->checkmark->checkmark->timedue;
-
-        $group = false;
-        $submission = false;
-
         $timesubmitted = $values->timesubmitted;
 
-        $status = 'new';
-        $statusstring = '';
-        if ($values->timesubmitted || $values->timemarked) {
-            $status = 'submitted';
-            $statusstring = $status;
-        }
-        if ($values->timemarked) {
-            $statusstring = 'marked';
-        }
+        $overrides = checkmark_get_overridden_dates($this->checkmark->cm->instance, $values->id, $this->checkmark->course->id);
 
-        $displaystatus = $status;
-        if ($displaystatus == 'new') {
-            $displaystatus = '';
-        }
-
-        $o .= $OUTPUT->container(get_string('submissionstatus_' . $statusstring, 'checkmark'),
-                ['class' => 'submissionstatus' .$displaystatus]);
-        if ($due && ($timesubmitted > $due) && $status != 'new') {
-            $usertime = format_time($timesubmitted - $due);
-            $latemessage = get_string('submittedlateshort',
-                'checkmark',
-                $usertime);
-            $o .= $OUTPUT->container($latemessage, ['class' => 'latesubmission']);
-        }
+        $o .= $OUTPUT->container($values->status, 'submissionstatussubmitted');
 
         // If overridden dates are present for this user, we display an icon with popup!
-        if ($this->hasoverrides && $overrides = checkmark_get_overridden_dates($this->checkmark->cm->instance,
-            $values->id, $this->checkmark->course->id)) {
+        if ($this->hasoverrides && $overrides) {
+            // If the user has an override, we have to check if it was still a late submission!
+            if ($overrides->timedue && ($timesubmitted > $overrides->timedue)) {
+                $usertime = format_time($timesubmitted - $overrides->timedue);
+                $latemessage = get_string(
+                    'submittedlateshort',
+                    'checkmark',
+                    $usertime
+                );
+                $o .= $OUTPUT->container($latemessage, 'latesubmission');
+            }
+
             $context = new stdClass();
             $overrideediturl = new moodle_url('/mod/checkmark/extend.php');
             $returnurl = new moodle_url('/mod/checkmark/submissions.php');
@@ -1853,6 +1856,16 @@ class submissionstable extends \table_sql {
                 $context->cutoffdate = userdate($overrides->cutoffdate, get_string('strftimerecentfull'));
             }
             $o .= $OUTPUT->render_from_template('mod_checkmark/overridetooltip', $context);
+        } else {
+            if ($due && ($timesubmitted > $due)) {
+                $usertime = format_time($timesubmitted - $due);
+                $latemessage = get_string(
+                    'submittedlateshort',
+                    'checkmark',
+                    $usertime
+                );
+                $o .= $OUTPUT->container($latemessage, 'latesubmission');
+            }
         }
 
         if ($this->is_downloading()) {

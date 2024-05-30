@@ -40,7 +40,7 @@
 }}
 <span {{#checkid}}data-checkid="{{.}}"{{/checkid}}{{!
         }} class="mod_checkmark_examplestate fa-stack" {{#is_forced}}title = "{{get_forcedstring}}"{{/is_forced}}>
-  <i class="fa fa-square-o fa-stack-2x{{#is_forced}} text-error{{/is_forced}}"></i>
-  {{^is_forced}}{{#is_checked}}<i class="fa fa-times fa-stack-1x" style="top: -1px;"></i>{{/is_checked}}{{/is_forced}}
-  {{#is_forced_checked}}<i class="fa fa-times fa-stack-1x text-error" style="top: -1px;"></i>{{/is_forced_checked}}
+  <i class="fa fa-stack-2x {{#is_forced}} text-error{{/is_forced}}">{{#pix}} i/unchecked, core {{/pix}}</i>
+  {{^is_forced}}{{#is_checked}}<i class="fa fa-stack-1x" style="top: 5px;">{{#pix}} e/cancel, core {{/pix}}</i>{{/is_checked}}{{/is_forced}}
+  {{#is_forced_checked}}<i class="fa fa-stack-1x text-error" style="top: 5px;">{{#pix}} e/cancel, core {{/pix}}</i>{{/is_forced_checked}}
 </span>
