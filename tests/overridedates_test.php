@@ -72,7 +72,7 @@ class overridedates_test extends advanced_testcase {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function setUp():void {
+    public function setUp(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         $this->testuser = $this->getDataGenerator()->create_user(['email' => 'test@example.com', 'username' => 'test']);

@@ -266,7 +266,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
      * @param stdClass $cm
      * @throws coding_exception
      */
-    private function print_attandance_info ($table, $summary, $cm) {
+    private function print_attandance_info($table, $summary, $cm) {
         global $CFG;
         if ($summary->attendantcount > 0) {
             $cell1content = get_string('attendance', 'checkmark');

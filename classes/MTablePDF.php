@@ -1044,7 +1044,7 @@ class MTablePDF extends \pdf {
      * @param string $startstring String $string's beginning schould be checked for
      * @return bool True if $string starts with $startString, False if not
      */
-    public static function starts_with ($string, $startstring) {
+    public static function starts_with($string, $startstring) {
         $len = strlen($startstring);
         return (substr($string, 0, $len) === $startstring);
     }
