@@ -104,6 +104,8 @@ class checkmark {
     public $instance;
     /** @var checkmark_renderer the custom renderer for this module */
     private $output;
+    /** @var array $var array an array containing per-user checkmark records, each having calculated properties (e.g. dates) */
+    private $userinstances = [];
 
     /**
      * Constructor for the checkmark class

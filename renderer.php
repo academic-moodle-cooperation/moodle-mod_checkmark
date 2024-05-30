@@ -49,6 +49,9 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
  */
 class mod_checkmark_renderer extends plugin_renderer_base {
 
+    /** @var string a unique ID. */
+    public $htmlid;
+
     /**
      * Rendering checkmark files
      *
