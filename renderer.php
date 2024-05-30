@@ -70,7 +70,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
      */
     public function render_checkmark_files(checkmark_files $tree) {
         $this->htmlid = html_writer::random_id('checkmark_files_tree');
-        $this->page->requires->js_init_call('M.mod_assign.init_tree', array(true, $this->htmlid));
+        $this->page->requires->js_init_call('M.mod_assign.init_tree', [true, $this->htmlid]);
         $html = '<div id="' . $this->htmlid . '">';
         $html .= $this->htmllize_tree($tree, $tree->dir);
         $html .= '</div>';
@@ -87,7 +87,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
      */
     protected function htmllize_tree(checkmark_files $tree, $dir) {
         global $CFG;
-        $yuiconfig = array();
+        $yuiconfig = [];
         $yuiconfig['type'] = 'html';
 
         if (empty($dir['subdirs']) && empty($dir['files'])) {
@@ -99,7 +99,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
             $image = $this->output->pix_icon(file_folder_icon(),
                     $subdir['dirname'],
                     'moodle',
-                    array('class' => 'icon'));
+                    ['class' => 'icon']);
             $result .= '<li yuiConfig=\'' . json_encode($yuiconfig) . '\'>' .
                     '<div>' . $image . ' ' . s($subdir['dirname']) . '</div> ' .
                     $this->htmllize_tree($tree, $subdir) .
@@ -111,7 +111,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
             $image = $this->output->pix_icon(file_file_icon($file),
                     $filename,
                     'moodle',
-                    array('class' => 'icon'));
+                    ['class' => 'icon']);
             $result .= '<li yuiConfig=\'' . json_encode($yuiconfig) . '\'>' .
                     '<div>' .
                     '<div class="fileuploadsubmission">' . $image . ' ' .
@@ -150,7 +150,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         if (!empty($secondattributes)) {
             $cell2->attributes = $secondattributes;
         }
-        $row->cells = array($cell1, $cell2);
+        $row->cells = [$cell1, $cell2];
         $table->data[] = $row;
     }
 
@@ -360,7 +360,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
 
         $warningmsg = '';
 
-        // Submission Status TODO: classes
+        // Submission Status TODO: classes.
         $cell1content = get_string('submissionstatus', 'checkmark');
         $cell2attributes = [];
 
@@ -377,9 +377,9 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         }
 
         if ($status['gradingstatus'] == "graded") {
-                $cell2attributes = array('class' => 'submissiongraded');
+                $cell2attributes = ['class' => 'submissiongraded'];
         } else {
-            $cell2attributes = array('class' => 'submissionnotgraded');
+            $cell2attributes = ['class' => 'submissionnotgraded'];
         }
         $this->add_table_row_tuple($t, $cell1content, $cell2content, [], $cell2attributes);
 
@@ -388,7 +388,8 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         $time = time();
         if ($status['timedue'] > 0 || !empty($status['timecreated'])) {
             $cell1content = get_string('timeremaining', 'checkmark');
-            [$cell2content, $cell2attributes] = [get_string('paramtimeremaining', 'checkmark', format_time($status['timedue'] - $time)), 'timeremaining'];
+            [$cell2content, $cell2attributes] =
+                [get_string('paramtimeremaining', 'checkmark', format_time($status['timedue'] - $time)), 'timeremaining'];
             $this->add_table_row_tuple($t, $cell1content, $cell2content, [], ['class' => $cell2attributes]);
         }
 
@@ -403,7 +404,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
 
         $this->add_table_row_tuple($t, $cell1content, $cell2content);
 
-        // checkmark info
+        // Checkmark info.
         $cell1content = get_string('checkmarks', 'checkmark');
         if (!empty($status['checkmarkinfo'])) {
             $cell2content = get_string('submissionstatus_checkmark_summary', 'checkmark', $status['checkmarkinfo']);
@@ -447,7 +448,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
             $this->add_table_row_tuple($t, $cell1content, $cell2content);
         }
 
-        // feedback
+        // Feedback.
         $cell1content = get_string('feedback', 'checkmark');
         $cell2content = $status['feedback'];
         $this->add_table_row_tuple($t, $cell1content, $cell2content);
