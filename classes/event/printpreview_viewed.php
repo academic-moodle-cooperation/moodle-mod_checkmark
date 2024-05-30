@@ -41,11 +41,11 @@ class printpreview_viewed extends submissions_viewed_base {
      */
     public static function printpreview(\stdClass $cm) {
         // Trigger overview event.
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $cm->instance,
             'context'  => \context_module::instance($cm->id),
             'other'    => 'printpreview',
-        ));
+        ]);
         return $event;
     }
 

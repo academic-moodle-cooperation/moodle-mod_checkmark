@@ -89,7 +89,7 @@ class example_deleted extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url("/mod/checkmark/view.php", [
-            'id' => $this->contextinstanceid
+            'id' => $this->contextinstanceid,
         ]);
     }
 

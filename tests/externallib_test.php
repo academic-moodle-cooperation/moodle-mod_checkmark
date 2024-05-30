@@ -36,6 +36,7 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  *
  * @package   mod_checkmark
  * @runTestsInSeparateProcesses
+ * @covers \mod_checkmark\externallib.php
  *
  */
 class externallib_test extends externallib_advanced_testcase {
@@ -63,7 +64,7 @@ class externallib_test extends externallib_advanced_testcase {
         $course1 = $this->getDataGenerator()->create_course([
             'fullname' => 'PHPUnitTestCourse1',
             'summary' => 'Test course for automated php unit tests',
-            'summaryformat' => FORMAT_HTML
+            'summaryformat' => FORMAT_HTML,
         ]);
 
         $this->getDataGenerator()->enrol_user($user->id, $course1->id);
@@ -71,7 +72,7 @@ class externallib_test extends externallib_advanced_testcase {
         $course2 = $this->getDataGenerator()->create_course([
             'fullname' => 'PHPUnitTestCourse2',
             'summary' => 'Test course for automated php unit tests',
-            'summaryformat' => FORMAT_HTML
+            'summaryformat' => FORMAT_HTML,
         ]);
 
         $this->getDataGenerator()->enrol_user($user->id, $course2->id);
@@ -79,7 +80,7 @@ class externallib_test extends externallib_advanced_testcase {
         $course3 = $this->getDataGenerator()->create_course([
             'fullname' => 'PHPUnitTestCourse3',
             'summary' => 'Test course for automated php unit tests',
-            'summaryformat' => FORMAT_HTML
+            'summaryformat' => FORMAT_HTML,
         ]);
 
         $checkmark1 = self::getDataGenerator()->create_module('checkmark', [
@@ -139,7 +140,7 @@ class externallib_test extends externallib_advanced_testcase {
         $course = $this->getDataGenerator()->create_course([
             'fullname' => 'PHPUnitTestCourse',
             'summary' => 'Test course for automated php unit tests',
-            'summaryformat' => FORMAT_HTML
+            'summaryformat' => FORMAT_HTML,
         ]);
 
         $this->getDataGenerator()->enrol_user($user->id, $course->id);
@@ -214,7 +215,7 @@ class externallib_test extends externallib_advanced_testcase {
         $course = $this->getDataGenerator()->create_course([
             'fullname' => 'PHPUnitTestCourse',
             'summary' => 'Test course for automated php unit tests',
-            'summaryformat' => FORMAT_HTML
+            'summaryformat' => FORMAT_HTML,
         ]);
 
         $this->getDataGenerator()->enrol_user($user->id, $course->id);
@@ -224,7 +225,7 @@ class externallib_test extends externallib_advanced_testcase {
             'name' => 'Checkmark Module',
             'intro' => 'Checkmark module for automated php unit tests',
             'introformat' => FORMAT_HTML,
-            'cutoffdate' => time() - 60 * 60 * 24 // Yesterday.
+            'cutoffdate' => time() - 60 * 60 * 24, // Yesterday.
         ]);
 
         $this->setUser($user);
@@ -254,7 +255,7 @@ class externallib_test extends externallib_advanced_testcase {
         $course = $this->getDataGenerator()->create_course([
             'fullname' => 'PHPUnitTestCourse',
             'summary' => 'Test course for automated php unit tests',
-            'summaryformat' => FORMAT_HTML
+            'summaryformat' => FORMAT_HTML,
         ]);
 
         $this->getDataGenerator()->enrol_user($user->id, $course->id);

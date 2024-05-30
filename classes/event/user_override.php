@@ -45,15 +45,15 @@ abstract class user_override extends \core\event\base {
      * Get objectid mapping
      */
     public static function get_objectid_mapping() {
-        return array('db' => 'checkmark_overrides', 'restore' => 'checkmark_override');
+        return ['db' => 'checkmark_overrides', 'restore' => 'checkmark_override'];
     }
 
     /**
      * Get other mapping
      */
     public static function get_other_mapping() {
-        $othermapped = array();
-        $othermapped['checkmarkid'] = array('db' => 'checkmark', 'restore' => 'checkmark');
+        $othermapped = [];
+        $othermapped['checkmarkid'] = ['db' => 'checkmark', 'restore' => 'checkmark'];
 
         return $othermapped;
     }

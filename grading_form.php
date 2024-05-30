@@ -24,8 +24,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * This class contains the grading form for checkmark-submissions
  *
@@ -149,12 +147,12 @@ class mod_checkmark_grading_form extends moodleform {
     public function add_grades_elements() {
         $mform =& $this->_form;
 
-        $attributes = array();
+        $attributes = [];
         if ($this->_customdata->gradingdisabled) {
             $attributes['disabled'] = 'disabled';
         }
 
-        $grademenu = array(-1 => get_string('nograde')) + make_grades_menu($this->_customdata->checkmark->grade);
+        $grademenu = [-1 => get_string('nograde')] + make_grades_menu($this->_customdata->checkmark->grade);
 
         $mform->addElement('select', 'xgrade', get_string('grade', 'grades'), $grademenu, $attributes);
         if ($this->_customdata->feedbackobj !== false) {
@@ -177,7 +175,7 @@ class mod_checkmark_grading_form extends moodleform {
                     echo $options[$outcome->grades[$this->_customdata->submission->userid]->grade];
                 } else {
                     $options[''] = get_string('nooutcome', 'grades');
-                    $attributes = array('id' => 'menuoutcome_'.$n );
+                    $attributes = ['id' => 'menuoutcome_'.$n ];
                     $mform->addElement('select', 'outcome_'.$n.'['.$this->_customdata->userid.']',
                                        $outcome->name.':', $options, $attributes );
                     $mform->setType('outcome_'.$n.'['.$this->_customdata->userid.']', PARAM_INT);
@@ -233,9 +231,11 @@ class mod_checkmark_grading_form extends moodleform {
                 $mform->addElement('static', 'disabledattendance', get_string('attendance', 'checkmark'), $symbol);
             } else {
                 // TODO: if there's time, we add JS to show a beautiful select with symbols!
-                $options = array(-1 => '? '.strtolower(get_string('unknown', 'checkmark')),
-                                 1  => '✓ '.strtolower(get_string('attendant', 'checkmark')),
-                                 0  => '✗ '.strtolower(get_string('absent', 'checkmark')));
+                $options = [
+                    -1 => '? ' . strtolower(get_string('unknown', 'checkmark')),
+                    1 => '✓ ' . strtolower(get_string('attendant', 'checkmark')),
+                    0 => '✗ ' . strtolower(get_string('absent', 'checkmark')),
+                ];
                 $mform->addElement('select', 'attendance', get_string('attendance', 'checkmark'), $options);
                 $mform->setType('attendance', PARAM_INT); // To be cleaned before display!
                 $mform->setDefault('attendance', $this->_customdata->attendance);
@@ -276,7 +276,7 @@ class mod_checkmark_grading_form extends moodleform {
                 $mform->addElement('static', 'disabledpresentationfeedback', get_string('presentationfeedback', 'checkmark'),
                                    $presentationfeedback);
             } else if ($this->_customdata->instance_presentationgrade) {
-                $grademenu = array(-1 => get_string('nograde'));
+                $grademenu = [-1 => get_string('nograde')];
                 $grademenu = $grademenu + make_grades_menu($this->_customdata->checkmark->presentationgrade);
                 if ($presentationgrade == '') {
                     $presentationgrade = -1;
@@ -302,8 +302,8 @@ class mod_checkmark_grading_form extends moodleform {
      */
     public function add_grading_buttons() {
         $mform =& $this->_form;
-        $buttonarray = array();
-        $buttonarray2 = array();
+        $buttonarray = [];
+        $buttonarray2 = [];
         if ($this->_customdata->previousid > 0) {
             $buttonarray2[] = &$mform->createElement('submit', 'previous', get_string('previous'));
         }
@@ -316,9 +316,9 @@ class mod_checkmark_grading_form extends moodleform {
             $buttonarray2[] = &$mform->createElement('submit', 'next', get_string('next'));
         }
         $buttonarray[] = &$mform->createElement('cancel');
-        $mform->addGroup($buttonarray, 'grading_buttonar', '', array(' '), false);
+        $mform->addGroup($buttonarray, 'grading_buttonar', '', ' ', false);
         if (!empty($buttonarray2)) {
-            $mform->addGroup($buttonarray2, 'grading_buttonar2', '', array(' '), false);
+            $mform->addGroup($buttonarray2, 'grading_buttonar2', '', ' ', false);
         }
         $mform->closeHeaderBefore('grading_buttonar');
     }
@@ -339,7 +339,7 @@ class mod_checkmark_grading_form extends moodleform {
      * @return mixed[] Editor-options
      */
     protected function get_editor_options($editor = 'feedback') {
-        $editoroptions = array();
+        $editoroptions = [];
         $editoroptions['context'] = context_module::instance($this->_customdata->cm->id);
         $editoroptions['component'] = 'mod_checkmark';
         $editoroptions['filearea'] = $editor;
@@ -399,7 +399,7 @@ class mod_checkmark_grading_form extends moodleform {
      * Overwrites parents get_data() method to perform some actions in addition.
      * TODO: do we need this still here?
      *
-     * @return array form data
+     * @return stdClass|null form data
      */
     public function get_data() {
         $data = parent::get_data();
@@ -437,9 +437,9 @@ class mod_checkmark_grading_form extends moodleform {
             $examplearray = [];
             $examplearray[] =& $mform->createElement('advcheckbox', $example->get_id(), '',
                     $example->get_name().' ('.$example->get_grade().' '.
-                    $example->get_pointsstring().')', array('class' => 'examplecheck $' . $example->get_grade()));
+                    $example->get_pointsstring().')', ['class' => 'examplecheck $' . $example->get_grade()]);
             $examplearray[] =& $mform->createElement('html', $example->render_forced_hint());
-            $mform->addGroup($examplearray, 'examplearr', '', array(' '), false);
+            $mform->addGroup($examplearray, 'examplearr', '', ' ', false);
 
             if ($example->is_checked()) { // Is it checked?
                 $mform->setDefault($example->get_id(), 1);

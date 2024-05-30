@@ -24,8 +24,6 @@
  */
 namespace mod_checkmark;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Special class holding all the export settings. Used to streamline event creation, etc.
  *

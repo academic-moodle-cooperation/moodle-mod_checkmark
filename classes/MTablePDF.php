@@ -174,7 +174,8 @@ class MTablePDF extends \pdf {
                 $title4, $desc4, $title5, $desc5, $title6, $desc6) = $header;
         // We know this makes no sense, but it's just to visualize how they will be used!
         $this->header = [$title1, $desc1, $title2, $desc2, $title3, $desc3,
-                $title4, $desc4, $title5, $desc5, $title6, $desc6];
+                $title4, $desc4, $title5, $desc5, $title6, $desc6,
+            ];
     }
 
     /**
@@ -742,7 +743,8 @@ class MTablePDF extends \pdf {
             array_unshift($this->columnwidths, ['mode' => 'Fixed', 'value' => '7']);
             array_unshift($this->columnformat,
                 [["fill" => 0, "align" => "C", "stretch" => self::STRETCH_DISABLED],
-                    ["fill" => 1, "align" => "C", "stretch" => self::STRETCH_DISABLED]]);
+                    ["fill" => 1, "align" => "C", "stretch" => self::STRETCH_DISABLED],
+                ]);
             array_unshift($this->titles, '');
             $i = 1;
             foreach ($this->data as &$row) {
@@ -832,7 +834,7 @@ class MTablePDF extends \pdf {
                 'bold' => 1,
                 'bottom' => 1,
                 'align' => 'center',
-                'v_align' => 'vcenter'
+                'v_align' => 'vcenter',
         ];
         $headlineformat = $workbook->add_format($headlineprop);
         $headlineformat->set_left(1);
@@ -855,7 +857,7 @@ class MTablePDF extends \pdf {
         $textprop = [
                 'size' => 10,
                 'align' => 'left',
-                'v_align' => 'vcenter'
+                'v_align' => 'vcenter',
         ];
         $text = $workbook->add_format($textprop);
         $text->set_num_format(1);
@@ -1042,7 +1044,7 @@ class MTablePDF extends \pdf {
      * @param string $startstring String $string's beginning schould be checked for
      * @return bool True if $string starts with $startString, False if not
      */
-    public static function starts_with ($string, $startstring) {
+    public static function starts_with($string, $startstring) {
         $len = strlen($startstring);
         return (substr($string, 0, $len) === $startstring);
     }

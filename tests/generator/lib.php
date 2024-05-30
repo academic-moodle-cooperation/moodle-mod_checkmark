@@ -24,8 +24,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * checkmark module data generator class
  *
@@ -49,7 +47,7 @@ class mod_checkmark_generator extends testing_module_generator {
 
         $timecreated = time();
 
-        $defaultsettings = array(
+        $defaultsettings = [
             'name' => 'Checkmark',
             'intro' => 'Introtext',
             'introformat' => 1,
@@ -76,7 +74,7 @@ class mod_checkmark_generator extends testing_module_generator {
             'presentationgrade' => 0,
             'presentationgradebook' => 0,
             'already_submit' => 0,
-        );
+        ];
 
         foreach ($defaultsettings as $name => $value) {
             if (!isset($record->{$name})) {
@@ -165,8 +163,8 @@ class mod_checkmark_generator extends testing_module_generator {
         // Trigger grade event!
         $checkmark->update_grade($feedback);
         // Trigger the event!
-        \mod_checkmark\event\grade_updated::manual($checkmark->cm, array('userid' => $feedback->userid,
-                'feedbackid' => $feedback->id))->trigger();
+        \mod_checkmark\event\grade_updated::manual($checkmark->cm, ['userid' => $feedback->userid,
+                'feedbackid' => $feedback->id, ])->trigger();
     }
 
     /**

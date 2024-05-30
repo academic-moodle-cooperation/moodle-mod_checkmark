@@ -56,12 +56,12 @@ class grade_updated extends \core\event\base {
     public static function manual(\stdClass $cm, array $data) {
         $data['type'] = 'manual';
         $data['instance'] = $cm->instance;
-        $event = self::create(array(
+        $event = self::create([
             'objectid'    => $data['feedbackid'],
             'context'     => \context_module::instance($cm->id),
             'relateduserid' => $data['userid'],
             'other'       => $data,
-        ));
+        ]);
         return $event;
     }
 
@@ -75,12 +75,12 @@ class grade_updated extends \core\event\base {
     public static function automatic(\stdClass $cm, array $data) {
         $data['type'] = 'automatic';
         $data['instance'] = $cm->instance;
-        $event = self::create(array(
+        $event = self::create([
             'objectid'    => $data['feedbackid'],
             'context'     => \context_module::instance($cm->id),
             'relateduserid' => $data['userid'],
             'other'       => $data,
-        ));
+        ]);
         return $event;
     }
 
@@ -117,8 +117,10 @@ class grade_updated extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/checkmark/submissions.php", array('id'  => $this->contextinstanceid,
-                                                                       'tab' => 'submissions'));
+        return new \moodle_url("/mod/checkmark/submissions.php", [
+            'id' => $this->contextinstanceid,
+            'tab' => 'submissions',
+        ]);
     }
 
     /**

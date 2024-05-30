@@ -27,16 +27,16 @@ require(__DIR__ . '/../../config.php');
 
 $id   = required_param('id', PARAM_INT);          // Course module ID!
 
-$PAGE->set_url('/mod/checkmark/grade.php', array('id' => $id));
+$PAGE->set_url('/mod/checkmark/grade.php', ['id' => $id]);
 if (! $cm = get_coursemodule_from_id('checkmark', $id)) {
     throw new moodle_exception('invalidcoursemodule');
 }
 
-if (! $checkmark = $DB->get_record('checkmark', array('id' => $cm->instance))) {
+if (! $checkmark = $DB->get_record('checkmark', ['id' => $cm->instance])) {
     throw new moodle_exception('invalidid', 'checkmark');
 }
 
-if (! $course = $DB->get_record('course', array('id' => $checkmark->course))) {
+if (! $course = $DB->get_record('course', ['id' => $checkmark->course])) {
     throw new moodle_exception('coursemisconf', 'checkmark');
 }
 

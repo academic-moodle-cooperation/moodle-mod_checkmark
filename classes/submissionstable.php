@@ -129,7 +129,7 @@ class submissionstable extends \table_sql {
     /** @var int */
     protected $currentgroup = null;
 
-    /** @var \stdClass */
+    /** @var stdClass */
     protected $gradinginfo = null;
 
     /** @var bool */
@@ -217,9 +217,7 @@ class submissionstable extends \table_sql {
         // Save status of table(s) persistent as user preference!
         $this->is_persistent(true);
 
-        if ($DB->record_exists('checkmark_overrides', [
-            'checkmarkid' => $this->checkmark->checkmark->id
-        ])) {
+        if ($DB->record_exists('checkmark_overrides', ['checkmarkid' => $this->checkmark->checkmark->id])) {
             $this->hasoverrides = true;
         }
     }
@@ -347,7 +345,7 @@ class submissionstable extends \table_sql {
                 [],
                 [],
                 [],
-                []
+                [],
             ];
         }
         if (! $this->rawdata) {
@@ -356,7 +354,7 @@ class submissionstable extends \table_sql {
                 [],
                 [],
                 [],
-                []
+                [],
             ];
         }
 
@@ -386,7 +384,7 @@ class submissionstable extends \table_sql {
             $this->headers,
             $returndata,
             $this->columnformat,
-            $this->cellwidth
+            $this->cellwidth,
         ];
     }
 
@@ -410,10 +408,10 @@ class submissionstable extends \table_sql {
             $tablecolumns[] = 'example' . $key;
             $this->cellwidth[] = [
                 'mode' => 'Fixed',
-                'value' => $width
+                'value' => $width,
             ];
             $this->columnformat['example' . $key] = [
-                'align' => 'C'
+                'align' => 'C',
             ];
             $helpicons[] = null;
         }
@@ -447,16 +445,16 @@ class submissionstable extends \table_sql {
         // Adapt table for submissions view (columns, etc.)!
         $tablecolumns = [
             'selection',
-            'fullname'
+            'fullname',
         ];
         $selectallbox = $table->checkbox_controller();
         $tableheaders = [
             $selectallbox,
-            get_string('fullnameuser')
+            get_string('fullnameuser'),
         ];
         $helpicons = [
             null,
-            null
+            null,
         ];
         $table->add_colgroup('sel', 1);
 
@@ -539,7 +537,8 @@ class submissionstable extends \table_sql {
         $table->define_columns($tablecolumns);
         $table->define_headers($tableheaders);
         $table->define_help_for_headers($helpicons);
-        $table->define_baseurl($CFG->wwwroot . '/mod/checkmark/submissions.php?id=' . $table->checkmark->cm->id . '&amp;currentgroup=' . $table->currentgroup);
+        $table->define_baseurl($CFG->wwwroot . '/mod/checkmark/submissions.php?id=' .
+            $table->checkmark->cm->id . '&amp;currentgroup=' . $table->currentgroup);
 
         $table->sortable(true, 'lastname'); // Sorted by lastname by default!
         $table->collapsible(true);
@@ -659,7 +658,8 @@ class submissionstable extends \table_sql {
         $table->set_sql($fields, $from, $where, $params, $groupby);
         $table->set_count_sql("SELECT COUNT(u.id) FROM " . $from . " WHERE " . $where, $params);
 
-        $table->gradinginfo = grade_get_grades($table->checkmark->course->id, 'mod', 'checkmark', $table->checkmark->checkmark->id, $users);
+        $table->gradinginfo = grade_get_grades($table->checkmark->course->id, 'mod', 'checkmark',
+            $table->checkmark->checkmark->id, $users);
         $table->strupdate = get_string('update');
         $table->strgrade = get_string('grade', 'grades');
         $table->grademenu = make_grades_menu($table->checkmark->checkmark->grade);
@@ -698,25 +698,25 @@ class submissionstable extends \table_sql {
             return [
                 false,
                 $userids[$pos],
-                false
+                false,
             ];
         } else if ($pos > 0 && $pos < count($userids) - 1) {
             return [
                 $userids[$pos - 1],
                 $userids[$pos],
-                $userids[$pos + 1]
+                $userids[$pos + 1],
             ];
         } else if ($pos == 0) {
             return [
                 false,
                 $userids[$pos],
-                $userids[$pos + 1]
+                $userids[$pos + 1],
             ];
         } else if ($pos == count($userids) - 1) {
             return [
                 $userids[$pos - 1],
                 $userids[$pos],
-                false
+                false,
             ];
         }
 
@@ -776,13 +776,13 @@ class submissionstable extends \table_sql {
 
         // Adapt table for export view (columns, etc.)!
         $tableheaders = [
-            ''
+            '',
         ];
         $tablecolumns = [
-            'selection'
+            'selection',
         ];
         $helpicons = [
-            null
+            null,
         ];
         $table->cellwidth = [];
         $table->columnformat = [];
@@ -790,10 +790,10 @@ class submissionstable extends \table_sql {
         if (! $seperatenamecolumns) {
             $table->cellwidth[] = [
                 'mode' => 'Fixed',
-                'value' => '25'
+                'value' => '25',
             ];
             $table->columnformat['fullname'] = [
-                'align' => 'L'
+                'align' => 'L',
             ];
             $tablecolumns[] = 'fullname';
             $tableheaders[] = get_string('name');
@@ -814,10 +814,10 @@ class submissionstable extends \table_sql {
                 $table->column_class($name, $name);
                 $table->cellwidth[] = [
                     'mode' => 'Fixed',
-                    'value' => '25'
+                    'value' => '25',
                 ];
                 $table->columnformat[$name] = [
-                    'align' => 'L'
+                    'align' => 'L',
                 ];
             }
             $namefieldcount = count($usednamefields);
@@ -831,10 +831,10 @@ class submissionstable extends \table_sql {
             $tablecolumns[] = $cur;
             $table->cellwidth[] = [
                 'mode' => 'Fixed',
-                'value' => '20'
+                'value' => '20',
             ];
             $table->columnformat[$cur] = [
-                'align' => 'L'
+                'align' => 'L',
             ];
             $helpicons[] = null;
         }
@@ -844,10 +844,10 @@ class submissionstable extends \table_sql {
             $tablecolumns[] = 'groups';
             $table->cellwidth[] = [
                 'mode' => 'Fixed',
-                'value' => '20'
+                'value' => '20',
             ];
             $table->columnformat['groups'] = [
-                'align' => 'L'
+                'align' => 'L',
             ];
             $helpicons[] = null;
             $table->add_colgroup('group', 1);
@@ -857,10 +857,10 @@ class submissionstable extends \table_sql {
         $tableheaders[] = get_string('lastmodified') . ' (' . get_string('submission', 'checkmark') . ')';
         $table->cellwidth[] = [
             'mode' => 'Fixed',
-            'value' => '30'
+            'value' => '30',
         ];
         $table->columnformat['timesubmitted'] = [
-            'align' => 'L'
+            'align' => 'L',
         ];
         $helpicons[] = null;
         $table->add_colgroup('timesubmitted', 1);
@@ -872,10 +872,10 @@ class submissionstable extends \table_sql {
             $tablecolumns[] = 'summary';
             $table->cellwidth[] = [
                 'mode' => 'Fixed',
-                'value' => '20'
+                'value' => '20',
             ];
             $table->columnformat['summary'] = [
-                'align' => 'L'
+                'align' => 'L',
             ];
             $helpicons[] = null;
             $table->add_colgroup('summary', 1);
@@ -886,10 +886,10 @@ class submissionstable extends \table_sql {
             $tablecolumns[] = 'grade';
             $table->cellwidth[] = [
                 'mode' => 'Fixed',
-                'value' => '15'
+                'value' => '15',
             ];
             $table->columnformat['grade'] = [
-                'align' => 'R'
+                'align' => 'R',
             ];
             $helpicons[] = null;
         }
@@ -898,10 +898,10 @@ class submissionstable extends \table_sql {
         $tablecolumns[] = 'feedback';
         $table->cellwidth[] = [
             'mode' => 'Fixed',
-            'value' => '50'
+            'value' => '50',
         ];
         $table->columnformat['feedback'] = [
-            'align' => 'L'
+            'align' => 'L',
         ];
         $helpicons[] = null;
 
@@ -910,10 +910,10 @@ class submissionstable extends \table_sql {
             $tablecolumns[] = 'outcome';
             $table->cellwidth[] = [
                 'mode' => 'Fixed',
-                'value' => '50'
+                'value' => '50',
             ];
             $table->columnformat['outcome'] = [
-                'align' => 'L'
+                'align' => 'L',
             ];
             $helpicons[] = null;
             $table->add_colgroup('feedback outcomes', 3);
@@ -927,10 +927,10 @@ class submissionstable extends \table_sql {
             $tablecolumns[] = 'attendance';
             $table->cellwidth[] = [
                 'mode' => 'Fixed',
-                'value' => '20'
+                'value' => '20',
             ];
             $table->columnformat['attendance'] = [
-                'align' => 'R'
+                'align' => 'R',
             ];
             $table->add_colgroup('attendance', 1);
         }
@@ -942,10 +942,10 @@ class submissionstable extends \table_sql {
                 $tablecolumns[] = 'presentationgrade';
                 $table->cellwidth[] = [
                     'mode' => 'Fixed',
-                    'value' => '20'
+                    'value' => '20',
                 ];
                 $table->columnformat['presentationgrade'] = [
-                    'align' => 'R'
+                    'align' => 'R',
                 ];
                 $span ++;
             }
@@ -954,10 +954,10 @@ class submissionstable extends \table_sql {
             $tablecolumns[] = 'presentationfeedback';
             $table->cellwidth[] = [
                 'mode' => 'Fixed',
-                'value' => '50'
+                'value' => '50',
             ];
             $table->columnformat['presentationfeedback'] = [
-                'align' => 'L'
+                'align' => 'L',
             ];
             $table->add_colgroup('presentationgrade', $span);
         }
@@ -966,10 +966,10 @@ class submissionstable extends \table_sql {
         $tablecolumns[] = 'signature';
         $table->cellwidth[] = [
             'mode' => 'Fixed',
-            'value' => '30'
+            'value' => '30',
         ];
         $table->columnformat['signature'] = [
-            'align' => 'L'
+            'align' => 'L',
         ];
         $helpicons[] = null;
         $table->add_colgroup('signature', 1);
@@ -977,7 +977,8 @@ class submissionstable extends \table_sql {
         $table->define_columns($tablecolumns);
         $table->define_headers($tableheaders);
         $table->define_help_for_headers($helpicons);
-        $table->define_baseurl($CFG->wwwroot . '/mod/checkmark/export.php?id=' . $table->checkmark->cm->id . '&amp;currentgroup=' . $table->currentgroup);
+        $table->define_baseurl($CFG->wwwroot . '/mod/checkmark/export.php?id=' .
+            $table->checkmark->cm->id . '&amp;currentgroup=' . $table->currentgroup);
 
         $table->sortable(true, 'lastname'); // Sorted by lastname by default!
         $table->collapsible(true);
@@ -1062,7 +1063,8 @@ class submissionstable extends \table_sql {
         $from = "{user} u " . "LEFT JOIN {checkmark_submissions} s ON u.id = s.userid AND s.checkmarkid = :checkmarkid
                  LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid2
                  LEFT JOIN {checkmark_checks} gchks ON gchks.submissionid = s.id
-                 LEFT JOIN {checkmark_checks} cchks ON cchks.submissionid = s.id AND cchks.state = 1 " . $groupssql . $useridentity->joins;
+                 LEFT JOIN {checkmark_checks} cchks ON cchks.submissionid = s.id AND cchks.state = 1 "
+                    . $groupssql . $useridentity->joins;
 
         $where = "u.id " . $sqluserids;
 
@@ -1095,7 +1097,8 @@ class submissionstable extends \table_sql {
         $table->set_sql($fields, $from, $where, $params, $groupby);
         $table->set_count_sql("SELECT COUNT(DISTINCT u.id) FROM " . $from . " WHERE " . $where, $params);
 
-        $table->gradinginfo = grade_get_grades($table->checkmark->course->id, 'mod', 'checkmark', $table->checkmark->checkmark->id, $users);
+        $table->gradinginfo = grade_get_grades($table->checkmark->course->id, 'mod', 'checkmark',
+            $table->checkmark->checkmark->id, $users);
 
         return $table;
     }
@@ -1109,7 +1112,7 @@ class submissionstable extends \table_sql {
      *            how many cols the group should span
      */
     protected function add_colgroup($class, $span = 1) {
-        $colgrp = new \stdClass();
+        $colgrp = new stdClass();
         $colgrp->span = $span;
         $colgrp->class = $class;
 
@@ -1123,10 +1126,10 @@ class submissionstable extends \table_sql {
         global $PAGE;
 
         if ($this->hasoverrides) {
-            $params = new \stdClass();
+            $params = new stdClass();
             $params->id = $this->attributes['id'];
             $PAGE->requires->js_call_amd('mod_checkmark/overrides', 'initializer', [
-                $params
+                $params,
             ]);
         }
         if ($this->quickgrade && ! $this->use_no_html()) {
@@ -1138,7 +1141,7 @@ class submissionstable extends \table_sql {
             foreach ($this->colgroups as $colgrp) {
                 echo \html_writer::start_tag('colgroup', [
                     'class' => $colgrp->class,
-                    'span' => $colgrp->span
+                    'span' => $colgrp->span,
                 ]);
                 for ($i = 0; $i < $colgrp->span; $i ++) {
                     echo \html_writer::empty_tag('col');
@@ -1256,7 +1259,7 @@ class submissionstable extends \table_sql {
 
         if (empty($users)) {
             return [
-                - 1
+                - 1,
             ];
         }
 
@@ -1300,20 +1303,20 @@ class submissionstable extends \table_sql {
 
         $baseurl = $PAGE->url;
 
-        $allurl = new \moodle_url($baseurl, [
-            'select' => self::SEL_ALL
+        $allurl = new moodle_url($baseurl, [
+            'select' => self::SEL_ALL,
         ]);
-        $noneurl = new \moodle_url($baseurl, [
-            'select' => self::SEL_NONE
+        $noneurl = new moodle_url($baseurl, [
+            'select' => self::SEL_NONE,
         ]);
-        $gradedurl = new \moodle_url($baseurl, [
-            'select' => self::SEL_GRADED
+        $gradedurl = new moodle_url($baseurl, [
+            'select' => self::SEL_GRADED,
         ]);
-        $reqgradingurl = new \moodle_url($baseurl, [
-            'select' => self::SEL_REQ_GRADING
+        $reqgradingurl = new moodle_url($baseurl, [
+            'select' => self::SEL_REQ_GRADING,
         ]);
-        $submittedurl = new \moodle_url($baseurl, [
-            'select' => self::SEL_SUBMITTED
+        $submittedurl = new moodle_url($baseurl, [
+            'select' => self::SEL_SUBMITTED,
         ]);
 
         $randomid = \html_writer::random_id('checkboxcontroller');
@@ -1323,16 +1326,16 @@ class submissionstable extends \table_sql {
             $title = '';
         }
 
-        $params = new \stdClass();
+        $params = new stdClass();
         $params->table = '.usersubmissions table.submissions';
         $params->id = $randomid;
         $PAGE->requires->js_call_amd('mod_checkmark/checkboxcontroller', 'initializer', [
-            $params
+            $params,
         ]);
 
         // return \html_writer::checkbox('selected[]', 1, false, null, ['id' => "chmrk_selectallcb"]);
         return \html_writer::tag('div', \html_writer::checkbox('selected[]', 1, false, null, ['id' => "chmrk_selectallcb"]), [
-            'id' => $randomid
+            'id' => $randomid,
         ]);
         // return \html_writer::tag('div', $title . \html_writer::link($allurl, get_string('all'), [
         // 'class' => 'all'
@@ -1374,7 +1377,7 @@ class submissionstable extends \table_sql {
             $selectstate = $this->defaultselectstate;
 
             $attr = [
-                'class' => 'checkboxgroup1'
+                'class' => 'checkboxgroup1',
             ];
             if ($select == self::SEL_ALL) {
                 $selectstate = true;
@@ -1471,14 +1474,14 @@ class submissionstable extends \table_sql {
                 return $values->groupname;
             } else {
                 return \html_writer::tag('div', $values->groupname, [
-                    'id' => 'gr' . $values->id
+                    'id' => 'gr' . $values->id,
                 ]);
             }
         } else if ($this->use_no_html() || $this->format == self::FORMAT_COLORS) {
             return '';
         } else {
             return \html_writer::tag('div', '-', [
-                'id' => 'gr' . $values->id
+                'id' => 'gr' . $values->id,
             ]);
         }
     }
@@ -1504,7 +1507,7 @@ class submissionstable extends \table_sql {
             if ($finalgrade->locked || $finalgrade->overridden) {
                 $gradeattr = [
                     'id' => 'g' . $values->id,
-                    'class' => $lockedoroverridden
+                    'class' => $lockedoroverridden,
                 ];
                 if ($this->use_no_html()) {
                     return $finalgrade->formatted_grade;
@@ -1515,26 +1518,26 @@ class submissionstable extends \table_sql {
                 $attributes = [];
                 $attributes['tabindex'] = $this->tabindex ++;
                 $menu = \html_writer::select($this->grademenu, 'menu[' . $values->id . ']', (int) $values->grade, [
-                    - 1 => get_string('nograde')
+                    - 1 => get_string('nograde'),
                 ], $attributes);
                 $oldgradeattr = [
                     'type' => 'hidden',
                     'name' => 'oldgrade[' . $values->id . ']',
-                    'value' => $values->grade
+                    'value' => $values->grade,
                 ];
                 $oldgrade = \html_writer::empty_tag('input', $oldgradeattr);
                 return \html_writer::tag('div', $menu . $oldgrade, [
-                    'id' => 'g' . $values->id
+                    'id' => 'g' . $values->id,
                 ]);
             } else {
                 if ($this->use_no_html()) {
                     return $this->checkmark->display_grade($values->grade);
                 } else {
-                    // hier muss ein secondary button rein
+                    // Hier muss ein secondary button rein.
                     $button = $this->get_grade_button($values, false);
                     return $button .= \html_writer::tag('div', $this->checkmark->display_grade($values->grade), [
                         'id' => 'g' . $values->id,
-                        'class' => 'mt-2'
+                        'class' => 'mt-2',
                     ]);
                 }
             }
@@ -1544,7 +1547,7 @@ class submissionstable extends \table_sql {
                     return $finalgrade->formatted_grade;
                 } else {
                     return \html_writer::tag('div', $finalgrade->formatted_grade, [
-                        'id' => 'g' . $values->id
+                        'id' => 'g' . $values->id,
                     ]);
                 }
             } else if ($this->quickgrade && ! $this->use_no_html()) {
@@ -1552,23 +1555,23 @@ class submissionstable extends \table_sql {
                 $attributes = [];
                 $attributes['tabindex'] = $this->tabindex ++;
                 $menu = \html_writer::select($this->grademenu, 'menu[' . $values->id . ']', $values->grade, [
-                    - 1 => get_string('nograde')
+                    - 1 => get_string('nograde'),
                 ], $attributes);
                 $oldgradearr = [
                     'type' => 'hidden',
                     'name' => 'oldgrade' . $values->id,
-                    'value' => $values->grade
+                    'value' => $values->grade,
                 ];
                 $oldgrade = \html_writer::empty_tag('input', $oldgradearr);
                 return \html_writer::tag('div', $menu . $oldgrade, [
-                    'id' => 'g' . $values->id
+                    'id' => 'g' . $values->id,
                 ]);
             } else {
                 if ($this->use_no_html()) {
                     return '-';
                 } else {
                     return $this->get_grade_button($values, true) . \html_writer::tag('div', '-', [
-                        'id' => 'g' . $values->id
+                        'id' => 'g' . $values->id,
                     ]);
                     // return $this->get_grade_button($values, true);
                 }
@@ -1594,7 +1597,7 @@ class submissionstable extends \table_sql {
                     return $finalgrade->str_feedback;
                 } else {
                     return \html_writer::tag('div', $finalgrade->str_feedback, [
-                        'id' => 'com' . $values->id
+                        'id' => 'com' . $values->id,
                     ]);
                 }
             } else if ($this->quickgrade && ! $this->use_no_html()) {
@@ -1602,7 +1605,7 @@ class submissionstable extends \table_sql {
                 $inputarr = [
                     'type' => 'hidden',
                     'name' => 'oldfeedback[' . $values->id . ']',
-                    'value' => $feedbackclean
+                    'value' => $feedbackclean,
                 ];
                 $oldfeedback = \html_writer::empty_tag('input', $inputarr);
                 $content = \html_writer::tag('textarea', $feedbackclean, [
@@ -1610,14 +1613,14 @@ class submissionstable extends \table_sql {
                     'name' => 'feedback[' . $values->id . ']',
                     'id' => 'feedback' . $values->id,
                     'rows' => 2,
-                    'cols' => 20
+                    'cols' => 20,
                 ]);
                 return \html_writer::tag('div', $content . $oldfeedback, [
-                    'id' => 'com' . $values->id
+                    'id' => 'com' . $values->id,
                 ]);
             } else {
                 if ($this->use_no_html()) {
-                    // replace NULL string with empty string to avoid problems with MTablePDF
+                    // Replace NULL string with empty string to avoid problems with MTablePDF.
                     if (is_null($values->feedback)) {
                         return '';
                     } else {
@@ -1625,7 +1628,7 @@ class submissionstable extends \table_sql {
                     }
                 } else {
                     return \html_writer::tag('div', $values->feedback, [
-                        'id' => 'com' . $values->id
+                        'id' => 'com' . $values->id,
                     ]);
                 }
             }
@@ -1635,7 +1638,7 @@ class submissionstable extends \table_sql {
                     return $finalgrade->str_feedback;
                 } else {
                     return \html_writer::tag('div', $finalgrade->str_feedback, [
-                        'id' => 'com' . $values->id
+                        'id' => 'com' . $values->id,
                     ]);
                 }
             } else if ($this->quickgrade && ! $this->use_no_html()) {
@@ -1646,7 +1649,7 @@ class submissionstable extends \table_sql {
                 $inputarr = [
                     'type' => 'hidden',
                     'name' => 'oldfeedback' . $values->id,
-                    'value' => $feedbackvalue
+                    'value' => $feedbackvalue,
                 ];
                 $oldfeedback = \html_writer::empty_tag('input', $inputarr);
 
@@ -1655,17 +1658,17 @@ class submissionstable extends \table_sql {
                     'name' => 'feedback[' . $values->id . ']',
                     'id' => 'feedback' . $values->id,
                     'rows' => '2',
-                    'cols' => '20'
+                    'cols' => '20',
                 ]);
                 return \html_writer::tag('div', $content . $oldfeedback, [
-                    'id' => 'com' . $values->id
+                    'id' => 'com' . $values->id,
                 ]);
             } else {
                 if ($this->use_no_html()) {
                     return '';
                 } else {
                     return \html_writer::tag('div', '&nbsp;', [
-                        'id' => 'com' . $values->id
+                        'id' => 'com' . $values->id,
                     ]);
                 }
             }
@@ -1704,7 +1707,7 @@ class submissionstable extends \table_sql {
                 return strip_tags($content);
             } else {
                 return \html_writer::tag('div', $content, [
-                    'id' => 'ts' . $values->id
+                    'id' => 'ts' . $values->id,
                 ]);
             }
         } else {
@@ -1712,7 +1715,7 @@ class submissionstable extends \table_sql {
                 return '-';
             } else {
                 return \html_writer::tag('div', '-', [
-                    'id' => 'ts' . $values->id
+                    'id' => 'ts' . $values->id,
                 ]);
             }
         }
@@ -1740,7 +1743,7 @@ class submissionstable extends \table_sql {
                 return $date;
             } else {
                 return \html_writer::tag('div', $date, [
-                    'id' => 'tt' . $values->id
+                    'id' => 'tt' . $values->id,
                 ]);
             }
         } else if ($values->feedbackid && $values->timemarked > 0) {
@@ -1749,13 +1752,13 @@ class submissionstable extends \table_sql {
                 return $date;
             } else {
                 return \html_writer::tag('div', $date, [
-                    'id' => 'tt' . $values->id
+                    'id' => 'tt' . $values->id,
                 ]);
             }
         } else {
             if ($this->use_no_html()) {
                 return \html_writer::tag('div', '-', [
-                    'id' => 'tt' . $values->id
+                    'id' => 'tt' . $values->id,
                 ]);
             } else {
                 return '-';
@@ -1798,35 +1801,35 @@ class submissionstable extends \table_sql {
             $context = new stdClass();
             $overrideediturl = new moodle_url('/mod/checkmark/extend.php');
             $returnurl = new moodle_url('/mod/checkmark/submissions.php');
-            $returnurl = $returnurl->out(true, array(
-                'id' => $this->checkmark->cm->id
-            ));
+            $returnurl = $returnurl->out(true, [
+                'id' => $this->checkmark->cm->id,
+            ]);
             if (! empty($overrides->userid)) {
                 $context->isgroupoverride = false;
-                $context->editurlstr = $overrideediturl->out(true, array(
+                $context->editurlstr = $overrideediturl->out(true, [
                     'id' => $this->checkmark->cm->id,
                     'type' => \mod_checkmark\overrideform::USER,
                     'mode' => \mod_checkmark\overrideform::EDIT,
                     'users' => $overrides->userid,
-                    'return' => $returnurl
-                ));
+                    'return' => $returnurl,
+                ]);
             } else if (! empty($overrides->groupid)) {
                 $context->isgroupoverride = true;
                 $context->groupname = groups_get_group_name($overrides->groupid);
-                $context->addurlstr = $overrideediturl->out(true, array(
+                $context->addurlstr = $overrideediturl->out(true, [
                     'id' => $this->checkmark->cm->id,
                     'type' => \mod_checkmark\overrideform::USER,
                     'mode' => \mod_checkmark\overrideform::ADD,
                     'users' => $values->id,
-                    'return' => $returnurl
-                ));
-                $context->editurlstr = $overrideediturl->out(true, array(
+                    'return' => $returnurl,
+                ]);
+                $context->editurlstr = $overrideediturl->out(true, [
                     'id' => $this->checkmark->cm->id,
                     'type' => \mod_checkmark\overrideform::GROUP,
                     'mode' => \mod_checkmark\overrideform::EDIT,
                     'users' => $overrides->groupid,
-                    'return' => $returnurl
-                ));
+                    'return' => $returnurl,
+                ]);
             }
 
             if ($overrides->timeavailable === null) {
@@ -1886,7 +1889,7 @@ class submissionstable extends \table_sql {
             return $finalgrade->str_grade;
         } else {
             return \html_writer::tag('span', $finalgrade->str_grade, [
-                'id' => 'finalgrade_' . $values->id
+                'id' => 'finalgrade_' . $values->id,
             ]);
         }
     }
@@ -1909,20 +1912,21 @@ class submissionstable extends \table_sql {
                 $outcomes .= $outcome->name . ': ' . $options[$index] . "\n";
             } else {
                 $outcomes .= \html_writer::start_tag('div', [
-                    'class' => 'outcome'
+                    'class' => 'outcome',
                 ]);
                 $outcomes .= \html_writer::tag('label', $outcome->name);
-                if ($outcome->grades[$values->id]->locked or ! $this->quickgrade) {
+                if ($outcome->grades[$values->id]->locked || ! $this->quickgrade) {
                     $options[0] = get_string('nooutcome', 'grades');
                     $outcomes .= ': ' . \html_writer::tag('span', $options[$index], [
-                        'id' => 'outcome_' . $n . '_' . $values->id
+                        'id' => 'outcome_' . $n . '_' . $values->id,
                     ]);
                 } else {
                     $attributes = [];
                     $attributes['id'] = 'outcome_' . $n . '_' . $values->id;
                     $usr = $values->id;
-                    $outcomes .= ' ' . \html_writer::select($options, 'outcome_' . $n . '[' . $usr . ']', $outcome->grades[$usr]->grade, [
-                        get_string('nooutcome', 'grades')
+                    $outcomes .= ' ' . \html_writer::select($options, 'outcome_' . $n . '[' . $usr . ']',
+                        $outcome->grades[$usr]->grade, [
+                        get_string('nooutcome', 'grades'),
                     ], $attributes);
                 }
                 $outcomes .= \html_writer::end_tag('div');
@@ -1954,7 +1958,7 @@ class submissionstable extends \table_sql {
             return $summary;
         } else {
             return \html_writer::tag('div', $summary, [
-                'id' => 'sum' . $values->id
+                'id' => 'sum' . $values->id,
             ]);
         }
     }
@@ -1973,7 +1977,7 @@ class submissionstable extends \table_sql {
         if (! empty($this->checkmark->checkmark->attendancegradebook)) {
             $finalgrade = $this->gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM]->grades[$values->id];
         } else {
-            $finalgrade = new \stdClass();
+            $finalgrade = new stdClass();
             $finalgrade->locked = 0;
             $finalgrade->overridden = 0;
         }
@@ -1984,7 +1988,7 @@ class submissionstable extends \table_sql {
             } else {
                 $symbol = checkmark_get_attendance_symbol($finalgrade->grade);
                 return \html_writer::tag('div', $symbol, [
-                    'id' => 'com' . $values->id
+                    'id' => 'com' . $values->id,
                 ]);
             }
         } else if (has_capability('mod/checkmark:trackattendance', $this->context) && $this->quickgrade && ! $this->use_no_html()) {
@@ -1994,17 +1998,17 @@ class submissionstable extends \table_sql {
             $inputarr = [
                 'type' => 'hidden',
                 'name' => 'oldattendance[' . $values->id . ']',
-                'value' => $values->attendance
+                'value' => $values->attendance,
             ];
             $oldattendance = \html_writer::empty_tag('input', $inputarr);
             $attr = [
                 'tabindex' => $this->tabindex ++,
-                'id' => 'attendance' . $values->id
+                'id' => 'attendance' . $values->id,
             ];
             $options = [
                 - 1 => '? ' . strtolower(get_string('unknown', 'checkmark')),
                 1 => '✓ ' . strtolower(get_string('attendant', 'checkmark')),
-                0 => '✗ ' . strtolower(get_string('absent', 'checkmark'))
+                0 => '✗ ' . strtolower(get_string('absent', 'checkmark')),
             ];
             if ($values->attendance === null) {
                 $content = \html_writer::select($options, 'attendance[' . $values->id . ']', - 1, false, $attr);
@@ -2013,7 +2017,7 @@ class submissionstable extends \table_sql {
             }
 
             return \html_writer::tag('div', $content . $oldattendance, [
-                'id' => 'att' . $values->id
+                'id' => 'att' . $values->id,
             ]);
         } else {
             if ($this->use_no_html()) {
@@ -2024,7 +2028,7 @@ class submissionstable extends \table_sql {
             } else {
                 $symbol = checkmark_get_attendance_symbol($values->attendance);
                 return \html_writer::tag('div', $symbol, [
-                    'id' => 'com' . $values->id
+                    'id' => 'com' . $values->id,
                 ]);
             }
         }
@@ -2061,7 +2065,7 @@ class submissionstable extends \table_sql {
         if ($presgradebook && ($finalgrade->locked || $finalgrade->overridden)) {
             $gradeattr = [
                 'id' => 'pg' . $values->id,
-                'class' => $lockedoroverridden
+                'class' => $lockedoroverridden,
             ];
             if ($this->use_no_html()) {
                 return $finalgrade->formatted_grade;
@@ -2074,17 +2078,18 @@ class submissionstable extends \table_sql {
             }
             $attributes = [];
             $attributes['tabindex'] = $this->tabindex ++;
-            $menu = \html_writer::select($this->presentationgrademenu, 'presentationgrade[' . $values->id . ']', (int) $values->presentationgrade, [
-                - 1 => get_string('nograde')
+            $menu = \html_writer::select($this->presentationgrademenu, 'presentationgrade[' . $values->id . ']',
+                (int) $values->presentationgrade, [
+                - 1 => get_string('nograde'),
             ], $attributes);
             $oldgradeattr = [
                 'type' => 'hidden',
                 'name' => 'oldpresentationgrade[' . $values->id . ']',
-                'value' => (int) $values->presentationgrade
+                'value' => (int) $values->presentationgrade,
             ];
             $oldgrade = \html_writer::empty_tag('input', $oldgradeattr);
             return \html_writer::tag('div', $menu . $oldgrade, [
-                'id' => 'pg' . $values->id
+                'id' => 'pg' . $values->id,
             ]);
         } else {
             if ($this->use_no_html()) {
@@ -2095,12 +2100,13 @@ class submissionstable extends \table_sql {
                 }
             } else {
                 if ($values->feedbackid) {
-                    return \html_writer::tag('div', $this->checkmark->display_grade($values->presentationgrade, CHECKMARK_PRESENTATION_ITEM), [
-                        'id' => 'pg' . $values->id
+                    return \html_writer::tag('div', $this->checkmark->display_grade($values->presentationgrade,
+                        CHECKMARK_PRESENTATION_ITEM), [
+                        'id' => 'pg' . $values->id,
                     ]);
                 } else {
                     return \html_writer::tag('div', '-', [
-                        'id' => 'pg' . $values->id
+                        'id' => 'pg' . $values->id,
                     ]);
                 }
             }
@@ -2132,7 +2138,7 @@ class submissionstable extends \table_sql {
                 return $finalgrade->str_feedback;
             } else {
                 return \html_writer::tag('div', $finalgrade->str_feedback, [
-                    'id' => 'pcom' . $values->id
+                    'id' => 'pcom' . $values->id,
                 ]);
             }
         } else if ($this->quickgrade && ! $this->use_no_html()) {
@@ -2143,7 +2149,7 @@ class submissionstable extends \table_sql {
             $inputarr = [
                 'type' => 'hidden',
                 'name' => 'oldpresentationfeedback[' . $values->id . ']',
-                'value' => trim(str_replace('<br />', '<br />\n', $feedbackclean))
+                'value' => trim(str_replace('<br />', '<br />\n', $feedbackclean)),
             ];
             $oldfeedback = \html_writer::empty_tag('input', $inputarr);
             $attr = [
@@ -2151,11 +2157,11 @@ class submissionstable extends \table_sql {
                 'name' => 'presentationfeedback[' . $values->id . ']',
                 'id' => 'presentationfeedback' . $values->id,
                 'rows' => 2,
-                'cols' => 20
+                'cols' => 20,
             ];
             $content = \html_writer::tag('textarea', strip_tags(trim(str_replace('<br />', '<br />\n', $feedbackclean))), $attr);
             return \html_writer::tag('div', $content . $oldfeedback, [
-                'id' => 'pcom' . $values->id
+                'id' => 'pcom' . $values->id,
             ]);
         } else {
             if ($values->feedbackid) {
@@ -2163,7 +2169,7 @@ class submissionstable extends \table_sql {
                     return ($values->presentationfeedback === null) ? '' : $values->presentationfeedback;
                 } else {
                     return \html_writer::tag('div', $values->presentationfeedback, [
-                        'id' => 'pcom' . $values->id
+                        'id' => 'pcom' . $values->id,
                     ]);
                 }
             } else {
@@ -2171,7 +2177,7 @@ class submissionstable extends \table_sql {
                     return '';
                 } else {
                     return \html_writer::tag('div', '&nbsp;', [
-                        'id' => 'com' . $values->id
+                        'id' => 'com' . $values->id,
                     ]);
                 }
             }
@@ -2218,7 +2224,7 @@ class submissionstable extends \table_sql {
             } else if ($this->quickgrade && ! $this->use_no_html()) {
                 $attributes = [
                     'class' => 'examplecheck checkline' . $values->id . ' $' . $example->grade,
-                    'id' => 'ex' . $values->id . '_' . $match[1]
+                    'id' => 'ex' . $values->id . '_' . $match[1],
                 ];
                 if ($example->is_forced()) {
                     $attributes['title'] = get_string('forced', 'checkmark');
@@ -2226,28 +2232,29 @@ class submissionstable extends \table_sql {
                 $cbhidden = \html_writer::tag('input', '', [
                     'type' => 'hidden',
                     'name' => 'ex[' . $values->id . '_' . $match[1] . ']',
-                    'value' => '0'
+                    'value' => '0',
                 ]);
-                $cb = $cbhidden . \html_writer::checkbox('ex[' . $values->id . '_' . $match[1] . ']', $values->id, $example->is_checked(), null, $attributes);
+                $cb = $cbhidden . \html_writer::checkbox('ex[' . $values->id . '_' . $match[1] . ']', $values->id,
+                    $example->is_checked(), null, $attributes);
                 $oldcb = \html_writer::tag('input', '', [
                     'type' => 'hidden',
                     'name' => 'oldex[' . $values->id . '_' . $match[1] . ']',
-                    'value' => $example->is_checked()
+                    'value' => $example->is_checked(),
                 ]);
                 if ($example->is_forced()) {
                     return $oldcb . $cb . \html_writer::tag('div', '', [
                         'id' => 'ex' . $values->id . '_' . $match[1],
-                        'class' => 'excontainer exborder'
+                        'class' => 'excontainer exborder',
                     ]);
                 } else {
                     return $oldcb . $cb . \html_writer::tag('div', '', [
                         'id' => 'ex' . $values->id . '_' . $match[1],
-                        'class' => 'excontainer'
+                        'class' => 'excontainer',
                     ]);
                 }
             } else {
                 return \html_writer::tag('div', $example->print_examplestate(), [
-                    'id' => 'ex' . $values->id . '_' . $match[1]
+                    'id' => 'ex' . $values->id . '_' . $match[1],
                 ]);
             }
         }
@@ -2263,7 +2270,7 @@ class submissionstable extends \table_sql {
                     return $values->$colname;
                 } else {
                     return \html_writer::tag('div', $values->$colname, [
-                        'id' => 'u' . $colname . $values->id
+                        'id' => 'u' . $colname . $values->id,
                     ]);
                 }
             } else {
@@ -2271,7 +2278,7 @@ class submissionstable extends \table_sql {
                     return '-';
                 } else {
                     return \html_writer::tag('div', '-', [
-                        'id' => 'u' . $colname . $values->id
+                        'id' => 'u' . $colname . $values->id,
                     ]);
                 }
             }
@@ -2290,11 +2297,11 @@ class submissionstable extends \table_sql {
         if (empty($html)) {
             return null;
         }
-        $text = str_replace(array(
+        $text = str_replace([
             '<br />',
             '<br>',
-            '</p>'
-        ), "\n", $html);
+            '</p>',
+        ], "\n", $html);
         return strip_tags(trim($text));
     }
 
@@ -2318,10 +2325,10 @@ class submissionstable extends \table_sql {
         if (empty($text)) {
             return null;
         }
-        return str_replace(array(
+        return str_replace([
             "\r\n",
-            "\n"
-        ), '<br>', $text);
+            "\n",
+        ], '<br>', $text);
     }
 
     /**
@@ -2380,13 +2387,14 @@ class submissionstable extends \table_sql {
             return $text;
         } else {
             // No more buttons, we use popups!
-            $popupurl = $CFG->wwwroot . '/mod/checkmark/submissions.php?id=' . $this->checkmark->cm->id . '&userid=' . $values->id . '&mode=single' . '&filter=' . $this->filter;
+            $popupurl = $CFG->wwwroot . '/mod/checkmark/submissions.php?id=' . $this->checkmark->cm->id . '&userid=' .
+                $values->id . '&mode=single' . '&filter=' . $this->filter;
 
             // $button = $OUTPUT->action_link($popupurl, $text);
             $button = \html_writer::tag('a', $btnstring, [
                 'class' => 'btn btn-' . $btntype . ' mr-1 ml-0 float-left',
                 'href' => $popupurl,
-                'id' => 'submissions'
+                'id' => 'submissions',
             ]);
 
             // If overridden dates are present for this user, we display an icon with popup!

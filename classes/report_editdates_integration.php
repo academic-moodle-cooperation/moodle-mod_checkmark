@@ -58,7 +58,7 @@ extends report_editdates_mod_date_extractor {
     public function get_settings(cm_info $cm) {
         $checkmark = $this->mods[$cm->instance];
 
-        return array(
+        return [
                 'timeavailable' => new report_editdates_date_setting(
                         get_string('availabledate', 'checkmark'),
                         $checkmark->timeavailable,
@@ -75,7 +75,7 @@ extends report_editdates_mod_date_extractor {
                         get_string('gradingdue', 'checkmark'),
                         $checkmark->gradingdue,
                         self::DATETIME, true, 5),
-                );
+                ];
     }
 
     /**
@@ -86,7 +86,7 @@ extends report_editdates_mod_date_extractor {
      * @throws coding_exception
      */
     public function validate_dates(cm_info $cm, array $dates) {
-        $errors = array();
+        $errors = [];
         if ($dates['timeavailable'] && $dates['timedue']
                 && $dates['timedue'] < $dates['timeavailable']) {
             $errors['timedue'] = get_string('duedatevalidation', 'checkmark');

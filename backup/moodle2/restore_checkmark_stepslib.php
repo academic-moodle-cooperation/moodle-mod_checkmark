@@ -42,7 +42,7 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
      */
     protected function define_structure() {
 
-        $paths = array();
+        $paths = [];
         $userinfo = $this->get_setting_value('userinfo');
 
         $checkmark = new restore_path_element('checkmark', '/activity/checkmark');
@@ -131,8 +131,8 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
             && isset($data->examplestart) && !empty($data->examplecount) && ($data->examplecount > 0)) {
             // Prepare processing of old standard-naming backup!
             $addexamples = true;
-            $examplenames = array();
-            $examplegrades = array();
+            $examplenames = [];
+            $examplegrades = [];
             $points = $data->grade / $data->examplecount;
             for ($i = $data->examplestart; $i < $data->examplestart + $data->examplecount; $i++) {
                 $examplenames[] = $i;
@@ -153,9 +153,11 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
         // Insert examples if it was an old backup!
         if (!empty($addexamples)) {
             foreach ($examplenames as $key => $examplename) {
-                $DB->insert_record('checkmark_examples', array('checkmarkid' => $newitemid,
-                                                               'name'        => $examplename,
-                                                               'grade'       => $examplegrades[$key]));
+                $DB->insert_record('checkmark_examples', [
+                    'checkmarkid' => $newitemid,
+                    'name' => $examplename,
+                    'grade' => $examplegrades[$key],
+                ]);
             }
         }
     }
@@ -250,8 +252,8 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
 
         // Convert old db structure to new one if needed!
         if ($examples !== false) {
-            $examplecount = $DB->count_records('checkmark_examples', array('checkmarkid' => $data->checkmarkid));
-            $ids = $DB->get_fieldset_select('checkmark_examples', 'id', 'checkmarkid = ?', array($data->checkmarkid));
+            $examplecount = $DB->count_records('checkmark_examples', ['checkmarkid' => $data->checkmarkid]);
+            $ids = $DB->get_fieldset_select('checkmark_examples', 'id', 'checkmarkid = ?', [$data->checkmarkid]);
             for ($k = 1; $k <= $examplecount; $k++) {
                 $data = new stdClass();
                 $data->exampleid = $ids[$k - 1];

@@ -30,8 +30,8 @@ require_login();
 
 require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 
-$id   = optional_param('id', 0, PARAM_INT);          // Course module ID
-$c    = optional_param('c', 0, PARAM_INT);           // checkmark ID
+$id   = optional_param('id', 0, PARAM_INT);          // Course module ID.
+$c    = optional_param('c', 0, PARAM_INT);           // Checkmark ID.
 $mode = optional_param('mode', 'all', PARAM_ALPHANUM);  // What mode are we in?
 
 // Sets url with params and performs require_login!

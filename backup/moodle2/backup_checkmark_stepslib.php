@@ -42,35 +42,39 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         // Are we including userinfo?
         $userinfo = $this->get_setting_value('userinfo');
         // Define each element separated!
-        $checkmark = new backup_nested_element('checkmark', array('id'), array(
+        $checkmark = new backup_nested_element('checkmark', ['id'], [
             'name', 'intro', 'introformat', 'alwaysshowdescription', 'resubmit', 'timeavailable', 'timedue', 'cutoffdate',
             'gradingdue', 'emailteachers', 'exampleprefix', 'grade', 'trackattendance', 'attendancegradelink',
             'attendancegradebook', 'presentationgrading', 'presentationgrade', 'presentationgradebook', 'timemodified',
-                'flexiblenaming', 'completionsubmit'));
+            'flexiblenaming', 'completionsubmit',
+        ]);
 
         $overrides = new backup_nested_element('overrides');
 
         $override = new backup_nested_element('override', ['id'], ['checkmarkid', 'groupid', 'userid', 'timeavailable', 'timedue',
-            'cutoffdate', 'timecreated', 'modifierid', 'grouppriority']);
+            'cutoffdate', 'timecreated', 'modifierid', 'grouppriority',
+        ]);
 
         $submissions = new backup_nested_element('submissions');
 
-        $submission = new backup_nested_element('submission', array('id'), array(
-            'userid', 'timecreated', 'timemodified'));
+        $submission = new backup_nested_element('submission', ['id'], [
+            'userid', 'timecreated', 'timemodified',
+        ]);
 
         $feedbacks = new backup_nested_element('feedbacks');
 
-        $feedback = new backup_nested_element('feedback', array('id'), array(
+        $feedback = new backup_nested_element('feedback', ['id'], [
             'userid', 'grade', 'feedback', 'format', 'attendance', 'presentationgrade', 'presentationfeedback',
-            'presentationformat', 'graderid', 'mailed', 'timecreated', 'timemodified'));
+            'presentationformat', 'graderid', 'mailed', 'timecreated', 'timemodified',
+        ]);
 
         $examples = new backup_nested_element('examples');
 
-        $example = new backup_nested_element('example', array('id'), array('checkmarkid', 'name', 'grade'));
+        $example = new backup_nested_element('example', ['id'], ['checkmarkid', 'name', 'grade']);
 
         $checks = new backup_nested_element('checks');
 
-        $check = new backup_nested_element('check', array('id'), array('checkmarkid', 'submissionid', 'exampleid', 'state'));
+        $check = new backup_nested_element('check', ['id'], ['checkmarkid', 'submissionid', 'exampleid', 'state']);
 
         // Now build the tree!
         $checkmark->add_child($examples);
@@ -86,20 +90,20 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
         $checks->add_child($check);
 
         // Define sources!
-        $checkmark->set_source_table('checkmark', array('id' => backup::VAR_ACTIVITYID));
+        $checkmark->set_source_table('checkmark', ['id' => backup::VAR_ACTIVITYID]);
 
         $example->set_source_table('checkmark_examples',
-                                    array('checkmarkid' => backup::VAR_PARENTID));
+                                    ['checkmarkid' => backup::VAR_PARENTID]);
 
         // All the rest of elements only happen if we are including user info!
         if ($userinfo) {
             $override->set_source_table('checkmark_overrides', ['checkmarkid' => backup::VAR_PARENTID]);
             $submission->set_source_table('checkmark_submissions',
-                                          array('checkmarkid' => backup::VAR_PARENTID));
+                                          ['checkmarkid' => backup::VAR_PARENTID]);
             $feedback->set_source_table('checkmark_feedbacks',
-                                          array('checkmarkid' => backup::VAR_PARENTID));
+                                          ['checkmarkid' => backup::VAR_PARENTID]);
             $check->set_source_table('checkmark_checks',
-                                      array('submissionid' => backup::VAR_PARENTID));
+                                      ['submissionid' => backup::VAR_PARENTID]);
         }
 
         // Define id annotations!

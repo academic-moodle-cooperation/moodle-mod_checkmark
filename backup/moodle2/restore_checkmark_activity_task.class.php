@@ -59,9 +59,9 @@ class restore_checkmark_activity_task extends restore_activity_task {
      * processed by the link decoder
      */
     public static function define_decode_contents() {
-        $contents = array();
+        $contents = [];
 
-        $contents[] = new restore_decode_content('checkmark', array('intro'), 'checkmark');
+        $contents[] = new restore_decode_content('checkmark', ['intro'], 'checkmark');
 
         return $contents;
     }
@@ -71,7 +71,7 @@ class restore_checkmark_activity_task extends restore_activity_task {
      * to the activity to be executed by the link decoder
      */
     public static function define_decode_rules() {
-        $rules = array();
+        $rules = [];
 
         $rules[] = new restore_decode_rule('CHECKMARKVIEWBYID', '/mod/checkmark/view.php?id=$1',
                                            'course_module');
@@ -89,7 +89,7 @@ class restore_checkmark_activity_task extends restore_activity_task {
      * of {restore_log_rule} objects
      */
     public static function define_restore_log_rules() {
-        $rules = array();
+        $rules = [];
 
         $rules[] = new restore_log_rule('checkmark', 'add', 'view.php?id={course_module}',
                                         '{checkmark}');
@@ -120,7 +120,7 @@ class restore_checkmark_activity_task extends restore_activity_task {
      * activity level. All them are rules not linked to any module instance (cmid = 0)
      */
     public static function define_restore_log_rules_for_course() {
-        $rules = array();
+        $rules = [];
 
         $rules[] = new restore_log_rule('checkmark', 'view all', 'index.php?id={course}', null);
 
@@ -136,13 +136,15 @@ class restore_checkmark_activity_task extends restore_activity_task {
         // Here we try to restore corrupt calendar entries due to old checkmark events being course events!
         $courseid = $this->get_courseid();
         if ($checkmarkid = $this->get_activityid()) { // ...always set, but just to be sure to not break any course-restore!
-            $checkmark = $DB->get_record('checkmark', array('id' => $checkmarkid));
-            foreach (array('course', 'due') as $type) {
-                $params = array('eventtype'  => $type,
-                                'modulename' => 'checkmark',
-                                'courseid'   => $courseid,
-                                'timestart'  => $checkmark->timedue,
-                                'name'       => '%'.$checkmark->name.'%');
+            $checkmark = $DB->get_record('checkmark', ['id' => $checkmarkid]);
+            foreach (['course', 'due'] as $type) {
+                $params = [
+                    'eventtype' => $type,
+                    'modulename' => 'checkmark',
+                    'courseid' => $courseid,
+                    'timestart' => $checkmark->timedue,
+                    'name' => '%' . $checkmark->name . '%',
+                ];
                 $where = $DB->sql_like('eventtype', ':eventtype')."
                          AND ".$DB->sql_like('modulename', ':modulename')."
                          AND courseid = :courseid

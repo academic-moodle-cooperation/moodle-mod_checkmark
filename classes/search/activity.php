@@ -25,8 +25,6 @@
 
 namespace mod_checkmark\search;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Search area for mod_checkmark activities.
  *
