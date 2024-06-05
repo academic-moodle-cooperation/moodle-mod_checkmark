@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+4.3.1 (2024-06-05)
+------------------
+* [FIXED] #7881 Fix to correctly display the submissions for overridden deadlines
+* [FIXED] #7904 Fix bug to display checkmark description for all roles
+* [FIXED] #7908 Fix sorting bug for the checkmark submission table column status
+* [FIXED] #7912 Fix CSV export for submissions to display the data the feedback fields correctly
+
 4.3.0 (2024-01-30)
 ------------------
 * [FIXED] #7783 Fix data bug for export of .txt, .ods and .xlsx
