@@ -580,3 +580,8 @@ $string['submittedlateshort'] = '{$a} late';
 $string['disabled'] = 'Disabled';
 $string['overrideentrydeleted'] = 'Entry deleted';
 $string['overrideentryswapped'] = 'Entry swapped';
+
+$string['coursetitle'] = 'Course title';
+$string['coursetitle_help'] = 'Define here if you want to use the course full name (long name) or the course short name for the title of your export';
+$string['courseshortname'] = 'Course short name';
+$string['coursefullname'] = 'Course full name';
