@@ -367,7 +367,7 @@ class submissionstable extends \table_sql {
                 if ($fieldkey == 'feedback') {
                     $formattedfieldvalue = "\"" . $fieldvalue . "\"";
                     $formattedfieldvalue = $this->convert_html_to_text($formattedfieldvalue);
-                $formattedrow->$fieldkey = $formattedfieldvalue;
+                    $formattedrow->$fieldkey = $formattedfieldvalue;
                 } else {
                     $formattedrow->$fieldkey = $fieldvalue;
                 }
