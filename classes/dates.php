@@ -42,12 +42,28 @@ class dates extends activity_dates {
      * @return array
      */
     protected function get_dates(): array {
-        global $DB;
+        global $DB, $CFG;
+
+        require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
+
+        $course = get_course($this->cm->course);
+        $context = \context_module::instance($this->cm->id);
+        $checkmark = new \checkmark($course->id, null, $this->cm, $course);
+
+        $timeavailable = $this->cm->customdata['timeavailable'] ?? null;
+        $timedue = $this->cm->customdata['timedue'] ?? null;
+
+        list($overrideopen, $overridedue) = $checkmark->get_avail_due_times();
+        if ($overrideopen) {
+            $timeavailable = $overrideopen;
+        }
+        if ($overridedue) {
+            $timedue = $overridedue;
+        }
 
         $now = time();
         $dates = [];
-        if (isset($this->cm->customdata['timeavailable'])) {
-            $timeavailable = $this->cm->customdata['timeavailable'];
+        if ($timeavailable) {
             $openlabelid = $timeavailable > $now ? 'activitydate:opens' : 'activitydate:opened';
             $dates[] = [
                 'label' => get_string($openlabelid, 'mod_checkmark'),
@@ -55,8 +71,7 @@ class dates extends activity_dates {
             ];
         }
 
-        if (isset($this->cm->customdata['timedue'])) {
-            $timedue = $this->cm->customdata['timedue'];
+        if ($timedue) {
             $dates[] = [
                 'label' => get_string('activitydate:due', 'mod_checkmark'),
                 'timestamp' => (int) $timedue,
