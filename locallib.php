@@ -3085,6 +3085,8 @@ class checkmark {
             set_user_preference('checkmark_sumrel', $sumrel);
             $seperatenamecolumns = optional_param('seperatenamecolumns', 0, PARAM_BOOL);
             set_user_preference('checkmark_seperatenamecolumns', $seperatenamecolumns);
+            $coursetitle = optional_param('coursetitle', '', PARAM_TEXT);
+            set_user_preference('checkmark_coursetitle', $coursetitle);
             if ($format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
                 $printperpage = optional_param('printperpage', 0, PARAM_INT);
                 $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
@@ -3111,6 +3113,7 @@ class checkmark {
             $sumrel = get_user_preferences('checkmark_sumrel', 1);
             $seperatenamecolumns = get_user_preferences('checkmark_seperatenamecolumns', 0);
             $format = get_user_preferences('checkmark_format', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
+            $coursetitle = get_user_preferences('checkmark_coursetitle', '');
         }
 
         if ($format != \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF
@@ -3150,6 +3153,7 @@ class checkmark {
                 $forcesinglelinenames,
                 $zipped,
                 $sequentialnumbering,
+                $coursetitle,
         ];
     }
 
@@ -3430,7 +3434,7 @@ class checkmark {
          */
         list($filter, $sumabs, $sumrel, $seperatenamecolumns, $format, $printperpage, ,
                 $textsize, $orientation, $printheader, $forcesinglelinenames, $zipped,
-                $sequentialnumbering) = $this->print_preferences();
+                $sequentialnumbering, $coursetitle) = $this->print_preferences();
 
         if (!empty($template)) {
             $classname = '\\mod_checkmark\\local\\exporttemplates\\' . $template;
@@ -3474,7 +3478,8 @@ class checkmark {
         $notactivestr = get_string('notactive', 'checkmark');
         $timeavailablestr = !empty($this->checkmark->timeavailable) ? userdate($this->checkmark->timeavailable) : $notactivestr;
         $timeduestr = !empty($this->checkmark->timedue) ? userdate($this->checkmark->timedue) : $notactivestr;
-        $paramarray = [get_string('course') . ':', $this->course->fullname,
+        $courseheadertitle = $coursetitle == 'courseshortname' ? $this->course->shortname : $this->course->fullname;
+        $paramarray = [get_string('course') . ':', $courseheadertitle,
                 get_string('availabledate', 'checkmark') . ':', $timeavailablestr,
                 !$template ? get_string('strprintpreview', 'checkmark') : '', $filters[$filter],
             // Second header row!

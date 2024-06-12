@@ -111,6 +111,14 @@ class exportform extends \moodleform {
         $mform->hideIf('zipped', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
         $mform->hideIf('zipped', 'group', 'neq', 0);
 
+        // Select course title as long name or short name.
+        $mform->addElement('select', 'coursetitle', get_string('coursetitle', 'checkmark'), [
+            'courseshortname' => get_string('courseshortname', 'checkmark'),
+            'courselongname' => get_string('coursefullname', 'checkmark'),
+        ]);
+        $mform->addHelpButton('coursetitle', 'coursetitle', 'checkmark');
+        $mform->setDefault('coursetitle', 'courseshortname');
+
         $templatenames = self::get_templates();
         $templates = ['' => get_string('custom_settings', 'checkmark')];
         foreach ($templatenames as $cur) {
