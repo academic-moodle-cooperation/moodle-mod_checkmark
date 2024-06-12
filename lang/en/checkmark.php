@@ -585,3 +585,9 @@ $string['coursetitle'] = 'Course title';
 $string['coursetitle_help'] = 'Define here if you want to use the course full name (long name) or the course short name for the title of your export';
 $string['courseshortname'] = 'Course short name';
 $string['coursefullname'] = 'Course full name';
+
+$string['remove_grade'] = 'Remove grade';
+$string['remove_grade_error'] = 'Error while bulk removing grades';
+$string['remove_grade_success'] = 'Successfully removed grades for {$a} users';
+$string['remove_grade_one_success'] = 'Successfully removed grade for {$a} user';
+$string['remove_grade_failed'] = 'Failed to remove grade for users';
