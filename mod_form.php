@@ -454,11 +454,16 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform = $this->_form;
 
         if ($defaultvalues['instance']) {
+            if($this->cm == null) {
+                $this->cm = get_coursemodule_from_instance('checkmark', $defaultvalues['instance']);
+            }
             if (checkmark_count_real_submissions($this->cm) != 0) {
                 $mform->addElement('hidden', 'allready_submit', 'yes');
+                $mform->setType('allready_submit', PARAM_RAW);
                 $defaultvalues['allready_submit'] = 'yes';
             } else {
                 $mform->addElement('hidden', 'allready_submit', 'no');
+                $mform->setType('allready_submit', PARAM_RAW);
                 $defaultvalues['allready_submit'] = 'no';
             }
 
