@@ -311,8 +311,8 @@ function mod_checkmark_pluginfile($course,
     $relativepath = implode('/', $args);
     $fullpath = "/{$context->id}/mod_checkmark/$filearea/$itemid/$relativepath";
 
-    $fs = get_file_storage();
-    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) || $file->is_directory()) {
+    $file = get_file_storage()->get_file_by_hash(sha1($fullpath));
+    if (!$file || $file->is_directory()) {
         return false;
     }
     send_stored_file($file, 0, 0, $forcedownload, $options);
