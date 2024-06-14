@@ -3,7 +3,7 @@ CHANGELOG
 
 4.3.2 (2024-06-14)
 ------------------
-* [FIXED] #7973 Fix that assignment files are not downloadable anymore
+* [FIXED] #7973 Fix that additional files are not downloadable anymore
 
 4.3.1 (2024-06-05)
 ------------------
