@@ -3564,7 +3564,8 @@ class checkmark {
          * Get all settings preferences, some will be overwritten if a template is used!
          */
         list($filter, $sumabs, $sumrel, $seperatenamecolumns, $format, $printperpage, ,
-                $textsize, $orientation, $printheader, $forcesinglelinenames, $sequentialnumbering) = $this->print_preferences();
+                $textsize, $orientation, $printheader, $forcesinglelinenames, , $sequentialnumbering, $coursetitle) = $this->print_preferences();
+
 
         if (!empty($template)) {
             $classname = '\\mod_checkmark\\local\\exporttemplates\\' . $template;
@@ -3609,7 +3610,8 @@ class checkmark {
             if (is_number($printperpage) && $printperpage != 0) {
                 $pdf->setrowsperpage($printperpage);
             }
-            $paramarray = [get_string('course') . ':', $this->course->fullname,
+            $courseheadertitle = $coursetitle == 'courseshortname' ? $this->course->shortname : $this->course->fullname;
+            $paramarray = [get_string('course') . ':', $courseheadertitle,
                     get_string('availabledate', 'checkmark') . ':', $timeavailablestr,
                     !$template ? get_string('strprintpreview', 'checkmark') : '', $filters[$filter],
                 // Second header row!
