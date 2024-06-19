@@ -2971,7 +2971,7 @@ class checkmark {
             }
 
             $grp[0]->addOption(get_string('remove_grade', 'checkmark'), 'removegrade');
-            if ($this->checkmark->presentationgrade) {
+            if ($this->checkmark->presentationgrading) {
                 $grp[0]->addOption(get_string('remove_presentation_grade', 'checkmark'), 'removepresentationgrade');
             }
 
