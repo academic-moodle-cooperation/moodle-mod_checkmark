@@ -284,6 +284,8 @@ $string['bulk_help'] = 'Here you can perform actions like "setting attendance", 
 <li><strong>mark as attendant:</strong> Mark selected users as attendant</li>
 <li><strong>mark as absent:</strong> Mark selected users as absent</li>
 <li><strong>grade automatically:</strong> Calculate automatic grade for selected users</li>
+<li><strong>remove grade:</strong> Remove grade for selected users</li>
+<li><strong>remove grade (presentation):</strong> Remove presentation grade for selected users</li>
 <li><strong>mark as attendant and grade:</strong> Mark selected users as attendant and grade them automatically right afterwards</li>
 <li><strong>mark as absent and grade:</strong> Mark selected users as absent and grade them automatically right afterwards</li>
 </ul><br />
