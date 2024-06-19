@@ -23,6 +23,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\output\local\dropdown\status;
 use mod_checkmark\submission;
 use mod_checkmark\submissionstable;
 
@@ -1603,7 +1604,8 @@ class checkmark {
             case self::FILTER_SELECTED:
                 // Prepare list with selected users!
                 if (empty($selected)) {
-                    return 0;
+                    $result['status'] = GRADE_UPDATE_FAILED;
+                    return $result;
                 }
                 $usrlst = $selected;
 
@@ -2148,6 +2150,58 @@ class checkmark {
                             } else {
                                 throw new moodle_exception('autograde_error', 'checkmark');
                             }
+                        }
+                    }
+
+                    // Bulk remove grades.
+                    if(in_array($bulkaction, ['removegrade'])) {
+                        if(has_capability('mod/checkmark:grade', context_module::instance($this->cm->id))) {
+                            $result = $this->remove_grades(self::FILTER_SELECTED, $selected);
+                            if (!isset($message)) {
+                                $message = '';
+                            } else {
+                                $message .= html_writer::empty_tag('br');
+                            }
+                            if ($result['status'] == GRADE_UPDATE_OK) {
+                                if ($result['updated'] == 1) {
+                                    $string = 'remove_grade_one_success';
+                                } else {
+                                    $string = 'remove_grade_success';
+                                }
+                                $message .= $OUTPUT->notification(get_string($string, 'checkmark', $result['updated']),
+                                        'notifysuccess');
+                            } else {
+                                $message .= $OUTPUT->notification(get_string('remove_grade_failed', 'checkmark'),
+                                        'notifyproblem');
+                            }
+                        } else {
+                            throw new moodle_exception('remove_grade_error', 'checkmark');
+                        }
+                    }
+
+                    // Bulk remove grades.
+                    if(in_array($bulkaction, ['removepresentationgrade'])) {
+                        if(has_capability('mod/checkmark:grade', context_module::instance($this->cm->id))) {
+                            $result = $this->remove_presentation_grades(self::FILTER_SELECTED, $selected);
+                            if (!isset($message)) {
+                                $message = '';
+                            } else {
+                                $message .= html_writer::empty_tag('br');
+                            }
+                            if ($result['status'] == GRADE_UPDATE_OK) {
+                                if ($result['updated'] == 1) {
+                                    $string = 'remove_presentation_grade_one_success';
+                                } else {
+                                    $string = 'remove_presentation_grade_success';
+                                }
+                                $message .= $OUTPUT->notification(get_string($string, 'checkmark', $result['updated']),
+                                        'notifysuccess');
+                            } else {
+                                $message .= $OUTPUT->notification(get_string('remove_presentation_grade_failed', 'checkmark'),
+                                        'notifyproblem');
+                            }
+                        } else {
+                            throw new moodle_exception('remove_presentation_grade_error', 'checkmark');
                         }
                     }
                 }
@@ -2914,6 +2968,11 @@ class checkmark {
                 }
                 $grp[0]->addOption(get_string('setattendantandgrade', 'checkmark'), 'setattendantandgrade', $attr);
                 $grp[0]->addOption(get_string('setabsentandgrade', 'checkmark'), 'setabsentandgrade', $attr);
+            }
+
+            $grp[0]->addOption(get_string('remove_grade', 'checkmark'), 'removegrade');
+            if ($this->checkmark->presentationgrade) {
+                $grp[0]->addOption(get_string('remove_presentation_grade', 'checkmark'), 'removepresentationgrade');
             }
 
             if (has_capability('mod/checkmark:manageoverrides', $this->context)) {
@@ -4474,6 +4533,82 @@ class checkmark {
             }
         }
         return $record;
+    }
+
+    /**
+     * Bulk remove grades from graded submissions for selected users
+     *
+     * @param int $filter (optional) which entrys to filter (self::FILTER_ALL, self::FILTER_REQUIRE_GRADING)
+     * @param int[] $selected (optional) selected users, used if filter equals self::FILTER_SELECTED
+     * @return int|array 0 if everything's ok, otherwise error code
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    public function remove_grades($filter = self::FILTER_ALL, $selected = []) {
+        return $this->bulk_remove_grades($selected, 'grade');
+    }
+
+    /**
+     * Bulk remove presentation grades from presentation grades for selected users
+     *
+     * @param int $filter (optional) which entrys to filter (self::FILTER_ALL, self::FILTER_REQUIRE_GRADING)
+     * @param int[] $selected (optional) selected users, used if filter equals self::FILTER_SELECTED
+     * @return int|array 0 if everything's ok, otherwise error code
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    public function remove_presentation_grades($filter = self::FILTER_ALL, $selected = []) {
+        return $this->bulk_remove_grades($selected, 'presentationgrade');
+    }
+
+    /**
+     * Bulk remove specified grade type from graded submissions for selected users
+     *
+     * @param int[] $selected Selected users
+     * @param string $gradetype Type of grade to remove ('grade' or 'presentationgrade')
+     * @return int|array 0 if everything's ok, otherwise error code
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    private function bulk_remove_grades($selected, $gradetype)
+    {
+        global $DB;
+
+        $result = ['status' => GRADE_UPDATE_FAILED, 'updated' => 0];
+
+        if (empty($selected)) {
+            return $result;
+        }
+
+        $params = [];
+        list($sqluserids, $userparams) = $DB->get_in_or_equal($selected, SQL_PARAMS_NAMED, 'user');
+        $params = array_merge_recursive($params, $userparams);
+        $params['checkmarkid'] = $this->checkmark->id;
+
+        $sql = "SELECT u.id
+              FROM {user} u
+         LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid
+             WHERE u.deleted = 0 AND u.id " . $sqluserids;
+
+        $users = $DB->get_records_sql($sql, $params);
+
+        if (empty($users)) {
+            return $result;
+        }
+
+        $timemarked = time();
+        foreach ($users as $user) {
+            $feedback = $this->get_feedback($user->id);
+            if ($feedback) {
+                $feedback->$gradetype = -1;
+                $feedback->timemodified = $timemarked;
+                $DB->update_record('checkmark_feedbacks', $feedback);
+                $result['updated']++;
+            }
+        }
+
+        $result['status'] = GRADE_UPDATE_OK;
+        return $result;
     }
 }
 
