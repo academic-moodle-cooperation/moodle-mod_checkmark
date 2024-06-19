@@ -145,7 +145,8 @@ class override_actionmenu implements templatable, renderable {
         $groupmode = ($type == "group");
         $type = $groupmode ? \mod_checkmark\overrideform::GROUP : \mod_checkmark\overrideform::USER;
         $url = new moodle_url('/mod/checkmark/extend.php', ['id' => $this->currenturl->get_param('id'),
-            'action' => $action, 'type' => $type]);
+            'action' => $action, 'type' => $type,
+        ]);
 
         $options = [];
         if ($action == 'addgroup' && !$this->show_groups()) {
@@ -158,7 +159,7 @@ class override_actionmenu implements templatable, renderable {
         $urlselect = $this->get_select_menu();
         return [
             'addoverride' => $overridebutton->export_for_template($output),
-            'urlselect' => $urlselect->export_for_template($output)
+            'urlselect' => $urlselect->export_for_template($output),
         ];
     }
 }

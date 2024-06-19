@@ -60,8 +60,8 @@ class example_updated extends \core\event\base {
             'context' => \context_module::instance($cmid),
             'other' => [
                 'old' => ['id' => ''.$old->id, 'name' => ''.$old->name, 'grade' => ''.$old->grade],
-                'new' => ['id' => ''.$new->id, 'name' => ''.$new->name, 'grade' => ''.$new->grade]
-            ]
+                'new' => ['id' => ''.$new->id, 'name' => ''.$new->name, 'grade' => ''.$new->grade],
+            ],
         ]);
 
         return $event;
@@ -95,7 +95,7 @@ class example_updated extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url("/mod/checkmark/view.php", [
-            'id' => $this->contextinstanceid
+            'id' => $this->contextinstanceid,
         ]);
     }
 

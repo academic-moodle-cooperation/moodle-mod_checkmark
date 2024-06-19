@@ -23,10 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_checkmark;
-use \core\event\course_module_updated;
-use \grade_item;
-
-defined('MOODLE_INTERNAL') || die;
+use core\event\course_module_updated;
+use grade_item;
 
 /**
  * mod_checkmark\observer handles events due to changes in moodle core which affect grouptool
@@ -71,10 +69,12 @@ class observer {
             $attupdate = grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id,
                     CHECKMARK_ATTENDANCE_ITEM, null, $params);
             // Move attendance item directly after grade item, if it exists in the same category!
-            $params = ['courseid'     => $checkmark->course,
-                       'itemtype'     => 'mod',
-                       'itemmodule'   => 'checkmark',
-                       'iteminstance' => $checkmark->id];
+            $params = [
+                'courseid' => $checkmark->course,
+                'itemtype' => 'mod',
+                'itemmodule' => 'checkmark',
+                'iteminstance' => $checkmark->id,
+            ];
             if ($attendanceitem = grade_item::fetch($params + ['itemnumber' => CHECKMARK_ATTENDANCE_ITEM])) {
                 if ($gradeitem = grade_item::fetch($params + ['itemnumber' => CHECKMARK_GRADE_ITEM])) {
                     if ($gradeitem->categoryid == $attendanceitem->categoryid) {
@@ -90,10 +90,12 @@ class observer {
             $presupdate = grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id,
                     CHECKMARK_PRESENTATION_ITEM, null, $params);
             // Move presentation item attendance item directly after attendance or grade item, if one of them exists!
-            $params = ['courseid'     => $checkmark->course,
-                       'itemtype'     => 'mod',
-                       'itemmodule'   => 'checkmark',
-                       'iteminstance' => $checkmark->id];
+            $params = [
+                'courseid' => $checkmark->course,
+                'itemtype' => 'mod',
+                'itemmodule' => 'checkmark',
+                'iteminstance' => $checkmark->id,
+            ];
             if ($presentationitem = grade_item::fetch($params + ['itemnumber' => CHECKMARK_PRESENTATION_ITEM])) {
                 if ($attendanceitem = grade_item::fetch($params + ['itemnumber' => CHECKMARK_ATTENDANCE_ITEM])) {
                     if ($attendanceitem->categoryid == $presentationitem->categoryid) {

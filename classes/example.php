@@ -24,8 +24,6 @@
  */
 namespace mod_checkmark;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * This is the object class for an example in checkmark
  *

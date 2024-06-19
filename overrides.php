@@ -34,7 +34,7 @@ $action   = optional_param('action', '', PARAM_ALPHA);
 $redirect = $CFG->wwwroot.'/mod/checkmark/overrides.php?id=' . $cmid . '&amp;mode=group';
 
 list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'checkmark');
-$checkmark = $DB->get_record('checkmark', array('id' => $cm->instance), '*', MUST_EXIST);
+$checkmark = $DB->get_record('checkmark', ['id' => $cm->instance], '*', MUST_EXIST);
 
 require_login($course, false, $cm);
 
@@ -74,7 +74,7 @@ $lowestgrouppriority = $DB->get_record_sql($sql, $params)->max;
 $groups = $accessallgroups ? groups_get_all_groups($cm->course) : groups_get_activity_allowed_groups($cm);
 
 // Default mode is "group", unless there are no groups.
-if ($mode != "user" and $mode != "group") {
+if ($mode != "user" && $mode != "group") {
     if (!empty($groups)) {
         $mode = "group";
     } else {
@@ -83,7 +83,7 @@ if ($mode != "user" and $mode != "group") {
 }
 $groupmode = ($mode == "group");
 
-$url = new moodle_url('/mod/checkmark/overrides.php', array('id' => $cm->id, 'mode' => $mode));
+$url = new moodle_url('/mod/checkmark/overrides.php', ['id' => $cm->id, 'mode' => $mode]);
 
 $PAGE->set_url($url);
 
@@ -160,16 +160,16 @@ if ($groupmode) {
 
 // Initialise table.
 $table = new html_table();
-$table->headspan = array(1, 2, 1);
-$table->colclasses = array('colname', 'colsetting', 'colvalue', 'colaction');
-$table->head = array(
+$table->headspan = [1, 2, 1];
+$table->colclasses = ['colname', 'colsetting', 'colvalue', 'colaction'];
+$table->head = [
         $colname,
         get_string('overrides', 'checkmark'),
         get_string('action'),
-);
+];
 
-$userurl = new moodle_url('/user/view.php', array());
-$groupurl = new moodle_url('/group/overview.php', array('id' => $cm->course));
+$userurl = new moodle_url('/user/view.php', []);
+$groupurl = new moodle_url('/group/overview.php', ['id' => $cm->course]);
 
 $overrideediturl = new moodle_url('/mod/checkmark/extend.php');
 $type = $groupmode ? \mod_checkmark\overrideform::GROUP : \mod_checkmark\overrideform::USER;
@@ -179,8 +179,8 @@ $hasinactive = false; // Whether there are any inactive overrides.
 
 foreach ($overrides as $override) {
 
-    $fields = array();
-    $values = array();
+    $fields = [];
+    $values = [];
     $active = true;
     $id = $groupmode ? $override->groupid : $override->userid;
     // Check for inactive overrides.
@@ -217,30 +217,34 @@ foreach ($overrides as $override) {
     $iconstr = '';
     if ($active) {
         // Edit.
-        $editurlstr = $overrideediturl->out(true, array('id' => $cmid, 'type' => $type,
-                'mode' => \mod_checkmark\overrideform::EDIT, 'users' => $id));
+        $editurlstr = $overrideediturl->out(true, ['id' => $cmid, 'type' => $type,
+                'mode' => \mod_checkmark\overrideform::EDIT, 'users' => $id,
+            ]);
         $iconstr = '<a title="' . get_string('edit') . '" href="'. $editurlstr . '">' .
                 $OUTPUT->pix_icon('t/edit', get_string('edit')) . '</a> ';
         // Duplicate.
-        $copyurlstr = $overrideediturl->out(true, array('id' => $cmid, 'type' => $type,
-                'mode' => \mod_checkmark\overrideform::COPY, 'users' => $id));
+        $copyurlstr = $overrideediturl->out(true, ['id' => $cmid, 'type' => $type,
+                'mode' => \mod_checkmark\overrideform::COPY, 'users' => $id,
+            ]);
         $iconstr .= '<a title="' . get_string('copy') . '" href="' . $copyurlstr . '">' .
                 $OUTPUT->pix_icon('t/copy', get_string('copy')) . '</a> ';
     }
     // Delete.
-    $deleteurlstr = $overrideediturl->out(true, array('id' => $cmid, 'type' => $type,
-            'mode' => \mod_checkmark\overrideform::DELETE, 'users' => $id));
+    $deleteurlstr = $overrideediturl->out(true, ['id' => $cmid, 'type' => $type,
+            'mode' => \mod_checkmark\overrideform::DELETE, 'users' => $id,
+        ]);
     $iconstr .= '<a title="' . get_string('delete') . '" href="' . $deleteurlstr . '">' .
             $OUTPUT->pix_icon('t/delete', get_string('delete')) . '</a> ';
 
     if ($groupmode) {
         $usergroupstr = '<a href="' . $groupurl->out(true,
-                        array('group' => $override->groupid)) . '" >' . $override->name . '</a>';
+                        ['group' => $override->groupid]) . '" >' . $override->name . '</a>';
 
         // Move up.
         if ($override->grouppriority < $highestgrouppriority) {
-            $moveupstr = $overrideediturl->out(true, array('id' => $cmid, 'type' => $type,
-                    'mode' => \mod_checkmark\overrideform::UP, 'users' => $id));
+            $moveupstr = $overrideediturl->out(true, ['id' => $cmid, 'type' => $type,
+                    'mode' => \mod_checkmark\overrideform::UP, 'users' => $id,
+                ]);
             $iconstr .= '<a title="'.get_string('moveup').'" href="' . $moveupstr . '">' .
                     $OUTPUT->pix_icon('t/up', get_string('moveup')) . '</a> ';
         } else {
@@ -249,8 +253,9 @@ foreach ($overrides as $override) {
 
         // Move down.
         if ($override->grouppriority > $lowestgrouppriority) {
-            $movedownstr = $overrideediturl->out(true, array('id' => $cmid, 'type' => $type,
-                    'mode' => \mod_checkmark\overrideform::DOWN, 'users' => $id));
+            $movedownstr = $overrideediturl->out(true, ['id' => $cmid, 'type' => $type,
+                    'mode' => \mod_checkmark\overrideform::DOWN, 'users' => $id,
+                ]);
             $iconstr .= '<a title="'.get_string('movedown').'" href="' . $movedownstr . '">' .
                     $OUTPUT->pix_icon('t/down', get_string('movedown')) . '</a> ';
         } else {
@@ -260,7 +265,7 @@ foreach ($overrides as $override) {
 
     } else {
         $usergroupstr = html_writer::link($userurl->out(false,
-                array('id' => $override->userid, 'course' => $course->id)),
+                ['id' => $override->userid, 'course' => $course->id]),
                 fullname($override));
     }
 
@@ -298,7 +303,7 @@ foreach ($overrides as $override) {
 }
 
 // Output the table and button.
-echo html_writer::start_tag('div', array('id' => 'checkmarkoverrides'));
+echo html_writer::start_tag('div', ['id' => 'checkmarkoverrides']);
 if (count($table->data)) {
     echo html_writer::table($table);
 }
@@ -314,8 +319,8 @@ if (!$overrides) {
     }
     echo $OUTPUT->notification($message, 'info');
 }
-echo html_writer::start_tag('div', array('class' => 'buttons'));
-$options = array();
+echo html_writer::start_tag('div', ['class' => 'buttons']);
+$options = [];
 if ($groupmode) {
     if (empty($groups)) {
         // There are no groups.
@@ -323,7 +328,7 @@ if ($groupmode) {
         $options['disabled'] = true;
     }
 } else {
-    $users = array();
+    $users = [];
     // See if there are any users in the checkmark.
     if ($accessallgroups) {
         $users = get_enrolled_users($context, '', 0, 'u.id');

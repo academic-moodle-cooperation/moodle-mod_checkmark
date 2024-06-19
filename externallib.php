@@ -44,7 +44,10 @@ class mod_checkmark_external extends external_api {
     public static function get_checkmarks_by_courses_parameters() {
         return new external_function_parameters([
             'courseids' => new external_multiple_structure(
-                new external_value(PARAM_INT, 'Course id'), 'Array of course ids (all enrolled courses if empty array)', VALUE_DEFAULT, []
+                new external_value(PARAM_INT, 'Course id'),
+                'Array of course ids (all enrolled courses if empty array)',
+                VALUE_DEFAULT,
+                []
             ),
         ]);
     }
@@ -58,8 +61,9 @@ class mod_checkmark_external extends external_api {
         return new external_single_structure([
             'checkmarks' => new external_multiple_structure(
                 self::checkmark_structure(),
-                'All checkmarks for the given courses'),
-            'warnings' => new external_warnings()
+                'All checkmarks for the given courses'
+            ),
+            'warnings' => new external_warnings(),
         ]);
     }
 
@@ -78,7 +82,7 @@ class mod_checkmark_external extends external_api {
         $warnings = new stdClass();
 
         $params = self::validate_parameters(self::get_checkmarks_by_courses_parameters(), [
-            'courseids' => $courseids
+            'courseids' => $courseids,
         ]);
 
         $rcheckmarks = [];
@@ -176,7 +180,7 @@ class mod_checkmark_external extends external_api {
     public static function submit_returns() {
         return new external_single_structure([
             'checkmark' => self::checkmark_structure(),
-            'warnings' => new external_warnings()
+            'warnings' => new external_warnings(),
         ]);
     }
 
@@ -198,7 +202,7 @@ class mod_checkmark_external extends external_api {
         global $USER;
         $params = self::validate_parameters(self::submit_parameters(), [
             'id' => $id,
-            'submission_examples' => $submissionexamples
+            'submission_examples' => $submissionexamples,
         ]);
 
         $warnings = [];

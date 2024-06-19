@@ -27,16 +27,16 @@ namespace mod_checkmark\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
-use \core_privacy\local\metadata\collection;
-use \core_privacy\local\metadata\provider as metadataprovider;
-use \core_privacy\local\request\contextlist;
-use \core_privacy\local\request\plugin\provider as pluginprovider;
-use \core_privacy\local\request\user_preference_provider as user_preference_provider;
-use \core_privacy\local\request\writer;
-use \core_privacy\local\request\approved_contextlist;
-use \core_privacy\local\request\transform;
-use \core_privacy\local\request\helper;
-use \core_privacy\local\request\core_userlist_provider;
+use core_privacy\local\metadata\collection;
+use core_privacy\local\metadata\provider as metadataprovider;
+use core_privacy\local\request\contextlist;
+use core_privacy\local\request\plugin\provider as pluginprovider;
+use core_privacy\local\request\user_preference_provider as user_preference_provider;
+use core_privacy\local\request\writer;
+use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\transform;
+use core_privacy\local\request\helper;
+use core_privacy\local\request\core_userlist_provider;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\approved_userlist;
 
@@ -78,7 +78,7 @@ class provider implements metadataprovider, pluginprovider, user_preference_prov
                 'graderid' => 'privacy:metadata:graderid',
                 'mailed' => 'privacy:metadata:mailed',
                 'timecreated' => 'privacy:metadata:feedback:timecreated',
-                'timemodified' => 'privacy:metadata:feedback:timemodified'
+                'timemodified' => 'privacy:metadata:feedback:timemodified',
         ];
         $overrides = [
                 'timeavailable' => 'privacy:metadata:timeavailable',
@@ -127,7 +127,7 @@ class provider implements metadataprovider, pluginprovider, user_preference_prov
                 'fuserid' => $userid,
                 'fgraderid' => $userid,
                 'ouserid' => $userid,
-                'omodifierid' => $userid
+                'omodifierid' => $userid,
         ];
 
         $sql = "SELECT ctx.id
@@ -138,9 +138,11 @@ class provider implements metadataprovider, pluginprovider, user_preference_prov
           WHERE EXISTS (
                 SELECT 1 FROM {checkmark_submissions} s WHERE s.checkmarkid = c.id AND s.userid = :suserid)
              OR EXISTS (
-                SELECT 1 FROM {checkmark_feedbacks} f WHERE f.checkmarkid = c.id AND (f.userid = :fuserid OR f.graderid = :fgraderid))
+                SELECT 1 FROM {checkmark_feedbacks} f WHERE f.checkmarkid = c.id
+                    AND (f.userid = :fuserid OR f.graderid = :fgraderid))
              OR EXISTS (
-                SELECT 1 FROM {checkmark_overrides} o WHERE o.checkmarkid = c.id AND (o.userid = :ouserid OR o.modifierid = :omodifierid))";
+                SELECT 1 FROM {checkmark_overrides} o WHERE o.checkmarkid = c.id
+                    AND (o.userid = :ouserid OR o.modifierid = :omodifierid))";
 
         $contextlist = new contextlist();
         $contextlist->add_from_sql($sql, $params);
@@ -163,7 +165,7 @@ class provider implements metadataprovider, pluginprovider, user_preference_prov
         $params = [
                 'modulename' => 'checkmark',
                 'contextid' => $context->id,
-                'contextlevel' => CONTEXT_MODULE
+                'contextlevel' => CONTEXT_MODULE,
         ];
 
         // Get all who submitted!
@@ -334,7 +336,7 @@ class provider implements metadataprovider, pluginprovider, user_preference_prov
             'quickgrade' => 'privacy:metadata:pref:quickgrade',
             'sumabs' => 'privacy:metadata:pref:sumabs',
             'sumrel' => 'privacy:metadata:pref:sumrel',
-            'textsize' => 'privacy:metadata:pref:textsize'
+            'textsize' => 'privacy:metadata:pref:textsize',
         ];
         foreach ($prefs as $key => $text) {
             $value = get_user_preferences('checkmark_' . $key, null, $userid);
@@ -362,7 +364,7 @@ class provider implements metadataprovider, pluginprovider, user_preference_prov
             $data->examples[] = (object)[
                 'name' => $example->name,
                 'checked' => transform::yesno($example->state),
-                'grade' => $example->grade
+                'grade' => $example->grade,
             ];
         }
 

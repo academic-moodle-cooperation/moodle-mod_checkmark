@@ -26,8 +26,6 @@ namespace mod_checkmark;
 
 use renderable;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Renderable checkmark grading summary
  * @package   mod_checkmark

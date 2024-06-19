@@ -23,7 +23,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_checkmark\task;
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class send_notifications handles sending of messages to students if they got new unmailed feedback (grades, comments).
@@ -61,8 +60,8 @@ class send_notifications extends \core\task\scheduled_task {
          */
 
         $timenow   = time();
-        $endtime   = $timenow - $CFG->maxeditingtime;
-        $validmsgtime = get_config('checkmark', 'validmsgtime');
+        $endtime   = $timenow - $CFG->maxeditingtime; // Maxeditingtime is 1800 in config table.
+        $validmsgtime = get_config('checkmark', 'validmsgtime'); // Validmsgtime is 2 in config_plugins table.
         if (false !== $validmsgtime) {
             $starttime = $endtime - $validmsgtime * 24 * 3600;   // Two days earlier?
         } else {
@@ -76,12 +75,12 @@ class send_notifications extends \core\task\scheduled_task {
 
                 echo 'Processing checkmark feedback '.$feedback->id."\n";
 
-                if (!$user = $DB->get_record('user', array('id' => $feedback->userid))) {
+                if (!$user = $DB->get_record('user', ['id' => $feedback->userid])) {
                     echo 'Could not find user '.$user->id."\n";
                     continue;
                 }
 
-                if (!$course = $DB->get_record('course', array('id' => $feedback->course))) {
+                if (!$course = $DB->get_record('course', ['id' => $feedback->course])) {
                     echo 'Could not find course '.$feedback->course."\n";
                     continue;
                 }
@@ -90,7 +89,7 @@ class send_notifications extends \core\task\scheduled_task {
                  * Override the language and timezone of the 'current' user, so that
                  * mail is customised for the receiver.
                  */
-                \cron_setup_user($user, $course);
+                \core\cron::setup_user($user, $course);
 
                 if (!\is_enrolled(\context_course::instance($feedback->course), $user->id)) {
                     echo fullname($user).' isn\'t an active participant in ' .
@@ -98,7 +97,7 @@ class send_notifications extends \core\task\scheduled_task {
                     continue;
                 }
 
-                if (!$grader = $DB->get_record('user', array('id' => $feedback->graderid))) {
+                if (!$grader = $DB->get_record('user', ['id' => $feedback->graderid])) {
                     echo 'Could not find teacher '.$feedback->graderid."\n";
                     continue;
                 }
@@ -158,10 +157,10 @@ class send_notifications extends \core\task\scheduled_task {
                 $message->contexturlname    = $checkmarkinfo->checkmark;
 
                 \message_send($message);
-                $DB->set_field('checkmark_feedbacks', 'mailed', '1', array('id' => $feedback->id));
+                $DB->set_field('checkmark_feedbacks', 'mailed', '1', ['id' => $feedback->id]);
             }
 
-            \cron_setup_user();
+            \core\cron::setup_user();
         } else {
             echo "\nNo unmailed Submissions!\n";
         }

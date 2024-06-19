@@ -55,11 +55,11 @@ class submission_edited extends \core\event\base {
      */
     public static function create_from_object(\stdClass $cm, \mod_checkmark\submission $submission) {
         // Trigger overview event.
-        $event = self::create(array(
+        $event = self::create([
                 'objectid'      => $submission->get_id(),
                 'context'       => \context_module::instance($cm->id),
                 'relateduserid' => $submission->get_userid(),
-        ));
+        ]);
         $event->add_record_snapshot('checkmark_submissions', $submission->export_for_snapshot());
         return $event;
     }
@@ -78,8 +78,10 @@ class submission_edited extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/checkmark/submissions.php", array('id'  => $this->contextinstanceid,
-                'tab' => 'submissions'));
+        return new \moodle_url("/mod/checkmark/submissions.php", [
+            'id' => $this->contextinstanceid,
+            'tab' => 'submissions',
+        ]);
     }
 
     /**

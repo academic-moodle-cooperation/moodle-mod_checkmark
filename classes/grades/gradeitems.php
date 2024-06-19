@@ -23,8 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_checkmark\grades;
-defined('MOODLE_INTERNAL') || die();
-use \core_grades\local\gradeitem\itemnumber_mapping;
+
+use core_grades\local\gradeitem\itemnumber_mapping;
 
 /**
  * Grade item mappings for the activity.
@@ -44,7 +44,7 @@ class gradeitems implements itemnumber_mapping {
         return [
                 0 => 'checks',
                 1 => 'attendence',
-                2 => 'presentation'
+                2 => 'presentation',
         ];
     }
 }

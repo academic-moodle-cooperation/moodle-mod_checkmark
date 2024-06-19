@@ -57,8 +57,13 @@ class actionmenu implements templatable, renderable {
      */
     public function export_for_template(\renderer_base $output): array {
         return [
-            'submissionlink' => (new moodle_url('/mod/checkmark/view.php', ['id' => $this->cmid, 'action' => 'grading']))->out(false),
-            'gradelink' => (new moodle_url('/mod/checkmark/view.php', ['id' => $this->cmid, 'action' => 'grader']))->out(false)
+            'submissionlink' => (
+                new moodle_url(
+                    '/mod/checkmark/view.php',
+                    ['id' => $this->cmid, 'action' => 'grading']
+                )
+            )->out(false),
+            'gradelink' => (new moodle_url('/mod/checkmark/view.php', ['id' => $this->cmid, 'action' => 'grader']))->out(false),
         ];
     }
 

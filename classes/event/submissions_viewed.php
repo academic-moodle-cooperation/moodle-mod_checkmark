@@ -40,11 +40,11 @@ class submissions_viewed extends submissions_viewed_base {
      * @return \mod_checkmark\event\submissions_viewed event object
      */
     public static function submissions(\stdClass $cm) {
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $cm->instance,
             'context'  => \context_module::instance($cm->id),
             'other'    => 'submissions',
-        ));
+        ]);
         return $event;
     }
 

@@ -23,10 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_checkmark\local\exporttemplates;
-use \mod_checkmark\basetemplate as basetemplate;
-use \mod_checkmark\MTablePDF as MTablePDF;
-
-defined('MOODLE_INTERNAL') || die();
+use mod_checkmark\basetemplate as basetemplate;
+use mod_checkmark\MTablePDF as MTablePDF;
 
 /**
  * Template table-class exported with specific settings!

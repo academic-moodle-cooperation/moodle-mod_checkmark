@@ -24,8 +24,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * checkmark module data generator class
  *
@@ -54,7 +52,7 @@ class behat_mod_checkmark_generator extends behat_generator_base {
                         'datagenerator' => 'feedback',
                         'required' => ['checkmark', 'user'],
                         'switchids' => ['checkmark' => 'checkmark', 'user' => 'userid', 'attendance' => 'attendance'],
-                ]
+                ],
         ];
     }
 

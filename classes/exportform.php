@@ -24,9 +24,6 @@
  */
 namespace mod_checkmark;
 
-defined('MOODLE_INTERNAL') || die();
-
-
 /**
  * This class contains the grading form for checkmark-submissions
  *
@@ -42,7 +39,7 @@ class exportform extends \moodleform {
         MTablePDF::OUTPUT_FORMAT_XLSX       => 'XLSX',
         MTablePDF::OUTPUT_FORMAT_ODS        => 'ODS',
         MTablePDF::OUTPUT_FORMAT_CSV_COMMA  => 'CSV (;)',
-        MTablePDF::OUTPUT_FORMAT_CSV_TAB    => 'CSV (tab)'
+        MTablePDF::OUTPUT_FORMAT_CSV_TAB    => 'CSV (tab)',
     ];
 
     /** @var  \stdClass course module object */
@@ -109,7 +106,7 @@ class exportform extends \moodleform {
 
         $mform->addElement('advcheckbox', 'zipped', '', get_string('zippedgrouppdfs', 'checkmark'), null, [
                 MTablePDF::UNCOMPRESSED,
-                MTablePDF::ZIPPED
+                MTablePDF::ZIPPED,
         ]);
         $mform->hideIf('zipped', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
         $mform->hideIf('zipped', 'group', 'neq', 0);
@@ -125,7 +122,7 @@ class exportform extends \moodleform {
         // How many submissions per page?
         $pppgroup = [
             $mform->createElement('text', 'printperpage', get_string('pdfpagesize', 'checkmark'), ['size' => 3]),
-            $mform->createElement('advcheckbox', 'printoptimum', '', get_string('optimum', 'checkmark'), ['group' => 2])
+            $mform->createElement('advcheckbox', 'printoptimum', '', get_string('optimum', 'checkmark'), ['group' => 2]),
         ];
         $mform->addGroup($pppgroup, 'printperpagegrp', get_string('pdfpagesize', 'checkmark'), ' ', false);
         $mform->addHelpButton('printperpagegrp', 'pdfpagesize', 'checkmark');
@@ -136,7 +133,7 @@ class exportform extends \moodleform {
         $textsizes = [
             MTablePDF::FONTSIZE_SMALL => get_string('strsmall', 'checkmark'),
             MTablePDF::FONTSIZE_MEDIUM => get_string('strmedium', 'checkmark'),
-            MTablePDF::FONTSIZE_LARGE => get_string('strlarge', 'checkmark')
+            MTablePDF::FONTSIZE_LARGE => get_string('strlarge', 'checkmark'),
         ];
         $mform->addElement('select', 'textsize', get_string('pdftextsize', 'checkmark'), $textsizes);
         $mform->hideIf('textsize', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
@@ -144,7 +141,7 @@ class exportform extends \moodleform {
 
         $pageorientations = [
             MTablePDF::LANDSCAPE => get_string('strlandscape', 'checkmark'),
-            MTablePDF::PORTRAIT => get_string('strportrait', 'checkmark')
+            MTablePDF::PORTRAIT => get_string('strportrait', 'checkmark'),
         ];
         $mform->addElement('select', 'pageorientation', get_string('pdfpageorientation', 'checkmark'), $pageorientations);
         $mform->hideIf('pageorientation', 'format', 'neq', MTablePDF::OUTPUT_FORMAT_PDF);
@@ -215,7 +212,7 @@ class exportform extends \moodleform {
             $grouplabel = get_string('groupsseparate');
         }
 
-        if ($aag and $this->cm->groupingid) {
+        if ($aag && $this->cm->groupingid) {
             if ($grouping = groups_get_grouping($this->cm->groupingid)) {
                 $grouplabel = $grouplabel . ' (' . format_string($grouping->name) . ')';
             }

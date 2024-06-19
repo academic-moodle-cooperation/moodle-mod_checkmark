@@ -32,6 +32,6 @@ defined('MOODLE_INTERNAL') || die;
  * @todo should we split implement these in two sepparate message providers?
  */
 
-$messageproviders = array (
-    'checkmark_updates' => array ()
-);
+$messageproviders = [
+    'checkmark_updates' => [],
+];

@@ -23,8 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_checkmark;
-use \mod_checkmark\submissionstable as submissionstable;
-use \mod_checkmark\MTablePDF as MTablePDF;
+use mod_checkmark\submissionstable as submissionstable;
+use mod_checkmark\MTablePDF as MTablePDF;
 
 /**
  * Template table-class exported with specific settings!
@@ -147,7 +147,7 @@ abstract class basetemplate extends submissionstable {
      * @param int[] $ids for which user ids to filter
      * @return submissionstable object
      */
-    public static function create_export_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL, $ids = array()) {
+    public static function create_export_table($checkmarkorcmid = null, $filter = \checkmark::FILTER_ALL, $ids = []) {
         global $CFG, $DB;
         // We need to have the same ID to ensure the columns are collapsed if their collapsed in the other table!
         $table = static::get_table_instance('mod-checkmark-submissions', $checkmarkorcmid);
@@ -169,7 +169,7 @@ abstract class basetemplate extends submissionstable {
         $table->initialbars(true);
 
         // Create and set the SQL!
-        $params = array();
+        $params = [];
         $ufields = \core_user\fields::for_userpic()->get_sql('u')->selects;
         $table->examplecount = count($table->checkmark->checkmark->examples);
         $params['examplecount'] = $table->examplecount;
@@ -249,10 +249,10 @@ abstract class basetemplate extends submissionstable {
         $this->download = '';
 
         if (!$this->rawdata || ($this->rawdata instanceof \Traversable && !$this->rawdata->valid())) {
-            return array(array(), array(), array(), array(), array());
+            return [[], [], [], [], []];
         }
 
-        $returndata = array();
+        $returndata = [];
         $this->format = $type;
         foreach ($this->rawdata as $key => $row) {
             $returndata[$key] = $this->format_row($row);
@@ -264,7 +264,7 @@ abstract class basetemplate extends submissionstable {
             $this->rawdata->close();
         }
 
-        return array($this->columns, $this->headers, $returndata, $this->columnformat, $this->cellwidth);
+        return [$this->columns, $this->headers, $returndata, $this->columnformat, $this->cellwidth];
     }
 }
 
