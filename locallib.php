@@ -3722,7 +3722,8 @@ class checkmark {
         global $CFG, $USER, $DB;
         require_once($CFG->libdir . '/gradelib.php');
 
-        if (!($formdata = data_submitted()) || !confirm_sesskey()) {      // No incoming data?
+        $formdata = data_submitted();
+        if (!$formdata || !confirm_sesskey()) {      // No incoming data?
             return false;
         }
 
@@ -3853,7 +3854,8 @@ class checkmark {
 
         require_once($CFG->libdir . '/gradelib.php');
 
-        if (!$formdata = data_submitted() || !confirm_sesskey()) {
+        $formdata = data_submitted();
+        if (!$formdata || !confirm_sesskey()) {
             return;
         }
 
