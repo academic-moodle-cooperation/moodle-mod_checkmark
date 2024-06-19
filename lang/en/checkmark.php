@@ -591,3 +591,9 @@ $string['remove_grade_error'] = 'Error while bulk removing grades';
 $string['remove_grade_success'] = 'Successfully removed grades for {$a} users';
 $string['remove_grade_one_success'] = 'Successfully removed grade for {$a} user';
 $string['remove_grade_failed'] = 'Failed to remove grade for users';
+
+$string['remove_presentation_grade'] = 'Remove grade (presentation)';
+$string['remove_presentation_grade_error'] = 'Error while bulk removing grades (presentation)';
+$string['remove_presentation_grade_success'] = 'Successfully removed grades (presentation) for {$a} users';
+$string['remove_presentation_grade_one_success'] = 'Successfully removed grade (presentation) for {$a} user';
+$string['remove_presentation_grade_failed'] = 'Failed to remove grade (presentation) for users';
