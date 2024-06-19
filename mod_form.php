@@ -51,7 +51,9 @@ class mod_checkmark_mod_form extends moodleform_mod {
     /** @var object */
     protected $submissioncount = null;
 
-    /** Defines checkmark instance settings form */
+    /**
+     * Defines checkmark instance settings form
+     */
     public function definition() {
         global $CFG, $COURSE;
         $mform =& $this->_form;
@@ -406,12 +408,18 @@ class mod_checkmark_mod_form extends moodleform_mod {
         return !empty($data[$this->get_suffixed_name('completionsubmit')]);
     }
 
-    /** Needed by plugin checkmark if it includes a filemanager element in the settings form! */
+    /**
+     * Needed by plugin checkmark if it includes a filemanager element in the settings form!
+     * @return bool
+     */
     public function has_instance() {
         return ($this->_instance != null);
     }
 
-    /** Needed by plugin checkmarks if it includes a filemanager element in the settings form! */
+    /**
+     *  Needed by plugin checkmarks if it includes a filemanager element in the settings form!
+     * @return bool|core\context\course|core\context\module
+     */
     public function get_context() {
         return $this->context;
     }
@@ -454,7 +462,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform = $this->_form;
 
         if ($defaultvalues['instance']) {
-            if($this->cm == null) {
+            if ($this->cm == null) {
                 $this->cm = get_coursemodule_from_instance('checkmark', $defaultvalues['instance']);
             }
             if (checkmark_count_real_submissions($this->cm) != 0) {

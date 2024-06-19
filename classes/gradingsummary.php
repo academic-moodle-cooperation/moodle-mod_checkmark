@@ -49,9 +49,9 @@ class gradingsummary implements renderable {
     public $coursemoduleid = 0;
     /** @var int coursestartdate - start date of the course as a unix timestamp*/
     public $coursestartdate;
-    /** @var boolean cangrade - Can the current user grade students? */
+    /** @var bool cangrade - Can the current user grade students? */
     public $cangrade = false;
-    /** @var boolean isvisible - Is the assignment's context module visible to students? */
+    /** @var bool isvisible - Is the assignment's context module visible to students? */
     public $isvisible = true;
     /** @var int attendantcount - Count of attending students. -1 if attendance is not active */
     public $attendantcount = -1;

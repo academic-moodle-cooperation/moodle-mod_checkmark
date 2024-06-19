@@ -2154,8 +2154,8 @@ class checkmark {
                     }
 
                     // Bulk remove grades.
-                    if(in_array($bulkaction, ['removegrade'])) {
-                        if(has_capability('mod/checkmark:grade', context_module::instance($this->cm->id))) {
+                    if (in_array($bulkaction, ['removegrade'])) {
+                        if (has_capability('mod/checkmark:grade', context_module::instance($this->cm->id))) {
                             $result = $this->remove_grades(self::FILTER_SELECTED, $selected);
                             if (!isset($message)) {
                                 $message = '';
@@ -2180,8 +2180,8 @@ class checkmark {
                     }
 
                     // Bulk remove grades.
-                    if(in_array($bulkaction, ['removepresentationgrade'])) {
-                        if(has_capability('mod/checkmark:grade', context_module::instance($this->cm->id))) {
+                    if (in_array($bulkaction, ['removepresentationgrade'])) {
+                        if (has_capability('mod/checkmark:grade', context_module::instance($this->cm->id))) {
                             $result = $this->remove_presentation_grades(self::FILTER_SELECTED, $selected);
                             if (!isset($message)) {
                                 $message = '';
@@ -3623,8 +3623,8 @@ class checkmark {
          * Get all settings preferences, some will be overwritten if a template is used!
          */
         list($filter, $sumabs, $sumrel, $seperatenamecolumns, $format, $printperpage, ,
-                $textsize, $orientation, $printheader, $forcesinglelinenames, , $sequentialnumbering, $coursetitle) = $this->print_preferences();
-
+                $textsize, $orientation, $printheader, $forcesinglelinenames, , $sequentialnumbering,
+                $coursetitle) = $this->print_preferences();
 
         if (!empty($template)) {
             $classname = '\\mod_checkmark\\local\\exporttemplates\\' . $template;
@@ -4464,7 +4464,7 @@ class checkmark {
      * @param int|null $userid the id of the user to load the assign instance for.
      * @return stdClass The settings
      */
-    public function get_instance(int $userid = null): stdClass {
+    public function get_instance(int|null $userid = null): stdClass {
         global $USER;
         $userid = $userid ?? $USER->id;
 
@@ -4479,6 +4479,7 @@ class checkmark {
         $this->userinstances[$userid] = $this->calculate_properties($this->instance, $userid);
         return $this->userinstances[$userid];
     }
+
     /**
      * Get the settings for the current instance of this assignment.
      *
@@ -4495,6 +4496,7 @@ class checkmark {
         }
         return $this->instance;
     }
+
     /**
      * Get the current course module.
      *
@@ -4515,6 +4517,7 @@ class checkmark {
         }
         return null;
     }
+
     /**
      * Calculates and updates various properties based on the specified user.
      *
@@ -4572,8 +4575,7 @@ class checkmark {
      * @throws coding_exception
      * @throws dml_exception
      */
-    private function bulk_remove_grades($selected, $gradetype)
-    {
+    private function bulk_remove_grades($selected, $gradetype) {
         global $DB;
 
         $result = ['status' => GRADE_UPDATE_FAILED, 'updated' => 0];

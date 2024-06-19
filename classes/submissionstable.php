@@ -101,13 +101,6 @@ class submissionstable extends \table_sql {
     /** @var \int protected if formated cells should contain html */
     protected $format = self::FORMAT_HTML;
 
-    /**
-     *
-     * @var \bool protected suppressinitials shows whether or not the intials bars should be printed
-     * @deprecated since Moodle 3.3 TODO remove in Moodle 3.7
-     */
-    protected $suppressinitials = false;
-
     /** @var \bool protected defaultselectstate whether or not the select checkboxes should be checked or not checked by default */
     protected $defaultselectstate = false;
 
@@ -739,12 +732,12 @@ class submissionstable extends \table_sql {
      *            from where to fetch (SQL snippet)
      * @param string $where
      *            where conditions for SQL query (SQL snippet)
-     * @param array $params
+     * @param array|null $params
      *            (optional) params for query
      * @param string $groupby
      *            (optional) groupby clause (SQL snippet)
      */
-    public function set_sql($fields, $from, $where, array $params = null, $groupby = '') {
+    public function set_sql($fields, $from, $where, array|null $params = null, $groupby = '') {
         parent::set_sql($fields, $from, $where, $params);
         $this->sql->groupby = $groupby;
     }
@@ -1072,21 +1065,21 @@ class submissionstable extends \table_sql {
         $where = "u.id " . $sqluserids;
 
         // These filters might not be necessary as the userids used in the joins are already filtered by them.
-        if ($filter == \checkmark::FILTER_SUBMITTED) {
+        if ($filter == checkmark::FILTER_SUBMITTED) {
             $where .= ' AND s.timemodified > 0';
-        } else if ($filter == \checkmark::FILTER_REQUIRE_GRADING) {
+        } else if ($filter == checkmark::FILTER_REQUIRE_GRADING) {
             $where .= ' AND COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0)';
-        } else if ($filter == \checkmark::FILTER_ATTENDANT) {
+        } else if ($filter == checkmark::FILTER_ATTENDANT) {
             $where .= ' AND attendance = 1';
-        } else if ($filter == \checkmark::FILTER_ABSENT) {
+        } else if ($filter == checkmark::FILTER_ABSENT) {
             $where .= ' AND attendance = 0';
-        } else if ($filter == \checkmark::FILTER_UNKNOWN) {
+        } else if ($filter == checkmark::FILTER_UNKNOWN) {
             $where .= ' AND attendance IS NULL';
-        } else if ($filter == \checkmark::FILTER_PRESENTATIONGRADING) {
+        } else if ($filter == checkmark::FILTER_PRESENTATIONGRADING) {
             $where .= " AND presentationgrade IS NOT NULL OR presentationfeedback IS NOT NULL";
-        } else if ($filter == \checkmark::FILTER_NO_PRESENTATIONGRADING) {
+        } else if ($filter == checkmark::FILTER_NO_PRESENTATIONGRADING) {
             $where .= " AND presentationgrade IS NULL AND presentationfeedback IS NULL";
-        } else if ($filter == \checkmark::FILTER_GRADED) {
+        } else if ($filter == checkmark::FILTER_GRADED) {
             $where .= " AND COALESCE(f.timemodified,0) >= COALESCE(s.timemodified,0) AND f.timemodified IS NOT NULL";
         }
 
@@ -1214,31 +1207,31 @@ class submissionstable extends \table_sql {
             $sqluserids = "";
         }
 
-        if (($filter == \checkmark::FILTER_SELECTED) || ($filter == \checkmark::FILTER_ALL)) {
+        if (($filter == checkmark::FILTER_SELECTED) || ($filter == checkmark::FILTER_ALL)) {
             $sql = "SELECT u.id FROM {user} u
                       JOIN (" . $esql . ") eu ON eu.id=u.id
                      WHERE 1=1" . $sqluserids;
         } else {
             $wherefilter = '';
-            if ($filter == \checkmark::FILTER_SUBMITTED) {
+            if ($filter == checkmark::FILTER_SUBMITTED) {
                 $wherefilter = " AND s.timemodified > 0";
-            } else if ($filter == \checkmark::FILTER_NOT_SUBMITTED) {
+            } else if ($filter == checkmark::FILTER_NOT_SUBMITTED) {
                 $wherefilter = " AND (s.timemodified <= 0 OR s.timemodified IS NULL)";
-            } else if ($filter == \checkmark::FILTER_REQUIRE_GRADING) {
+            } else if ($filter == checkmark::FILTER_REQUIRE_GRADING) {
                 $wherefilter = " AND COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0) ";
-            } else if ($filter == \checkmark::FILTER_EXTENSION) {
+            } else if ($filter == checkmark::FILTER_EXTENSION) {
                 $wherefilter = " AND o.id IS NOT NULL";
-            } else if ($filter == \checkmark::FILTER_ATTENDANT) {
+            } else if ($filter == checkmark::FILTER_ATTENDANT) {
                 $wherefilter .= " AND attendance = 1";
-            } else if ($filter == \checkmark::FILTER_ABSENT) {
+            } else if ($filter == checkmark::FILTER_ABSENT) {
                 $wherefilter .= " AND attendance = 0";
-            } else if ($filter == \checkmark::FILTER_UNKNOWN) {
+            } else if ($filter == checkmark::FILTER_UNKNOWN) {
                 $wherefilter .= " AND attendance IS NULL";
-            } else if ($filter == \checkmark::FILTER_PRESENTATIONGRADING) {
+            } else if ($filter == checkmark::FILTER_PRESENTATIONGRADING) {
                 $wherefilter .= " AND presentationgrade IS NOT NULL OR presentationfeedback IS NOT NULL";
-            } else if ($filter == \checkmark::FILTER_NO_PRESENTATIONGRADING) {
+            } else if ($filter == checkmark::FILTER_NO_PRESENTATIONGRADING) {
                 $wherefilter .= " AND presentationgrade IS NULL AND presentationfeedback IS NULL";
-            } else if ($filter == \checkmark::FILTER_GRADED) {
+            } else if ($filter == checkmark::FILTER_GRADED) {
                 $wherefilter .= " AND COALESCE(f.timemodified,0) >= COALESCE(s.timemodified,0) AND f.timemodified IS NOT NULL";
             }
             $params['checkmarkid'] = $checkmarkid;
@@ -1282,7 +1275,7 @@ class submissionstable extends \table_sql {
      *            Currently active filter (FILTER_ALL, FILTER_REQUIRE_GRADING, FILTER_SUBMITTED...)
      * @param array $ids
      *            (optional) Array of userids to filter for
-     * @return array|int[] Array of found userids. [-1] if none are found
+     * @return int Integer number of found userids. 0 if none are found.
      */
     public static function count_userids($context, $checkmarkid, $currentgroup, $filter, $ids = []) {
         $idsres = self::get_userids_static($context, $checkmarkid, $currentgroup, $filter, $ids);
@@ -1336,23 +1329,9 @@ class submissionstable extends \table_sql {
             $params,
         ]);
 
-        // return \html_writer::checkbox('selected[]', 1, false, null, ['id' => "chmrk_selectallcb"]);
         return \html_writer::tag('div', \html_writer::checkbox('selected[]', 1, false, null, ['id' => "chmrk_selectallcb"]), [
             'id' => $randomid,
         ]);
-        // return \html_writer::tag('div', $title . \html_writer::link($allurl, get_string('all'), [
-        // 'class' => 'all'
-        // ]) . ' / ' . \html_writer::link($noneurl, get_string('none'), [
-        // 'class' => 'none'
-        // ]) . ' / ' . \html_writer::link($gradedurl, get_string('graded', 'checkmark'), [
-        // 'class' => 'graded'
-        // ]) . ' / ' . \html_writer::link($reqgradingurl, get_string('ungraded', 'checkmark'), [
-        // 'class' => 'ungraded'
-        // ]) . ' / ' . \html_writer::link($submittedurl, get_string('submitted', 'checkmark'), [
-        // 'class' => 'submitted'
-        // ]), [
-        // 'id' => $randomid
-        // ]);
     }
 
     /**
@@ -1576,7 +1555,6 @@ class submissionstable extends \table_sql {
                     return $this->get_grade_button($values, true) . \html_writer::tag('div', '-', [
                         'id' => 'g' . $values->id,
                     ]);
-                    // return $this->get_grade_button($values, true);
                 }
             }
         }
@@ -2398,7 +2376,6 @@ class submissionstable extends \table_sql {
             $popupurl = $CFG->wwwroot . '/mod/checkmark/submissions.php?id=' . $this->checkmark->cm->id . '&userid=' .
                 $values->id . '&mode=single' . '&filter=' . $this->filter;
 
-            // $button = $OUTPUT->action_link($popupurl, $text);
             $button = \html_writer::tag('a', $btnstring, [
                 'class' => 'btn btn-' . $btntype . ' mr-1 ml-0 float-left',
                 'href' => $popupurl,
