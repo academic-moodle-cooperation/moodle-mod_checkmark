@@ -599,7 +599,8 @@ class submissionstable extends \table_sql {
         }
 
         $stringgraded = get_string('submissionstatus_marked', 'checkmark');
-        $stringnew = get_string('submissionstatus_submitted', 'checkmark');
+        $stringsubmitted = get_string('submissionstatus_submitted', 'checkmark');
+        $stringnosubmission = get_string('submissionstatus_new', 'checkmark');
         // Case statement to determine the status of the submission. With this the status column can be sorted.
         $fields = "u.id, ' ' AS selection, ' ' AS picture " . $ufields . " " . $useridentity->selects . ",
                     s.id AS submissionid, f.id AS feedbackid, f.grade, f.feedback,
@@ -607,7 +608,9 @@ class submissionstable extends \table_sql {
                     CASE
                         WHEN f.timemodified IS NOT NULL
                             THEN '$stringgraded'
-                        ELSE '$stringnew'
+                        WHEN s.timemodified IS NOT NULL
+                            THEN '$stringsubmitted'
+                        ELSE '$stringnosubmission'
                     END AS status";
         if ($table->checkmark->checkmark->trackattendance) {
             $fields .= ", f.attendance AS attendance";
@@ -1783,7 +1786,12 @@ class submissionstable extends \table_sql {
 
         $overrides = checkmark_get_overridden_dates($this->checkmark->cm->instance, $values->id, $this->checkmark->course->id);
 
-        $o .= $OUTPUT->container($values->status, 'submissionstatussubmitted');
+        $displaystatus = '';
+        if ($values->status != get_string('submissionstatus_new', 'checkmark')) {
+            $displaystatus = 'submitted';
+        }
+
+        $o .= $OUTPUT->container($values->status, 'submissionstatus' .$displaystatus);
 
         // If overridden dates are present for this user, we display an icon with popup!
         if ($this->hasoverrides && $overrides) {
