@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+4.x.y (unreleased)
+------------------
+* [FIXED] #7702 Fix SQL syntax error
+
 4.3.2 (2024-06-14)
 ------------------
 * [FIXED] #7973 Fix that additional files are not downloadable anymore
