@@ -480,7 +480,7 @@ class submissionstable extends \table_sql {
         $table->addexamplecolumns($tablecolumns, $tableheaders, $helpicons);
 
         if ($table->checkmark->checkmark->grade != 0) {
-            $tableheaders[] = get_string('grade', 'grades');
+            $tableheaders[] = get_string('modgrade', 'grades');
             $tablecolumns[] = 'grade';
             $helpicons[] = null;
             $feedbackcols = 3;
@@ -490,7 +490,7 @@ class submissionstable extends \table_sql {
         $tableheaders[] = get_string('comment', 'checkmark');
         $tablecolumns[] = 'feedback';
         $helpicons[] = null;
-        $tableheaders[] = get_string('lastmodified') . ' (' . get_string('grade', 'grades') . ')';
+        $tableheaders[] = get_string('lastmodified') . ' (' . get_string('modgrade', 'grades') . ')';
         $tablecolumns[] = 'timemarked';
         $helpicons[] = null;
         $table->add_colgroup('feedback', $feedbackcols);
@@ -657,7 +657,7 @@ class submissionstable extends \table_sql {
         $table->gradinginfo = grade_get_grades($table->checkmark->course->id, 'mod', 'checkmark',
             $table->checkmark->checkmark->id, $users);
         $table->strupdate = get_string('update');
-        $table->strgrade = get_string('grade', 'grades');
+        $table->strgrade = get_string('modgrade', 'grades');
         $table->grademenu = make_grades_menu($table->checkmark->checkmark->grade);
         if ($table->checkmark->checkmark->presentationgrading && $table->checkmark->checkmark->presentationgrade) {
             $table->presentationgrademenu = make_grades_menu($table->checkmark->checkmark->presentationgrade);
@@ -878,7 +878,7 @@ class submissionstable extends \table_sql {
         }
 
         if ($table->checkmark->checkmark->grade != 0) {
-            $tableheaders[] = get_string('grade', 'grades');
+            $tableheaders[] = get_string('modgrade', 'grades');
             $tablecolumns[] = 'grade';
             $table->cellwidth[] = [
                 'mode' => 'Fixed',

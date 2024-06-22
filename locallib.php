@@ -1069,7 +1069,7 @@ class checkmark {
             if ($this->checkmark->grade) {
                 $content =
                         html_writer::tag('div', html_writer::tag('strong',
-                                        get_string('grade', 'grades') . ': ') . $grade->str_long_grade,
+                                        get_string('modgrade', 'grades') . ': ') . $grade->str_long_grade,
                         ['class' => 'grade']);
             } else {
                 $content = '';
@@ -4292,7 +4292,7 @@ class checkmark {
     public function user_outline($grade) {
 
         $result = new stdClass();
-        $result->info = get_string('grade', 'grades') . ': ' . $grade->str_long_grade;
+        $result->info = get_string('modgrade', 'grades') . ': ' . $grade->str_long_grade;
         $result->time = $grade->dategraded;
         return $result;
     }
@@ -4309,7 +4309,7 @@ class checkmark {
     public function user_complete($user, $grade = null) {
         global $OUTPUT;
         if ($grade) {
-            echo $OUTPUT->container(get_string('grade', 'grades') . ': ' . $grade->str_long_grade);
+            echo $OUTPUT->container(get_string('modgrade', 'grades') . ': ' . $grade->str_long_grade);
             if ($grade->str_feedback) {
                 echo $OUTPUT->container(get_string('feedback') . ': ' . $grade->str_feedback);
             }

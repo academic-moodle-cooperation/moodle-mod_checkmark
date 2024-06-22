@@ -1707,7 +1707,7 @@ function checkmark_print_recent_mod_activity($activity, $courseid, $detail) {
 
     if (isset($activity->grade)) {
         echo '<div class="grade">';
-        echo get_string('grade', 'grades') . ': ';
+        echo get_string('modgrade', 'grades') . ': ';
         echo $activity->grade;
         echo '</div>';
     }
@@ -2264,7 +2264,7 @@ function mod_checkmark_core_calendar_provide_event_action(calendar_event $event,
     $started = time() >= $cmptime;
 
     if ($event->eventtype == CHECKMARK_EVENT_TYPE_GRADINGDUE) {
-        $name = get_string('grade', 'grades');
+        $name = get_string('modgrade', 'grades');
         $url = new \moodle_url('/mod/checkmark/submissions.php', [
                 'id' => $cm->id,
         ]);
