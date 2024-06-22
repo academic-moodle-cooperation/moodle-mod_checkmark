@@ -649,11 +649,11 @@ class submissionstable extends \table_sql {
             $where .= 'f.attendance IS NULL AND ';
         }
         $where .= "u.id " . $sqluserids;
-        $mappings = $useridentity->mappings;
-        if (! empty($mappings)) {
-            $mappings = "," . implode(",", $useridentity->mappings);
+
+        $groupby = " u.id, s.id, f.id" . $ufields;
+        if (!empty($useridentity->mappings)) {
+            $groupby .= ", " . implode(",", $useridentity->mappings);
         }
-        $groupby = " u.id, s.id, f.id " . $ufields . " " . $mappings;
         if ($table->groupmode != NOGROUPS) {
             $groupby .= ", grpq.groupname";
         }
@@ -1090,12 +1090,11 @@ class submissionstable extends \table_sql {
             $where .= " AND COALESCE(f.timemodified,0) >= COALESCE(s.timemodified,0) AND f.timemodified IS NOT NULL";
         }
 
-        $mappings = $useridentity->mappings;
-        if (! empty($mappings)) {
-            $mappings = "," . implode(",", $useridentity->mappings);
+        $groupby = "u.id, s.id, f.id" . $ufields;
+        if (!empty($useridentity->mappings)) {
+            $groupby .= ", " . implode(",", $useridentity->mappings);
         }
-
-        $groupby = " u.id, s.id, f.id " . $ufields . " " . $mappings . ", f.attendance";
+        $groupby .= ", f.attendance";
 
         $table->set_sql($fields, $from, $where, $params, $groupby);
         $table->set_count_sql("SELECT COUNT(DISTINCT u.id) FROM " . $from . " WHERE " . $where, $params);
