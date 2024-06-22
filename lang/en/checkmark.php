@@ -333,7 +333,6 @@ $string['early'] = '{$a} early';
 $string['editmysubmission'] = 'Edit my submission';
 $string['extended_until'] = 'Extended until {$a}';
 $string['addsubmission'] = 'Add submission';
-$string['editoverride'] = 'Edit override';
 $string['emailstudents'] = 'Email alerts to students';
 $string['emailteachermail'] = '{$a->username} has updated the checkmark submission
 for \'{$a->checkmark}\' on {$a->dayupdated} at {$a->timeupdated}.
@@ -492,40 +491,17 @@ $string['zippedgrouppdfs'] = 'Groups as separate PDFs';
  * End of block with standard-strings
  */
 
-// Deprecated since Moodle 3.1!
-$string['autograde_all'] = 'Grade all submissions';
-$string['autograde_custom'] = 'Grade selected users';
-$string['autograde_no_users_selected'] = 'You have not selected any user to grade. Select the required users via the checkboxes in the left column of the table below.';
-$string['autograde_req'] = 'Grade ungraded';
-$string['autograde_str'] = 'Auto-grading';
-$string['autograde_str_help'] = 'Auto-grading calculates users grades according to points per example and checked examples. It adds the points for each checked example and uses this as the users grade. <ul><li>grade selected users - grades just these users, which are checked in the list. If a user hasn\'t submitted anything, a empty submission get\'s added.</li><li>grade who needs grading - grades every submission which is more up to date than the corresponding grading</li><li>grade all submissions - grades all present submissions (for this instance). Does NOT add empty submissions.</li></ul><br />The grade gets calculated based on chosen example grades and checked examples:<ul><li>standard-grading: here each example is equally weighted (integral grade per example). The grade is calculated by multiplication of the sum of checked examples with the quotient of checkmark-grade and checkmark-count.</li><li>individual example-weights: the grade is the sum of example grades for each checked example (according to instance-settings).</li></ul>';
-
 // Deprecated since Moodle 3.3!
 $string['end_of_submission_for'] = 'End of submission for {$a}';
-
-// Deprecated since Moodle 3.6!
-$string['checkbrokengradebookgrades'] = 'Check broken gradebook grades';
-$string['checkbrokengradebookgrades_desc'] = 'Due to a bug in version 2.9.1 of the Checkmark, grades have not been transfered to gradebook correctly.
-The following submissions have been affected by this bug:';
-$string['checkbrokengradebookgrades_mail'] = 'Due to a bug in version 2.9.1 of the Checkmark, grades have not been transfered to gradebook correctly.
-The following submissions have been affected by this bug and were automatically fixed:';
 
 $string['editoverride'] = 'Edit override';
 $string['invalidoverrideid'] = 'Invalid override id';
 $string['duplicateoverride'] = 'Duplicate override';
-$string['groupoverrides'] = 'Group overrides';
-$string['groupsnone'] = 'No groups you can access.';
 $string['overridegroup'] = 'Override group';
 $string['overrideuser'] = 'Override user';
-$string['useroverrides'] = 'User overrides';
-$string['usersnone'] = 'No students have access to this assignment.';
 $string['userassignmentdefaults'] = 'User assignment defaults';
-$string['allowsubmissionsfromdate'] = 'Allow submissions from';
-$string['allowsubmissionsfromdate_help'] = 'If enabled, students will not be able to submit before this date. If disabled, students will be able to start submitting right away.';
-$string['duedate'] = 'Due date';
 $string['duedatecolon'] = 'Due date: {$a}';
 $string['duedate_help'] = 'This is when the assignment is due. Submissions will still be allowed after this date, but any assignments submitted after this date will be marked as late. Set an assignment cut-off date to prevent submissions after a certain date.';
-$string['cutoffdate'] = 'Cut-off date';
 $string['cutoffdatecolon'] = 'Cut-off date: {$a}';
 $string['cutoffdate_help'] = 'If set, the assignment will not accept submissions after this date without an extension.';
 $string['cutoffdatevalidation'] = 'Cut-off date cannot be earlier than the due date.';
@@ -544,8 +520,6 @@ $string['duedatevalidation'] = 'Due date cannot be earlier than the allow submis
 $string['nooverridedata'] = 'You must override at least one of the assignment settings.';
 $string['overridegroupeventname'] = '{$a->checkmark} - {$a->group}';
 $string['overrideusereventname'] = '{$a->checkmark} - Override';
-$string['addnewgroupoverride'] = 'Add group override';
-$string['addnewuseroverride'] = 'Add user override';
 $string['overridessummary'] = 'Settings overrides exist ({$a})';
 $string['overridessummarythisgroup'] = 'Settings overrides exist ({$a}) for this group';
 $string['overridessummaryyourgroups'] = 'Settings overrides exist ({$a}) for your groups';
@@ -571,11 +545,9 @@ $string['gradedon'] = 'Graded on';
 $string['timemodified'] = 'Last modified';
 $string['gradingstatus'] = 'Grading status';
 $string['nosubmissionyet'] = 'No submissions have been made yet';
-$string['submissionstatus'] = 'Submission status';
 $string['choosegradingaction'] = 'Grading action';
 $string['viewgradebook'] = 'View gradebook';
 $string['paramtimeremaining'] = '{$a} remaining';
-$string['submissionstatusheading'] = 'Submission status';
 $string['nogroupoverrridemessage'] = 'There are currently no group overrides';
 $string['nouseroverrridemessage'] = 'There are currently no user overrides';
 $string['submittedlateshort'] = '{$a} late';
