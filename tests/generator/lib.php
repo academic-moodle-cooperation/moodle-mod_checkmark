@@ -38,11 +38,11 @@ class mod_checkmark_generator extends testing_module_generator {
     /**
      * Generator method creating a mod_checkmark instance.
      *
-     * @param array|stdClass $record (optional) Named array containing instance settings
-     * @param array $options (optional) general options for course module. Can be merged into $record
+     * @param array|stdClass|null $record (optional) Named array containing instance settings
+     * @param array|null  $options (optional) general options for course module. Can be merged into $record
      * @return stdClass record from module-defined table with additional field cmid (corresponding id in course_modules table)
      */
-    public function create_instance($record = null, array $options = null) {
+    public function create_instance($record = null, array|null $options = null) {
         $record = (object)(array)$record;
 
         $timecreated = time();
