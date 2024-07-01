@@ -79,6 +79,9 @@ class mod_checkmark_mod_form extends moodleform_mod {
             null, ['subdirs' => 0, 'maxbytes' => $COURSE->maxbytes] );
         $mform->addHelpButton('introattachments', 'introattachments', 'checkmark');
 
+        $mform->addElement('advcheckbox', 'submissionattachments', get_string('submissionattachments', 'checkmark'));
+        $mform->addHelpButton('submissionattachments', 'submissionattachments', 'checkmark');
+
         $this->add_availability_elements();
 
         $this->add_checkmark_elements();

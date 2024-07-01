@@ -571,3 +571,6 @@ $string['remove_presentation_grade_error'] = 'Error while bulk removing grades (
 $string['remove_presentation_grade_success'] = 'Successfully removed grades (presentation) for {$a} users';
 $string['remove_presentation_grade_one_success'] = 'Successfully removed grade (presentation) for {$a} user';
 $string['remove_presentation_grade_failed'] = 'Failed to remove grade (presentation) for users';
+
+$string['submissionattachments'] = 'Only show files during submission';
+$string['submissionattachments_help'] = 'Tick the box to only show files on the submission page. Otherwise, files will be shown on both the assignment and submission pages.';
