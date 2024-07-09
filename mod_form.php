@@ -43,6 +43,8 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
  */
 class mod_checkmark_mod_form extends moodleform_mod {
     /** @var object */
+    protected $checkmarkinstance = null;
+    /** @var object */
     protected $_checkmarkinstance = null;
     /** @var int */
     protected $update = 0;
