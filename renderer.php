@@ -115,12 +115,16 @@ class mod_checkmark_renderer extends plugin_renderer_base {
                     $filename,
                     'moodle',
                     ['class' => 'icon']);
+            $timemodified = userdate(
+                $file->get_timemodified(),
+                get_string('strftimedatetime', 'langconfig')
+            );
             $result .= '<li yuiConfig=\'' . json_encode($yuiconfig) . '\'>' .
                     '<div>' .
                     '<div class="fileuploadsubmission">' . $image . ' ' .
                     $file->fileurl . ' ' .
                     '</div>' .
-                    '<div class="fileuploadsubmissiontime">' . $file->timemodified . '</div>' .
+                    '<div class="fileuploadsubmissiontime">' . $timemodified . '</div>' .
                     '</div>' .
                     '</li>';
         }
@@ -528,11 +532,6 @@ class checkmark_files implements renderable {
             $this->preprocess($subdir, $filearea, $component);
         }
         foreach ($dir['files'] as $file) {
-
-            $file->timemodified = userdate(
-                    $file->get_timemodified(),
-                    get_string('strftimedatetime', 'langconfig')
-            );
             $url = moodle_url::make_pluginfile_url($this->context->id, $component, $filearea, $file->get_itemid(),
                     $file->get_filepath(), $file->get_filename(), true);
             $filename = $file->get_filename();
