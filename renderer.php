@@ -115,14 +115,21 @@ class mod_checkmark_renderer extends plugin_renderer_base {
                     $filename,
                     'moodle',
                     ['class' => 'icon']);
+            // Preprocess the date displayed.
             $timemodified = userdate(
                 $file->get_timemodified(),
                 get_string('strftimedatetime', 'langconfig')
             );
+            // Create the URL for the file.
+            $url = moodle_url::make_pluginfile_url($tree->context->id, $tree->component, $tree->filearea, $file->get_itemid(),
+                    $file->get_filepath(), $filename, true);
+            $fileurl = html_writer::link($url, $filename, [
+                    'target' => '_blank',
+            ]);
             $result .= '<li yuiConfig=\'' . json_encode($yuiconfig) . '\'>' .
                     '<div>' .
                     '<div class="fileuploadsubmission">' . $image . ' ' .
-                    $file->fileurl . ' ' .
+                    $fileurl . ' ' .
                     '</div>' .
                     '<div class="fileuploadsubmissiontime">' . $timemodified . '</div>' .
                     '</div>' .
@@ -489,6 +496,10 @@ class checkmark_files implements renderable {
     public $cm;
     /** @var stdClass $course */
     public $course;
+    /** @var string $filearea */
+    public $filearea;
+    /** @var string $component */
+    public $component;
 
     /**
      * The constructor
@@ -501,43 +512,12 @@ class checkmark_files implements renderable {
     public function __construct(context $context, $sid, $filearea, $component) {
         global $CFG;
         $this->context = $context;
+        $this->filearea = $filearea;
+        $this->component = $component;
         list($context, $course, $cm) = get_context_info_array($context->id);
         $this->cm = $cm;
         $this->course = $course;
         $fs = get_file_storage();
         $this->dir = $fs->get_area_tree($context->id, $component, $filearea, $sid);
-
-        $files = $fs->get_area_files($context->id,
-                $component,
-                $filearea,
-                $sid,
-                'timemodified',
-                false);
-
-        $this->preprocess($this->dir, $filearea, $component);
-    }
-
-    /**
-     * Preprocessing the file list
-     *
-     * @param array $dir
-     * @param string $filearea
-     * @param string $component
-     * @return void
-     */
-    public function preprocess($dir, $filearea, $component) {
-        global $CFG;
-
-        foreach ($dir['subdirs'] as $subdir) {
-            $this->preprocess($subdir, $filearea, $component);
-        }
-        foreach ($dir['files'] as $file) {
-            $url = moodle_url::make_pluginfile_url($this->context->id, $component, $filearea, $file->get_itemid(),
-                    $file->get_filepath(), $file->get_filename(), true);
-            $filename = $file->get_filename();
-            $file->fileurl = html_writer::link($url, $filename, [
-                    'target' => '_blank',
-            ]);
-        }
     }
 }
