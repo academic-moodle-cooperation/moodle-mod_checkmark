@@ -1,9 +1,13 @@
 CHANGELOG
 =========
 
-4.x.y (unreleased)
+4.4.0 (2024-07-21)
 ------------------
 * [FIXED] #7702 Fix SQL syntax error
+* [FEATURE] #5424 New course title selection setting for export
+* [FIXED] #7587 Fix error in bulk edit completion form
+* [FIXED] #7971 Fix wording for late submission as "late" instead of "remaining"
+* [UPDATE] #7933 Icon for the activity
 
 4.3.2 (2024-06-14)
 ------------------
