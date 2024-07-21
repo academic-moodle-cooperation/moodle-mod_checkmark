@@ -8,6 +8,7 @@ CHANGELOG
 * [FIXED] #7587 Fix error in bulk edit completion form
 * [FIXED] #7971 Fix wording for late submission as "late" instead of "remaining"
 * [UPDATE] #7933 Icon for the activity
+* [FEATURE] #7524 New feature to bulk remove grades from submissions [github pull #74 @jondo]
 
 4.3.2 (2024-06-14)
 ------------------
