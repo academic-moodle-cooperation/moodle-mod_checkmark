@@ -23,7 +23,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use core\output\local\dropdown\status;
 use mod_checkmark\submission;
 use mod_checkmark\submissionstable;
 
@@ -4599,6 +4598,9 @@ class checkmark {
         if (empty($users)) {
             return $result;
         }
+        if (empty($grades) || !is_array($grades)) {
+            $grades = [];
+        }
 
         $timemarked = time();
         foreach ($users as $user) {
@@ -4609,9 +4611,20 @@ class checkmark {
                 $DB->update_record('checkmark_feedbacks', $feedback);
                 $result['updated']++;
             }
+
+            // Update in gradebook only for grade remove, not presentation.
+            if ($gradetype == 'grade') {
+                if (!isset($grades[$user->id])) {
+                    $grades[$user->id] = new stdClass();
+                }
+                $grades[$user->id]->userid = $user->id;
+                $grades[$user->id]->rawgrade = null;
+            }
         }
 
-        $result['status'] = GRADE_UPDATE_OK;
+        // This is to update grade in gradebook.
+        $result['status'] = grade_update('mod/checkmark', $this->checkmark->course, 'mod',
+                        'checkmark', $this->checkmark->id, 0, $grades, $params);
         return $result;
     }
 }
