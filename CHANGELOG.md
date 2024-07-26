@@ -7,8 +7,8 @@ CHANGELOG
 * [FEATURE] #5424 New course title selection setting for export
 * [FIXED] #7587 Fix error in bulk edit completion form
 * [FIXED] #7971 Fix wording for late submission as "late" instead of "remaining"
-* [UPDATE] #7933 Icon for the activity
-* [FEATURE] #7524 New feature to bulk remove grades from submissions [github pull #74 @jondo]
+* [UPDATE] #7933 New icon for the activity to follow moodle 4.4 logo style
+* [FEATURE] #7524 New feature to bulk remove grades from submissions [github PR #74 - jondo]
 
 4.3.2 (2024-06-14)
 ------------------

@@ -3,7 +3,7 @@ Checkmark
 
 This file is part of the mod_checkmark plugin for Moodle - <http://moodle.org/>
 
-*Author:*    Daniel Binder, Philipp Hager, Katarzyna Potocka, Alexander Melem
+*Author:*    Daniel Binder, Philipp Hager, Katarzyna Potocka, Alexander Melem, Clemens Marx
 
 *Copyright:* [Academic Moodle Cooperation](http://www.academic-moodle-cooperation.org)
 
