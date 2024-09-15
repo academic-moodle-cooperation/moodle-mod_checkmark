@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+
+4.1.2 (2024-09-15)
+* [FIXED] #7771 Fix display bug with font awesome version 6
+
 4.1.1 (2022-07-28)
 ------------------
 * [FIXED] #7523 Fix rogue database-index during upgrade to 4.1 issue
