@@ -228,7 +228,18 @@ class submission {
 
         $context = clone $this;
         $context->examples = array_values($this->get_examples_or_example_template());
+        $context->fontawesomeversionsix = $this->is_fontawesomeversionsix();
 
         return $OUTPUT->render_from_template('mod_checkmark/submission', $context);
+    }
+
+    /**
+     * Returns bool if the fontawesome version is 6
+     *
+     * @return bool
+     */
+    public function is_fontawesomeversionsix() {
+        $faconfig = get_config('theme_boost_union', 'fontawesomeversion');
+        return $faconfig == "fa6free";
     }
 }
