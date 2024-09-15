@@ -116,6 +116,10 @@ class example {
      * CHECKED_OVERWRITTEN: The example has not been checked by the student and was overwritten as checked by the teacher
      */
     public $state = 0x0000;
+    /**
+     * @var bool $fontawesomeversionsix: Flag if fontawesome version 6 is used
+     */
+    public $fontawesomeversionsix = false;
 
     /**
      * example constructor.
@@ -131,6 +135,7 @@ class example {
         $this->name = $name;
         $this->grade = $grade;
         $this->prefix = $prefix;
+        $this->fontawesomeversionsix = $this->is_fontawesomeversionsix();
 
         if ($state !== null) {
             $this->state = $state;
@@ -485,5 +490,15 @@ class example {
                 return get_string('strpoints', 'checkmark');
                 break;
         }
+    }
+
+    /**
+     * Returns if the font awesome version 6 is used
+     *
+     * @return bool
+     */
+    public function is_fontawesomeversionsix() {
+        $faconfig = get_config('theme_boost_union', 'fontawesomeversion');
+        return $faconfig == "fa6free";
     }
 }

@@ -40,7 +40,14 @@
 }}
 <span {{#checkid}}data-checkid="{{.}}"{{/checkid}}{{!
         }} class="mod_checkmark_examplestate fa-stack" {{#is_forced}}title = "{{get_forcedstring}}"{{/is_forced}}>
-  <i class="fa fa-square-o fa-stack-2x{{#is_forced}} text-error{{/is_forced}}"></i>
-  {{^is_forced}}{{#is_checked}}<i class="fa fa-times fa-stack-1x" style="top: -1px;"></i>{{/is_checked}}{{/is_forced}}
-  {{#is_forced_checked}}<i class="fa fa-times fa-stack-1x text-error" style="top: -1px;"></i>{{/is_forced_checked}}
+    {{#fontawesomeversionsix}}
+        <i class="fa-regular fa-square fa-stack-2x{{#is_forced}} text-error{{/is_forced}}"></i>
+        {{^is_forced}}{{#is_checked}}<i class="fa fa-times fa-stack-1x" style="top: -1px;"></i>{{/is_checked}}{{/is_forced}}
+        {{#is_forced_checked}}<i class="fa fa-times fa-stack-1x text-error" style="top: -1px;"></i>{{/is_forced_checked}}
+    {{/fontawesomeversionsix}}
+    {{^fontawesomeversionsix}}
+        <i class="fa fa-square-o fa-stack-2x{{#is_forced}} text-error{{/is_forced}}"></i>
+        {{^is_forced}}{{#is_checked}}<i class="fa fa-times fa-stack-1x" style="top: -1px;"></i>{{/is_checked}}{{/is_forced}}
+        {{#is_forced_checked}}<i class="fa fa-times fa-stack-1x text-error" style="top: -1px;"></i>{{/is_forced_checked}}
+    {{/fontawesomeversionsix}}
 </span>
