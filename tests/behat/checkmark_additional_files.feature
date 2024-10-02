@@ -17,9 +17,7 @@ Feature: In course, a teacher should be able to add files to a checkmark
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I turn editing mode on
-    When I add a "Checkmark" to section "2" and I fill the form with:
+    And I add a checkmark activity to course "Course 1" section "1" and I fill the form with:
       | Checkmark name | checkmark |
       | Description    | check     |
       | ID number      | checkmark |

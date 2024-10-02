@@ -23,7 +23,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use core\output\local\dropdown\status;
 use mod_checkmark\submission;
 use mod_checkmark\submissionstable;
 
@@ -4609,10 +4608,17 @@ class checkmark {
                 $DB->update_record('checkmark_feedbacks', $feedback);
                 $result['updated']++;
             }
+
+            // Update in gradebook.
+            if ($gradetype == 'grade') {
+                checkmark_update_grades($this->checkmark, $user->id);
+            }
+            if ($gradetype == 'presentationgrade') {
+                checkmark_update_presentation_grades($this->checkmark, $user->id);
+            }
         }
 
-        $result['status'] = GRADE_UPDATE_OK;
-        return $result;
+        return GRADE_UPDATE_OK;
     }
 }
 
