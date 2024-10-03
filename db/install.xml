@@ -1,4 +1,8 @@
-<XMLDB xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" PATH="mod/checkmark/db" VERSION="2022120701" COMMENT="XMLDB file for Moodle mod/checkmark" xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/checkmark/db" VERSION="20241003" COMMENT="XMLDB file for Moodle mod/checkmark"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
   <TABLES>
     <TABLE NAME="checkmark" COMMENT="Defines checkmarks">
       <FIELDS>
@@ -26,6 +30,7 @@
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="flexiblenaming" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false" COMMENT="Indicates weather flexiblenaming is on or off 1: On NULL or other: Use old method to determine flexiblenaming"/>
         <FIELD NAME="completionsubmit" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If this field is set to 1, then the activity will be automatically marked as 'complete' once the user submits their assignment."/>
+        <FIELD NAME="submissionattachments" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Only show additional files during open submission."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
