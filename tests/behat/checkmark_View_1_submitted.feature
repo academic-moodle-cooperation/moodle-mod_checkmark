@@ -39,15 +39,7 @@ Feature: In checkmark, a teacher should be able to how many students have submit
     And I am on "Course 1" course homepage
     And I follow "Kreuzerlübung"
     Then I should see "Grade"
-    And the following should exist in the "generaltable" table:
-      | Hidden from students  |
-      | No                    |
-    And the following should exist in the "generaltable" table:
-      | Participants  |
-      | 1             |
-    And the following should exist in the "generaltable" table:
-      | Submitted  |
-      | 1          |
-    And the following should exist in the "generaltable" table:
-      | Needs grading  |
-      | 1              |
+    And I should see "No" in the "Hidden from students" "table_row"
+    And I should see "1" in the "Participants" "table_row"
+    And I should see "1" in the "Submitted" "table_row"
+    And I should see "1" in the "Requires grading" "table_row"
