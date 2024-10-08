@@ -23,6 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_checkmark;
+
 defined('MOODLE_INTERNAL') || die();
 
 // Make sure the code being tested is accessible.
@@ -37,13 +39,13 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php'); // Include the code
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class formvalidation_test extends basic_testcase {
+class formvalidation_test extends \basic_testcase {
     /**
      * Tests if there is an proper error for different amounts of examples and example-gradesum
      */
     public function test_countmismatch() {
         // Setup fixture!
-        $checkmark = new checkmark();
+        $checkmark = new \checkmark();
         $data['examplegrades'] = '1,2,3';
         $data['examplenames'] = '1,2';
         $data['grade'] = '6';
@@ -54,7 +56,7 @@ class formvalidation_test extends basic_testcase {
         $errors = $checkmark->form_validation($data);
 
         // Validate outcome!
-        $a = new stdClass();
+        $a = new \stdClass();
         $a->namecount = 2;
         $a->gradecount = 3;
         $this->assertEquals($errors['examplenames'], get_string('count_individuals_mismatch', 'checkmark', $a));
@@ -70,7 +72,7 @@ class formvalidation_test extends basic_testcase {
      */
     public function test_summismatch() {
         // Setup fixture!
-        $checkmark = new checkmark();
+        $checkmark = new \checkmark();
         $data['examplegrades'] = '1,2,3';
         $data['examplenames'] = '1,2,3';
         $data['grade'] = '5';
@@ -81,7 +83,7 @@ class formvalidation_test extends basic_testcase {
         $errors = $checkmark->form_validation($data);
 
         // Validate outcome!
-        $a = new stdClass();
+        $a = new \stdClass();
         $a->gradesum = 6;
         $a->maxgrade = $data['grade'];
         $this->assertEquals($errors['grade'], get_string('gradesum_mismatch', 'checkmark', $a));
@@ -97,7 +99,7 @@ class formvalidation_test extends basic_testcase {
      */
     public function test_both_errors() {
         // Setup fixture!
-        $checkmark = new checkmark();
+        $checkmark = new \checkmark();
         $data['examplegrades'] = '1,2,3';
         $data['examplenames'] = '1,2';
         $data['grade'] = '5';
@@ -108,7 +110,7 @@ class formvalidation_test extends basic_testcase {
         $errors = $checkmark->form_validation($data);
 
         // Validate outcome!
-        $a = new stdClass();
+        $a = new \stdClass();
         $a->gradesum = 6;
         $a->maxgrade = $data['grade'];
         $a->gradecount = 3;
@@ -116,7 +118,7 @@ class formvalidation_test extends basic_testcase {
         $this->assertEquals($errors['grade'], get_string('gradesum_mismatch', 'checkmark', $a));
         $this->assertEquals($errors['examplenames'], get_string('count_individuals_mismatch', 'checkmark', $a));
         $this->assertEquals($errors['examplegrades'], get_string('count_individuals_mismatch', 'checkmark', $a).
-                                                      html_writer::empty_tag('br').
+                                                      \html_writer::empty_tag('br').
                                                       get_string('gradesum_mismatch', 'checkmark', $a));
 
         // Teardown fixture!
@@ -129,7 +131,7 @@ class formvalidation_test extends basic_testcase {
      */
     public function test_noflexiblenaming() {
         // Setup fixture!
-        $checkmark = new checkmark();
+        $checkmark = new \checkmark();
         $data['examplecount'] = '5';
         $data['examplestart'] = '1';
         $data['examplegrades'] = '1,2,3';
@@ -156,7 +158,7 @@ class formvalidation_test extends basic_testcase {
      */
     public function test_noerror() {
         // Setup fixture!
-        $checkmark = new checkmark();
+        $checkmark = new \checkmark();
         $data['examplegrades'] = '1,2,3';
         $data['examplenames'] = '1,2,3';
         $data['grade'] = '6';

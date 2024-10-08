@@ -1571,7 +1571,7 @@ class submissionstable extends \table_sql {
         $finalgrade = $this->gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$values->id];
 
         if ($values->feedbackid) {
-            // Print Comment!
+            // Print Comment to the submissions table.
             if ($finalgrade->locked || $finalgrade->overridden) {
                 if ($this->use_no_html()) {
                     return $finalgrade->str_feedback;
@@ -2117,7 +2117,7 @@ class submissionstable extends \table_sql {
             $finalgrade = false;
         }
 
-        // Print Comment!
+        // Print Comment of the presentation to the submissions table.
         if ($presgradebook && ($finalgrade->locked || $finalgrade->overridden)) {
             if ($this->use_no_html()) {
                 return $finalgrade->str_feedback;
