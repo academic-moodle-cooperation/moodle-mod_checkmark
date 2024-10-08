@@ -48,7 +48,7 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php'); // Include the code
  * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class overridedates_test extends \advanced_testcase {
+final class overridedates_test extends \advanced_testcase {
 
     /**
      * @var \checkmark Checkmark object used for testing
@@ -75,6 +75,7 @@ class overridedates_test extends \advanced_testcase {
      * @throws \moodle_exception
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
         $this->setAdminUser();
         $this->testuser = $this->getDataGenerator()->create_user(['email' => 'test@example.com', 'username' => 'test']);
@@ -208,7 +209,7 @@ class overridedates_test extends \advanced_testcase {
      *
      * @throws \dml_exception
      */
-    public function test_add_identical_overwrite() {
+    public function test_add_identical_overwrite(): void {
         global $DB;
         $sink = $this->redirectEvents();
         $this->checkmark->override_dates([$this->testgroup1->id], $this->checkmark->checkmark->timeavailable,

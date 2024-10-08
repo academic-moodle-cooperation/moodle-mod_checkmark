@@ -24,8 +24,6 @@
  */
 namespace mod_checkmark;
 
-use core_external\external_api;
-
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -40,7 +38,7 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @covers \mod_checkmark\externallib.php
  *
  */
-class externallib_test extends \externallib_advanced_testcase {
+final class externallib_test extends \externallib_advanced_testcase {
 
     /** @var \stdClass Variable that holds instance of the current course */
     private $_course;
