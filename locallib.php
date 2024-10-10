@@ -811,6 +811,10 @@ class checkmark {
             return;
         }
 
+        // Variables have to be initialized to avoid Behat undefined variable errors.
+        $timeavailable = 0;
+        $due = 0;
+
         if (($this->checkmark->timeavailable || ($this->overrides && $this->overrides->timeavailable &&
             ($this->overrides->timeavailable !== $this->checkmark->timeavailable))) &&
             (!$this->overrides || $this->overrides->timeavailable !== 0)) {
@@ -4677,7 +4681,7 @@ function checkmark_override_summary(stdClass $checkmark, stdClass $cm, int $curr
         $params[] = $checkmark->id;
 
         $groupcount = $DB->count_records_select('checkmark_overrides',
-            "groupid $groupidtest AND quiz = ?", $params);
+            "groupid $groupidtest AND checkmarkid = ?", $params);
         $usercount = $DB->count_records_sql("
                 SELECT COUNT(1)
                   FROM {checkmark_overrides} o
