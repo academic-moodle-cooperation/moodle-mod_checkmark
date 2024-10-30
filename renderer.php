@@ -33,6 +33,7 @@
  */
 
 use mod_checkmark\output\override_actionmenu;
+use mod_checkmark\output\checkmark_header;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -127,19 +128,44 @@ class mod_checkmark_renderer extends plugin_renderer_base {
                     'target' => '_blank',
             ]);
             $result .= '<li yuiConfig=\'' . json_encode($yuiconfig) . '\'>' .
-                    '<div>' .
+                '<div>' .
                     '<div class="fileuploadsubmission">' . $image . ' ' .
                     $fileurl . ' ' .
                     '</div>' .
                     '<div class="fileuploadsubmissiontime">' . $timemodified . '</div>' .
-                    '</div>' .
-                    '</li>';
+                '</div>' .
+            '</li>';
         }
 
         $result .= '</ul>';
 
         return $result;
     }
+
+    /**
+     * Render the header.
+     *
+     * @param checkmark_header $header
+     * @return string
+     */
+    public function render_checkmark_header(checkmark_header $header) {
+        $o = '';
+        $description = '';
+
+        // Manually edit the activity header by adding the description.
+        $activityheader = $this->page->activityheader;
+        if ($header->showintro) {
+            $description .= format_module_intro('checkmark', $header->checkmark, $header->coursemoduleid);
+        }
+        $description .= $header->postfix;
+        $activityheader->set_attrs([
+            'description' => $description,
+        ]);
+
+        $o .= $this->output->header();
+        return $o;
+    }
+
 
     /**
      * Utility function to add a row of data to a table with 2 columns where the first column is the table's header.
