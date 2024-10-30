@@ -599,7 +599,7 @@ class submissionstable extends \table_sql {
                     s.id AS submissionid, f.id AS feedbackid, f.grade, f.feedback,
                     s.timemodified AS timesubmitted, f.timemodified AS timemarked,
                     CASE
-                        WHEN f.timemodified IS NOT NULL
+                        WHEN f.timemodified IS NOT NULL AND f.timemodified <> 0
                             THEN '$stringgraded'
                         WHEN s.timemodified IS NOT NULL
                             THEN '$stringsubmitted'
