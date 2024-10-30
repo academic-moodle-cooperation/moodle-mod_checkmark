@@ -456,7 +456,8 @@ class checkmark {
         if (!is_enrolled($this->context, $USER, 'mod/checkmark:submit')) {
             $editable = false;
         } else {
-            $editable = $this->isopen() && (!$submission || $this->checkmark->resubmit || ($feedback === false));
+            // When feedback timemodified is 0, the grading was removed and the submission is editable again.
+            $editable = $this->isopen() && (!$submission || $this->checkmark->resubmit || ($feedback === false) || !$feedback->timemodified);
         }
         $editmode = ($editable && $edit);
 
@@ -4603,12 +4604,14 @@ class checkmark {
             return $result;
         }
 
-        $timemarked = time();
+        // Reset time so that the status changes back to "Submitted for grading".
+        $resettime = 0;
         foreach ($users as $user) {
             $feedback = $this->get_feedback($user->id);
             if ($feedback) {
                 $feedback->$gradetype = -1;
-                $feedback->timemodified = $timemarked;
+                $feedback->timemodified = $resettime;
+                // We update the feedback instead of deleting it to keep the feedback comment.
                 $DB->update_record('checkmark_feedbacks', $feedback);
                 $result['updated']++;
             }
@@ -4622,7 +4625,8 @@ class checkmark {
             }
         }
 
-        return GRADE_UPDATE_OK;
+        $result['status'] = GRADE_UPDATE_OK;
+        return $result;
     }
 }
 
