@@ -1,6 +1,7 @@
 CHANGELOG
 =========
 4.1.2 (2024-09-15)
+------------------
 * [FIXED] #7771 Fix display bug with font awesome version 6
 
 4.1.1 (2022-07-28)
