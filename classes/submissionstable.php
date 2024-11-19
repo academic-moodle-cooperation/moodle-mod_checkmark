@@ -1943,4 +1943,18 @@ class submissionstable extends \table_sql {
         ksort($usednamefields);
         return $usednamefields;
     }
+
+    /**
+     * Override the table show_hide_link to not show for select column.
+     *
+     * @param string $column the column name, index into various names.
+     * @param int $index numerical index of the column.
+     * @return string HTML fragment.
+     */
+    protected function show_hide_link($column, $index) {
+        if ($index > 0) {
+            return parent::show_hide_link($column, $index);
+        }
+        return '';
+    }
 }
