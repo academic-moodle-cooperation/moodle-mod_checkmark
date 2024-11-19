@@ -442,7 +442,7 @@ class submissionstable extends \table_sql {
         ];
         $selectallbox = $table->checkbox_controller();
         $tableheaders = [
-            $selectallbox,
+            get_string('select') . $selectallbox,
             get_string('fullnameuser'),
         ];
         $helpicons = [
@@ -772,7 +772,7 @@ class submissionstable extends \table_sql {
 
         // Adapt table for export view (columns, etc.)!
         $tableheaders = [
-            '',
+            get_string('select'),
         ];
         $tablecolumns = [
             'selection',
@@ -1012,6 +1012,8 @@ class submissionstable extends \table_sql {
 
         $table->column_class('signature', 'signature');
         $table->no_sorting('signature');
+
+        $table->no_sorting('selection');
 
         // Create and set the SQL!
         $params = [];
@@ -2385,5 +2387,19 @@ class submissionstable extends \table_sql {
 
             return $button;
         }
+    }
+
+    /**
+     * Override the table show_hide_link to not show for select column.
+     *
+     * @param string $column the column name, index into various names.
+     * @param int $index numerical index of the column.
+     * @return string HTML fragment.
+     */
+    protected function show_hide_link($column, $index) {
+        if ($index > 0) {
+            return parent::show_hide_link($column, $index);
+        }
+        return '';
     }
 }
