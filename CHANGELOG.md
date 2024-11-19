@@ -2,8 +2,8 @@ CHANGELOG
 =========
 4.1.2 (2024-09-15)
 ------------------
-* [FIXED] #7771 Fix display bug with font awesome version 6
-* [FIXED] #8104 Fix download with hidden select column. Removed the button to prevent hiding the select column
+* [FIXED] #7771 Fix display bug with font awesome version 6 [github pull #76 @AntonT76]
+* [FIXED] #8104 Fix download with hidden select column by removing the button to hide the select column [github pull #80 @XTRage]
 
 4.1.1 (2022-07-28)
 ------------------
