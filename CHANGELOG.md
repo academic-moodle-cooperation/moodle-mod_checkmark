@@ -1,9 +1,10 @@
 CHANGELOG
 =========
 
-4.4.1 (2024-11-06)
+4.4.1 (2024-11-22)
 ------------------
 * [FIXED] #8086 Fix displayed status in the submissions table after feedback was removed
+* [FIXED] #8105 Fix download with hidden select column by removing the button to hide the select column
 * [FEATURE] #7906 New setting to display files only during open submission
 
 4.4.0 (2024-07-21)
