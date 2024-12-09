@@ -32,7 +32,7 @@ Feature: In a checkmark I want to grade ungraded submissions.
       | Example 4 | 1 |
       | Example 5 | 1 |
       | Example 6 | 1 |
-    And I press "Save changes"
+    And I press "Save submission"
     And I log out
     When I am on the "CM1" Activity page logged in as teacher1
     And I navigate to "Submissions" in current page administration

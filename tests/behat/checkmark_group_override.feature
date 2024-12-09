@@ -166,11 +166,11 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I log out
     When I am on the "CM1" Activity page logged in as student2
     Then I should see "Wednesday, 1 January 2020, 8:00"
-    And "Save changes" "button" should be visible
+    And "Save submission" "button" should be visible
     And I log out
     When I am on the "CM1" Activity page logged in as student1
     Then I should see "##tomorrow##%A, %d %B %Y, 12:00##"
-    And "Save changes" "button" should not be visible
+    And "Save submission" "button" should not be visible
 
   @javascript
   Scenario: Allow a user to have a different cut-off date
@@ -196,11 +196,11 @@ Feature: In a course, a teacher should be able to add overrides to general dates
     And I log out
     When I am on the "CM1" Activity page logged in as student2
     Then I should see "Saturday, 1 February 2020, 8:00"
-    And "Save changes" "button" should be visible
+    And "Save submission" "button" should be visible
     And I log out
     When I am on the "CM1" Activity page logged in as student1
     Then I should see "Saturday, 1 February 2020, 8:00"
-    And "Save changes" "button" should not be visible
+    And "Save submission" "button" should not be visible
 
   @javascript
   Scenario: Reorder group overrides and use the one with the highest priority for a given user

@@ -33,7 +33,7 @@ Feature: In checkmark, a teacher should be able to how many students have submit
       | Example 4 | 1 |
       | Example 5 | 1 |
       | Example 6 | 1 |
-    And I press "Save changes"
+    And I press "Save submission"
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
