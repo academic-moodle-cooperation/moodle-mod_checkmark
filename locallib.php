@@ -357,7 +357,7 @@ class checkmark {
         if (!is_enrolled($this->context, $USER, 'mod/checkmark:submit')) {
             $editable = false;
         } else {
-            $editable = $this->isopen() && (!$submission || $this->checkmark->resubmit || ($feedback === false));
+            $editable = $this->isopen();
         }
 
         echo html_writer::start_div('header-maxwidth');
@@ -457,8 +457,7 @@ class checkmark {
         if (!is_enrolled($this->context, $USER, 'mod/checkmark:submit')) {
             $editable = false;
         } else {
-            // When feedback timemodified is 0, the grading was removed and the submission is editable again.
-            $editable = $this->isopen() && (!$submission || $this->checkmark->resubmit || ($feedback === false) || !$feedback->timemodified);
+            $editable = $this->isopen();
         }
         $editmode = ($editable && $edit);
 

@@ -2273,7 +2273,7 @@ function mod_checkmark_core_calendar_provide_event_action(calendar_event $event,
     } else {
         $usersubmission = $checkmark->get_submission($USER->id, false);
         $feedback = $checkmark->get_feedback($USER->id);
-        if ((!$checkmark->isopen(true) && $started) || ($feedback && !$checkmark->checkmark->resubmit)) {
+        if ((!$checkmark->isopen(true) && $started) || $feedback) {
             // The user has already been graded, nothing more to do here!
             return null;
         }

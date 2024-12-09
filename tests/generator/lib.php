@@ -58,7 +58,6 @@ class mod_checkmark_generator extends testing_module_generator {
             'gradingdue' => $timecreated + 1209600, // 2 weeks later!
             'timeavailable' => $timecreated,
             'cutoffdate' => 0,
-            'resubmit' => 1,
             'emailteachers' => 1,
             'examplecount' => 10,
             'examplestart' => 1,

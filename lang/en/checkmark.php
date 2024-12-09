@@ -39,8 +39,6 @@ $string['all_attendant'] = 'All attendant participants';
 $string['all_unknown'] = 'All with unknown attendance status';
 $string['all_with_presentationgrading'] = 'All participants with a presentation grade';
 $string['all_without_presentationgrading'] = 'All participants without a presentation grade';
-$string['allowresubmit'] = 'Allow resubmitting';
-$string['allowresubmit_help'] = 'If enabled, students will be allowed to resubmit checkmarks after they have been graded (to be regraded).';
 $string['allowsubmissionsfromdate'] = 'Allow submissions from';
 $string['allowsubmissionsfromdate_help'] = 'If enabled, students will not be able to submit before this date. If disabled, students will be able to start submitting right away.';
 $string['alreadygraded'] = 'Your submission has already been graded and resubmission is not allowed.';
@@ -451,6 +449,7 @@ $string['reviewed'] = 'Reviewed';
 $string['save'] = 'Save';
 $string['saveallfeedback'] = 'Save all grading changes';
 $string['saveoverrideandstay'] = 'Save and enter another override';
+$string['savesubmission'] = 'Save submission';
 $string['search:activity'] = 'Checkmark - activity information';
 $string['select'] = 'Select';
 $string['selection'] = 'Selection';
@@ -550,3 +549,7 @@ $string['viewpreview'] = 'View preview';
 $string['viewsubmissions'] = 'Submissions';
 $string['yoursubmission'] = 'Your submission';
 $string['zippedgrouppdfs'] = 'Groups as separate PDFs';
+
+// Deprecated since Moodle 4.5!
+$string['allowresubmit'] = 'Allow resubmitting';
+$string['allowresubmit_help'] = 'If enabled, students will be allowed to resubmit checkmarks after they have been graded (to be regraded).';
