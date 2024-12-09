@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+4.5.0 (2024-12-09)
+------------------
+* [FIXED] #7905 Database schema not aligned error fixed by adding key [github issue #77 - Menrath]
+* [FIXED] #8105 Fix download with hidden select column by removing the button to hide the select column [github issue #80 - XTRage]
+* [CHANGED] #8099 Checkmark submission now always possible in the open submission period, independent of received feedback
+* [REMOVED] #8099 'Cancel' button for students at submission page; Resubmit setting removed
+
 4.4.1 (2024-11-06)
 ------------------
 * [FIXED] #8086 Fix displayed status in the submissions table after feedback was removed
