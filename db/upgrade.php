@@ -1398,7 +1398,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024072101, 'checkmark');
     }
 
-    if ($oldversion < 2024072102) {
+    if ($oldversion < 2024120900) {
         try {
             // Define key submission_check_key (unique) to be added to checkmark_checks.
             $table = new xmldb_table('checkmark_checks');
@@ -1407,7 +1407,7 @@ function xmldb_checkmark_upgrade($oldversion) {
             // Launch add key submission_check_key.
             $dbman->add_key($table, $key);
             // Checkmark savepoint reached.
-            upgrade_mod_savepoint(true, 2024072102, 'checkmark');
+            upgrade_mod_savepoint(true, 2024120900, 'checkmark');
         } catch (Exception $e) {
             throw new moodle_exception('upgradekeyerror', 'checkmark', '',
                 'https://github.com/academic-moodle-cooperation/moodle-mod_checkmark/issues/72', $e->getTraceAsString());
