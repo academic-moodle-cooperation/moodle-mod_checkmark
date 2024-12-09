@@ -298,10 +298,6 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $params->dividingSymbol = checkmark::DELIMITER;
         $PAGE->requires->js_call_amd('mod_checkmark/settings', 'initializer', [$params]);
 
-        $mform->addElement('select', 'resubmit', get_string('allowresubmit', 'checkmark'), $ynoptions);
-        $mform->addHelpButton('resubmit', 'allowresubmit', 'checkmark');
-        $mform->setDefault('resubmit', 0);
-
         $mform->addElement('select', 'emailteachers', get_string('emailteachers', 'checkmark'),
             $ynoptions);
         $mform->addHelpButton('emailteachers', 'emailteachers', 'checkmark');

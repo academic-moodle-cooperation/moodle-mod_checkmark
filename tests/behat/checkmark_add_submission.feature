@@ -32,6 +32,6 @@ Feature: In a course, a student should be able to add a submission
       | Example 4 | 1 |
       | Example 5 | 1 |
       | Example 6 | 1 |
-    And I press "Save changes"
+    And I press "Save submission"
     Then I should see "Submitted for grading"
     Then I should see "6 out of 10 examples checked."
