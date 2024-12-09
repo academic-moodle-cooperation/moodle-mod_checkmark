@@ -94,7 +94,7 @@ class mod_checkmark_generator extends testing_module_generator {
      * @throws moodle_exception
      */
     public function create_submission($data) {
-        global $CFG, $DB;
+        global $CFG;
         require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
         $checkmark = $this->get_test_checkmark($data);
         $userid = $data['userid'];
@@ -102,7 +102,6 @@ class mod_checkmark_generator extends testing_module_generator {
         $submission = $checkmark->get_submission($userid, true);
         $i = 1;
         foreach ($submission->get_examples() as $key => $example) {
-            $name = $key;
             if (isset($data['example' . $i]) && ($data['example' . $i] != 0)) {
                 $submission->get_example($key)->set_state(\mod_checkmark\example::CHECKED);
             } else {
@@ -176,7 +175,7 @@ class mod_checkmark_generator extends testing_module_generator {
      * @throws moodle_exception
      */
     private function get_test_checkmark($data) {
-        global $CFG, $DB;
+        global $CFG;
         require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
         if (!isset($data['userid'])) {
             throw new coding_exception('Must specify user (id) when creating a checkmark submission.');

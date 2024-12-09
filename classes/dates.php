@@ -42,12 +42,11 @@ class dates extends activity_dates {
      * @return array
      */
     protected function get_dates(): array {
-        global $DB, $CFG;
+        global $CFG;
 
         require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 
         $course = get_course($this->cm->course);
-        $context = \context_module::instance($this->cm->id);
         $checkmark = new \checkmark($course->id, null, $this->cm, $course);
 
         $timeavailable = $this->cm->customdata['timeavailable'] ?? null;

@@ -23,6 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_checkmark;
+
 defined('MOODLE_INTERNAL') || die();
 
 // Make sure the code being tested is accessible.
@@ -36,14 +38,15 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php'); // Include the code
  * @author    Philipp Hager
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers    \mod_checkmark\locallib.php (tests for the form_validation method; settings form for new checkmark instance)
  */
-class formvalidation_test extends basic_testcase {
+final class formvalidation_test extends \basic_testcase {
     /**
      * Tests if there is an proper error for different amounts of examples and example-gradesum
      */
-    public function test_countmismatch() {
+    public function test_countmismatch(): void {
         // Setup fixture!
-        $checkmark = new checkmark();
+        $checkmark = new \checkmark();
         $data['examplegrades'] = '1,2,3';
         $data['examplenames'] = '1,2';
         $data['grade'] = '6';
@@ -54,7 +57,7 @@ class formvalidation_test extends basic_testcase {
         $errors = $checkmark->form_validation($data);
 
         // Validate outcome!
-        $a = new stdClass();
+        $a = new \stdClass();
         $a->namecount = 2;
         $a->gradecount = 3;
         $this->assertEquals($errors['examplenames'], get_string('count_individuals_mismatch', 'checkmark', $a));
@@ -68,9 +71,9 @@ class formvalidation_test extends basic_testcase {
     /**
      * Tests if there is an proper error for when example-gradesum differs from gradesum in instance
      */
-    public function test_summismatch() {
+    public function test_summismatch(): void {
         // Setup fixture!
-        $checkmark = new checkmark();
+        $checkmark = new \checkmark();
         $data['examplegrades'] = '1,2,3';
         $data['examplenames'] = '1,2,3';
         $data['grade'] = '5';
@@ -81,7 +84,7 @@ class formvalidation_test extends basic_testcase {
         $errors = $checkmark->form_validation($data);
 
         // Validate outcome!
-        $a = new stdClass();
+        $a = new \stdClass();
         $a->gradesum = 6;
         $a->maxgrade = $data['grade'];
         $this->assertEquals($errors['grade'], get_string('gradesum_mismatch', 'checkmark', $a));
@@ -95,9 +98,9 @@ class formvalidation_test extends basic_testcase {
     /**
      * Tests if both errors together will be displayed correctly
      */
-    public function test_both_errors() {
+    public function test_both_errors(): void {
         // Setup fixture!
-        $checkmark = new checkmark();
+        $checkmark = new \checkmark();
         $data['examplegrades'] = '1,2,3';
         $data['examplenames'] = '1,2';
         $data['grade'] = '5';
@@ -108,7 +111,7 @@ class formvalidation_test extends basic_testcase {
         $errors = $checkmark->form_validation($data);
 
         // Validate outcome!
-        $a = new stdClass();
+        $a = new \stdClass();
         $a->gradesum = 6;
         $a->maxgrade = $data['grade'];
         $a->gradecount = 3;
@@ -116,7 +119,7 @@ class formvalidation_test extends basic_testcase {
         $this->assertEquals($errors['grade'], get_string('gradesum_mismatch', 'checkmark', $a));
         $this->assertEquals($errors['examplenames'], get_string('count_individuals_mismatch', 'checkmark', $a));
         $this->assertEquals($errors['examplegrades'], get_string('count_individuals_mismatch', 'checkmark', $a).
-                                                      html_writer::empty_tag('br').
+                                                      \html_writer::empty_tag('br').
                                                       get_string('gradesum_mismatch', 'checkmark', $a));
 
         // Teardown fixture!
@@ -127,9 +130,9 @@ class formvalidation_test extends basic_testcase {
     /**
      * Tests if there are no errors if flexible naming is deactivated and amount and sum mismatch
      */
-    public function test_noflexiblenaming() {
+    public function test_noflexiblenaming(): void {
         // Setup fixture!
-        $checkmark = new checkmark();
+        $checkmark = new \checkmark();
         $data['examplecount'] = '5';
         $data['examplestart'] = '1';
         $data['examplegrades'] = '1,2,3';
@@ -154,9 +157,9 @@ class formvalidation_test extends basic_testcase {
     /**
      * Tests if no error will be wrongly displayed if everythings correct
      */
-    public function test_noerror() {
+    public function test_noerror(): void {
         // Setup fixture!
-        $checkmark = new checkmark();
+        $checkmark = new \checkmark();
         $data['examplegrades'] = '1,2,3';
         $data['examplenames'] = '1,2,3';
         $data['grade'] = '6';

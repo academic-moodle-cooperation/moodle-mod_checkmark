@@ -112,7 +112,6 @@ class mod_checkmark_mod_form extends moodleform_mod {
      *
      */
     public function add_availability_elements() {
-        global $OUTPUT, $PAGE;
         $mform = $this->_form;
 
         $mform->addElement('header', 'availability', get_string('availability', 'checkmark'));
@@ -282,7 +281,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
      * Helper method adding checkmark elements
      */
     public function add_checkmark_elements() {
-        global $OUTPUT, $PAGE;
+        global $PAGE;
 
         $mform = $this->_form;
 

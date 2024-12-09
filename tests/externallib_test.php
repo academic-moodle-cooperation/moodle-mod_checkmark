@@ -22,8 +22,7 @@
  * @copyright 2021 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-use core_external\external_api;
+namespace mod_checkmark;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -39,11 +38,11 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @covers \mod_checkmark\externallib.php
  *
  */
-class externallib_test extends externallib_advanced_testcase {
+final class externallib_test extends \externallib_advanced_testcase {
 
-    /** @var stdClass Variable that holds instance of the current course */
+    /** @var \stdClass Variable that holds instance of the current course */
     private $_course;
-    /**  @var checkmark Variable that holds instance of the current checkmark */
+    /**  @var \checkmark Variable that holds instance of the current checkmark */
     private $_checkmark;
 
     public function setUp(): void {
@@ -55,8 +54,7 @@ class externallib_test extends externallib_advanced_testcase {
     /**
      * Test if the user only gets checkmarks for enrolled courses
      */
-    public function test_get_checkmarks_by_courses() {
-        global $CFG, $DB, $USER;
+    public function test_get_checkmarks_by_courses(): void {
         $this->resetAfterTest(true);
 
         $user = $this->getDataGenerator()->create_user();
@@ -83,21 +81,21 @@ class externallib_test extends externallib_advanced_testcase {
             'summaryformat' => FORMAT_HTML,
         ]);
 
-        $checkmark1 = self::getDataGenerator()->create_module('checkmark', [
+        self::getDataGenerator()->create_module('checkmark', [
             'course' => $course1->id,
             'name' => 'Checkmark Module 1',
             'intro' => 'Checkmark module for automated php unit tests',
             'introformat' => FORMAT_HTML,
         ]);
 
-        $checkmark2 = self::getDataGenerator()->create_module('checkmark', [
+        self::getDataGenerator()->create_module('checkmark', [
             'course' => $course2->id,
             'name' => 'Checkmark Module 2',
             'intro' => 'Checkmark module for automated php unit tests',
             'introformat' => FORMAT_HTML,
         ]);
 
-        $checkmark3 = self::getDataGenerator()->create_module('checkmark', [
+        self::getDataGenerator()->create_module('checkmark', [
             'course' => $course3->id,
             'name' => 'Checkmark Module 3',
             'intro' => 'Checkmark module for automated php unit tests',
@@ -106,7 +104,7 @@ class externallib_test extends externallib_advanced_testcase {
 
         $this->setUser($user);
 
-        $result = mod_checkmark_external::get_checkmarks_by_courses([]);
+        $result = \mod_checkmark_external::get_checkmarks_by_courses([]);
 
         // User is enrolled only in course1 and course2, so the third checkmark module in course3 should not be included.
         $this->assertEquals(2, count($result->checkmarks));
@@ -116,8 +114,7 @@ class externallib_test extends externallib_advanced_testcase {
      * Test if the user gets a valid checkmark from the endpoint
      * @runInSeparateProcess
      */
-    public function test_get_checkmark() {
-        global $CFG, $DB, $USER;
+    public function test_get_checkmark(): void {
         $result = $this->init_test_suite_one_course();
 
         // Checkmark name should be equal to 'Checkmark Module'.
@@ -130,9 +127,7 @@ class externallib_test extends externallib_advanced_testcase {
     /**
      * Test if the user gets an exception when the checkmark is hidden in the course
      */
-    public function test_get_checkmark_hidden() {
-        global $CFG, $DB, $USER;
-
+    public function test_get_checkmark_hidden(): void {
         $this->resetAfterTest(true);
 
         $user = $this->getDataGenerator()->create_user();
@@ -156,18 +151,15 @@ class externallib_test extends externallib_advanced_testcase {
         $this->setUser($user);
 
         // Test should throw require_login_exception!
-        $this->expectException(require_login_exception::class);
+        $this->expectException(\require_login_exception::class);
 
-        $result = mod_checkmark_external::get_checkmark($checkmark->cmid);
-
+        \mod_checkmark_external::get_checkmark($checkmark->cmid);
     }
 
     /**
      * Test the submission of a checkmark module
      */
-    public function test_get_submit() {
-        global $CFG, $DB, $USER;
-
+    public function test_get_submit(): void {
         $result = $this->init_test_suite_one_course();
 
         $submissionexamples = [];
@@ -175,7 +167,7 @@ class externallib_test extends externallib_advanced_testcase {
             $submissionexamples[] = ['id' => $example->id, 'checked' => $example->id % 2];
         }
 
-        $result = mod_checkmark_external::submit($this->_checkmark->cmid, $submissionexamples);
+        $result = \mod_checkmark_external::submit($this->_checkmark->cmid, $submissionexamples);
 
         // Checkmark name should be equal to 'Checkmark Module'!
         $this->assertEquals('Checkmark Module', $result->checkmark->name);
@@ -188,7 +180,7 @@ class externallib_test extends externallib_advanced_testcase {
             $this->assertEquals($result->checkmark->examples[$i]->id % 2, $result->checkmark->examples[$i]->checked);
         }
 
-        $result = mod_checkmark_external::get_checkmark($this->_checkmark->cmid);
+        $result = \mod_checkmark_external::get_checkmark($this->_checkmark->cmid);
 
         // Checkmark name should be equal to 'Checkmark Module'!
         $this->assertEquals('Checkmark Module', $result->checkmark->name);
@@ -205,9 +197,7 @@ class externallib_test extends externallib_advanced_testcase {
     /**
      * Test if the user gets an exception if the submission is already closed ('cutoffdate' was yesterday)
      */
-    public function test_get_submit_negative() {
-        global $CFG, $DB, $USER;
-
+    public function test_get_submit_negative(): void {
         $this->resetAfterTest(true);
 
         $user = $this->getDataGenerator()->create_user();
@@ -230,7 +220,7 @@ class externallib_test extends externallib_advanced_testcase {
 
         $this->setUser($user);
 
-        $result = mod_checkmark_external::get_checkmark($checkmark->cmid);
+        $result = \mod_checkmark_external::get_checkmark($checkmark->cmid);
 
         $submissionexamples = [];
         foreach ($result->checkmark->examples as $example) {
@@ -238,15 +228,14 @@ class externallib_test extends externallib_advanced_testcase {
         }
 
         // Test should throw moodle_exception because the 'cutofdate' was yesterday.
-        $this->expectException(moodle_exception::class);
+        $this->expectException(\moodle_exception::class);
 
-        $result = mod_checkmark_external::submit($checkmark->cmid, $submissionexamples);
-
+        $result = \mod_checkmark_external::submit($checkmark->cmid, $submissionexamples);
     }
 
     /**
      * Creates a course, a new checkmark instance inside, and enrols one user
-     * @return stdClass object that will be used from the tests
+     * @return \stdClass object that will be used from the tests
      */
     public function init_test_suite_one_course() {
         $this->resetAfterTest(true);
@@ -269,7 +258,7 @@ class externallib_test extends externallib_advanced_testcase {
 
         $this->setUser($user);
 
-        $result = mod_checkmark_external::get_checkmark($checkmark->cmid);
+        $result = \mod_checkmark_external::get_checkmark($checkmark->cmid);
         $this->_course = $course;
         $this->_checkmark = $checkmark;
         return $result;

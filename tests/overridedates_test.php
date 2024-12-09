@@ -23,6 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_checkmark;
+
 defined('MOODLE_INTERNAL') || die();
 
 // Make sure the code being tested is accessible.
@@ -46,33 +48,34 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php'); // Include the code
  * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class overridedates_test extends advanced_testcase {
+final class overridedates_test extends \advanced_testcase {
 
     /**
-     * @var checkmark Checkmark object used for testing
+     * @var \checkmark Checkmark object used for testing
      */
     private $checkmark;
     /**
-     * @var stdClass User object used for testing
+     * @var \stdClass User object used for testing
      */
     private $testuser;
     /**
-     * @var stdClass Group object used for testing
+     * @var \stdClass Group object used for testing
      */
     private $testgroup1;
     /**
-     * @var stdClass Another group object used for testing
+     * @var \stdClass Another group object used for testing
      */
     private $testgroup2;
 
     /**
      * Set up a checkmark instance, a user and a group
      *
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws moodle_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
         $this->setAdminUser();
         $this->testuser = $this->getDataGenerator()->create_user(['email' => 'test@example.com', 'username' => 'test']);
@@ -83,15 +86,15 @@ class overridedates_test extends advanced_testcase {
         $this->testgroup2 = $this->getDataGenerator()->create_group(['courseid' => $course1->id]);
         $this->getDataGenerator()->create_group_member(['userid' => $this->testuser->id, 'groupid' => $this->testgroup1->id]);
         $this->getDataGenerator()->create_group_member(['userid' => $this->testuser->id, 'groupid' => $this->testgroup2->id]);
-        $this->checkmark = new checkmark($checkmark->cmid);
+        $this->checkmark = new \checkmark($checkmark->cmid);
     }
 
     /**
      * Test the creation of a single user override
      *
-     * @throws dml_exception
+     * @throws \dml_exception
      */
-    public function test_add_user_override() {
+    public function test_add_user_override(): void {
         global $DB;
         $timedueoverride = time() + 1209600; // 2 weeks after now.
         $sink = $this->redirectEvents();
@@ -115,9 +118,9 @@ class overridedates_test extends advanced_testcase {
     /**
      * Test the creation of a single group override
      *
-     * @throws dml_exception
+     * @throws \dml_exception
      */
-    public function test_add_group_override() {
+    public function test_add_group_override(): void {
         global $DB;
         $timedueoverride = time() + 1209600; // 2 weeks after now.
         $sink = $this->redirectEvents();
@@ -140,7 +143,7 @@ class overridedates_test extends advanced_testcase {
     }
 
 
-    public function test_update_user_override() {
+    public function test_update_user_override(): void {
         global $DB;
 
         // Create a user override as tested above.
@@ -170,7 +173,7 @@ class overridedates_test extends advanced_testcase {
         $sink->close();
     }
 
-    public function test_update_group_override() {
+    public function test_update_group_override(): void {
         global $DB;
 
         // Create a group override as tested above.
@@ -204,9 +207,9 @@ class overridedates_test extends advanced_testcase {
     /**
      * Test if no overwrite is created if dates identical to the checkmark's dates are passed.
      *
-     * @throws dml_exception
+     * @throws \dml_exception
      */
-    public function test_add_identical_overwrite() {
+    public function test_add_identical_overwrite(): void {
         global $DB;
         $sink = $this->redirectEvents();
         $this->checkmark->override_dates([$this->testgroup1->id], $this->checkmark->checkmark->timeavailable,
@@ -221,9 +224,9 @@ class overridedates_test extends advanced_testcase {
     /**
      * Test if delete_override deletes an existing user override from the database and fires the correct events
      *
-     * @throws dml_exception
+     * @throws \dml_exception
      */
-    public function test_delete_user_override() {
+    public function test_delete_user_override(): void {
         global $DB;
 
         // Create a user override as tested above.
@@ -242,9 +245,9 @@ class overridedates_test extends advanced_testcase {
     /**
      * Test if delete_override deletes an existing group override from the database and fires the correct events
      *
-     * @throws dml_exception
+     * @throws \dml_exception
      */
-    public function test_delete_group_override() {
+    public function test_delete_group_override(): void {
         global $DB;
 
         // Create a group override as tested above.
@@ -262,9 +265,9 @@ class overridedates_test extends advanced_testcase {
     /**
      * Test the reordering of priorities of two groups in both directions
      *
-     * @throws dml_exception
+     * @throws \dml_exception
      */
-    public function test_reorder_grouppriority() {
+    public function test_reorder_grouppriority(): void {
         global $DB;
         $timedueoverride1 = time() + 1209600; // 2 weeks after now.
         $timedueoverride2 = time() + 2419200; // 4 weeks after now.
@@ -330,7 +333,7 @@ class overridedates_test extends advanced_testcase {
      * @param string $calendarkind Class the calendar event should be an instance of
      * @param null $calendarkind2 Class the second calendar event should be an instance of or null if there is none
      */
-    private function check_events($events, $logkind, $calendarkind = null, $calendarkind2 = null) {
+    private function check_events($events, $logkind, $calendarkind = null, $calendarkind2 = null): void {
         // TODO Eventually rewrite this method in a generic way so it can be used by other tests too.
         if ($calendarkind2) {
             $this->assertCount(3, $events);
@@ -373,7 +376,7 @@ class overridedates_test extends advanced_testcase {
      * @param array $b
      * @return bool
      */
-    private static function arrays_are_similar($a, $b) {
+    private static function arrays_are_similar($a, $b): bool {
         // If the indexes don't match, return immediately.
         if (count(array_diff_assoc($a, $b))) {
             return false;
