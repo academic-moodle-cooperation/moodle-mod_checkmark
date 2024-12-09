@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.1 (2024-11-06)
+------------------
+* [FIXED] #8086 Fix displayed status in the submissions table after feedback was removed
+* [FEATURE] #7906 New setting to display files only during open submission
+
 4.4.0 (2024-07-21)
 ------------------
 * [FIXED] #7702 Fix SQL syntax error

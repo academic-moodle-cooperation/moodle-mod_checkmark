@@ -1382,5 +1382,21 @@ function xmldb_checkmark_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2022120701, 'checkmark');
     }
 
+    if ($oldversion < 2024072101) {
+
+        // Define field submissionattachments to be added to checkmark.
+        $table = new xmldb_table('checkmark');
+        $field = new xmldb_field('submissionattachments', XMLDB_TYPE_INTEGER, '2',
+            null, XMLDB_NOTNULL, null, '0', 'completionsubmit');
+
+        // Conditionally launch add field submissionattachments.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2024072101, 'checkmark');
+    }
+
     return true;
 }

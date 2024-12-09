@@ -100,6 +100,8 @@ class export {
     private $perpage = 0;
     /** @var $singlelinenames bool whether or not names should be restricted on a single line */
     private $singlelinenames = false;
+    /** @var $sequentialnumbering bool whether or not to use sequential numbering for each row */
+    private $sequentialnumbering = false;
 
 
     /** @var $template string Template used for the export */

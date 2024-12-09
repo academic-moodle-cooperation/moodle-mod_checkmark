@@ -25,6 +25,7 @@
 
 use mod_checkmark\submission;
 use mod_checkmark\submissionstable;
+use mod_checkmark\output\checkmark_header;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -456,7 +457,8 @@ class checkmark {
         if (!is_enrolled($this->context, $USER, 'mod/checkmark:submit')) {
             $editable = false;
         } else {
-            $editable = $this->isopen() && (!$submission || $this->checkmark->resubmit || ($feedback === false));
+            // When feedback timemodified is 0, the grading was removed and the submission is editable again.
+            $editable = $this->isopen() && (!$submission || $this->checkmark->resubmit || ($feedback === false) || !$feedback->timemodified);
         }
         $editmode = ($editable && $edit);
 
@@ -520,7 +522,6 @@ class checkmark {
         if ($late) {
             \core\notification::error(get_string('latesubmissionwarning', 'checkmark'));
         }
-        echo $this->get_introattachments();
 
         $gradingsummery = $this->create_grading_summary();
         echo html_writer::tag('div', $this->buttongroup($gradingsummery), ['class' => 'tertiary-navigation pl-0 header-maxwidth']);
@@ -626,7 +627,15 @@ class checkmark {
                 ': ' . format_string($this->checkmark->name, true));
         $PAGE->set_heading($this->course->fullname);
 
-        echo $OUTPUT->header();
+        // Postfix are the additional files here.
+        $o = $this->get_renderer()->render(new checkmark_header(
+            $this->get_instance(),
+            $this->show_intro(),
+            $this->get_course_module()->id,
+            $this->get_introattachments())
+        );
+
+        echo $o;
     }
 
     /**
@@ -791,11 +800,38 @@ class checkmark {
      * Print intro attachment files if there are any
      */
     public function get_introattachments() {
-        if ($files = $this->get_renderer()->checkmark_files($this->context, 0,
+        if ($this->should_provide_intro_attachments()) {
+            if ($files = $this->get_renderer()->checkmark_files($this->context, 0,
                 CHECKMARK_INTROATTACHMENT_FILEAREA, 'mod_checkmark')) {
-            return $files;
+                return $files;
+            }
         }
         return '';
+    }
+
+    /**
+     * Check if the intro attachments should be provided. Based on the database entry for the checkmark setting.
+     *
+     * @return bool
+     */
+    public function should_provide_intro_attachments() {
+        global $DB;
+
+        $submissionattachments = $DB->get_field('checkmark', 'submissionattachments', ['id' => $this->checkmark->id]);
+        // If attachments should only be shown when the submission is open, check if the submission is open.
+        if ($submissionattachments) {
+            return $this->isopen();
+        }
+        return true;
+    }
+
+    /**
+     * Based on the current checkmark settings should we display the intro.
+     *
+     * @return bool showintro
+     */
+    public function show_intro() {
+        return $this->checkmark->alwaysshowdescription || $this->isopen();
     }
 
     /**
@@ -810,6 +846,10 @@ class checkmark {
             ($this->overrides && !$this->overrides->timeavailable && !$this->overrides->timedue))) {
             return;
         }
+
+        // Variables have to be initialized to avoid Behat undefined variable errors.
+        $timeavailable = 0;
+        $due = 0;
 
         if (($this->checkmark->timeavailable || ($this->overrides && $this->overrides->timeavailable &&
             ($this->overrides->timeavailable !== $this->checkmark->timeavailable))) &&
@@ -4599,12 +4639,14 @@ class checkmark {
             return $result;
         }
 
-        $timemarked = time();
+        // Reset time so that the status changes back to "Submitted for grading".
+        $resettime = 0;
         foreach ($users as $user) {
             $feedback = $this->get_feedback($user->id);
             if ($feedback) {
                 $feedback->$gradetype = -1;
-                $feedback->timemodified = $timemarked;
+                $feedback->timemodified = $resettime;
+                // We update the feedback instead of deleting it to keep the feedback comment.
                 $DB->update_record('checkmark_feedbacks', $feedback);
                 $result['updated']++;
             }
@@ -4618,7 +4660,8 @@ class checkmark {
             }
         }
 
-        return GRADE_UPDATE_OK;
+        $result['status'] = GRADE_UPDATE_OK;
+        return $result;
     }
 }
 
@@ -4677,7 +4720,7 @@ function checkmark_override_summary(stdClass $checkmark, stdClass $cm, int $curr
         $params[] = $checkmark->id;
 
         $groupcount = $DB->count_records_select('checkmark_overrides',
-            "groupid $groupidtest AND quiz = ?", $params);
+            "groupid $groupidtest AND checkmarkid = ?", $params);
         $usercount = $DB->count_records_sql("
                 SELECT COUNT(1)
                   FROM {checkmark_overrides} o
