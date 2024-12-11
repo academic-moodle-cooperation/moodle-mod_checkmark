@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-4.5.0 (2024-12-09)
+4.5.0 (2024-12-10)
 ------------------
 * [FIXED] #7905 Database schema not aligned error fixed by adding key [github issue #77 - Menrath]
 * [FIXED] #8105 Fix download with hidden select column by removing the button to hide the select column [github issue #80 - XTRage]

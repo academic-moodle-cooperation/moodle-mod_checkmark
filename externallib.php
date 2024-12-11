@@ -220,7 +220,7 @@ class mod_checkmark_external extends external_api {
         if (!is_enrolled($checkmark->context, $USER, 'mod/checkmark:submit')) {
             $editable = false;
         } else {
-            $editable = $checkmark->isopen() && (!$submission || $checkmark->checkmark->resubmit || ($feedback === false));
+            $editable = $checkmark->isopen() && (!$submission || ($feedback === false));
         }
 
         if (!$editable) {
