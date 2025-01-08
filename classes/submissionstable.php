@@ -1778,7 +1778,7 @@ class submissionstable extends \table_sql {
             if ($overrides->timedue && ($timesubmitted > $overrides->timedue)) {
                 $usertime = format_time($timesubmitted - $overrides->timedue);
                 $latemessage = get_string(
-                    'submittedlateshort',
+                    'late',
                     'checkmark',
                     $usertime
                 );
@@ -1847,7 +1847,7 @@ class submissionstable extends \table_sql {
             if ($due && ($timesubmitted > $due)) {
                 $usertime = format_time($timesubmitted - $due);
                 $latemessage = get_string(
-                    'submittedlateshort',
+                    'late',
                     'checkmark',
                     $usertime
                 );

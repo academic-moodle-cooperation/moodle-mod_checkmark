@@ -241,10 +241,6 @@ class mod_checkmark_renderer extends plugin_renderer_base {
                 'href' => $urlbase . $cm->id . '&updatepref=1' . '&filter=3',
             ]);
             $this->add_table_row_tuple($t, $cell1content, $linkcell2);
-        } else {
-            $cell1content = get_string('allowsubmissionsfromdate', 'checkmark');
-            $cell2content = userdate($summary->timeavailable);
-            $this->add_table_row_tuple($t, $cell1content, $cell2content);
         }
 
         $time = time();
@@ -253,8 +249,6 @@ class mod_checkmark_renderer extends plugin_renderer_base {
             // Due date.
             $cell1content = get_string('duedate', 'checkmark');
             $duedate = $summary->duedate;
-            $cell2content = userdate($duedate);
-            $this->add_table_row_tuple($t, $cell1content, $cell2content);
 
             // Time remaining.
             $cell1content = get_string('timeremaining', 'checkmark');
@@ -407,6 +401,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         $cell2content = get_string('nosubmissionyet', 'checkmark');
         if ($status['submissionstatus'] == 'submitted') {
             $cell2content = get_string('submissionstatus_submitted', 'checkmark');
+            $cell2attributes = ['class' => 'submissionstatus' . $status['submissionstatus']];
         }
         $this->add_table_row_tuple($t, $cell1content, $cell2content, [], $cell2attributes);
 
@@ -426,16 +421,20 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         // Time remaining.
         // Only add the row if there is a due date, or a countdown.
         $time = time();
-        if ($status['timedue'] > 0 || !empty($status['timecreated'])) {
+        if ($status['timedue'] > 0 && !empty($status['timecreated'])) {
             $cell1content = get_string('timeremaining', 'checkmark');
             if ($status['timedue'] - $time < 0) {
                 [$cell2content, $cell2attributes] =
-                    [get_string('submittedlateshort', 'checkmark', format_time($status['timedue'] - $time)), 'timeremaining'];
+                    [get_string('submittedlate', 'checkmark', format_time($status['timedue'] - $time)), 'latesubmission'];
             } else {
                 [$cell2content, $cell2attributes] =
-                    [get_string('paramtimeremaining', 'checkmark', format_time($status['timedue'] - $time)), 'timeremaining'];
+                    [get_string('submittedearly', 'checkmark', format_time($status['timedue'] - $time)), 'earlysubmission'];
             }
             $this->add_table_row_tuple($t, $cell1content, $cell2content, [], ['class' => $cell2attributes]);
+        } else if ($status['timedue'] > 0) {
+            $cell1content = get_string('timeremaining', 'checkmark');
+            $cell2content = get_string('paramtimeremaining', 'checkmark', format_time($status['timedue'] - $time));
+            $this->add_table_row_tuple($t, $cell1content, $cell2content);
         }
 
         // Last modified.
