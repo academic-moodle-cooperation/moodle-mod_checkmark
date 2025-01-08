@@ -425,10 +425,10 @@ class mod_checkmark_renderer extends plugin_renderer_base {
             $cell1content = get_string('timeremaining', 'checkmark');
             if ($status['timedue'] - $time < 0) {
                 [$cell2content, $cell2attributes] =
-                    [get_string('submittedlate', 'checkmark', format_time($status['timedue'] - $time)), 'latesubmission'];
+                    [get_string('submittedlate', 'checkmark', format_time($status['timedue'] - $status['timecreated'])), 'latesubmission'];
             } else {
                 [$cell2content, $cell2attributes] =
-                    [get_string('submittedearly', 'checkmark', format_time($status['timedue'] - $time)), 'earlysubmission'];
+                    [get_string('submittedearly', 'checkmark', format_time($status['timedue'] - $status['timecreated'])), 'earlysubmission'];
             }
             $this->add_table_row_tuple($t, $cell1content, $cell2content, [], ['class' => $cell2attributes]);
         } else if ($status['timedue'] > 0) {
