@@ -423,7 +423,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         $time = time();
         if ($status['timedue'] > 0 && !empty($status['timecreated'])) {
             $cell1content = get_string('timeremaining', 'checkmark');
-            if ($status['timedue'] - $time < 0) {
+            if ($status['timedue'] - $status['timecreated'] < 0) {
                 [$cell2content, $cell2attributes] =
                     [get_string('submittedlate', 'checkmark', format_time($status['timedue'] - $status['timecreated'])), 'latesubmission'];
             } else {
