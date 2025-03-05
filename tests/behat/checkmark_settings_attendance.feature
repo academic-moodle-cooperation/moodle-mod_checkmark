@@ -18,21 +18,21 @@ Feature: Use attendance tracking and auto-grading linked to attendance
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
     And the following "activities" exist:
-      | activity  | course | idnumber | name        | intro                                               | timeavailable | timedue |
+      | activity  | course | idnumber | name        | intro                                               | timeavailable | timedue      |
       | checkmark | C1     | CM1      | Checkmark 1 | This checkmark is always available since yesterday! | ##yesterday## | ##tomorrow## |
     When I am on the "CM1" Activity page logged in as teacher1
     And I follow "Settings"
     And I press "Expand all"
-    And I set the following fields to these values: 
-      | id_trackattendance     | 0 | 
+    And I set the following fields to these values:
+      | id_trackattendance     | 0 |
       | id_attendancegradelink | 0 |
       | id_attendancegradebook | 0 |
     And I press "Save and display"
     And I follow "Submissions"
     And I should not see "Attendance"
     And I follow "Settings"
-    And I set the following fields to these values: 
-      | id_trackattendance     | 1 | 
+    And I set the following fields to these values:
+      | id_trackattendance     | 1 |
       | id_attendancegradelink | 0 |
       | id_attendancegradebook | 0 |
     And I press "Save and display"
@@ -57,7 +57,7 @@ Feature: Use attendance tracking and auto-grading linked to attendance
     And I press "Start"
     Then I should see "Auto-grading successful! 2 submissions updated."
     And I follow "Settings"
-    And I set the following fields to these values:  
+    And I set the following fields to these values:
       | id_attendancegradelink | 1 |
     And I press "Save and display"
     And I follow "Submission"

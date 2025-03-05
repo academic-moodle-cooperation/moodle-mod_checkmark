@@ -17,7 +17,7 @@ Feature: Testing due date settings
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
     And the following "activities" exist:
-      | activity  | course | idnumber | name        | intro                                               | timeavailable | timedue |
+      | activity  | course | idnumber | name        | intro                                               | timeavailable | timedue      |
       | checkmark | C1     | CM1      | Checkmark 1 | This checkmark is always available since yesterday! | ##yesterday## | ##tomorrow## |
 
   @javascript
@@ -29,11 +29,11 @@ Feature: Testing due date settings
     And I should see "##tomorrow##%A, %d %B %Y##"
     And I follow "Settings"
     And I set the following fields to these values:
-      | calendarteachers | 1 | 
+      | calendarteachers | 1 |
     And I press "Save and display"
     And I follow "Dashboard"
     And I should see "Checkmark 1 is due"
-    And I am on the "CM1" Activity page 
+    And I am on the "CM1" Activity page
     And I follow "Settings"
     And I set the following fields to these values:
       | calendarteachers | 0 |
@@ -47,6 +47,6 @@ Feature: Testing due date settings
     Then I should see "##tomorrow##%A, %d %B %Y##"
     And I follow "Settings"
     And I set the following fields to these values:
-      | Due date               | ##today## |
+      | Due date | ##today## |
     And I press "Save and display"
     Then I should see "##today##%A, %d %B %Y##"
