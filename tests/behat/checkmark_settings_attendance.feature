@@ -55,7 +55,7 @@ Feature: Use attendance tracking and auto-grading linked to attendance
       | chmrk_selectallcb | 1     |
       | bulkaction        | grade |
     And I press "Start"
-    Then I should see "Auto-grading successful! 2 submissions updated."
+    Then I should see "Auto-grading successful! 1 submission updated."
     And I follow "Settings"
     And I set the following fields to these values:
       | id_attendancegradelink | 1 |
