@@ -1330,7 +1330,7 @@ class submissionstable extends \table_sql {
             $params,
         ]);
 
-        return \html_writer::tag('div', \html_writer::checkbox('selected[]', 1, false, null, ['id' => "chmrk_selectallcb"]), [
+        return \html_writer::tag('div', \html_writer::checkbox('selected[]', '', false, null, ['id' => "chmrk_selectallcb"]), [
             'id' => $randomid,
         ]);
     }
