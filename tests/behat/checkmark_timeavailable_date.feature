@@ -1,11 +1,11 @@
 @mod @mod_checkmark @amc
-Feature: Change Allow submission from date
-  In order to change to start date of a checkmar
+Feature: Change "Allow submissions from" date
+  In order to change the start date of a checkmark
   As a teacher
-  I need to be able change to Allow submission from date
+  I need to be able change the "Allow submission from" date
 
   @javascript
-  Scenario: Change timeavailable
+  Scenario: Change "Allow submissions from" data and check if it is displayed correctly
     Given the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
@@ -17,11 +17,14 @@ Feature: Change Allow submission from date
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
-    # We do not need to manually create the checkmark instance again,
-    # this has been testet in checkmark_adding.feature, use generators!
     And the following "activities" exist:
       | activity  | course | idnumber | name        | intro                                               | timeavailable |
       | checkmark | C1     | CM1      | Checkmark 1 | This checkmark is always available since yesterday! | ##yesterday## |
     When I am on the "CM1" Activity page logged in as teacher1
     Then I should see "Opened"
     And I should see "##yesterday##%A, %d %B %Y##"
+    And I follow "Settings"
+    And I set the following fields to these values:
+      | Allow submissions from | ##today## |
+    And I press "Save and display"
+    Then I should see "##today##%A, %d %B %Y##"
