@@ -73,18 +73,7 @@ $string['availability'] = 'Availability';
 $string['availabledate'] = 'Allow submissions from';
 $string['availabledate_help'] = 'Begin of the submission period. After this date students are able to submit.';
 $string['bulk'] = 'Bulk processing';
-$string['bulk_help'] = 'Here you can perform actions like "setting attendance", "automatic grading" or combinations thereof on multiple entries.<br />
-<ul>
-<li><strong>mark as attendant:</strong> Mark selected users as attendant</li>
-<li><strong>mark as absent:</strong> Mark selected users as absent</li>
-<li><strong>grade automatically:</strong> Calculate automatic grade for selected users</li>
-<li><strong>remove grade:</strong> Remove grade for selected users</li>
-<li><strong>remove grade (presentation):</strong> Remove presentation grade for selected users</li>
-<li><strong>mark as attendant and grade:</strong> Mark selected users as attendant and grade them automatically right afterwards</li>
-<li><strong>mark as absent and grade:</strong> Mark selected users as absent and grade them automatically right afterwards</li>
-</ul><br />
-Note: if attendency is linked to the grades only attendant users will be awarded points for checked examples.
-Absent users will be graded with 0 points and users with unknown attendancy will be skipped at all!';
+$string['bulk_help'] = 'Here you can perform actions like "setting attendance", "automatic grading" or combinations thereof on multiple entries.<br /><ul><li><strong>mark as attendant:</strong> Mark selected users as attendant</li><li><strong>mark as absent:</strong> Mark selected users as absent</li><li><strong>grade automatically:</strong> Calculate automatic grade for selected users</li><li><strong>remove grade:</strong> Remove grade for selected users</li><li><strong>remove grade (presentation):</strong> Remove presentation grade for selected users</li><li><strong>mark as attendant and grade:</strong> Mark selected users as attendant and grade them automatically right afterwards</li><li><strong>mark as absent and grade:</strong> Mark selected users as absent and grade them automatically right afterwards</li></ul><br />Note: if attendency is linked to the grades only attendant users will be awarded points for checked examples. Absent users will be graded with 0 points and users with unknown attendancy will be skipped at all!';
 $string['bulk_no_users_selected'] = 'You haven\'t selected any user. Select the required users via the checkboxes in the left column of the table below.';
 $string['calendardue'] = '{$a} is due';
 $string['calendargradingdue'] = '{$a} is due to be graded';
@@ -108,17 +97,9 @@ $string['checkmark_overviewsummary_nograde'] = 'You\'ve checked {$a->checked_exa
 $string['checkmark_summary'] = 'You\'ve checked <span id="examples">{$a->checked_examples}</span> out of {$a->total_examples} examples.<br />(<span id="grade">{$a->checked_grade}</span> out of a maximum of {$a->total_grade} points)';
 $string['checkmarkdetails'] = 'Checkmark details';
 $string['checkmarkisdue'] = 'Checkmark assignment is due';
-$string['checkmarkmail'] = '{$a->grader} posted a comment on your
-checkmark submission for \'{$a->checkmark}\'
-
-You can see it appended to your checkmark submission:
-
-    {$a->url}';
-$string['checkmarkmailhtml'] = '{$a->grader} posted a comment on your
-checkmark submission for \'<i>{$a->checkmark}</i>\'<br /><br />
-You can see it appended to your <a href="{$a->url}">checkmark submission</a>.';
-$string['checkmarkmailsmall'] = '{$a->grader} posted a comment on your
-checkmark submission for \'{$a->checkmark}\' You can see it appended to your submission';
+$string['checkmarkmail'] = '{$a->grader} posted a comment on your checkmark submission for \'{$a->checkmark}\'\n\nYou can see it appended to your checkmark submission:\n\n{$a->url}';
+$string['checkmarkmailhtml'] = '{$a->grader} posted a comment on your checkmark submission for \'<i>{$a->checkmark}</i>\'<br /><br />You can see it appended to your <a href="{$a->url}">checkmark submission</a>.';
+$string['checkmarkmailsmall'] = '{$a->grader} posted a comment on your checkmark submission for \'{$a->checkmark}\' You can see it appended to your submission';
 $string['checkmarkname'] = 'Checkmark name';
 $string['checkmarks'] = 'Checkmarks';
 $string['checkmarkstatstitle'] = 'Course overview checkmark';
@@ -169,19 +150,10 @@ $string['editoverride'] = 'Edit override';
 $string['element_disabled'] = 'The following element is disabled because of existing submissions.';
 $string['elements_disabled'] = 'The following elements are disabled because of existing submissions.';
 $string['emailstudents'] = 'Email alerts to students';
-$string['emailteachermail'] = '{$a->username} has updated the checkmark submission
-for \'{$a->checkmark}\' on {$a->dayupdated} at {$a->timeupdated}.
-
-It is available here:
-
-    {$a->url}';
-$string['emailteachermailhtml'] = '{$a->username} has updated the checkmark submission
-for <i>\'{$a->checkmark}\' on {$a->dayupdated} at {$a->timeupdated}</i><br /><br />
-It is <a href="{$a->url}">available on the web site</a>.';
+$string['emailteachermail'] = '{$a->username} has updated the checkmark submission for \'{$a->checkmark}\' on {$a->dayupdated} at {$a->timeupdated}.\n\nIt is available here:\n\n{$a->url}';
+$string['emailteachermailhtml'] = '{$a->username} has updated the checkmark submission for <i>\'{$a->checkmark}\' on {$a->dayupdated} at {$a->timeupdated}</i><br /><br />It is <a href="{$a->url}">available on the web site</a>.';
 $string['emailteachers'] = 'Email alerts to teachers';
-$string['emailteachers_help'] = 'If enabled, teachers receive email notification whenever students add or update a checkmark submission.
-
-Only teachers who are able to grade the particular checkmark are notified. For example, if the course uses separate groups, teachers restricted to particular groups won\'t receive notification about students in other groups.';
+$string['emailteachers_help'] = 'If enabled, teachers receive email notification whenever students add or update a checkmark submission.<br><br>Only teachers who are able to grade the particular checkmark are notified. For example, if the course uses separate groups, teachers restricted to particular groups won\'t receive notification about students in other groups.';
 $string['emptysubmission'] = 'You have not submitted anything yet';
 $string['enablenotification'] = 'Send notifications';
 $string['enablenotification_help'] = 'If enabled, students will be notified once their checkmark submissions (or corresponding presentations) are graded or their attendancy is marked.';
@@ -215,23 +187,7 @@ $string['exporttemplate_grades_extended'] = 'Gradinglist extended';
 $string['exporttemplate_signature'] = 'Signaturelist simple';
 $string['exporttemplate_signature_extended'] = 'Signaturelist extended';
 $string['exporttemplates'] = 'Template';
-$string['exporttemplates_help'] = 'Quick export with predefined templates<br />
-<ul>
-    <li><strong>custom settings</strong><br />
-        no template is used, all settings have to be made manually</li>
-    <li><strong>Gradinglist simple:</strong><br />
-        portrait, small font, with header/footer, names printed in one line<br />
-        containing following columns: [fullname, examples, grade]</li>
-    <li><strong>Gradinglist extended:</strong><br />
-        landscape, small font, with header/footer, names printed in one line<br />
-        containing following columns: [fullname, idnumber, examples, checked, grade]</li>
-    <li><strong>Signaturelist simple:</strong><br />
-        portrait, small font, with header/footer, names printed in one line<br />
-        containing following columns: [fullname, examples, signature]</li>
-    <li><strong>Signaturelist extended:</strong><br />
-        landscape, small font, with header/footer, names printed in one line<br />
-        containing following columns: [fullname, idnumber, examples, checked, grade, signature]</li>
-</ul>';
+$string['exporttemplates_help'] = 'Quick export with predefined templates<br /><ul><li><strong>custom settings</strong><br />no template is used, all settings have to be made manually</li><li><strong>Gradinglist simple:</strong><br />portrait, small font, with header/footer, names printed in one line<br />containing following columns: [fullname, examples, grade]</li><li><strong>Gradinglist extended:</strong><br />landscape, small font, with header/footer, names printed in one line<br />containing following columns: [fullname, idnumber, examples, checked, grade]</li><li><strong>Signaturelist simple:</strong><br />portrait, small font, with header/footer, names printed in one line<br />containing following columns: [fullname, examples, signature]</li><li><strong>Signaturelist extended:</strong><br />landscape, small font, with header/footer, names printed in one line<br />containing following columns: [fullname, idnumber, examples, checked, grade, signature]</li></ul>';
 $string['extended_until'] = 'Extended until {$a}';
 $string['extensionduedate'] = 'Extension due date';
 $string['extensionnotafterduedate'] = 'Extension date must be after the due date';
@@ -249,8 +205,7 @@ $string['flexiblenaming'] = 'Individual naming/grading';
 $string['flexiblenaming_help'] = 'If activated individual names and grades are being used for each example.';
 $string['forced'] = 'Overwritten by teacher';
 $string['forcesinglelinenames'] = 'Force single-line names';
-$string['forcesinglelinenames_help'] = '<p>Enforces the name to be written to the PDF in a single line.</p>
-<p><i>Beware:</i> if there are too many columns or the name is too long it will be distorted and can become unreadable. Hide some unimportant columns to have more room for the name if this happens.</p>';
+$string['forcesinglelinenames_help'] = '<p>Enforces the name to be written to the PDF in a single line.</p><p><i>Beware:</i> if there are too many columns or the name is too long it will be distorted and can become unreadable. Hide some unimportant columns to have more room for the name if this happens.</p>';
 $string['format'] = 'Format';
 $string['gotoactivity'] = 'Go to activity';
 $string['grade'] = 'Grade';
