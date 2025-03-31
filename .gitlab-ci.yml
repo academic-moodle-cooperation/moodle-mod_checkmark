@@ -1,76 +1,18 @@
-cache:
-  paths:
-    - .composer/cache
-
 default:
   tags:
     - moodle
 
-variables:
-  CI_BUILD_DIR: "$CI_PROJECT_DIR"
-  COMPOSER_HOME: "$CI_PROJECT_DIR/.composer/cache"
+stages:
+  - preflight
+  - test
+  - deploy
 
-  POSTGRES_USER: "postgres"
-  POSTGRES_HOST_AUTH_METHOD: "trust"
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - when: always
 
-  MYSQL_ROOT_HOST: "%"
-  MYSQL_ALLOW_EMPTY_PASSWORD: "true"
-  MYSQL_CHARACTER_SET_SERVER: "utf8mb4"
-  MYSQL_COLLATION_SERVER: "utf8mb4_unicode_ci"
-
-.job_template: &job_configuration
-  image: quay.io/amc/moodle-plugin-ci:${PHP_VERSION}-node.22
-  before_script:
-    - cd ../..
-    - moodle-db-isready
-    - moodle-plugin-ci install --moodle="moodle-upstream-core" --db-host=$DB_HOST --db-port=$DB_PORT
-    - eval $(failed setup-command)
-  script:
-    - moodle-plugin-ci phplint || failed
-    - moodle-plugin-ci phpmd || failed
-    - moodle-plugin-ci phpcs
-    - moodle-plugin-ci validate
-    - moodle-plugin-ci savepoints
-    - moodle-plugin-ci mustache
-    - moodle-plugin-ci grunt
-    - moodle-plugin-ci phpdoc
-    - moodle-plugin-ci phpunit
-    - moodle-plugin-ci behat --profile chrome
-    - failed result
-  after_script:
-    - failed report
-  parallel:
-    matrix:
-      - MOODLE_BRANCH: [ "MOODLE_405_STABLE" ]
-        PHP_VERSION: [ "8.1", "8.2", "8.3" ]
-
-test:postgres:
-  <<: *job_configuration
-  services:
-    - postgres:14
-    - docker:dind
-  variables:
-    DB: pgsql
-    DB_HOST: postgres
-    DB_PORT: 5432
-
-test:mysql:
-  <<: *job_configuration
-  services:
-    - name: mysql:8.0.23
-      command: ["mysqld", "--port=6033"]
-    - docker:dind
-  variables:
-    DB: mysqli
-    DB_HOST: mysql
-    DB_PORT: 6033
-
-test:mariadb:
-  <<: *job_configuration
-  services:
-    - mariadb:10.6
-    - docker:dind
-  variables:
-    DB: "mariadb"
-    DB_HOST: "mariadb"
-    DB_PORT: 3306
+include:
+  - component: $CI_SERVER_FQDN/amc/moodle/moodle-ci/moodle-plugin-ci@4.5
+  - component: $CI_SERVER_FQDN/amc/moodle/moodle-ci/moodle-devil-app@4.5
