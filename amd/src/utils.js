@@ -1,11 +1,11 @@
-define(['jquery', 'core/str'], function ($, str) {
+define(['jquery', 'core/str'], function($, str) {
 
-    var Utils = function () {
+    var Utils = function() {
         this.baseurl = M.cfg.wwwroot + "/mod/checkmark/handlehideall.php";
     };
     var baseurl;
 
-    Utils.prototype.toggleExamples = function (show) {
+    Utils.prototype.toggleExamples = function(show) {
         if (show) {
             this.getForAllExamples('false');
         } else {
@@ -13,7 +13,7 @@ define(['jquery', 'core/str'], function ($, str) {
         }
     };
 
-    Utils.prototype.getForAllExamples = function (key) {
+    Utils.prototype.getForAllExamples = function(key) {
         var allexamples = this.getExampleSelectors();
         $.ajax({
             url: baseurl,
@@ -22,7 +22,7 @@ define(['jquery', 'core/str'], function ($, str) {
                 columns: allexamples
             },
             statusCode: {
-                200: function () {
+                "200": function() {
                     var url = window.location.href;
                     url = url.replace(/thide=[a-z0-9]+/, '') /* Removes thide=....3242 !*/
                              .replace(/tshow=[a-z0-9]+/, '') /* Removes tshow=....3432 ! */
@@ -35,14 +35,14 @@ define(['jquery', 'core/str'], function ($, str) {
         });
     };
 
-    Utils.prototype.getExampleSelectors = function () {
+    Utils.prototype.getExampleSelectors = function() {
         var allexamples = [];
 
-        $("th.colexample").each(function () {
+        $("th.colexample").each(function() {
 
             var classes = $(this).attr("class");
-            var classes_arr = classes.split(" ");
-            classes_arr.forEach(function (value) {
+            var classesArray = classes.split(" ");
+            classesArray.forEach(function(value) {
                 if (value.startsWith("example")) {
                     allexamples.push(value);
                 }
@@ -50,17 +50,17 @@ define(['jquery', 'core/str'], function ($, str) {
         });
         return allexamples;
     };
-    Utils.prototype.allExamplesCollapsed = function () {
+    Utils.prototype.allExamplesCollapsed = function() {
         return $('th.colexample > .commands').length === 0;
     };
-    Utils.prototype.getBaseUrl = function () {
+    Utils.prototype.getBaseUrl = function() {
         return this.baseurl;
     };
-    Utils.prototype.clearPointerEventsFromIcons = function () {
-        $('.fa-minus,.fa-plus').css('pointer-events','none');
+    Utils.prototype.clearPointerEventsFromIcons = function() {
+        $('.fa-minus,.fa-plus').css('pointer-events', 'none');
     };
     return {
-        init: function () {
+        init: function() {
             var utils = new Utils();
             var showallContainer = '<th><div id="showallcontainer">';
             showallContainer += '<a id="showall" href="javascript:void(0)">' +
@@ -85,19 +85,19 @@ define(['jquery', 'core/str'], function ($, str) {
             var showallColgroup = '<colgroup class="showall" span="1"><col></colgroup>';
             $('colgroup.timesubmitted').after(showallColgroup);
 
-            var strings = [ {
+            var strings = [{
                     key: 'showalltoggle',
                     component: 'checkmark'
-                },{
+                }, {
                     key: 'hidealltoggle',
                     component: 'checkmark'
-                },{
+                }, {
                     key: 'strexamples',
                     component: 'checkmark'
                 }
             ];
 
-            str.get_strings(strings).then(function (results) {
+            str.get_strings(strings).then(function(results) {
                 $('#showall').prop('aria-label', results[0]).prop('title', results[0]);
                 $('#hideall').prop('aria-label', results[1]).prop('title', results[1]);
                 $('#hidealllabel').text(results[2]);
@@ -113,11 +113,11 @@ define(['jquery', 'core/str'], function ($, str) {
                 $('colgroup.examples').hide();
             }
 
-            $(document).ready(function () {
-                $('#hideall').click(function () {
+            $(document).ready(function() {
+                $('#hideall').click(function() {
                     utils.toggleExamples(false);
                 });
-                $('#showall').click(function () {
+                $('#showall').click(function() {
                     utils.toggleExamples(true);
                 });
                 utils.clearPointerEventsFromIcons();

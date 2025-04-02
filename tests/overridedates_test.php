@@ -47,6 +47,7 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php'); // Include the code
  * @author    Daniel Binder
  * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers    \checkmark::override_dates
  */
 final class overridedates_test extends \advanced_testcase {
 
@@ -331,7 +332,7 @@ final class overridedates_test extends \advanced_testcase {
      * @param array $events Events caught by $sink->getEvents()
      * @param string $logkind Class the log event should be an instance of
      * @param string $calendarkind Class the calendar event should be an instance of
-     * @param null $calendarkind2 Class the second calendar event should be an instance of or null if there is none
+     * @param string|null $calendarkind2 Class the second calendar event should be an instance of or null if there is none
      */
     private function check_events($events, $logkind, $calendarkind = null, $calendarkind2 = null): void {
         // TODO Eventually rewrite this method in a generic way so it can be used by other tests too.
