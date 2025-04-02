@@ -1,15 +1,16 @@
-define(['jquery', 'core/str'], function ($, str) {
+define(['jquery', 'core/str'], function($, str) {
 
-    var State = function (name,state) {
+    var State = function(name, state) {
         this.name = name;
         this.state = state;
     };
 
-    var Quickgrade = function () {
+    var Quickgrade = function(originalState) {
+        this.originalState = originalState;
     };
 
-    Quickgrade.prototype.toogleOverwiteHint = function (element) {
-        if($(element).hasClass('exborder')) {
+    Quickgrade.prototype.toogleOverwiteHint = function(element) {
+        if ($(element).hasClass('exborder')) {
             $(element).removeClass('exborder');
         } else {
             $(element).addClass('exborder');
@@ -17,13 +18,13 @@ define(['jquery', 'core/str'], function ($, str) {
 
     };
 
-    Quickgrade.prototype.calculateSum = function (line) {
+    Quickgrade.prototype.calculateSum = function(line) {
         var sum = 0;
-        $('input.checkline' + line).each(function () {
-            if($(this).is(':checked')) {
+        $('input.checkline' + line).each(function() {
+            if ($(this).is(':checked')) {
                 var classname = $(this).attr('class');
                 var classes = classname.split(' ');
-                classes.forEach(function (value) {
+                classes.forEach(function(value) {
                     if (value.startsWith("$")) {
                         sum += parseFloat(value.substring(1));
                     }
@@ -32,7 +33,7 @@ define(['jquery', 'core/str'], function ($, str) {
         });
         return sum;
     };
-    Quickgrade.prototype.setPoints = function (line,points) {
+    Quickgrade.prototype.setPoints = function(line, points) {
         $('#menumenu' + line).val(points);
 
         var strings = [
@@ -41,27 +42,25 @@ define(['jquery', 'core/str'], function ($, str) {
                 component: 'checkmark'
             },
         ];
-        str.get_strings(strings).then(function (results) {
+        str.get_strings(strings).then(function(results) {
             $('#feedback' + line).text(results[0]);
         });
-
     };
 
-    Quickgrade.prototype.resetFeedback = function () {
+    Quickgrade.prototype.resetFeedback = function() {
         $('#id_feedback_editoreditable:first-child').text('');
     };
     return {
-        init: function () {
+        init: function() {
             var originalState = [];
             $('.overwritetag').each(function() {
-                originalState.push(new State(this.getAttribute('class'),this.style.display !== 'none'));
+                originalState.push(new State(this.getAttribute('class'), this.style.display !== 'none'));
             });
             var quickgrade = new Quickgrade(originalState);
-            quickgrade.originalState = originalState;
-            $(document).ready(function () {
-                $('input.examplecheck').change(function (event) {
-                    var line = event.target.attributes['value'].nodeValue;
-                    quickgrade.setPoints(line,quickgrade.calculateSum(line));
+            $(document).ready(function() {
+                $('input.examplecheck').change(function(event) {
+                    var line = event.target.attributes.value.nodeValue;
+                    quickgrade.setPoints(line, quickgrade.calculateSum(line));
                     quickgrade.toogleOverwiteHint(event.target.parentElement.lastChild);
                 });
                 /*

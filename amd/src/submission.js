@@ -32,6 +32,7 @@ define(['core/log', 'jquery'], function(log, $) {
      * @alias module:mod_checkmark/submission
      */
     let Submission = function() {
+        // Constructor function
     };
 
     /**
