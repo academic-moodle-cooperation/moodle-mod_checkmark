@@ -120,12 +120,14 @@ class exportform extends \moodleform {
         $mform->setDefault('coursetitle', 'courseshortname');
 
         $templatenames = self::get_templates();
-        $templates = ['' => get_string('custom_settings', 'checkmark')];
+        $templates = [];
         foreach ($templatenames as $cur) {
             $templates[$cur] = get_string('exporttemplate_'.$cur, 'checkmark');
         }
+        $templates[''] = get_string('custom_settings', 'checkmark');
         $mform->addElement('select', 'template', get_string('exporttemplates', 'checkmark'), $templates);
         $mform->addHelpButton('template', 'exporttemplates', 'checkmark');
+        $mform->setDefault('template', '');
 
         // How many submissions per page?
         $pppgroup = [
@@ -236,7 +238,7 @@ class exportform extends \moodleform {
     }
 
     /**
-     * Returns the available export templates
+     * Returns the available export templates sorted in alphabetical order.
      *
      * @return string[] available template-names
      */
@@ -255,6 +257,7 @@ class exportform extends \moodleform {
                 $templates[] = $cur;
             }
         }
+        sort($templates);
 
         return $templates;
     }
