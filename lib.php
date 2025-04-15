@@ -38,6 +38,9 @@ define('CHECKMARK_EVENT_TYPE_GRADINGDUE', 'gradingdue');
 
 define('CHECKMARK_INTROATTACHMENT_FILEAREA', 'introattachment');
 
+/** Maximum number of checkmarks for one column in the view and preview - otherwise responsive with more columns */
+define('MAXCHECKMARKS_FOR_ONECOLUMN', 10);
+
 /**
  * Deletes a checkmark instance
  *
