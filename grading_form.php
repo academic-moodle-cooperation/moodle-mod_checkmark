@@ -230,7 +230,6 @@ class mod_checkmark_grading_form extends moodleform {
                 $symbol = checkmark_get_attendance_symbol($attendance);
                 $mform->addElement('static', 'disabledattendance', get_string('attendance', 'checkmark'), $symbol);
             } else {
-                // TODO: if there's time, we add JS to show a beautiful select with symbols!
                 $options = [
                     -1 => '? ' . strtolower(get_string('unknown', 'checkmark')),
                     1 => '✓ ' . strtolower(get_string('attendant', 'checkmark')),

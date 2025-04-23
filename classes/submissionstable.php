@@ -2367,7 +2367,6 @@ class submissionstable extends \table_sql {
             $btntype = 'primary';
             $btnstring = get_string('gradeverb');
         }
-        // TODO: enhance with AJAX grading!
         $status = ($values->timemarked > 0) && ($values->timemarked >= $values->timesubmitted);
         $text = $status ? $this->strupdate : $this->strgrade;
         if ($this->use_no_html()) {
