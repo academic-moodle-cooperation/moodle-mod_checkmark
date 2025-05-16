@@ -2126,7 +2126,7 @@ function checkmark_supports($feature) {
             return MOD_PURPOSE_ASSESSMENT;
 
         default:
-            return false;
+            return null;
     }
 }
 
