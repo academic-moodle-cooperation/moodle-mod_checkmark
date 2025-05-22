@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.0.0 (2025-05-22)
+------------------
+* Moodle 5.0 compatible version
+* [FEATURE] #8333 Multilangfilter v2 is now supported
+
 4.5.0 (2024-12-10)
 ------------------
 * [FIXED] #7905 Database schema not aligned error fixed by adding key [github issue #77 - Menrath]
