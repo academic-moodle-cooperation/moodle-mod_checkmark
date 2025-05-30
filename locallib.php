@@ -3574,11 +3574,13 @@ class checkmark {
         $timeavailablestr = !empty($this->checkmark->timeavailable) ? userdate($this->checkmark->timeavailable) : $notactivestr;
         $timeduestr = !empty($this->checkmark->timedue) ? userdate($this->checkmark->timedue) : $notactivestr;
         $courseheadertitle = $coursetitle == 'courseshortname' ? $this->course->shortname : $this->course->fullname;
+        $courseheadertitle = format_string($courseheadertitle, true, ['context' => context_module::instance($this->cm->id)]);
         $paramarray = [get_string('course') . ':', $courseheadertitle,
                 get_string('availabledate', 'checkmark') . ':', $timeavailablestr,
                 !$template ? get_string('strprintpreview', 'checkmark') : '', $filters[$filter],
             // Second header row!
-                get_string('strassignment', 'checkmark') . ':', $this->checkmark->name,
+                get_string('strassignment', 'checkmark') . ':',
+                format_string($this->checkmark->name, true, ['context' => context_module::instance($this->cm->id)]),
                 get_string('duedate', 'checkmark') . ':', $timeduestr,
                 get_string('groups') . ':', $grpname,
             ];
@@ -3623,6 +3625,7 @@ class checkmark {
         \mod_checkmark\event\submissions_exported::exported($this->cm, $export)->trigger();
 
         $filename = $this->course->shortname . '-' . $this->checkmark->name;
+        $filename = format_string($filename, true, ['context' => context_module::instance($this->cm->id)]);
         if ($template) {
             $filename .= '-' . get_string('exporttemplate_' . $template, 'checkmark');
         }
@@ -3705,11 +3708,13 @@ class checkmark {
                 $pdf->setrowsperpage($printperpage);
             }
             $courseheadertitle = $coursetitle == 'courseshortname' ? $this->course->shortname : $this->course->fullname;
+            $courseheadertitle = format_string($courseheadertitle, true, ['context' => context_module::instance($this->cm->id)]);
             $paramarray = [get_string('course') . ':', $courseheadertitle,
                     get_string('availabledate', 'checkmark') . ':', $timeavailablestr,
                     !$template ? get_string('strprintpreview', 'checkmark') : '', $filters[$filter],
                 // Second header row!
-                    get_string('strassignment', 'checkmark') . ':', $this->checkmark->name,
+                    get_string('strassignment', 'checkmark') . ':',
+                    format_string($this->checkmark->name, true, ['context' => context_module::instance($this->cm->id)]),
                     get_string('duedate', 'checkmark') . ':', $timeduestr,
                     get_string('groups') . ':', $grpname,
             ];
@@ -3745,6 +3750,7 @@ class checkmark {
             \mod_checkmark\event\submissions_exported::exported($this->cm, $curexport)->trigger();
 
             $filename = $this->course->shortname . '-' . $this->checkmark->name . '-' . $currentgroup->name;
+            $filename = format_string($filename, true, ['context' => context_module::instance($this->cm->id)]);
             if ($template) {
                 $filename .= '-' . get_string('exporttemplate_' . $template, 'checkmark');
             }
@@ -3758,6 +3764,7 @@ class checkmark {
         $tmpdir = make_temp_directory('checkmark');
         $zipfile = tempnam($tmpdir, 'checkmark_');
         $zipname = $this->course->shortname . '-' . $this->checkmark->name;
+        $zipname = format_string($zipname, true, ['context' => context_module::instance($this->cm->id)]);
         if (!preg_match('/.zip$/', $zipname)) {
             $zipname .= '.zip';
         }
