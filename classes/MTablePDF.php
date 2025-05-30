@@ -796,7 +796,6 @@ class MTablePDF extends \pdf {
             $this->Output($tmpdir . $filename, 'F');
             return $tmpdir . $filename;
         } catch (\Exception $e) {
-            // TODO proper error handling and error localized strings!
             \core\notification::add('Problem during PDF-export.<br/>\n' . $e->getMessage() . '<br/>\n' . $e->getTraceAsString(),
                     'error');
         }

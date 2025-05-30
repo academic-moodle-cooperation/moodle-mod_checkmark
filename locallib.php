@@ -3051,7 +3051,6 @@ class checkmark {
         echo html_writer::empty_tag('br', ['class' => 'clearfloat']);
 
         // Mini form for setting user preference!
-        // TODO tscpr: should we make this form in a seperate file and handle there the saving of options?
         $formaction = new moodle_url('/mod/checkmark/submissions.php', ['id' => $this->cm->id]);
 
         $mform = new MoodleQuickForm('optionspref', 'post', $formaction, '', ['class' => 'optionspref']);
@@ -3351,7 +3350,6 @@ class checkmark {
             echo $message;   // Display messages here if any!
         }
 
-        // TODO JS to reload table via AJAX as soon as smth in the form changes?!?
         $mform->display();
 
         echo $OUTPUT->footer();
@@ -3646,8 +3644,7 @@ class checkmark {
         $groupmode = groups_get_activity_groupmode($this->cm);
         $aag = has_capability('moodle/site:accessallgroups', $this->context);
         if ($groupmode === NOGROUPS) {
-            // TODO proper exception text!
-            throw new coding_exception('wrong groupmode!');
+            throw new coding_exception('Groupmode NOGROUPS! - Groups not used in course or activity!');
         } else if ($groupmode == VISIBLEGROUPS || $aag) {
             $groups = groups_get_all_groups($this->course->id, 0, $this->course->defaultgroupingid);
         } else {
@@ -4268,14 +4265,10 @@ class checkmark {
             $userid = $USER->id;
         }
 
-        $output = '';
-
         $submission = $this->get_submission($userid);
         if (!$submission) {
             $submission = \mod_checkmark\submission::get_mock_submission($this->checkmark->id);
         }
-
-        // TODO we use a form here for now, but plan to use a better template in the future!
 
         return $submission->render();
     }

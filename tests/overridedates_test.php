@@ -335,7 +335,6 @@ final class overridedates_test extends \advanced_testcase {
      * @param string|null $calendarkind2 Class the second calendar event should be an instance of or null if there is none
      */
     private function check_events($events, $logkind, $calendarkind = null, $calendarkind2 = null): void {
-        // TODO Eventually rewrite this method in a generic way so it can be used by other tests too.
         if ($calendarkind2) {
             $this->assertCount(3, $events);
         } else {
