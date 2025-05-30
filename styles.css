@@ -325,7 +325,7 @@
 #page-mod-checkmark-preview .responsive-columns,
 #page-mod-checkmark-view #checkmarkform .responsive-columns {
     column-count: 1;
-    column-gap: 2rem;
+    column-gap: 1rem;
 }
 
 @media (min-width: 576px) {
