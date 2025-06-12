@@ -55,7 +55,7 @@ class checkmark_submission_form extends moodleform {
             get_string('savesubmission', 'checkmark'));
         $buttonarray[] = &$mform->createElement('reset', 'resetbutton', get_string('revert'),
             ['class' => 'btn btn-secondary mr-1']);
-        $mform->addGroup($buttonarray, 'buttonar', '', ' ', false);
+        $mform->addGroup($buttonarray, 'buttonar', '', ' ', false, ['class' => 'w-100 buttonar-leftalign']);
         $mform->closeHeaderBefore('buttonar');
 
         $examples = $this->_customdata->examples;

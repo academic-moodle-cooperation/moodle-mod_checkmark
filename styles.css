@@ -323,3 +323,10 @@
     break-inside: avoid;
     margin-bottom: 1rem;
 }
+
+#page-mod-checkmark-view #checkmarkform .buttonar-leftalign .felement {
+    flex: 0 0 100%;
+    max-width: 100%;
+    justify-content: flex-start;
+    padding-left: 0;
+}
