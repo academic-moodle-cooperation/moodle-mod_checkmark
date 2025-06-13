@@ -297,26 +297,36 @@
     color: black;
 }
 
-@media (min-width: 768px) {
-    .pagelayout-standard #page.drawers .main-inner,
-    body.limitedwidth #page.drawers .main-inner {
-        max-width: 830px;
+/* Responsive styles for checkmark preview and view */
+#page-mod-checkmark-preview .responsive-columns,
+#page-mod-checkmark-view #checkmarkform .responsive-columns {
+    column-count: 1;
+    column-gap: 1rem;
+}
+
+@media (min-width: 576px) {
+    #page-mod-checkmark-preview .responsive-columns,
+    #page-mod-checkmark-view #checkmarkform .responsive-columns {
+        column-count: 2;
     }
-    .pagelayout-standard #page.drawers .footer-popover,
-    body.limitedwidth #page.drawers .footer-popover {
-        max-width: 830px;
-        width: 100%;
-        margin: 0 auto;
-        border-radius: 0.5rem;
+}
+
+@media (min-width: 992px) {
+    #page-mod-checkmark-preview .responsive-columns,
+    #page-mod-checkmark-view #checkmarkform .responsive-columns {
+        column-count: 3;
     }
-    .header-maxwidth {
-        max-width: 830px;
-        margin: 0 auto;
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-    .header-maxwidth .header-inner {
-        padding-left: 0;
-        padding-right: 0;
-    }
+}
+
+#page-mod-checkmark-preview .example-checkmark,
+#page-mod-checkmark-view #checkmarkform .example-checkmark {
+    break-inside: avoid;
+    margin-bottom: 1rem;
+}
+
+#page-mod-checkmark-view #checkmarkform .buttonar-leftalign .felement {
+    flex: 0 0 100%;
+    max-width: 100%;
+    justify-content: flex-start;
+    padding-left: 0;
 }

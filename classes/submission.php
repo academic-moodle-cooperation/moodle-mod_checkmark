@@ -45,6 +45,8 @@ class submission {
     public $timecreated = null;
     /** @var int */
     public $timemodified = null;
+    /** @var bool */
+    public $showcolumns = false;
 
     /**
      * submission constructor.
@@ -225,6 +227,7 @@ class submission {
 
         $context = clone $this;
         $context->examples = array_values($this->get_examples_or_example_template());
+        $context->showcolumns = count($context->examples) > MAXCHECKMARKS_FOR_ONECOLUMN;
 
         return $OUTPUT->render_from_template('mod_checkmark/submission', $context);
     }

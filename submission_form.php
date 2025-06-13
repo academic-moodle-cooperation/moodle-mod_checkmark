@@ -55,34 +55,47 @@ class checkmark_submission_form extends moodleform {
             get_string('savesubmission', 'checkmark'));
         $buttonarray[] = &$mform->createElement('reset', 'resetbutton', get_string('revert'),
             ['class' => 'btn btn-secondary mr-1']);
-        $mform->addGroup($buttonarray, 'buttonar', '', ' ', false);
+        $mform->addGroup($buttonarray, 'buttonar', '', ' ', false, ['class' => 'w-100 buttonar-leftalign']);
         $mform->closeHeaderBefore('buttonar');
 
+        $examples = $this->_customdata->examples;
+        $usecolumns = count($examples) > MAXCHECKMARKS_FOR_ONECOLUMN;
+
+        if ($usecolumns) {
+            $mform->addElement('html', '<div class="responsive-columns">');
+        } else {
+            $mform->addElement('html', '<div>');
+        }
+
         foreach ($this->_customdata->examples as $key => $example) {
-            switch ($example->grade) {
-                case '1':
-                    $pointsstring = get_string('strpoint', 'checkmark');
-                break;
-                case '2':
-                default:
-                    $pointsstring = get_string('strpoints', 'checkmark');
-                break;
-            }
+            $pointsstring = ($example->grade === '1')
+                ? get_string('strpoint', 'checkmark')
+                : get_string('strpoints', 'checkmark');
 
             $attr = [
-                'id' => 'example'.$key,
+                'id' => 'example' . $key,
                 'group' => '1',
                 'data-grade' => $example->grade,
                 'data-name' => $example->shortname,
                 'data-example' => $example->id,
             ];
-            $mform->addElement('advcheckbox',
-                    $key, null, $example->prefix . $example->name.' ('.$example->grade.' '.$pointsstring.')',
-                    $attr, [0, 1]);
-            if (property_exists($this->_customdata, 'example'.$key)) {
-                $mform->setDefault($key, $this->_customdata->{'example'.$key});
+
+            $mform->addElement('html', '<div class="example-checkmark">');
+            $mform->addElement(
+                'advcheckbox',
+                $key,
+                '',
+                $example->prefix . $example->name . ' (' . $example->grade . ' ' . $pointsstring . ')',
+                $attr,
+                [0, 1]
+            );
+            $mform->addElement('html', '</div>');
+
+            if (property_exists($this->_customdata, 'example' . $key)) {
+                $mform->setDefault($key, $this->_customdata->{'example' . $key});
             }
         }
+        $mform->addElement('html', '</div>');
 
         // Here come the hidden params!
         $mform->addElement('hidden', 'id');
