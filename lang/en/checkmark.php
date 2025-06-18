@@ -255,7 +255,7 @@ $string['manycolumnsinpdfwarning'] = 'Attention: due to a high example-count and
 $string['maximumgrade'] = 'Maximum grade';
 $string['messageprovider:checkmark_updates'] = 'Checkmark notifications';
 $string['modulename'] = 'Checkmark';
-$string['modulename_help'] = 'Checkmarks enable the teacher to specify an assignment where students have to check marks which can then be graded.';
+$string['modulename_help'] = 'Checkmarks enable the teacher to specify an assignment where students have to check marks which can then be graded.<p><a href="https://academic-moodle-cooperation.org/anleitungen/kreuzerlubung-verwenden/?lng=en" target="_blank">Checkmark: Use the checkmark module</a></p><p><a href="https://academic-moodle-cooperation.org/anleitungen/kreuzerlubung-anwesenheit-erfassen/?lng=en" target="_blank">Checkmark: track attendance</a></p><p><a href="https://academic-moodle-cooperation.org/anleitungen/kreuzerlubung-tafelleistung-erfassen/?lng=en" target="_blank">Checkmark: track presentation grading</a></p><p><a href="https://academic-moodle-cooperation.org/anleitungen/kreuzerlubung-bericht-einsehen/?lng=en" target="_blank">Checkmark: review the Checkmark Report</a></p>';
 $string['modulenameplural'] = 'Checkmarks';
 $string['needattendanceentrycount'] = 'Needs attendance record';
 $string['newsubmissions'] = 'Checkmarks submitted';
