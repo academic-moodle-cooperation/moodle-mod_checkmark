@@ -1058,10 +1058,11 @@ class submissionstable extends \table_sql {
         $params = array_merge_recursive($params, $userparams);
         $params = array_merge_recursive($params, $useridentity->params);
 
+        // State for examples is 1 for CHECKED and 6 for CHECKED_OVERWRITTEN, from example class.
         $from = "{user} u " . "LEFT JOIN {checkmark_submissions} s ON u.id = s.userid AND s.checkmarkid = :checkmarkid
                  LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid2
                  LEFT JOIN {checkmark_checks} gchks ON gchks.submissionid = s.id
-                 LEFT JOIN {checkmark_checks} cchks ON cchks.submissionid = s.id AND cchks.state = 1 "
+                 LEFT JOIN {checkmark_checks} cchks ON cchks.submissionid = s.id AND (cchks.state = 1 OR cchks.state = 6)"
                     . $groupssql . $useridentity->joins;
 
         $where = "u.id " . $sqluserids;
