@@ -373,11 +373,7 @@ class checkmark {
         echo $OUTPUT->container_start('studentview');
         $previewform = new MoodleQuickForm('optionspref', 'post', '#', '');
 
-        $content = '';
-        $content .= $this->get_attendancehint();
-        $content .= "\n";
-
-        $content .= $this->get_checkmarks_overview_html($context);
+        $content = $this->get_checkmarks_overview_html($context);
         if (has_capability('mod/checkmark:grade', $this->context)) {
             $previewform->addElement('html', $content);
             $previewform->display();
