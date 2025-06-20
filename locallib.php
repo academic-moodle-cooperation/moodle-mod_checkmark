@@ -377,7 +377,7 @@ class checkmark {
         $content .= $this->get_attendancehint();
         $content .= "\n";
 
-        $content = $this->checkmark_get_content($content, $context);
+        $content .= $this->get_checkmarks_overview_html($context);
         if (has_capability('mod/checkmark:grade', $this->context)) {
             $previewform->addElement('html', $content);
             $previewform->display();
@@ -391,29 +391,31 @@ class checkmark {
     }
 
     /**
-     * get content
+     * This function returns the HTML with the checkmarks to be displayed. This is used to preview and to display
+     * the checkmarks after submission is over, and the checkmarks are not editable anymore.
      *
-     * @param string $content
-     * @param object $context
-     * @return string
+     * @param object $context Context instance to check capabilities
+     * @return string HTML with the checkmarks overview
      */
-    public function checkmark_get_content($content, $context) {
+    public function get_checkmarks_overview_html($context) {
         global $USER, $OUTPUT;
 
-        $content .= $OUTPUT->box_start('generalbox boxaligncenter header-maxwidth', 'checkmark');
+        $o = '';
         // Display overview!
         if (has_capability('mod/checkmark:view_preview', $context) ||
-            has_capability('mod/checkmark:submit', $context, $USER, false)) {
-            $content .= html_writer::start_tag('div', ['class' => 'mform']);
-            $content .= html_writer::start_tag('div', ['class' => 'clearfix']);
-            $content .= $this->print_user_submission($USER->id, true);
-            $content .= html_writer::end_tag('div');
-            $content .= html_writer::end_tag('div');
-            $content .= $OUTPUT->box_end();
-            $content .= "\n";
+        has_capability('mod/checkmark:submit', $context, $USER, false)) {
+            $o .= $OUTPUT->box_start('generalbox boxaligncenter header-maxwidth', 'checkmark');
+            $o .= html_writer::start_tag('div', ['class' => 'mform']);
+            $o .= html_writer::start_tag('div', ['class' => 'clearfix']);
+            $o .= $this->print_user_submission($USER->id, true);
+            $o .= html_writer::end_tag('div');
+            $o .= html_writer::end_tag('div');
+            $o .= $OUTPUT->box_end();
+            $o .= "\n";
         }
-        return $content;
+        return $o;
     }
+
     /**
      * Every view for checkmark (teacher/student/etc.)
      *
@@ -538,7 +540,6 @@ class checkmark {
 
         // Studentview Container start.
         echo $OUTPUT->container_start('studentview');
-        $previewform = new MoodleQuickForm('optionspref', 'post', '#', '');
 
         $content = '';
         $content .= $this->get_attendancehint();
@@ -550,26 +551,11 @@ class checkmark {
             $content .= $OUTPUT->box_end();
             $content .= "\n";
         } else {
-            $content .= $OUTPUT->box_start('generalbox boxaligncenter header-maxwidth', 'checkmark');
-            // Display overview!
-            if (has_capability('mod/checkmark:view_preview', $context) ||
-                    has_capability('mod/checkmark:submit', $context, $USER, false)) {
-                $content .= html_writer::start_tag('div', ['class' => 'mform']);
-                $content .= html_writer::start_tag('div', ['class' => 'clearfix']);
-                $content .= $this->print_user_submission($USER->id, true);
-                $content .= html_writer::end_tag('div');
-                $content .= html_writer::end_tag('div');
-            }
-            $content .= $OUTPUT->box_end();
-            $content .= "\n";
+            $content .= $this->get_checkmarks_overview_html($context);
         }
 
-        if (has_capability('mod/checkmark:grade', $this->context)) {
-
-            $previewform->addElement('header', 'studentpreview',
-                    get_string('studentpreview', 'checkmark'));
-            $previewform->addElement('html', $content);
-        } else {
+        // Display the checkmarks only for the students, not for the teachers.
+        if (!has_capability('mod/checkmark:grade', $this->context)) {
             echo $content;
             echo $this->view_student_summary($USER, true);
         }
@@ -579,6 +565,7 @@ class checkmark {
         $this->view_footer();
         echo "\n";
     }
+
     /**
      * Utility function to add a row of data to a table with 2 columns where the first column is the table's header.
      * Modified the table param and does not return a value.
@@ -605,6 +592,7 @@ class checkmark {
         $row->cells = [$cell1, $cell2];
         $table->data[] = $row;
     }
+
     /**
      * Display the header and top of a page
      *

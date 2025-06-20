@@ -299,32 +299,32 @@
 
 /* Responsive styles for checkmark preview and view */
 #page-mod-checkmark-preview .responsive-columns,
-#page-mod-checkmark-view #checkmarkform .responsive-columns {
+#page-mod-checkmark-view .responsive-columns {
     column-count: 1;
     column-gap: 1rem;
 }
 
 @media (min-width: 576px) {
     #page-mod-checkmark-preview .responsive-columns,
-    #page-mod-checkmark-view #checkmarkform .responsive-columns {
+    #page-mod-checkmark-view .responsive-columns {
         column-count: 2;
     }
 }
 
 @media (min-width: 992px) {
     #page-mod-checkmark-preview .responsive-columns,
-    #page-mod-checkmark-view #checkmarkform .responsive-columns {
+    #page-mod-checkmark-view .responsive-columns {
         column-count: 3;
     }
 }
 
 #page-mod-checkmark-preview .example-checkmark,
-#page-mod-checkmark-view #checkmarkform .example-checkmark {
+#page-mod-checkmark-view .example-checkmark {
     break-inside: avoid;
     margin-bottom: 1rem;
 }
 
-#page-mod-checkmark-view #checkmarkform .buttonar-leftalign .felement {
+#page-mod-checkmark-view .buttonar-leftalign .felement {
     flex: 0 0 100%;
     max-width: 100%;
     justify-content: flex-start;
