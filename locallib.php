@@ -538,8 +538,6 @@ class checkmark {
         echo $OUTPUT->container_start('studentview');
 
         $content = '';
-        $content .= $this->get_attendancehint();
-        $content .= "\n";
 
         if ($editable && has_capability('mod/checkmark:submit', $context, $USER, false) && !empty($mform)) {
             $content .= $OUTPUT->box_start('generalbox boxaligncenter header-maxwidth', 'checkmarkform');
@@ -914,20 +912,6 @@ class checkmark {
 
         $content .= $OUTPUT->box_end();
         return $content;
-    }
-
-    /**
-     * Display the hint if attendance is tracked and linked to grades
-     *
-     * @throws coding_exception
-     */
-    public function get_attendancehint() {
-        global $OUTPUT;
-        if (!$this->checkmark->trackattendance || !$this->checkmark->attendancegradelink) {
-            return;
-        }
-
-        return $OUTPUT->box(get_string('attendancegradelink_hint', 'checkmark'), 'generalbox', 'attendancehint');
     }
 
     /**
