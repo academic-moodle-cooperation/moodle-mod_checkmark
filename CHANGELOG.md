@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+5.0.0 (2025-05-22)
+------------------
+* Moodle 5.0 compatible version
+* [FIXED] #8360 Fix error to include manually overwritten examples by teachers in the export
+* [UPDATE] #6993 List of examples is now available in a responsive design
+* [UPDATE] #7665 Existing behat tests updated and some new ones added
+* [FEATURE] #8333 Multilang filter v2 is now supported
+
 4.5.0 (2024-12-10)
 ------------------
 * [FIXED] #7905 Database schema not aligned error fixed by adding key [github issue #77 - Menrath]
