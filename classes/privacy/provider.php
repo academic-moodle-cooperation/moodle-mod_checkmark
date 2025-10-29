@@ -93,7 +93,10 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
         $collection->add_database_table('checkmark_feedbacks', $feedbacks, 'privacy:metadata:feedbacks');
         $collection->add_database_table('checkmark_overrides', $overrides, 'privacy:metadata:overrides');
 
+        $collection->add_user_preference('checkmark_coursetitle', 'privacy:metadata:pref:coursetitle');
+        $collection->add_user_preference('checkmark_exporttemplate', 'privacy:metadata:pref:exporttemplate');
         $collection->add_user_preference('checkmark_filter', 'privacy:metadata:pref:filter');
+        $collection->add_user_preference('checkmark_filter_export', 'privacy:metadata:pref:filterexport');
         $collection->add_user_preference('checkmark_forcesinglelinenames', 'privacy:metadata:pref:forcesinglelinenames');
         $collection->add_user_preference('checkmark_format', 'privacy:metadata:pref:format');
         $collection->add_user_preference('checkmark_mailinfo', 'privacy:metadata:pref:mailinfo');
@@ -102,6 +105,8 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
         $collection->add_user_preference('checkmark_perpage', 'privacy:metadata:pref:perpage');
         $collection->add_user_preference('checkmark_printheader', 'privacy:metadata:pref:printheader');
         $collection->add_user_preference('checkmark_quickgrade', 'privacy:metadata:pref:quickgrade');
+        $collection->add_user_preference('checkmark_seperatenamecolumns', 'privacy:metadata:pref:seperatenamecolumns');
+        $collection->add_user_preference('checkmark_sequentialnumbering', 'privacy:metadata:pref:sequentialnumbering');
         $collection->add_user_preference('checkmark_sumabs', 'privacy:metadata:pref:sumabs');
         $collection->add_user_preference('checkmark_sumrel', 'privacy:metadata:pref:sumrel');
         $collection->add_user_preference('checkmark_textsize', 'privacy:metadata:pref:textsize');
