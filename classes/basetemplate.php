@@ -23,8 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_checkmark;
-use mod_checkmark\submissionstable as submissionstable;
-use mod_checkmark\MTablePDF as MTablePDF;
+use mod_checkmark\submissionstable;
+use mod_checkmark\MTablePDF;
 
 /**
  * Template table-class exported with specific settings!
@@ -183,7 +183,7 @@ abstract class basetemplate extends submissionstable {
         $params['checkmarkid2'] = $table->checkmark->checkmark->id;
 
         $users = $table->get_userids($filter, $ids);
-    [$sqluserids, $userparams] = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'user');
+        [$sqluserids, $userparams] = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'user');
         $params = array_merge_recursive($params, $userparams);
 
         $from = "{user} u " .

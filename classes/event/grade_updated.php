@@ -92,8 +92,8 @@ class grade_updated extends \core\event\base {
     public function get_description() {
         switch ($this->data['other']['type']) {
             case 'manual':
-                return "The user with id '" . $this->userid . "' updated the grade for user with id '" . $this->data['relateduserid'] .
-                    "' in checkmark module with course module id '$this->contextinstanceid'.";
+                return "The user with id '" . $this->userid . "' updated the grade for user with id '"
+                    . $this->data['relateduserid'] . "' in checkmark module with course module id '$this->contextinstanceid'.";
             case 'automatic':
                 return "The user with id '" . $this->userid . "' updated the grade for user with id '"
                     . $this->data['relateduserid'] . "'"

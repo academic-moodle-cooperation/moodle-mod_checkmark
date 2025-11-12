@@ -77,9 +77,12 @@ function checkmark_delete_instance($id) {
         $result = false;
     }
 
-    $submissions = $DB->get_fieldset_select('checkmark_submissions', 'id',
-            'checkmarkid = :checkmarkid',
-            ['checkmarkid' => $checkmark->id]);
+    $submissions = $DB->get_fieldset_select(
+        'checkmark_submissions',
+        'id',
+        'checkmarkid = :checkmarkid',
+        ['checkmarkid' => $checkmark->id]
+    );
     if (!empty($submissions)) {
         list($ssql, $sparams) = $DB->get_in_or_equal($submissions, SQL_PARAMS_NAMED);
     } else {
@@ -91,9 +94,12 @@ function checkmark_delete_instance($id) {
         $result = false;
     }
 
-    $examples = $DB->get_fieldset_select('checkmark_examples', 'id',
-            'checkmarkid = :checkmarkid',
-            ['checkmarkid' => $checkmark->id]);
+    $examples = $DB->get_fieldset_select(
+        'checkmark_examples',
+        'id',
+        'checkmarkid = :checkmarkid',
+        ['checkmarkid' => $checkmark->id]
+    );
     if (!empty($examples)) {
         list($esql, $eparams) = $DB->get_in_or_equal($examples, SQL_PARAMS_NAMED);
     } else {
@@ -106,12 +112,19 @@ function checkmark_delete_instance($id) {
     }
 
     if (!empty($examples) || !empty($submissions)) {
-        $DB->delete_records_select('checkmark_checks', 'submissionid ' . $ssql . ' OR exampleid ' . $esql,
-                array_merge($sparams, $eparams));
+        $DB->delete_records_select(
+            'checkmark_checks',
+            'submissionid ' . $ssql . ' OR exampleid ' . $esql,
+            array_merge($sparams, $eparams)
+        );
     }
 
-    if (!$DB->delete_records('event', ['modulename' => 'checkmark',
-            'instance' => $checkmark->id, ])) {
+    if (
+        !$DB->delete_records('event', [
+            'modulename' => 'checkmark',
+            'instance' => $checkmark->id,
+        ])
+    ) {
         $result = false;
     }
 
@@ -138,11 +151,19 @@ function checkmark_update_instance($checkmark) {
     $checkmark->timemodified = time();
 
     // Clean examplenames and examplegrades!
-    $checkmark->examplenames = preg_replace('#^,*|,*$#', '',
-            $checkmark->examplenames, -1);
+    $checkmark->examplenames = preg_replace(
+        '#^,*|,*$#',
+        '',
+        $checkmark->examplenames,
+        -1
+    );
     $checkmark->examplenames = preg_replace('#,{2,}#', ',', $checkmark->examplenames, -1);
-    $checkmark->examplegrades = preg_replace('#^,*|,*$#', '',
-            $checkmark->examplegrades, -1);
+    $checkmark->examplegrades = preg_replace(
+        '#^,*|,*$#',
+        '',
+        $checkmark->examplegrades,
+        -1
+    );
     $checkmark->examplegrades = preg_replace('#,{2,}#', ',', $checkmark->examplegrades, -1);
 
     $checkmark->id = $checkmark->instance;
@@ -176,8 +197,10 @@ function checkmark_update_instance($checkmark) {
             $examplecount = count(explode(checkmark::DELIMITER, $checkmark->examplenames));
         }
 
-        if (!$DB->record_exists('checkmark_submissions', ['checkmarkid' => $checkmark->instance])
-                || count($examples) == $examplecount) {
+        if (
+            !$DB->record_exists('checkmark_submissions', ['checkmarkid' => $checkmark->instance])
+            || count($examples) == $examplecount
+        ) {
             /* We won't change the grades after someone submitted already - otherwise he/she would
              * have submitted with other informations than displayed
              *
@@ -269,8 +292,13 @@ function checkmark_add_instance($checkmark) {
 function save_intro_draft_files($formdata, $cmid) {
     if (isset($formdata->introattachments)) {
         $context = context_module::instance($cmid);
-        file_save_draft_area_files($formdata->introattachments, $context->id,
-                'mod_checkmark', CHECKMARK_INTROATTACHMENT_FILEAREA, 0);
+        file_save_draft_area_files(
+            $formdata->introattachments,
+            $context->id,
+            'mod_checkmark',
+            CHECKMARK_INTROATTACHMENT_FILEAREA,
+            0
+        );
     }
 }
 
@@ -286,13 +314,15 @@ function save_intro_draft_files($formdata, $cmid) {
  * @param array $options additional options affecting the file serving
  * @return bool false if file not found, does not return if found - just send the file
  */
-function mod_checkmark_pluginfile($course,
-        $cm,
-        context $context,
-        $filearea,
-        $args,
-        $forcedownload,
-        array $options=[]) {
+function mod_checkmark_pluginfile(
+    $course,
+    $cm,
+    context $context,
+    $filearea,
+    $args,
+    $forcedownload,
+    array $options = []
+) {
     global $CFG;
 
     require_login($course, false, $cm);
@@ -306,7 +336,7 @@ function mod_checkmark_pluginfile($course,
     if ($filearea !== CHECKMARK_INTROATTACHMENT_FILEAREA) {
         return false;
     }
-    $itemid = (int)array_shift($args);
+    $itemid = (int) array_shift($args);
     if ($itemid != 0) {
         return false;
     }
@@ -334,7 +364,7 @@ function checkmark_update_examples($checkmark, $cmid = false) {
     if (!is_object($checkmark)) {
         // Something wrong happened, but this should never happen!
         throw new coding_exception('The checkmark param to checkmark_update_examples() must be an' .
-                ' object containing data from the mod_form.');
+            ' object containing data from the mod_form.');
     }
 
     if (!$cmid) {
@@ -350,8 +380,10 @@ function checkmark_update_examples($checkmark, $cmid = false) {
             $examplecount = count(explode(checkmark::DELIMITER, $checkmark->examplenames));
         }
 
-        if ($DB->record_exists('checkmark_submissions', ['checkmarkid' => $checkmark->instance])
-                && count($examples) !== $examplecount) {
+        if (
+            $DB->record_exists('checkmark_submissions', ['checkmarkid' => $checkmark->instance])
+            && count($examples) !== $examplecount
+        ) {
             return;
         }
 
@@ -405,8 +437,10 @@ function checkmark_update_examples($checkmark, $cmid = false) {
         reset($examples);
         foreach (array_keys($names) as $key) {
             if ($next = current($examples)) {
-                if (($next->name !== $names[$key]) || (empty($next->grade) && empty($grades[$key]))
-                        || ($next->grade !== $grades[$key])) {
+                if (
+                    ($next->name !== $names[$key]) || (empty($next->grade) && empty($grades[$key]))
+                    || ($next->grade !== $grades[$key])
+                ) {
                     $old = clone $next;
                     // If there's an old example to update, we reuse them!
                     $next->name = html_entity_decode($names[$key], ENT_COMPAT);
@@ -588,8 +622,14 @@ function checkmark_get_overridden_dates($checkmarkid, $userid = 0, $courseid = 0
         $records = $DB->get_records_sql($sql, $params, 0, 1);
     }
 
-    $userrecords = $DB->get_records('checkmark_overrides', ['checkmarkid' => $checkmarkid, 'userid' => $userid], "timecreated DESC",
-            "id, timeavailable, timedue, cutoffdate, userid", 0, 1);
+    $userrecords = $DB->get_records(
+        'checkmark_overrides',
+        ['checkmarkid' => $checkmarkid, 'userid' => $userid],
+        "timecreated DESC",
+        "id, timeavailable, timedue, cutoffdate, userid",
+        0,
+        1
+    );
 
     if (count($userrecords)) {
         $records = $userrecords;
@@ -621,8 +661,14 @@ function checkmark_get_override_dates_for_group($checkmarkid, $groupid) {
     if (empty($groupid)) {
         return;
     }
-    $records = $DB->get_records('checkmark_overrides', ['checkmarkid' => $checkmarkid, 'groupid' => $groupid],
-            'grouppriority DESC', 'id, timeavailable, timedue, cutoffdate', 0, 1);
+    $records = $DB->get_records(
+        'checkmark_overrides',
+        ['checkmarkid' => $checkmarkid, 'groupid' => $groupid],
+        'grouppriority DESC',
+        'id, timeavailable, timedue, cutoffdate',
+        0,
+        1
+    );
     return array_values($records)[0];
 }
 
@@ -649,7 +695,7 @@ function checkmark_get_user_grades($checkmark, $userid = 0) {
                    f.timemodified AS dategraded
               FROM {user} u, {checkmark_feedbacks} f
              WHERE u.id = f.userid AND f.checkmarkid = :aid' .
-            $user;
+        $user;
     return $DB->get_records_sql($sql, $params);
 }
 
@@ -698,7 +744,7 @@ function checkmark_get_user_attendances($checkmark, $userid = 0) {
                    f.timemodified AS dategraded
               FROM {user} u, {checkmark_feedbacks} f
              WHERE u.id = f.userid AND f.checkmarkid = :aid' .
-            $user;
+        $user;
     return $DB->get_records_sql($sql, $params);
 }
 
@@ -724,7 +770,7 @@ function checkmark_get_user_presentation_grades($checkmark, $userid = 0) {
                    f.presentationformat AS format, f.graderid AS usermodified, f.timemodified AS dategraded
               FROM {user} u, {checkmark_feedbacks} f
              WHERE u.id = f.userid AND f.checkmarkid = :aid' .
-            $user;
+        $user;
     return $DB->get_records_sql($sql, $params);
 }
 
@@ -877,8 +923,16 @@ function checkmark_grade_item_update($checkmark, $grades = null) {
         $checkmark->id = $checkmark->instance;
     }
 
-    return grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id, CHECKMARK_GRADE_ITEM, $grades,
-            $params);
+    return grade_update(
+        'mod/checkmark',
+        $checkmark->course,
+        'mod',
+        'checkmark',
+        $checkmark->id,
+        CHECKMARK_GRADE_ITEM,
+        $grades,
+        $params
+    );
 }
 
 /**
@@ -901,9 +955,10 @@ function checkmark_attendance_item_update($checkmark, $grades = null) {
     } else {
         $idnumber = null;
     }
-    $params = ['itemname' => get_string('attendance', 'checkmark') . ' ' . $checkmark->name,
-            'idnumber' => 'A' . $idnumber,
-        ];
+    $params = [
+        'itemname' => get_string('attendance', 'checkmark') . ' ' . $checkmark->name,
+        'idnumber' => 'A' . $idnumber,
+    ];
 
     $params['gradetype'] = GRADE_TYPE_VALUE;
     $params['grademax'] = 1;
@@ -934,14 +989,23 @@ function checkmark_attendance_item_update($checkmark, $grades = null) {
         }
     }
 
-    $gradeupdate = grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id, CHECKMARK_ATTENDANCE_ITEM,
-            $grades, $params);
+    $gradeupdate = grade_update(
+        'mod/checkmark',
+        $checkmark->course,
+        'mod',
+        'checkmark',
+        $checkmark->id,
+        CHECKMARK_ATTENDANCE_ITEM,
+        $grades,
+        $params
+    );
     // Move attendance item directly after grade item, if it exists in the same category!
-    $params = ['courseid' => $checkmark->course,
-            'itemtype' => 'mod',
-            'itemmodule' => 'checkmark',
-            'iteminstance' => $checkmark->id,
-        ];
+    $params = [
+        'courseid' => $checkmark->course,
+        'itemtype' => 'mod',
+        'itemmodule' => 'checkmark',
+        'iteminstance' => $checkmark->id,
+    ];
     if ($attendanceitem = grade_item::fetch($params + ['itemnumber' => CHECKMARK_ATTENDANCE_ITEM])) {
         if ($gradeitem = grade_item::fetch($params + ['itemnumber' => CHECKMARK_GRADE_ITEM])) {
             if ($gradeitem->categoryid == $attendanceitem->categoryid) {
@@ -964,9 +1028,10 @@ function checkmark_presentation_item_update($checkmark, $grades = null) {
     global $CFG;
     require_once($CFG->libdir . '/gradelib.php');
 
-    $params = ['itemname' => get_string('presentationgrade_short', 'checkmark') . ' ' . $checkmark->name,
-            'idnumber' => get_string('presentationgrade_short', 'checkmark') . $checkmark->cmidnumber,
-        ];
+    $params = [
+        'itemname' => get_string('presentationgrade_short', 'checkmark') . ' ' . $checkmark->name,
+        'idnumber' => get_string('presentationgrade_short', 'checkmark') . $checkmark->cmidnumber,
+    ];
 
     if ($checkmark->presentationgrade > 0) {
         $params['gradetype'] = GRADE_TYPE_VALUE;
@@ -989,15 +1054,24 @@ function checkmark_presentation_item_update($checkmark, $grades = null) {
         $checkmark->id = $checkmark->instance;
     }
 
-    $gradeupdate = grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id,
-            CHECKMARK_PRESENTATION_ITEM, $grades, $params);
+    $gradeupdate = grade_update(
+        'mod/checkmark',
+        $checkmark->course,
+        'mod',
+        'checkmark',
+        $checkmark->id,
+        CHECKMARK_PRESENTATION_ITEM,
+        $grades,
+        $params
+    );
 
     // Move presentation item attendance item directly after attendance or grade item, if one of them exists!
-    $params = ['courseid' => $checkmark->course,
-            'itemtype' => 'mod',
-            'itemmodule' => 'checkmark',
-            'iteminstance' => $checkmark->id,
-        ];
+    $params = [
+        'courseid' => $checkmark->course,
+        'itemtype' => 'mod',
+        'itemmodule' => 'checkmark',
+        'iteminstance' => $checkmark->id,
+    ];
     if ($presentationitem = grade_item::fetch($params + ['itemnumber' => CHECKMARK_PRESENTATION_ITEM])) {
         if ($attendanceitem = grade_item::fetch($params + ['itemnumber' => CHECKMARK_ATTENDANCE_ITEM])) {
             if ($attendanceitem->categoryid == $presentationitem->categoryid) {
@@ -1024,16 +1098,18 @@ function checkmark_presentation_item_update($checkmark, $grades = null) {
 function checkmark_grade_item_category_update($checkmark) {
 
     $gradeitems = grade_item::fetch_all([
-            'itemtype' => 'mod',
-            'itemmodule' => 'checkmark',
-            'iteminstance' => $checkmark->id,
-            'courseid' => $checkmark->course,
-        ]);
+        'itemtype' => 'mod',
+        'itemmodule' => 'checkmark',
+        'iteminstance' => $checkmark->id,
+        'courseid' => $checkmark->course,
+    ]);
     if (!empty($gradeitems)) {
         foreach ($gradeitems as $gradeitem) {
             if ($gradeitem->itemnumber == 0) {
-                if (isset($checkmark->gradepass) &&
-                        $gradeitem->gradepass != $checkmark->gradepass) {
+                if (
+                    isset($checkmark->gradepass) &&
+                    $gradeitem->gradepass != $checkmark->gradepass
+                ) {
                     $gradeitem->gradepass = $checkmark->gradepass;
                     $gradeitem->update();
                 }
@@ -1067,8 +1143,16 @@ function checkmark_grade_item_delete($checkmark) {
     global $CFG;
     require_once($CFG->libdir . '/gradelib.php');
 
-    return grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id, CHECKMARK_GRADE_ITEM, null,
-            ['deleted' => 1]);
+    return grade_update(
+        'mod/checkmark',
+        $checkmark->course,
+        'mod',
+        'checkmark',
+        $checkmark->id,
+        CHECKMARK_GRADE_ITEM,
+        null,
+        ['deleted' => 1]
+    );
 }
 
 /**
@@ -1081,8 +1165,16 @@ function checkmark_attendance_item_delete($checkmark) {
     global $CFG;
     require_once($CFG->libdir . '/gradelib.php');
 
-    return grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id, CHECKMARK_ATTENDANCE_ITEM, null,
-            ['deleted' => 1]);
+    return grade_update(
+        'mod/checkmark',
+        $checkmark->course,
+        'mod',
+        'checkmark',
+        $checkmark->id,
+        CHECKMARK_ATTENDANCE_ITEM,
+        null,
+        ['deleted' => 1]
+    );
 }
 
 /**
@@ -1095,8 +1187,16 @@ function checkmark_presentation_item_delete($checkmark) {
     global $CFG;
     require_once($CFG->libdir . '/gradelib.php');
 
-    return grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id, CHECKMARK_PRESENTATION_ITEM, null,
-            ['deleted' => 1]);
+    return grade_update(
+        'mod/checkmark',
+        $checkmark->course,
+        'mod',
+        'checkmark',
+        $checkmark->id,
+        CHECKMARK_PRESENTATION_ITEM,
+        null,
+        ['deleted' => 1]
+    );
 }
 
 /**
@@ -1115,8 +1215,11 @@ function checkmark_scale_used($checkmarkid, $scaleid) {
         return false;
     }
 
-    return $DB->record_exists_select('checkmark', "id = ? AND (grade = ? OR (presentationgrading = 1 AND presentationgrade = ?))",
-            [$checkmarkid, -$scaleid, -$scaleid]);
+    return $DB->record_exists_select(
+        'checkmark',
+        "id = ? AND (grade = ? OR (presentationgrading = 1 AND presentationgrade = ?))",
+        [$checkmarkid, -$scaleid, -$scaleid]
+    );
 }
 
 /**
@@ -1130,8 +1233,13 @@ function checkmark_scale_used($checkmarkid, $scaleid) {
 function checkmark_scale_used_anywhere($scaleid) {
     global $DB;
 
-    if (($scaleid > 0) && $DB->record_exists_select('checkmark', "grade = ? OR (presentationgrading = 1 AND presentationgrade = ?)",
-                    [-$scaleid, -$scaleid])) {
+    if (
+        ($scaleid > 0) && $DB->record_exists_select(
+            'checkmark',
+            "grade = ? OR (presentationgrading = 1 AND presentationgrade = ?)",
+            [-$scaleid, -$scaleid]
+        )
+    ) {
         return true;
     } else {
         return false;
@@ -1178,8 +1286,8 @@ function checkmark_refresh_override_events($checkmark, $override = null) {
     }
 
     foreach ($overrides as $current) {
-        $groupid   = isset($current->groupid) ? $current->groupid : 0;
-        $userid    = isset($current->userid) ? $current->userid : 0;
+        $groupid = isset($current->groupid) ? $current->groupid : 0;
+        $userid = isset($current->userid) ? $current->userid : 0;
         $duedate = $current->timedue !== null ? $current->timedue : $checkmarkinstance->timedue;
 
         // Only add 'due' events for an override if they differ from the checkmark default.
@@ -1190,17 +1298,17 @@ function checkmark_refresh_override_events($checkmark, $override = null) {
         $event->format = FORMAT_HTML;
         $event->description = format_module_intro('checkmark', $checkmarkinstance, $cmid);
         // Events module won't show user events when the courseid is nonzero.
-        $event->courseid    = ($userid) ? 0 : $checkmarkinstance->course;
-        $event->groupid     = $groupid;
-        $event->userid      = $userid;
-        $event->modulename  = 'checkmark';
-        $event->instance    = $checkmarkinstance->id;
-        $event->timestart   = $duedate;
+        $event->courseid = ($userid) ? 0 : $checkmarkinstance->course;
+        $event->groupid = $groupid;
+        $event->userid = $userid;
+        $event->modulename = 'checkmark';
+        $event->instance = $checkmarkinstance->id;
+        $event->timestart = $duedate;
         $event->timeduration = 0;
-        $event->timesort    = $event->timestart + $event->timeduration;
-        $event->visible     = instance_is_visible('checkmark', $checkmarkinstance);
-        $event->eventtype   = CHECKMARK_EVENT_TYPE_DUE;
-        $event->priority    = null;
+        $event->timesort = $event->timestart + $event->timeduration;
+        $event->visible = instance_is_visible('checkmark', $checkmarkinstance);
+        $event->eventtype = CHECKMARK_EVENT_TYPE_DUE;
+        $event->priority = null;
 
         // Determine the event name and priority.
         if ($groupid) {
@@ -1333,9 +1441,10 @@ function checkmark_refresh_events($courseid = 0, $instance = null, $cm = null) {
                     // We need to remove the links to files as the calendar is not ready
                     // to support module events with file areas.
                     $intro = strip_pluginfile_content($intro);
-                    $event->description = ['text' => $intro,
-                            'format' => $checkmark->introformat,
-                        ];
+                    $event->description = [
+                        'text' => $intro,
+                        'format' => $checkmark->introformat,
+                    ];
                 } else {
                     $event->description = format_module_intro('checkmark', $checkmark, $cm->id);
                 }
@@ -1395,9 +1504,11 @@ function checkmark_refresh_events($courseid = 0, $instance = null, $cm = null) {
                     calendar_event::create($event, false);
                 }
             } else {
-                $DB->delete_records('event', ['modulename' => 'checkmark', 'instance' => $checkmark->id,
-                        'eventtype' => $eventtype,
-                    ]);
+                $DB->delete_records('event', [
+                    'modulename' => 'checkmark',
+                    'instance' => $checkmark->id,
+                    'eventtype' => $eventtype,
+                ]);
             }
         }
     }
@@ -1436,7 +1547,8 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
     global $CFG, $USER, $DB, $OUTPUT;
 
     $userfields = core_user\fields::for_name()->get_sql('u')->selects;
-    if (!$submissions = $DB->get_records_sql('
+    if (
+        !$submissions = $DB->get_records_sql('
             SELECT asb.id, asb.timemodified, cm.id AS cmid, asb.userid
                    ' . $userfields . ', u.email, u.picture
               FROM {checkmark_submissions} asb
@@ -1447,7 +1559,8 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
              WHERE asb.timemodified > ? AND
                    a.course = ? AND
                    md.name = \'checkmark\'
-          ORDER BY asb.timemodified ASC', [$timestart, $course->id])) {
+          ORDER BY asb.timemodified ASC', [$timestart, $course->id])
+    ) {
         return false;
     }
 
@@ -1478,8 +1591,10 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
          */
         if (empty($showrecentsubs)) {
             if (!array_key_exists($cm->id, $grader)) {
-                $grader[$cm->id] = has_capability('moodle/grade:viewall',
-                        context_module::instance($cm->id));
+                $grader[$cm->id] = has_capability(
+                    'moodle/grade:viewall',
+                    context_module::instance($cm->id)
+                );
             }
             if (!$grader[$cm->id]) {
                 continue;
@@ -1488,8 +1603,12 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
 
         $groupmode = groups_get_activity_groupmode($cm, $course);
 
-        if ($groupmode == SEPARATEGROUPS && !has_capability('moodle/site:accessallgroups',
-                        context_module::instance($cm->id))) {
+        if (
+            $groupmode == SEPARATEGROUPS && !has_capability(
+                'moodle/site:accessallgroups',
+                context_module::instance($cm->id)
+            )
+        ) {
             if (isguestuser()) {
                 // Shortcut - guest user does not belong into any group.
                 continue;
@@ -1499,8 +1618,11 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
             if (empty($owngroups[$cm->id])) {
                 continue;
             }
-            $usersgroups = groups_get_all_groups($course->id, $submission->userid,
-                    $cm->groupingid);
+            $usersgroups = groups_get_all_groups(
+                $course->id,
+                $submission->userid,
+                $cm->groupingid
+            );
             if (is_array($usersgroups)) {
                 $usersgroups = array_keys($usersgroups);
                 $intersect = array_intersect($usersgroups, $owngroups[$cm->id]);
@@ -1521,8 +1643,14 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
     foreach ($show as $submission) {
         $cm = $modinfo->cms[$submission->cmid];
         $link = $CFG->wwwroot . '/mod/checkmark/view.php?id=' . $cm->id;
-        print_recent_activity_note($submission->timemodified, $submission, $cm->name, $link, false,
-                $viewfullnames);
+        print_recent_activity_note(
+            $submission->timemodified,
+            $submission,
+            $cm->name,
+            $link,
+            false,
+            $viewfullnames
+        );
     }
 
     return true;
@@ -1539,8 +1667,15 @@ function checkmark_print_recent_activity($course, $viewfullnames, $timestart) {
  * @param int $userid (optional) to filter for a user
  * @param int $groupid (optional) to filter for a group
  */
-function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid,
-        $userid = 0, $groupid = 0) {
+function checkmark_get_recent_mod_activity(
+    &$activities,
+    &$index,
+    $timestart,
+    $courseid,
+    $cmid,
+    $userid = 0,
+    $groupid = 0
+) {
     global $CFG, $COURSE, $USER, $DB;
 
     if ($COURSE->id == $courseid) {
@@ -1575,7 +1710,8 @@ function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $c
 
     $userfields = user_picture::fields('u', null, 'userid');
 
-    if (!$submissions = $DB->get_records_sql('SELECT asb.id, asb.timemodified,
+    if (
+        !$submissions = $DB->get_records_sql('SELECT asb.id, asb.timemodified,
                                                 ' . $userfields . '
                                                 FROM {checkmark_submissions} asb
                                                 JOIN {checkmark} a      ON a.id = asb.checkmarkid
@@ -1584,7 +1720,8 @@ function checkmark_get_recent_mod_activity(&$activities, &$index, $timestart, $c
             ' WHERE asb.timemodified > :timestart
                                                    AND a.id = :cminstance' .
             $userselect . ' ' . $groupselect .
-            ' ORDER BY asb.timemodified ASC', $params)) {
+            ' ORDER BY asb.timemodified ASC', $params)
+    ) {
         return;
     }
 
@@ -1697,8 +1834,8 @@ function checkmark_print_recent_mod_activity($activity, $courseid, $detail) {
     echo '<table border="0" cellpadding="3" cellspacing="0" class="checkmark-recent">';
 
     echo '<tr><td class="userpicture" valign="top">' .
-            $OUTPUT->user_picture($activity->user) .
-            '</td><td>';
+        $OUTPUT->user_picture($activity->user) .
+        '</td><td>';
 
     if ($detail) {
         $modname = get_string('modulename', 'checkmark');
@@ -1717,7 +1854,7 @@ function checkmark_print_recent_mod_activity($activity, $courseid, $detail) {
 
     echo '<div class="user">';
     echo '<a href="' . $CFG->wwwroot . '/user/view.php?id=' . $activity->user->id . '&amp;course=' . $courseid . '">' .
-            $activity->user->fullname . '</a>  - ' . userdate($activity->timestamp);
+        $activity->user->fullname . '</a>  - ' . userdate($activity->timestamp);
     echo '</div>';
 
     echo '</td></tr></table>';
@@ -1855,8 +1992,13 @@ function checkmark_getsummarystring($submission, $checkmark) {
     require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 
     $course = $DB->get_record('course', ['id' => $checkmark->course], '*', MUST_EXIST);
-    $cm = get_coursemodule_from_instance('checkmark', $checkmark->id, $course->id, false,
-            MUST_EXIST);
+    $cm = get_coursemodule_from_instance(
+        'checkmark',
+        $checkmark->id,
+        $course->id,
+        false,
+        MUST_EXIST
+    );
     $instance = new checkmark($cm->instance, $checkmark, $cm);
     if (!isset($submission)) {
         $submission = $instance->get_submission($USER->id, false); // Get the submission!
@@ -1920,9 +2062,10 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
         $feedback = false;
         $userid = $USER->id;
     } else {
-        $feedback = $DB->get_record('checkmark_feedbacks', ['checkmarkid' => $checkmark->id,
-                'userid' => $submission->get_userid(),
-            ]);
+        $feedback = $DB->get_record('checkmark_feedbacks', [
+            'checkmarkid' => $checkmark->id,
+            'userid' => $submission->get_userid(),
+        ]);
         $userid = $submission->get_userid();
     }
 
@@ -1950,7 +2093,7 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
                 $a->grade = get_string('notgradedyet', 'checkmark');
             } else {
                 $a->grade = get_string('graded', 'checkmark') . ': ' . (int) $feedback->grade .
-                        ' / ' . $checkmark->grade;
+                    ' / ' . $checkmark->grade;
             }
         } else if ($checkmark->grade < 0) {                                // Scale?
             if (empty($scalegrades[$checkmark->id])) {
@@ -1967,7 +2110,7 @@ function checkmark_getsubmissionstats($submission, $checkmark) {
             }
             if (key_exists((int) $feedback->grade, $scalegrades[$checkmark->id])) {
                 $a->grade = get_string('graded', 'checkmark') . ': ' .
-                        $scalegrades[$checkmark->id][(int) $feedback->grade];
+                    $scalegrades[$checkmark->id][(int) $feedback->grade];
             } else {
                 $a->grade = get_string('notgradedyet', 'checkmark');
             }
@@ -2083,8 +2226,8 @@ function checkmark_reset_course_form_definition(&$mform) {
  */
 function checkmark_reset_course_form_defaults() {
     return [
-            'reset_checkmark_submissions' => 1,
-            'reset_checkmark_overrides' => 1,
+        'reset_checkmark_submissions' => 1,
+        'reset_checkmark_overrides' => 1,
     ];
 }
 
@@ -2171,17 +2314,27 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
         $link = new moodle_url('/mod/checkmark/submissions.php', ['id' => $PAGE->cm->id]);
         $string = get_string('viewsubmissions', 'checkmark');
         $key = 'viewsubmissions';
-        $submissionnode = \navigation_node::create($string, $link, navigation_node::TYPE_SETTING,
-            $string, $key, null);
+        $submissionnode = \navigation_node::create(
+            $string,
+            $link,
+            navigation_node::TYPE_SETTING,
+            $string,
+            $key,
+            null
+        );
         $checkmarknode->add_node($submissionnode, $beforekey);
     }
 
     if (has_capability('mod/checkmark:manageoverrides', $settings->get_page()->cm->context)) {
         $url = new moodle_url('/mod/checkmark/overrides.php', ['id' => $settings->get_page()->cm->id, 'mode' => 'user']);
 
-        $node = navigation_node::create(get_string('overrides', 'checkmark'),
+        $node = navigation_node::create(
+            get_string('overrides', 'checkmark'),
             $url,
-            navigation_node::TYPE_SETTING, null, 'mod_checkmark_useroverrides');
+            navigation_node::TYPE_SETTING,
+            null,
+            'mod_checkmark_useroverrides'
+        );
         $checkmarknode->add_node($node, $beforekey);
     }
 }
@@ -2195,9 +2348,9 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
  */
 function checkmark_page_type_list() {
     $modulepagetype = [
-            'mod-checkmark-*' => get_string('page-mod-checkmark-x', 'checkmark'),
-            'mod-checkmark-view' => get_string('page-mod-checkmark-view', 'checkmark'),
-            'mod-checkmark-submissions' => get_string('page-mod-checkmark-submissions', 'checkmark'),
+        'mod-checkmark-*' => get_string('page-mod-checkmark-x', 'checkmark'),
+        'mod-checkmark-view' => get_string('page-mod-checkmark-view', 'checkmark'),
+        'mod-checkmark-submissions' => get_string('page-mod-checkmark-submissions', 'checkmark'),
     ];
     return $modulepagetype;
 }
@@ -2248,8 +2401,11 @@ function mod_checkmark_core_calendar_is_event_visible(calendar_event $event) {
  * @throws dml_exception
  * @throws moodle_exception
  */
-function mod_checkmark_core_calendar_provide_event_action(calendar_event $event,
-        \core_calendar\action_factory $factory, int $userid = 0) {
+function mod_checkmark_core_calendar_provide_event_action(
+    calendar_event $event,
+    \core_calendar\action_factory $factory,
+    int $userid = 0
+) {
     global $CFG, $USER;
 
     require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
@@ -2269,7 +2425,7 @@ function mod_checkmark_core_calendar_provide_event_action(calendar_event $event,
     if ($event->eventtype == CHECKMARK_EVENT_TYPE_GRADINGDUE) {
         $name = get_string('modgrade', 'grades');
         $url = new \moodle_url('/mod/checkmark/submissions.php', [
-                'id' => $cm->id,
+            'id' => $cm->id,
         ]);
         $itemcount = checkmark_count_real_ungraded_submissions($cm);
         $actionable = has_capability('mod/checkmark:grade', $context) && $started;
@@ -2282,8 +2438,8 @@ function mod_checkmark_core_calendar_provide_event_action(calendar_event $event,
         }
 
         $url = new \moodle_url('/mod/checkmark/view.php', [
-                'id' => $cm->id,
-                'edit' => 1,
+            'id' => $cm->id,
+            'edit' => 1,
         ]);
         $itemcount = 1;
         if (has_capability('mod/checkmark:grade', $context)) {
@@ -2306,10 +2462,10 @@ function mod_checkmark_core_calendar_provide_event_action(calendar_event $event,
     }
 
     return $factory->create_instance(
-            $name,
-            $url,
-            $itemcount,
-            $actionable
+        $name,
+        $url,
+        $itemcount,
+        $actionable
     );
 }
 
@@ -2324,7 +2480,7 @@ function mod_checkmark_core_calendar_provide_event_action(calendar_event $event,
 function mod_checkmark_core_calendar_event_action_shows_item_count(calendar_event $event, $itemcount = 0) {
     // List of event types where the action event's item count should be shown.
     $showitemcountfor = [
-            CHECKMARK_EVENT_TYPE_GRADINGDUE,
+        CHECKMARK_EVENT_TYPE_GRADINGDUE,
     ];
     // For mod_checkmark, item count should be shown if the event type is 'gradingdue' and there is one or more item count.
     return in_array($event->eventtype, $showitemcountfor) && $itemcount > 0;
@@ -2335,8 +2491,8 @@ function mod_checkmark_core_calendar_event_action_shows_item_count(calendar_even
  */
 function mod_checkmark_get_fontawesome_icon_map() {
     return [
-            'mod_checkmark:questionmark' => 'fa-question text-warning',
-            'mod_checkmark:overwrittendates' => 'fa-clock-o text-info',
+        'mod_checkmark:questionmark' => 'fa-question text-warning',
+        'mod_checkmark:overwrittendates' => 'fa-clock-o text-info',
     ];
 }
 
@@ -2348,8 +2504,10 @@ function mod_checkmark_get_fontawesome_icon_map() {
  */
 function mod_checkmark_get_completion_active_rule_descriptions($cm) {
     // Values will be present in cm_info, and we assume these are up to date.
-    if (empty($cm->customdata['customcompletionrules'])
-            || $cm->completion != COMPLETION_TRACKING_AUTOMATIC) {
+    if (
+        empty($cm->customdata['customcompletionrules'])
+        || $cm->completion != COMPLETION_TRACKING_AUTOMATIC
+    ) {
         return [];
     }
 
@@ -2408,8 +2566,8 @@ function checkmark_update_events($checkmark, $override = null) {
     }
 
     foreach ($overrides as $current) {
-        $groupid   = isset($current->groupid) ? $current->groupid : 0;
-        $userid    = isset($current->userid) ? $current->userid : 0;
+        $groupid = isset($current->groupid) ? $current->groupid : 0;
+        $userid = isset($current->userid) ? $current->userid : 0;
         $duedate = isset($current->timedue) ? $current->timedue : $checkmarkinstance->timedue;
         $timelimit = isset($current->timelimit) ? $current->timelimit : 0;
 
@@ -2421,17 +2579,17 @@ function checkmark_update_events($checkmark, $override = null) {
         $event->description = format_module_intro('checkmark', $checkmarkinstance, $cmid, false);
         $event->format = FORMAT_HTML;
         // Events module won't show user events when the courseid is nonzero.
-        $event->courseid    = ($userid) ? 0 : $checkmarkinstance->course;
-        $event->groupid     = $groupid;
-        $event->userid      = $userid;
-        $event->modulename  = 'checkmark';
-        $event->instance    = $checkmarkinstance->id;
-        $event->timestart   = $duedate;
+        $event->courseid = ($userid) ? 0 : $checkmarkinstance->course;
+        $event->groupid = $groupid;
+        $event->userid = $userid;
+        $event->modulename = 'checkmark';
+        $event->instance = $checkmarkinstance->id;
+        $event->timestart = $duedate;
         $event->timeduration = $timelimit;
-        $event->timesort    = $event->timestart + $event->timeduration;
-        $event->visible     = instance_is_visible('chackmark', $checkmarkinstance);
-        $event->eventtype   = ASSIGN_EVENT_TYPE_DUE;
-        $event->priority    = null;
+        $event->timesort = $event->timestart + $event->timeduration;
+        $event->visible = instance_is_visible('chackmark', $checkmarkinstance);
+        $event->eventtype = ASSIGN_EVENT_TYPE_DUE;
+        $event->priority = null;
 
         // Determine the event name and priority.
         if ($groupid) {
@@ -2466,7 +2624,7 @@ function checkmark_update_events($checkmark, $override = null) {
             } else {
                 unset($event->id);
             }
-            $event->name      = $eventname.' ('.get_string('duedate', 'checkmark').')';
+            $event->name = $eventname . ' (' . get_string('duedate', 'checkmark') . ')';
             calendar_event::create($event, false);
         }
     }

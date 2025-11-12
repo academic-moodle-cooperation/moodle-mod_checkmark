@@ -36,7 +36,6 @@ use cache_definition;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class overrides implements \cache_data_source {
-
     /** @var overrides the singleton instance of this class. */
     protected static $instance = null;
 

@@ -105,5 +105,4 @@ class submission_edited extends \core\event\base {
             throw new \coding_exception('Related user has to be set!');
         }
     }
-
 }

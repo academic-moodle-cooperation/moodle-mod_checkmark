@@ -34,7 +34,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_checkmark_grading_form extends moodleform {
-
     /**
      * Definition of the grading form.
      */
@@ -65,23 +64,30 @@ class mod_checkmark_grading_form extends moodleform {
         $mform->addElement('hidden', 'filter', '0');
         $mform->setType('filter', PARAM_INT);
 
-        $mform->addElement('static', 'picture', $OUTPUT->user_picture($this->_customdata->user),
-                           fullname($this->_customdata->user) . '<br/>' .
-                           userdate($this->_customdata->submission->timemodified) .
-                           $this->_customdata->lateness );
+        $mform->addElement(
+            'static',
+            'picture',
+            $OUTPUT->user_picture($this->_customdata->user),
+            fullname($this->_customdata->user) . '<br/>' .
+            userdate($this->_customdata->submission->timemodified) .
+            $this->_customdata->lateness
+        );
 
         $this->add_submission_content();
 
         $this->add_feedback_section();
 
         if ($this->_customdata->feedbackobj !== false) {
-            $datestring = userdate($this->_customdata->feedbackobj->timemodified).'&nbsp; ('.
-                                   format_time(time() - $this->_customdata->feedbackobj->timemodified).
-                                   ')';
+            $datestring = userdate($this->_customdata->feedbackobj->timemodified) . '&nbsp; (' .
+                format_time(time() - $this->_customdata->feedbackobj->timemodified) .
+                ')';
             $mform->addElement('header', 'Last Grade', get_string('lastgrade', 'checkmark'));
-            $mform->addElement('static', 'picture',
-                               $OUTPUT->user_picture($this->_customdata->grader),
-                               fullname($this->_customdata->grader).'<br/>'.$datestring);
+            $mform->addElement(
+                'static',
+                'picture',
+                $OUTPUT->user_picture($this->_customdata->grader),
+                fullname($this->_customdata->grader) . '<br/>' . $datestring
+            );
         }
         // Buttons we need!
         $this->add_grading_buttons();
@@ -122,8 +128,13 @@ class mod_checkmark_grading_form extends moodleform {
             $mform->addElement('static', 'disabledfeedback', '', $feedback);
         } else {
             // Visible elements!
-            $mform->addElement('editor', 'feedback_editor', get_string('feedback', 'checkmark'), null,
-                               $this->get_editor_options() );
+            $mform->addElement(
+                'editor',
+                'feedback_editor',
+                get_string('feedback', 'checkmark'),
+                null,
+                $this->get_editor_options()
+            );
             $mform->setDefault('feedback_editor', $this->_customdata->feedback);
         }
 
@@ -135,9 +146,12 @@ class mod_checkmark_grading_form extends moodleform {
 
         $mform->addElement('hidden', 'mailinfo_h', '0');
         $mform->setType('mailinfo_h', PARAM_INT);
-        $mform->addElement('checkbox', 'mailinfo',
-                           get_string('enablenotification', 'checkmark').
-                           $OUTPUT->help_icon('enablenotification', 'checkmark'));
+        $mform->addElement(
+            'checkbox',
+            'mailinfo',
+            get_string('enablenotification', 'checkmark') .
+            $OUTPUT->help_icon('enablenotification', 'checkmark')
+        );
         $mform->setType('mailinfo', PARAM_INT);
     }
 
@@ -156,7 +170,7 @@ class mod_checkmark_grading_form extends moodleform {
 
         $mform->addElement('select', 'xgrade', get_string('modgrade', 'grades'), $grademenu, $attributes);
         if ($this->_customdata->feedbackobj !== false) {
-            $mform->setDefault('xgrade', $this->_customdata->feedbackobj->grade );
+            $mform->setDefault('xgrade', $this->_customdata->feedbackobj->grade);
         }
         $mform->setType('xgrade', PARAM_INT);
     }
@@ -175,12 +189,17 @@ class mod_checkmark_grading_form extends moodleform {
                     echo $options[$outcome->grades[$this->_customdata->submission->userid]->grade];
                 } else {
                     $options[''] = get_string('nooutcome', 'grades');
-                    $attributes = ['id' => 'menuoutcome_'.$n ];
-                    $mform->addElement('select', 'outcome_'.$n.'['.$this->_customdata->userid.']',
-                                       $outcome->name.':', $options, $attributes );
-                    $mform->setType('outcome_'.$n.'['.$this->_customdata->userid.']', PARAM_INT);
+                    $attributes = ['id' => 'menuoutcome_' . $n];
+                    $mform->addElement(
+                        'select',
+                        'outcome_' . $n . '[' . $this->_customdata->userid . ']',
+                        $outcome->name . ':',
+                        $options,
+                        $attributes
+                    );
+                    $mform->setType('outcome_' . $n . '[' . $this->_customdata->userid . ']', PARAM_INT);
                     $grade = $outcome->grades[$this->_customdata->submission->userid]->grade;
-                    $mform->setDefault('outcome_'.$n.'['.$this->_customdata->userid.']', $grade);
+                    $mform->setDefault('outcome_' . $n . '[' . $this->_customdata->userid . ']', $grade);
                 }
             }
         }
@@ -195,18 +214,24 @@ class mod_checkmark_grading_form extends moodleform {
         $mform =& $this->_form;
 
         $coursecontext = context_module::instance($this->_customdata->cm->id);
-        if (has_capability('gradereport/grader:view', $coursecontext)
-            && has_capability('moodle/grade:viewall', $coursecontext)) {
+        if (
+            has_capability('gradereport/grader:view', $coursecontext)
+            && has_capability('moodle/grade:viewall', $coursecontext)
+        ) {
             $gradeitem = $this->_customdata->grading_info->items[CHECKMARK_GRADE_ITEM];
-            $grade = '<a href="'.$CFG->wwwroot.'/grade/report/grader/index.php?id='.
-                     $this->_customdata->course .'" >'.
-                     $gradeitem->grades[$this->_customdata->userid]->str_grade.'</a>';
+            $grade = '<a href="' . $CFG->wwwroot . '/grade/report/grader/index.php?id=' .
+                $this->_customdata->course . '" >' .
+                $gradeitem->grades[$this->_customdata->userid]->str_grade . '</a>';
         } else {
             $gradeitem = $this->_customdata->grading_info->items[CHECKMARK_GRADE_ITEM];
             $grade = $gradeitem->grades[$this->_customdata->userid]->str_grade;
         }
-        $mform->addElement('static', 'finalgrade', get_string('currentgrade', 'checkmark'),
-                           $grade);
+        $mform->addElement(
+            'static',
+            'finalgrade',
+            get_string('currentgrade', 'checkmark'),
+            $grade
+        );
         $mform->setType('finalgrade', PARAM_INT);
     }
 
@@ -265,15 +290,25 @@ class mod_checkmark_grading_form extends moodleform {
                 }
                 $presentationfeedback = $this->_customdata->presentationfeedback;
             }
-            if ($this->_customdata->presentationgradebook &&
-                    ($this->_customdata->presgradedisabled || !has_capability('mod/checkmark:gradepresentation', $context))) {
-                $mform->addElement('static', 'presentationgrade', get_string('presentationgrade', 'checkmark'),
-                                   $presentationitem->grades[$this->_customdata->userid]->str_long_grade);
+            if (
+                $this->_customdata->presentationgradebook &&
+                ($this->_customdata->presgradedisabled || !has_capability('mod/checkmark:gradepresentation', $context))
+            ) {
+                $mform->addElement(
+                    'static',
+                    'presentationgrade',
+                    get_string('presentationgrade', 'checkmark'),
+                    $presentationitem->grades[$this->_customdata->userid]->str_long_grade
+                );
                 if ($presentationfeedback == '') {
                     $presentationfeedback = '-';
                 }
-                $mform->addElement('static', 'disabledpresentationfeedback', get_string('presentationfeedback', 'checkmark'),
-                                   $presentationfeedback);
+                $mform->addElement(
+                    'static',
+                    'disabledpresentationfeedback',
+                    get_string('presentationfeedback', 'checkmark'),
+                    $presentationfeedback
+                );
             } else if ($this->_customdata->instance_presentationgrade) {
                 $grademenu = [-1 => get_string('nograde')];
                 $grademenu = $grademenu + make_grades_menu($this->_customdata->checkmark->presentationgrade);
@@ -284,13 +319,23 @@ class mod_checkmark_grading_form extends moodleform {
                 $mform->setType('presentationgrade', PARAM_INT);
                 $mform->setDefault('presentationgrade', $presentationgrade);
 
-                $mform->addElement('editor', 'presentationfeedback_editor', get_string('presentationfeedback', 'checkmark'),
-                                   null, $this->get_editor_options($this->_customdata->cm, 'presentationfeedback') );
+                $mform->addElement(
+                    'editor',
+                    'presentationfeedback_editor',
+                    get_string('presentationfeedback', 'checkmark'),
+                    null,
+                    $this->get_editor_options($this->_customdata->cm, 'presentationfeedback')
+                );
                 $mform->setDefault('presentationfeedback_editor', $presentationfeedback);
             } else if ($this->_customdata->instance_presentationgrade == 0) {
                 // Print only the presentationfeedback field in case grading is set to 'none'.
-                $mform->addElement('editor', 'presentationfeedback_editor', get_string('presentationfeedback', 'checkmark'),
-                        null, $this->get_editor_options($this->_customdata->cm, 'presentationfeedback') );
+                $mform->addElement(
+                    'editor',
+                    'presentationfeedback_editor',
+                    get_string('presentationfeedback', 'checkmark'),
+                    null,
+                    $this->get_editor_options($this->_customdata->cm, 'presentationfeedback')
+                );
                 $mform->setDefault('presentationfeedback_editor', $presentationfeedback);
             }
         }
@@ -306,12 +351,18 @@ class mod_checkmark_grading_form extends moodleform {
         if ($this->_customdata->previousid > 0) {
             $buttonarray2[] = &$mform->createElement('submit', 'previous', get_string('previous'));
         }
-        $buttonarray[] = &$mform->createElement('submit', 'submitbutton',
-                                                get_string('savechanges'));
+        $buttonarray[] = &$mform->createElement(
+            'submit',
+            'submitbutton',
+            get_string('savechanges')
+        );
         // If there are more to be graded.
         if ($this->_customdata->nextid > 0) {
-            $buttonarray[] = &$mform->createElement('submit', 'saveandnext',
-                                                    get_string('saveandnext'));
+            $buttonarray[] = &$mform->createElement(
+                'submit',
+                'saveandnext',
+                get_string('saveandnext')
+            );
             $buttonarray2[] = &$mform->createElement('submit', 'next', get_string('next'));
         }
         $buttonarray[] = &$mform->createElement('cancel');
@@ -375,21 +426,35 @@ class mod_checkmark_grading_form extends moodleform {
             $data->presentationfeedbackformat = FORMAT_HTML;
         }
 
-        if (($this->_customdata->feedbackobj !== false)
-            && !empty($this->_customdata->feedbackobj->id)) {
+        if (
+            ($this->_customdata->feedbackobj !== false)
+            && !empty($this->_customdata->feedbackobj->id)
+        ) {
             $itemid = $this->_customdata->feedbackobj->id;
         } else {
             $itemid = null;
         }
 
-        $data = file_prepare_standard_editor($data, 'feedback', $editoroptions,
-                                             $editoroptions['context'], $editoroptions['component'],
-                                             $editoroptions['filearea'], $itemid);
+        $data = file_prepare_standard_editor(
+            $data,
+            'feedback',
+            $editoroptions,
+            $editoroptions['context'],
+            $editoroptions['component'],
+            $editoroptions['filearea'],
+            $itemid
+        );
         if (!empty($this->_customdata->presentationgrading)) {
             $editoroptions = $this->get_editor_options($this->_customdata->cm, 'presentatonfeedback');
-            $data = file_prepare_standard_editor($data, 'presentationfeedback', $editoroptions,
-                                                 $editoroptions['context'], $editoroptions['component'],
-                                                 $editoroptions['filearea'], $itemid);
+            $data = file_prepare_standard_editor(
+                $data,
+                'presentationfeedback',
+                $editoroptions,
+                $editoroptions['context'],
+                $editoroptions['component'],
+                $editoroptions['filearea'],
+                $itemid
+            );
         }
         return parent::set_data($data);
     }
@@ -403,16 +468,23 @@ class mod_checkmark_grading_form extends moodleform {
     public function get_data() {
         $data = parent::get_data();
 
-        if (($this->_customdata->feedbackobj !== false)
-            && $this->_customdata->feedbackobj->id) {
+        if (
+            ($this->_customdata->feedbackobj !== false)
+            && $this->_customdata->feedbackobj->id
+        ) {
             $itemid = $this->_customdata->feedbackobj->id;
 
             if ($data) {
                 $editoroptions = $this->get_editor_options();
-                $data = file_postupdate_standard_editor($data, 'feedback', $editoroptions,
-                                                        $this->_customdata->context,
-                                                        $editoroptions['component'],
-                                                        $editoroptions['filearea'], $itemid);
+                $data = file_postupdate_standard_editor(
+                    $data,
+                    'feedback',
+                    $editoroptions,
+                    $this->_customdata->context,
+                    $editoroptions['component'],
+                    $editoroptions['filearea'],
+                    $itemid
+                );
             }
         }
         return $data;
@@ -434,9 +506,14 @@ class mod_checkmark_grading_form extends moodleform {
         $examples = $submission->get_examples_or_example_template();
         foreach ($examples as $example) {
             $examplearray = [];
-            $examplearray[] =& $mform->createElement('advcheckbox', $example->get_id(), '',
-                    $example->get_name().' ('.$example->get_grade().' '.
-                    $example->get_pointsstring().')', ['class' => 'examplecheck $' . $example->get_grade()]);
+            $examplearray[] =& $mform->createElement(
+                'advcheckbox',
+                $example->get_id(),
+                '',
+                $example->get_name() . ' (' . $example->get_grade() . ' ' .
+                $example->get_pointsstring() . ')',
+                ['class' => 'examplecheck $' . $example->get_grade()]
+            );
             $examplearray[] =& $mform->createElement('html', $example->render_forced_hint());
             $mform->addGroup($examplearray, 'examplearr', '', ' ', false);
 

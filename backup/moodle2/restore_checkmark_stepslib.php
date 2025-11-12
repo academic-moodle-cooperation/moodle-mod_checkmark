@@ -34,7 +34,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_checkmark_activity_structure_step extends restore_activity_structure_step {
-
     /**
      * Define structure for restoration
      *

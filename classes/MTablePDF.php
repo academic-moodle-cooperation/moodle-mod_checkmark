@@ -753,7 +753,6 @@ class MTablePDF extends \pdf {
                             0
                         );
                     }
-
                 } else if ($rowspans[$key] > 0) {
                     if ($debug) {
                         $value['data'] = $value['rowspan'] . "/_";
