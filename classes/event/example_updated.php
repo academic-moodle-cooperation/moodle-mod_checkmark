@@ -56,11 +56,11 @@ class example_updated extends \core\event\base {
      */
     public static function get($cmid, \stdClass $old, \stdClass $new) {
         $event = self::create([
-            'objectid' => ''.$old->id,
+            'objectid' => '' . $old->id,
             'context' => \context_module::instance($cmid),
             'other' => [
-                'old' => ['id' => ''.$old->id, 'name' => ''.$old->name, 'grade' => ''.$old->grade],
-                'new' => ['id' => ''.$new->id, 'name' => ''.$new->name, 'grade' => ''.$new->grade],
+                'old' => ['id' => '' . $old->id, 'name' => '' . $old->name, 'grade' => '' . $old->grade],
+                'new' => ['id' => '' . $new->id, 'name' => '' . $new->name, 'grade' => '' . $new->grade],
             ],
         ]);
 
@@ -73,10 +73,10 @@ class example_updated extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "Updated example ".$this->data['other']['old']['id']." in checkmark module with course module id '".
-                $this->contextinstanceid."'. Name: '".$this->data['other']['old']['name']."'->'".
-                $this->data['other']['new']['name']."' Grade: '".$this->data['other']['old']['grade']."'->'".
-                $this->data['other']['new']['grade']."'";
+        return "Updated example " . $this->data['other']['old']['id'] . " in checkmark module with course module id '" .
+            $this->contextinstanceid . "'. Name: '" . $this->data['other']['old']['name'] . "'->'" .
+            $this->data['other']['new']['name'] . "' Grade: '" . $this->data['other']['old']['grade'] . "'->'" .
+            $this->data['other']['new']['grade'] . "'";
     }
 
     /**

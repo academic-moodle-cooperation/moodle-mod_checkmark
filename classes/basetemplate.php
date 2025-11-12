@@ -121,10 +121,10 @@ abstract class basetemplate extends submissionstable {
         // Dynamically add examples!
         foreach ($this->checkmark->checkmark->examples as $key => $example) {
             $width = strlen($example->shortname) + strlen($example->grade) + 4;
-            $this->tableheaders[] = $example->shortname." (".$example->grade.'P)';
-            $this->tablecolumns[] = 'example'.$key;
+            $this->tableheaders[] = $example->shortname . " (" . $example->grade . 'P)';
+            $this->tablecolumns[] = 'example' . $key;
             $this->cellwidth[] = ['mode' => 'Fixed', 'value' => $width];
-            $this->columnformat['example'.$key] = ['align' => 'C'];
+            $this->columnformat['example' . $key] = ['align' => 'C'];
         }
     }
 
@@ -152,7 +152,7 @@ abstract class basetemplate extends submissionstable {
         // We need to have the same ID to ensure the columns are collapsed if their collapsed in the other table!
         $table = static::get_table_instance('mod-checkmark-submissions', $checkmarkorcmid);
 
-        list($table->sumabs, $table->sumrel, , , , ) = static::get_export_settings();
+        [$table->sumabs, $table->sumrel] = static::get_export_settings();
         $table->quickgrade = 0;
         $table->filter = $filter;
         $table->defaultselectstate = true; // Select all checkboxes by default!
@@ -161,8 +161,8 @@ abstract class basetemplate extends submissionstable {
 
         $table->define_columns($table->tablecolumns);
         $table->define_headers($table->tableheaders);
-        $table->define_baseurl($CFG->wwwroot.'/mod/checkmark/export.php?id='.$table->checkmark->cm->id.
-            '&amp;currentgroup='.$table->currentgroup);
+        $table->define_baseurl($CFG->wwwroot . '/mod/checkmark/export.php?id=' . $table->checkmark->cm->id .
+            '&amp;currentgroup=' . $table->currentgroup);
 
         $table->sortable(true, 'lastname'); // Sorted by lastname by default!
         $table->collapsible(true);
@@ -174,7 +174,7 @@ abstract class basetemplate extends submissionstable {
         $table->examplecount = count($table->checkmark->checkmark->examples);
         $params['examplecount'] = $table->examplecount;
 
-        $fields = "u.id ".$ufields.", u.idnumber,
+        $fields = "u.id " . $ufields . ", u.idnumber,
                   MAX(s.id) AS submissionid, MAX(f.id) AS feedbackid, MAX(f.grade) AS grade,
                   MAX(f.feedback) AS feedback, MAX(s.timemodified) AS timesubmitted,
                   MAX(f.timemodified) AS timemarked, 100 * COUNT( DISTINCT cchks.id ) / :examplecount AS summary,
@@ -183,16 +183,16 @@ abstract class basetemplate extends submissionstable {
         $params['checkmarkid2'] = $table->checkmark->checkmark->id;
 
         $users = $table->get_userids($filter, $ids);
-        list($sqluserids, $userparams) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'user');
+    [$sqluserids, $userparams] = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'user');
         $params = array_merge_recursive($params, $userparams);
 
-        $from = "{user} u ".
+        $from = "{user} u " .
             "LEFT JOIN {checkmark_submissions} s ON u.id = s.userid AND s.checkmarkid = :checkmarkid
                  LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid2
                  LEFT JOIN {checkmark_checks} gchks ON gchks.submissionid = s.id
                  LEFT JOIN {checkmark_checks} cchks ON cchks.submissionid = s.id AND cchks.state = 1 ";
 
-        $where = "u.id ".$sqluserids;
+        $where = "u.id " . $sqluserids;
 
         if ($filter == \checkmark::FILTER_SUBMITTED) {
             $where .= ' AND s.timemodified > 0';
@@ -214,13 +214,18 @@ abstract class basetemplate extends submissionstable {
             $where .= " AND COALESCE(f.timemodified,0) >= COALESCE(s.timemodified,0) AND f.timemodified IS NOT NULL";
         }
 
-        $groupby = " u.id, s.id, f.id ".$ufields.", u.idnumber, f.attendance";
+        $groupby = " u.id, s.id, f.id " . $ufields . ", u.idnumber, f.attendance";
 
         $table->set_sql($fields, $from, $where, $params, $groupby);
-        $table->set_count_sql("SELECT COUNT(DISTINCT u.id) FROM ".$from." WHERE ".$where, $params);
+        $table->set_count_sql("SELECT COUNT(DISTINCT u.id) FROM " . $from . " WHERE " . $where, $params);
 
-        $table->gradinginfo = grade_get_grades($table->checkmark->course->id, 'mod', 'checkmark', $table->checkmark->checkmark->id,
-            $users);
+        $table->gradinginfo = grade_get_grades(
+            $table->checkmark->course->id,
+            'mod',
+            'checkmark',
+            $table->checkmark->checkmark->id,
+            $users
+        );
 
         return $table;
     }
@@ -267,4 +272,3 @@ abstract class basetemplate extends submissionstable {
         return [$this->columns, $this->headers, $returndata, $this->columnformat, $this->cellwidth];
     }
 }
-

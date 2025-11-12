@@ -153,7 +153,7 @@ class MTablePDF extends \pdf {
     public function setcolumnformat($columnformat) {
         if (count($columnformat) != count($this->columnwidths)) {
             throw new moodle_exception("Columnformat (" . count($columnformat) . ") count doesnt match " .
-                    "column count (" . count($this->columnwidths) . ")");
+                "column count (" . count($this->columnwidths) . ")");
         }
 
         $columnformat = array_values($columnformat);
@@ -170,12 +170,35 @@ class MTablePDF extends \pdf {
      * @param array|string $header
      */
     public function setheadertext($header) {
-        list($title1, $desc1, $title2, $desc2, $title3, $desc3,
-                $title4, $desc4, $title5, $desc5, $title6, $desc6) = $header;
+        [
+            $title1,
+            $desc1,
+            $title2,
+            $desc2,
+            $title3,
+            $desc3,
+            $title4,
+            $desc4,
+            $title5,
+            $desc5,
+            $title6,
+            $desc6,
+        ] = $header;
         // We know this makes no sense, but it's just to visualize how they will be used!
-        $this->header = [$title1, $desc1, $title2, $desc2, $title3, $desc3,
-                $title4, $desc4, $title5, $desc5, $title6, $desc6,
-            ];
+        $this->header = [
+            $title1,
+            $desc1,
+            $title2,
+            $desc2,
+            $title3,
+            $desc3,
+            $title4,
+            $desc4,
+            $title5,
+            $desc5,
+            $title6,
+            $desc6,
+        ];
     }
 
     /**
@@ -189,7 +212,6 @@ class MTablePDF extends \pdf {
         $header = $this->header;
 
         if ($this->showheaderfooter) {
-
             $pagewidth = $this->getPageWidth();
             $scale = $pagewidth / 200;
             $oldfontsize = (int) $this->getFontSize();
@@ -324,7 +346,7 @@ class MTablePDF extends \pdf {
     public function addrow($row) {
         if (count($row) != count($this->columnwidths)) {
             throw new moodle_exception("number of columns from row (" . count($row) . ") doenst match " .
-                    "the number defined (" . count($this->columnwidths) . ")");
+                "the number defined (" . count($this->columnwidths) . ")");
             return false;
         }
 
@@ -466,8 +488,7 @@ class MTablePDF extends \pdf {
                 $sumrelativ += $width['value'];
                 $allfixed = false;
             } else {
-                throw new moodle_exception("ERROR: unvalid columnwidth format");
-                die();
+                throw new \moodle_exception("ERROR: unvalid columnwidth format");
             }
         }
 
@@ -616,8 +637,7 @@ class MTablePDF extends \pdf {
                 $spaceonpage[1] = 28;
             }
         } else {
-            throw new moodle_exception("an unexpected error occured. Please report this to your administrator.");
-            die();
+            throw new \moodle_exception("an unexpected error occured. Please report this to your administrator.");
         }
 
         $forcebreakonnextpage = false;
@@ -655,7 +675,6 @@ class MTablePDF extends \pdf {
                     $pdf->AddPage();
                     $fullrows = $rowheights[$rownum];
                     $forcebreakonnextpage = false;
-
                 }
                 // Break because of fixed rows per page.
             } else if ($this->rowsperpage && $this->rowsperpage > 0 && $rownum != 0 && $rownum % $this->rowsperpage == 0) {
@@ -709,11 +728,30 @@ class MTablePDF extends \pdf {
                     }
 
                     if ($cf['stretch'] != self::STRETCH_DISABLED) {
-                        $pdf->Cell($this->cw[$key], $numlines * $cellsize, $value['data'], 'LRTB', 0, $cf['align'],
-                                $cf['fill'], '', $cf['stretch'], false, 'T', 'M');
+                        $pdf->Cell(
+                            $this->cw[$key],
+                            $numlines * $cellsize,
+                            $value['data'],
+                            'LRTB',
+                            0,
+                            $cf['align'],
+                            $cf['fill'],
+                            '',
+                            $cf['stretch'],
+                            false,
+                            'T',
+                            'M'
+                        );
                     } else {
-                        $pdf->MultiCell($this->cw[$key], $numlines * $cellsize, $value['data'], 'LRTB',
-                                $cf['align'], $cf['fill'], 0);
+                        $pdf->MultiCell(
+                            $this->cw[$key],
+                            $numlines * $cellsize,
+                            $value['data'],
+                            'LRTB',
+                            $cf['align'],
+                            $cf['fill'],
+                            0
+                        );
                     }
 
                 } else if ($rowspans[$key] > 0) {
@@ -741,10 +779,13 @@ class MTablePDF extends \pdf {
 
         if ($this->sequentialnumbering) {
             array_unshift($this->columnwidths, ['mode' => 'Fixed', 'value' => '7']);
-            array_unshift($this->columnformat,
-                [["fill" => 0, "align" => "C", "stretch" => self::STRETCH_DISABLED],
+            array_unshift(
+                $this->columnformat,
+                [
+                    ["fill" => 0, "align" => "C", "stretch" => self::STRETCH_DISABLED],
                     ["fill" => 1, "align" => "C", "stretch" => self::STRETCH_DISABLED],
-                ]);
+                ]
+            );
             array_unshift($this->titles, '');
             $i = 1;
             foreach ($this->data as &$row) {
@@ -796,8 +837,10 @@ class MTablePDF extends \pdf {
             $this->Output($tmpdir . $filename, 'F');
             return $tmpdir . $filename;
         } catch (\Exception $e) {
-            \core\notification::add('Problem during PDF-export.<br/>\n' . $e->getMessage() . '<br/>\n' . $e->getTraceAsString(),
-                    'error');
+            \core\notification::add(
+                'Problem during PDF-export.<br/>\n' . $e->getMessage() . '<br/>\n' . $e->getTraceAsString(),
+                'error'
+            );
         }
 
         return false;
@@ -829,11 +872,11 @@ class MTablePDF extends \pdf {
         $textonlycolumns = array_flip($textonlycolumns);
 
         $headlineprop = [
-                'size' => 12,
-                'bold' => 1,
-                'bottom' => 1,
-                'align' => 'center',
-                'v_align' => 'vcenter',
+            'size' => 12,
+            'bold' => 1,
+            'bottom' => 1,
+            'align' => 'center',
+            'v_align' => 'vcenter',
         ];
         $headlineformat = $workbook->add_format($headlineprop);
         $headlineformat->set_left(1);
@@ -854,9 +897,9 @@ class MTablePDF extends \pdf {
         }
 
         $textprop = [
-                'size' => 10,
-                'align' => 'left',
-                'v_align' => 'vcenter',
+            'size' => 10,
+            'align' => 'left',
+            'v_align' => 'vcenter',
         ];
         $text = $workbook->add_format($textprop);
         $text->set_num_format(1);

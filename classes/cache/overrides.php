@@ -82,7 +82,7 @@ class overrides implements \cache_data_source {
                     'checkmark_overrides',
                     ['checkmark' => $checkmarkid, 'groupid' => $groupid],
                     'sortorder, timedue, cutoffdate, timeavailable'
-                    );
+                );
                 break;
             default:
                 throw new \coding_exception('Invalid cache key');

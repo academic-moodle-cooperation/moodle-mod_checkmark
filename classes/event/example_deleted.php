@@ -55,9 +55,9 @@ class example_deleted extends \core\event\base {
      */
     public static function get($cmid, \stdClass $example) {
         $event = self::create([
-            'objectid' => ''.$example->id,
+            'objectid' => '' . $example->id,
             'context' => \context_module::instance($cmid),
-            'other' => ['id' => ''.$example->id, 'name' => ''.$example->name, 'grade' => ''.$example->grade],
+            'other' => ['id' => '' . $example->id, 'name' => '' . $example->name, 'grade' => '' . $example->grade],
         ]);
 
         return $event;
@@ -69,8 +69,9 @@ class example_deleted extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "Deleted example ".$this->data['other']['id']." in checkmark module with course module id '"
-                .$this->contextinstanceid."'. Name: '".$this->data['other']['name']."' Grade: '".$this->data['other']['grade']."'";
+        return "Deleted example " . $this->data['other']['id'] . " in checkmark module with course module id '"
+            . $this->contextinstanceid . "'. Name: '" . $this->data['other']['name']
+            . "' Grade: '" . $this->data['other']['grade'] . "'";
     }
 
     /**

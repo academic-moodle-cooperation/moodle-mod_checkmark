@@ -52,8 +52,9 @@ class submission_overwritten extends submission_edited {
      * @return string
      */
     public function get_description() {
-        return "The user with id '".$this->userid."' has overwritten the submission for user with id '".$this->relateduserid.
-                "' in ".$this->objecttable." with course module id '$this->contextinstanceid'.";
+        return "The user with id '" . $this->userid . "' has overwritten the submission for user with id '"
+            . $this->relateduserid . "' in " . $this->objecttable
+            . " with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -64,5 +65,4 @@ class submission_overwritten extends submission_edited {
     public static function get_name() {
         return get_string('eventsubmissionoverwritten', 'checkmark');
     }
-
 }

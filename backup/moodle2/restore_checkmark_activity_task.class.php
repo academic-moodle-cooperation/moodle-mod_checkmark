@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/mod/checkmark/backup/moodle2/restore_checkmark_st
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_checkmark_activity_task extends restore_activity_task {
-
     /**
      * Define (add) particular settings this activity can have
      */
@@ -50,8 +49,10 @@ class restore_checkmark_activity_task extends restore_activity_task {
      */
     protected function define_my_steps() {
         // Checkmark only has one structure step!
-        $this->add_step(new restore_checkmark_activity_structure_step('checkmark_structure',
-                                                                      'checkmark.xml'));
+        $this->add_step(new restore_checkmark_activity_structure_step(
+            'checkmark_structure',
+            'checkmark.xml'
+        ));
     }
 
     /**
@@ -73,13 +74,18 @@ class restore_checkmark_activity_task extends restore_activity_task {
     public static function define_decode_rules() {
         $rules = [];
 
-        $rules[] = new restore_decode_rule('CHECKMARKVIEWBYID', '/mod/checkmark/view.php?id=$1',
-                                           'course_module');
-        $rules[] = new restore_decode_rule('CHECKMARKINDEX', '/mod/checkmark/index.php?id=$1',
-                                           'course');
+        $rules[] = new restore_decode_rule(
+            'CHECKMARKVIEWBYID',
+            '/mod/checkmark/view.php?id=$1',
+            'course_module'
+        );
+        $rules[] = new restore_decode_rule(
+            'CHECKMARKINDEX',
+            '/mod/checkmark/index.php?id=$1',
+            'course'
+        );
 
         return $rules;
-
     }
 
     /**
@@ -91,20 +97,42 @@ class restore_checkmark_activity_task extends restore_activity_task {
     public static function define_restore_log_rules() {
         $rules = [];
 
-        $rules[] = new restore_log_rule('checkmark', 'add', 'view.php?id={course_module}',
-                                        '{checkmark}');
-        $rules[] = new restore_log_rule('checkmark', 'update', 'view.php?id={course_module}',
-                                        '{checkmark}');
-        $rules[] = new restore_log_rule('checkmark', 'view', 'view.php?id={course_module}',
-                                        '{checkmark}');
-        $rules[] = new restore_log_rule('checkmark', 'upload', 'view.php?a={checkmark}',
-                                        '{checkmark}');
-        $rules[] = new restore_log_rule('checkmark', 'view submission',
-                                        'submissions.php.php?id={course_module}',
-                                        '{checkmark}');
-        $rules[] = new restore_log_rule('checkmark', 'update grades',
-                                        'submissions.php.php?id={course_module}&user={user}',
-                                        '{user}');
+        $rules[] = new restore_log_rule(
+            'checkmark',
+            'add',
+            'view.php?id={course_module}',
+            '{checkmark}'
+        );
+        $rules[] = new restore_log_rule(
+            'checkmark',
+            'update',
+            'view.php?id={course_module}',
+            '{checkmark}'
+        );
+        $rules[] = new restore_log_rule(
+            'checkmark',
+            'view',
+            'view.php?id={course_module}',
+            '{checkmark}'
+        );
+        $rules[] = new restore_log_rule(
+            'checkmark',
+            'upload',
+            'view.php?a={checkmark}',
+            '{checkmark}'
+        );
+        $rules[] = new restore_log_rule(
+            'checkmark',
+            'view submission',
+            'submissions.php.php?id={course_module}',
+            '{checkmark}'
+        );
+        $rules[] = new restore_log_rule(
+            'checkmark',
+            'update grades',
+            'submissions.php.php?id={course_module}&user={user}',
+            '{user}'
+        );
 
         return $rules;
     }
@@ -145,11 +173,11 @@ class restore_checkmark_activity_task extends restore_activity_task {
                     'timestart' => $checkmark->timedue,
                     'name' => '%' . $checkmark->name . '%',
                 ];
-                $where = $DB->sql_like('eventtype', ':eventtype')."
-                         AND ".$DB->sql_like('modulename', ':modulename')."
+                $where = $DB->sql_like('eventtype', ':eventtype') . "
+                         AND " . $DB->sql_like('modulename', ':modulename') . "
                          AND courseid = :courseid
                          AND timestart = :timestart
-                         AND ".$DB->sql_like('name', ':name');
+                         AND " . $DB->sql_like('name', ':name');
 
                 $events = $DB->get_records_select('event', $where, $params);
                 if (count($events) == 1) {

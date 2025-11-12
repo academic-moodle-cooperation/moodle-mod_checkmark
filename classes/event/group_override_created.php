@@ -41,7 +41,6 @@ use mod_checkmark\overrideform;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class group_override_created extends group_override {
-
     /**
      *  Initializes the event
      */
@@ -67,7 +66,7 @@ class group_override_created extends group_override {
      */
     public function get_description() {
         return "The user with id '$this->userid' created the override with id '$this->objectid' for the checkmark with " .
-                "course module id '$this->contextinstanceid' for the group with id '{$this->other['groupid']}'.";
+            "course module id '$this->contextinstanceid' for the group with id '{$this->other['groupid']}'.";
     }
 
     /**

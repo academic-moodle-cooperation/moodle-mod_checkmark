@@ -47,21 +47,29 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
 
         $checkmark = new restore_path_element('checkmark', '/activity/checkmark');
         $paths[] = $checkmark;
-        $example = new restore_path_element('checkmark_example',
-                                            '/activity/checkmark/examples/example');
+        $example = new restore_path_element(
+            'checkmark_example',
+            '/activity/checkmark/examples/example'
+        );
         $paths[] = $example;
 
         if ($userinfo) {
             $override = new restore_path_element('checkmark_override', '/activity/checkmark/overrides/override');
             $paths[] = $override;
-            $submission = new restore_path_element('checkmark_submission',
-                                                   '/activity/checkmark/submissions/submission');
+            $submission = new restore_path_element(
+                'checkmark_submission',
+                '/activity/checkmark/submissions/submission'
+            );
             $paths[] = $submission;
-            $check = new restore_path_element('checkmark_check',
-                                              '/activity/checkmark/submissions/submission/checks/check');
+            $check = new restore_path_element(
+                'checkmark_check',
+                '/activity/checkmark/submissions/submission/checks/check'
+            );
             $paths[] = $check;
-            $feedback = new restore_path_element('checkmark_feedback',
-                                                   '/activity/checkmark/feedbacks/feedback');
+            $feedback = new restore_path_element(
+                'checkmark_feedback',
+                '/activity/checkmark/feedbacks/feedback'
+            );
             $paths[] = $feedback;
         }
 
@@ -79,7 +87,7 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
 
         $addexamples = false;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $data->course = $this->get_courseid();
 
         $data->timedue = $this->apply_date_offset($data->timedue);
@@ -87,7 +95,7 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
         $data->timemodified = $this->apply_date_offset($data->timemodified);
 
         if (!isset($data->exampleprefix)) {
-            $data->exampleprefix = get_string('strexample', 'checkmark').' ';
+            $data->exampleprefix = get_string('strexample', 'checkmark') . ' ';
         }
 
         if (!isset($data->cutoffdate)) {
@@ -112,7 +120,7 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
             $data->grade = -($this->get_mappingid('scale', abs($data->grade)));
         }
 
-        if ($data->presentationgrade < 0 ) { // Scale found, get mapping!
+        if ($data->presentationgrade < 0) { // Scale found, get mapping!
             $data->grade = -($this->get_mappingid('scale', abs($data->grade)));
         }
 
@@ -127,8 +135,10 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
             unset($data->examplegrades);
             unset($data->flexiblenaming);
         }
-        if (isset($data->flexiblenaming) && !$data->flexiblenaming
-            && isset($data->examplestart) && !empty($data->examplecount) && ($data->examplecount > 0)) {
+        if (
+            isset($data->flexiblenaming) && !$data->flexiblenaming
+            && isset($data->examplestart) && !empty($data->examplecount) && ($data->examplecount > 0)
+        ) {
             // Prepare processing of old standard-naming backup!
             $addexamples = true;
             $examplenames = [];
@@ -170,7 +180,7 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
     protected function process_checkmark_override($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
 
         $data->checkmarkid = $this->get_new_parentid('checkmark');
@@ -192,7 +202,7 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
     protected function process_checkmark_submission($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
 
         // Convert old foreign key fields to new naming scheme!
@@ -276,7 +286,7 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
     protected function process_checkmark_feedback($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
 
         $data->checkmarkid = $this->get_new_parentid('checkmark');
@@ -297,7 +307,7 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
     protected function process_checkmark_example($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
 
         $data->checkmarkid = $this->get_new_parentid('checkmark');
@@ -314,7 +324,7 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
     protected function process_checkmark_check($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
 
         $data->submissionid = $this->get_new_parentid('checkmark_submission');

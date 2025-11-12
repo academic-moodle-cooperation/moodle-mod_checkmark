@@ -83,4 +83,3 @@ class group_override_updated extends group_override {
         ]);
     }
 }
-
