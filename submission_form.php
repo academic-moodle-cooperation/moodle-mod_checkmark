@@ -24,7 +24,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die;
-require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
+require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 
 /**
  * checkmark_submission_form extends moodleform and defines checkmarks' submission form
@@ -38,7 +38,6 @@ require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class checkmark_submission_form extends moodleform {
-
     /**
      * Defines the submission form
      */
@@ -51,10 +50,17 @@ class checkmark_submission_form extends moodleform {
         $mform->setAttributes($attr);
 
         $buttonarray = [];
-        $buttonarray[] = &$mform->createElement('submit', 'submitbutton',
-            get_string('savesubmission', 'checkmark'));
-        $buttonarray[] = &$mform->createElement('reset', 'resetbutton', get_string('revert'),
-            ['class' => 'btn btn-secondary mr-1']);
+        $buttonarray[] = &$mform->createElement(
+            'submit',
+            'submitbutton',
+            get_string('savesubmission', 'checkmark')
+        );
+        $buttonarray[] = &$mform->createElement(
+            'reset',
+            'resetbutton',
+            get_string('revert'),
+            ['class' => 'btn btn-secondary mr-1']
+        );
         $mform->addGroup($buttonarray, 'buttonar', '', ' ', false, ['class' => 'w-100 buttonar-leftalign']);
         $mform->closeHeaderBefore('buttonar');
 

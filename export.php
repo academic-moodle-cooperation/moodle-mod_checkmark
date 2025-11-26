@@ -36,7 +36,7 @@ $mode = optional_param('mode', 'all', PARAM_ALPHANUM);  // What mode are we in?
 
 // Sets url with params and performs require_login!
 $url = new moodle_url('/mod/checkmark/export.php');
-list($cm, $checkmark, $course) = \checkmark::init_checks($id, $c, $url);
+[$cm, $checkmark, $course] = \checkmark::init_checks($id, $c, $url);
 
 require_capability('mod/checkmark:grade', context_module::instance($cm->id));
 
@@ -57,7 +57,7 @@ if ($fromform = $mform->get_data()) {
     }
 }
 
-$pagetitle = $course->shortname.': '.get_string('modulename', 'checkmark').': '.format_string($checkmark->name, true);
+$pagetitle = $course->shortname . ': ' . get_string('modulename', 'checkmark') . ': ' . format_string($checkmark->name, true);
 $PAGE->set_title(strip_tags($pagetitle));
 $PAGE->set_heading($course->fullname);
 

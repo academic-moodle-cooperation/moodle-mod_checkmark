@@ -39,7 +39,6 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  *
  */
 final class externallib_test extends \externallib_advanced_testcase {
-
     /** @var \stdClass Variable that holds instance of the current course */
     private $_course;
     /**  @var \checkmark Variable that holds instance of the current checkmark */

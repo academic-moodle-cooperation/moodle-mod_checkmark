@@ -30,7 +30,7 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');
 }
 
-require_once($CFG->dirroot.'/course/moodleform_mod.php');
+require_once($CFG->dirroot . '/course/moodleform_mod.php');
 require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 
 /**
@@ -76,9 +76,13 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         $this->standard_intro_elements(get_string('description', 'checkmark'));
 
-        $mform->addElement('filemanager', 'introattachments',
+        $mform->addElement(
+            'filemanager',
+            'introattachments',
             get_string('introattachments', 'checkmark'),
-            null, ['subdirs' => 0, 'maxbytes' => $COURSE->maxbytes] );
+            null,
+            ['subdirs' => 0, 'maxbytes' => $COURSE->maxbytes]
+        );
         $mform->addHelpButton('introattachments', 'introattachments', 'checkmark');
 
         $mform->addElement('advcheckbox', 'submissionattachments', get_string('submissionattachments', 'checkmark'));
@@ -134,7 +138,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->addElement('date_time_selector', 'timedue', $name, ['optional' => true]);
         $settime = strtotime('00:00') + $allinfo->duedate;
 
-        $mform->setDefault('timedue',  $settime);
+        $mform->setDefault('timedue', $settime);
         if (!$allinfo->duedate_enabled) {
             $mform->setDefault('timedue', null);
         }
@@ -223,8 +227,14 @@ class mod_checkmark_mod_form extends moodleform_mod {
                 $ingradebook = true;
             } else {
                 // Get gradeoption infos from instance record!
-                if ($record = $DB->get_record('checkmark', ['id' => $this->_cm->instance],
-                    'presentationgrading, presentationgrade', MUST_EXIST)) {
+                if (
+                    $record = $DB->get_record(
+                        'checkmark',
+                        ['id' => $this->_cm->instance],
+                        'presentationgrading, presentationgrade',
+                        MUST_EXIST
+                    )
+                ) {
                     if (($record->presentationgrading == 0) || ($record->presentationgrade == 0)) {
                         $gradeoptions['currentgradetype'] = 'none';
                         $gradeoptions['currentgrade'] = $CFG->gradepointdefault;
@@ -298,13 +308,21 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $params->dividingSymbol = checkmark::DELIMITER;
         $PAGE->requires->js_call_amd('mod_checkmark/settings', 'initializer', [$params]);
 
-        $mform->addElement('select', 'emailteachers', get_string('emailteachers', 'checkmark'),
-            $ynoptions);
+        $mform->addElement(
+            'select',
+            'emailteachers',
+            get_string('emailteachers', 'checkmark'),
+            $ynoptions
+        );
         $mform->addHelpButton('emailteachers', 'emailteachers', 'checkmark');
         $mform->setDefault('emailteachers', 0);
 
-        $mform->addElement('select', 'calendarteachers', get_string('calendarteachers', 'checkmark'),
-            $ynoptions);
+        $mform->addElement(
+            'select',
+            'calendarteachers',
+            get_string('calendarteachers', 'checkmark'),
+            $ynoptions
+        );
         $mform->addHelpButton('calendarteachers', 'calendarteachers', 'checkmark');
         $mform->setDefault('calendarteachers', 0);
 
@@ -327,18 +345,27 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->addElement('text', 'exampleprefix', get_string('exampleprefix', 'checkmark'));
         $mform->setType('exampleprefix', PARAM_TEXT);
         $mform->addHelpButton('exampleprefix', 'exampleprefix', 'checkmark');
-        $mform->setDefault('exampleprefix', get_string('strexample', 'checkmark').' ');
+        $mform->setDefault('exampleprefix', get_string('strexample', 'checkmark') . ' ');
         $mform->setAdvanced('exampleprefix');
 
-        $mform->addElement('advcheckbox', 'flexiblenaming', get_string('flexiblenaming', 'checkmark'),
-            get_string('activateindividuals', 'checkmark'), ['id' => 'id_flexiblenaming', 'group' => 1],
-            ['0', '1']);
+        $mform->addElement(
+            'advcheckbox',
+            'flexiblenaming',
+            get_string('flexiblenaming', 'checkmark'),
+            get_string('activateindividuals', 'checkmark'),
+            ['id' => 'id_flexiblenaming', 'group' => 1],
+            ['0', '1']
+        );
         $mform->addHelpButton('flexiblenaming', 'flexiblenaming', 'checkmark');
 
         $mform->setAdvanced('flexiblenaming');
 
-        $mform->addElement('textarea', 'examplenames', get_string('examplenames', 'checkmark').' ('.checkmark::DELIMITER.')',
-            ['wrap' => 'virtual', 'rows' => '1']);
+        $mform->addElement(
+            'textarea',
+            'examplenames',
+            get_string('examplenames', 'checkmark') . ' (' . checkmark::DELIMITER . ')',
+            ['wrap' => 'virtual', 'rows' => '1']
+        );
         // We clean these by ourselves!
         $mform->setType('examplenames', PARAM_TEXT);
         $mform->addHelpButton('examplenames', 'examplenames', 'checkmark');
@@ -348,8 +375,12 @@ class mod_checkmark_mod_form extends moodleform_mod {
         $mform->hideIf('examplenames', 'flexiblenaming', 'notchecked');
         $mform->setAdvanced('examplenames');
 
-        $mform->addElement('textarea', 'examplegrades', get_string('examplegrades', 'checkmark').' ('.checkmark::DELIMITER.')',
-            ['id' => 'id_examplegrades', 'wrap' => 'virtual', 'rows' => '1']);
+        $mform->addElement(
+            'textarea',
+            'examplegrades',
+            get_string('examplegrades', 'checkmark') . ' (' . checkmark::DELIMITER . ')',
+            ['id' => 'id_examplegrades', 'wrap' => 'virtual', 'rows' => '1']
+        );
         // We clean these by ourselves!
         $mform->setType('examplegrades', PARAM_SEQUENCE);
         $mform->addHelpButton('examplegrades', 'examplegrades', 'checkmark');
@@ -390,9 +421,12 @@ class mod_checkmark_mod_form extends moodleform_mod {
     public function add_completion_rules() {
         $mform =& $this->_form;
 
-        $mform->addElement('advcheckbox', 'completionsubmit',
+        $mform->addElement(
+            'advcheckbox',
+            'completionsubmit',
             get_string('requiresubmit', 'checkmark'),
-            get_string('completionsubmit', 'checkmark'));
+            get_string('completionsubmit', 'checkmark')
+        );
         // Enable this completion rule by default.
         $mform->setDefault('completionsubmit', 1);
         return [$this->get_suffixed_name('completionsubmit')];
@@ -435,7 +469,7 @@ class mod_checkmark_mod_form extends moodleform_mod {
         if ($this->_checkmarkinstance) {
             return $this->_checkmarkinstance;
         }
-        require_once($CFG->dirroot.'/mod/checkmark/lib.php');
+        require_once($CFG->dirroot . '/mod/checkmark/lib.php');
         if (!empty($this->update)) {
             if (empty($this->cm)) {
                 $this->cm = get_coursemodule_from_id('checkmark', $this->update);
@@ -495,8 +529,10 @@ class mod_checkmark_mod_form extends moodleform_mod {
                     if (($oldname == null) && ($oldgrade == null)) {
                         $examplestart = $example->shortname;
                     } else {
-                        if ((intval($oldname) + 1 != intval($example->shortname))
-                            || (intval($oldgrade) != intval($example->grade))) {
+                        if (
+                            (intval($oldname) + 1 != intval($example->shortname))
+                            || (intval($oldgrade) != intval($example->grade))
+                        ) {
                                 $flexiblenaming = true;
                         }
                     }
@@ -522,11 +558,16 @@ class mod_checkmark_mod_form extends moodleform_mod {
 
         if (!empty($this->current) && !empty($this->current->id)) {
             $draftitemid = file_get_submitted_draft_itemid('introattachments');
-            file_prepare_draft_area($draftitemid, $this->context->id, 'mod_checkmark', CHECKMARK_INTROATTACHMENT_FILEAREA,
-                0, ['subdirs' => 0]);
+            file_prepare_draft_area(
+                $draftitemid,
+                $this->context->id,
+                'mod_checkmark',
+                CHECKMARK_INTROATTACHMENT_FILEAREA,
+                0,
+                ['subdirs' => 0]
+            );
             $defaultvalues['introattachments'] = $draftitemid;
         }
-
     }
 
     /**

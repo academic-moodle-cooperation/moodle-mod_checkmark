@@ -65,9 +65,17 @@ class observer {
 
         $attupdate = GRADE_UPDATE_OK;
         if ($checkmark->trackattendance && $checkmark->attendancegradebook) {
-            $params = ['itemname' => get_string('attendance', 'checkmark').' '.$event->other['name']];
-            $attupdate = grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id,
-                    CHECKMARK_ATTENDANCE_ITEM, null, $params);
+            $params = ['itemname' => get_string('attendance', 'checkmark') . ' ' . $event->other['name']];
+            $attupdate = grade_update(
+                'mod/checkmark',
+                $checkmark->course,
+                'mod',
+                'checkmark',
+                $checkmark->id,
+                CHECKMARK_ATTENDANCE_ITEM,
+                null,
+                $params
+            );
             // Move attendance item directly after grade item, if it exists in the same category!
             $params = [
                 'courseid' => $checkmark->course,
@@ -86,9 +94,17 @@ class observer {
 
         $presupdate = GRADE_UPDATE_OK;
         if ($checkmark->presentationgrading && $checkmark->presentationgradebook) {
-            $params = ['itemname' => get_string('presentationgrade_short', 'checkmark').' '.$event->other['name']];
-            $presupdate = grade_update('mod/checkmark', $checkmark->course, 'mod', 'checkmark', $checkmark->id,
-                    CHECKMARK_PRESENTATION_ITEM, null, $params);
+            $params = ['itemname' => get_string('presentationgrade_short', 'checkmark') . ' ' . $event->other['name']];
+            $presupdate = grade_update(
+                'mod/checkmark',
+                $checkmark->course,
+                'mod',
+                'checkmark',
+                $checkmark->id,
+                CHECKMARK_PRESENTATION_ITEM,
+                null,
+                $params
+            );
             // Move presentation item attendance item directly after attendance or grade item, if one of them exists!
             $params = [
                 'courseid' => $checkmark->course,

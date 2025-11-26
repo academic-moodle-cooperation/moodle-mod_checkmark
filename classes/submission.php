@@ -73,10 +73,12 @@ class submission {
             $this->examples = \checkmark::get_examples_static($this->checkmarkid);
 
             if ($submission) {
-                if ($submission->examples = $DB->get_records_sql('
+                if (
+                    $submission->examples = $DB->get_records_sql('
                     SELECT exampleid AS id, state
                       FROM {checkmark_checks}
-                     WHERE submissionid = :subid', ['subid' => $submission->id])) {
+                     WHERE submissionid = :subid', ['subid' => $submission->id])
+                ) {
                     foreach ($submission->examples as $key => $ex) {
                         $this->examples[$ex->id]->set_state($ex->state);
                     }
@@ -133,7 +135,7 @@ class submission {
      * @return \stdClass
      */
     public function export_for_snapshot() {
-        $record = new \stdClass;
+        $record = new \stdClass();
         $record->id = $this->id;
         $record->checkmarkid = $this->checkmarkid;
         $record->userid = $this->userid;

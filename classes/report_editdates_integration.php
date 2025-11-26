@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 
-require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
+require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
 
 /**
  * Class mod_checkmark_report_editdates_integration
@@ -36,9 +36,7 @@ require_once($CFG->dirroot.'/mod/checkmark/locallib.php');
  * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_checkmark_report_editdates_integration
-extends report_editdates_mod_date_extractor {
-
+class mod_checkmark_report_editdates_integration extends report_editdates_mod_date_extractor {
     /**
      * Constructor.
      *
@@ -60,21 +58,33 @@ extends report_editdates_mod_date_extractor {
 
         return [
                 'timeavailable' => new report_editdates_date_setting(
-                        get_string('availabledate', 'checkmark'),
-                        $checkmark->timeavailable,
-                        self::DATETIME, true, 5),
+                    get_string('availabledate', 'checkmark'),
+                    $checkmark->timeavailable,
+                    self::DATETIME,
+                    true,
+                    5
+                ),
                 'timedue' => new report_editdates_date_setting(
-                        get_string('duedate', 'checkmark'),
-                        $checkmark->timedue,
-                        self::DATETIME, true, 5),
+                    get_string('duedate', 'checkmark'),
+                    $checkmark->timedue,
+                    self::DATETIME,
+                    true,
+                    5
+                ),
                 'cutoffdate' => new report_editdates_date_setting(
-                        get_string('cutoffdate', 'checkmark'),
-                        $checkmark->cutoffdate,
-                        self::DATETIME, true, 5),
+                    get_string('cutoffdate', 'checkmark'),
+                    $checkmark->cutoffdate,
+                    self::DATETIME,
+                    true,
+                    5
+                ),
                 'gradingduedate' => new report_editdates_date_setting(
-                        get_string('gradingdue', 'checkmark'),
-                        $checkmark->gradingdue,
-                        self::DATETIME, true, 5),
+                    get_string('gradingdue', 'checkmark'),
+                    $checkmark->gradingdue,
+                    self::DATETIME,
+                    true,
+                    5
+                ),
                 ];
     }
 
@@ -87,8 +97,10 @@ extends report_editdates_mod_date_extractor {
      */
     public function validate_dates(cm_info $cm, array $dates) {
         $errors = [];
-        if ($dates['timeavailable'] && $dates['timedue']
-                && $dates['timedue'] < $dates['timeavailable']) {
+        if (
+            $dates['timeavailable'] && $dates['timedue']
+                && $dates['timedue'] < $dates['timeavailable']
+        ) {
             $errors['timedue'] = get_string('duedatevalidation', 'checkmark');
         }
         if ($dates['timedue'] && $dates['cutoffdate']) {
@@ -102,12 +114,16 @@ extends report_editdates_mod_date_extractor {
             }
         }
 
-        if ($dates['timedue'] && $dates['gradingduedate']
-                && $dates['timedue'] > $dates['gradingduedate']) {
+        if (
+            $dates['timedue'] && $dates['gradingduedate']
+                && $dates['timedue'] > $dates['gradingduedate']
+        ) {
             $errors['gradingduedate'] = get_string('gradingdueduedatevalidation', 'checkmark');
         }
-        if ($dates['timeavailable'] && $dates['gradingduedate'] &&
-            $dates['timeavailable'] > $dates['gradingduedate']) {
+        if (
+            $dates['timeavailable'] && $dates['gradingduedate'] &&
+            $dates['timeavailable'] > $dates['gradingduedate']
+        ) {
             $errors['gradingduedate'] = get_string('gradingduefromdatevalidation', 'checkmark');
         }
 

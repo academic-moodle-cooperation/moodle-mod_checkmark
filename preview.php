@@ -34,7 +34,7 @@ $c  = optional_param('c', 0, PARAM_INT);   // Checkmark ID?
 
 // Sets url with params and performs require_login!
 $url = new moodle_url('/mod/checkmark/preview.php');
-list($cm, $checkmark, $course) = \checkmark::init_checks($id, $c, $url);
+[$cm, $checkmark, $course] = \checkmark::init_checks($id, $c, $url);
 $PAGE->activityheader->disable();
 $checkmarkinstance = new checkmark($cm->id, $checkmark, $cm, $course);
 

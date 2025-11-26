@@ -181,7 +181,7 @@ class example {
      * @return \stdClass Snapshot of the present example
      */
     public function export_for_snapshot() {
-        $record = new \stdClass;
+        $record = new \stdClass();
         $record->id = $this->id;
         $record->name = $this->name;
         $record->grade = $this->grade;

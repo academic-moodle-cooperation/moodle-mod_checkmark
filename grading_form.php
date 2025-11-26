@@ -91,7 +91,6 @@ class mod_checkmark_grading_form extends moodleform {
         }
         // Buttons we need!
         $this->add_grading_buttons();
-
     }
 
     /**

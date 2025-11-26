@@ -35,7 +35,7 @@ $c  = optional_param('c', 0, PARAM_INT);   // Checkmark ID?
 
 // Sets url with params and performs require_login!
 $url = new moodle_url('/mod/checkmark/delete.php');
-list($cm, $checkmark, $course) = \checkmark::init_checks($id, $c, $url);
+[$cm, $checkmark, $course] = \checkmark::init_checks($id, $c, $url);
 
 $modinfo = get_fast_modinfo($course);
 $cminfo = $modinfo->get_cm($cm->id);
@@ -44,16 +44,16 @@ if (empty($cminfo->uservisible)) {
         // User cannot access the activity, but on the course page they will
         // see a link to it, greyed-out, with information (HTML format) from
         // $cm->availableinfo about why they can't access it.
-        $text = "<br />".format_text($cminfo->availableinfo, FORMAT_HTML);
+        $text = "<br />" . format_text($cminfo->availableinfo, FORMAT_HTML);
     } else {
         // User cannot access the activity and they will not see it at all.
         $text = '';
     }
-    $notification = $OUTPUT->notification(get_string('conditions_prevent_access', 'checkmark').$text, 'notifyproblem');
+    $notification = $OUTPUT->notification(get_string('conditions_prevent_access', 'checkmark') . $text, 'notifyproblem');
     echo $OUTPUT->box($notification, 'generalbox centered');
     die;
 }
 
 // Load up the required checkmark code!
-require($CFG->dirroot.'/mod/checkmark/lib.php');
+require($CFG->dirroot . '/mod/checkmark/lib.php');
 checkmark_delete_instance($checkmark->id);

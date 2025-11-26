@@ -84,7 +84,7 @@ function checkmark_delete_instance($id) {
         ['checkmarkid' => $checkmark->id]
     );
     if (!empty($submissions)) {
-        list($ssql, $sparams) = $DB->get_in_or_equal($submissions, SQL_PARAMS_NAMED);
+        [$ssql, $sparams] = $DB->get_in_or_equal($submissions, SQL_PARAMS_NAMED);
     } else {
         // No dataset should have submissionid = NULL so we can use this for our OR to select whom do delete!
         $ssql = ' = NULL';
@@ -101,7 +101,7 @@ function checkmark_delete_instance($id) {
         ['checkmarkid' => $checkmark->id]
     );
     if (!empty($examples)) {
-        list($esql, $eparams) = $DB->get_in_or_equal($examples, SQL_PARAMS_NAMED);
+        [$esql, $eparams] = $DB->get_in_or_equal($examples, SQL_PARAMS_NAMED);
     } else {
         // No dataset should have exampleid = NULL so we can use this for our OR to select whom do delete!
         $esql = ' = NULL';
@@ -615,7 +615,7 @@ function checkmark_get_overridden_dates($checkmarkid, $userid = 0, $courseid = 0
 
     $records = [];
     if (!empty($groups) && is_array($groups)) {
-        list($insql, $params) = $DB->get_in_or_equal($groups);
+        [$insql, $params] = $DB->get_in_or_equal($groups);
         array_push($params, $checkmarkid);
         $sql = "SELECT id, timeavailable, timedue, cutoffdate, groupid FROM {checkmark_overrides}
             WHERE groupid $insql AND checkmarkid = ? ORDER BY grouppriority DESC";
@@ -906,11 +906,9 @@ function checkmark_grade_item_update($checkmark, $grades = null) {
         $params['gradetype'] = GRADE_TYPE_VALUE;
         $params['grademax'] = $checkmark->grade;
         $params['grademin'] = 0;
-
     } else if ($checkmark->grade < 0) {
         $params['gradetype'] = GRADE_TYPE_SCALE;
         $params['scaleid'] = -$checkmark->grade;
-
     } else {
         $params['gradetype'] = GRADE_TYPE_TEXT; // Allow text comments only!
     }
@@ -1037,11 +1035,9 @@ function checkmark_presentation_item_update($checkmark, $grades = null) {
         $params['gradetype'] = GRADE_TYPE_VALUE;
         $params['grademax'] = $checkmark->presentationgrade;
         $params['grademin'] = 0;
-
     } else if ($checkmark->presentationgrade < 0) {
         $params['gradetype'] = GRADE_TYPE_SCALE;
         $params['scaleid'] = -$checkmark->presentationgrade;
-
     } else {
         $params['gradetype'] = GRADE_TYPE_TEXT; // Allow text comments only!
     }
@@ -1119,12 +1115,10 @@ function checkmark_grade_item_category_update($checkmark) {
                     $gradeitem->set_parent($checkmark->gradecat);
                 }
             } else if ($gradeitem->itemnumber == 1) {
-
                 if ($gradeitem->categoryid != $checkmark->gradecat) {
                     $gradeitem->set_parent($checkmark->gradecat);
                 }
             } else if ($gradeitem->itemnumber == 2) {
-
                 if ($gradeitem->categoryid != $checkmark->gradecat) {
                     $gradeitem->set_parent($checkmark->gradecat);
                 }
@@ -1784,7 +1778,6 @@ function checkmark_get_recent_mod_activity(
         $userids = [];
         foreach ($show as $submission) {
             $userids[] = $submission->userid;
-
         }
         $grades = grade_get_grades($courseid, 'mod', 'checkmark', $cm->instance, $userids);
     }
@@ -1914,7 +1907,7 @@ function checkmark_count_real_submissions($cm, $groupid = 0) {
         return 0;
     }
 
-    list($sqluserlist, $userlistparams) = $DB->get_in_or_equal($users);
+    [$sqluserlist, $userlistparams] = $DB->get_in_or_equal($users);
     $params = array_merge([$cm->instance], $userlistparams);
 
     return $DB->count_records_sql('SELECT COUNT(\'x\')
@@ -1971,7 +1964,6 @@ function checkmark_get_all_submissions($checkmark, $sort = '', $dir = 'DESC') {
     }
 
     return $records;
-
 }
 
 /*

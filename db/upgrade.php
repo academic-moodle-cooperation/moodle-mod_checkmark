@@ -518,7 +518,8 @@ function xmldb_checkmark_upgrade($oldversion) {
             }
 
             $instancecount++;
-            $ids = $DB->get_fieldset_sql('SELECT id
+            $ids = $DB->get_fieldset_sql(
+                'SELECT id
                                             FROM {checkmark_examples}
                                            WHERE checkmarkid = :checkmarkid',
                 ['checkmarkid' => $checkmark->id]
@@ -1039,7 +1040,6 @@ function xmldb_checkmark_upgrade($oldversion) {
     }
 
     if ($oldversion < 2016053100) {
-
         // Define field trackattendance to be added to checkmark.
         $table = new xmldb_table('checkmark');
         $fields = [

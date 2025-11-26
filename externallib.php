@@ -35,7 +35,6 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
  * @package   mod_checkmark
  */
 class mod_checkmark_external extends external_api {
-
     /**
      * Returns description of the get_checkmarks_by_courses parameters
      *
@@ -95,14 +94,12 @@ class mod_checkmark_external extends external_api {
 
         // Ensure there are courseids to loop through.
         if (!empty($params['courseids'])) {
-
-            list($courses, $warnings) = external_util::validate_courses($params['courseids'], $mycourses);
+            [$courses, $warnings] = external_util::validate_courses($params['courseids'], $mycourses);
 
             // Get the checkmarks in this course, this function checks users visibility permissions.
             // We can avoid then additional validate_context calls.
             $checkmarkinstances = get_all_instances_in_courses("checkmark", $courses);
             foreach ($checkmarkinstances as $checkmarkinstance) {
-
                 $checkmark = new checkmark($checkmarkinstance->coursemodule);
                 $rcheckmarks[] = self::export_checkmark($checkmark);
             }
@@ -167,8 +164,10 @@ class mod_checkmark_external extends external_api {
     public static function submit_parameters() {
         return new external_function_parameters([
             'id' => new external_value(PARAM_INT, 'The course module id (cmid) of the checkmark'),
-            'submission_examples' => new external_multiple_structure(self::submit_example_structure(),
-                'The examples of the submission (must match the examples of the checkmark)'),
+            'submission_examples' => new external_multiple_structure(
+                self::submit_example_structure(),
+                'The examples of the submission (must match the examples of the checkmark)'
+            ),
         ]);
     }
 
@@ -232,7 +231,6 @@ class mod_checkmark_external extends external_api {
 
         $examplecounter = count($submission->get_examples());
         foreach ($submission->get_examples() as $key => $example) {
-
             $maybesubmissionexample = null;
             foreach ($params['submission_examples'] as $submissionexample) {
                 if ($example->get_id() === $submissionexample['id']) {
@@ -242,14 +240,15 @@ class mod_checkmark_external extends external_api {
                 }
             }
 
-            if ($maybesubmissionexample &&
+            if (
+                $maybesubmissionexample &&
                 isset($maybesubmissionexample['checked']) &&
-                $maybesubmissionexample['checked'] != 0) {
+                $maybesubmissionexample['checked'] != 0
+            ) {
                 $submission->get_example($key)->set_state(\mod_checkmark\example::CHECKED);
             } else {
                 $submission->get_example($key)->set_state(\mod_checkmark\example::UNCHECKED);
             }
-
         }
 
         if ($examplecounter !== 0) {
@@ -285,7 +284,8 @@ class mod_checkmark_external extends external_api {
                 'submission_timemodified' => new external_value(PARAM_INT, 'submission changed', VALUE_OPTIONAL),
                 'examples' => new external_multiple_structure(self::example_structure(), 'Examples'),
                 'feedback' => self::feedback_structure(),
-            ], 'example information'
+            ],
+            'example information'
         );
     }
 
@@ -302,7 +302,8 @@ class mod_checkmark_external extends external_api {
                 'feedbackformat' => new external_value(PARAM_INT, 'Feedback comment format'),
                 'timecreated' => new external_value(PARAM_INT, 'Time the feedback was given'),
                 'timemodified' => new external_value(PARAM_INT, 'Time the feedback was modified'),
-            ], 'submission information',
+            ],
+            'submission information',
             VALUE_OPTIONAL
         );
     }
@@ -318,7 +319,8 @@ class mod_checkmark_external extends external_api {
                 'id' => new external_value(PARAM_INT, 'example id'),
                 'name' => new external_value(PARAM_TEXT, 'example name'),
                 'checked' => new external_value(PARAM_INT, 'example checked state', VALUE_OPTIONAL),
-            ], 'example information'
+            ],
+            'example information'
         );
     }
 
@@ -333,7 +335,8 @@ class mod_checkmark_external extends external_api {
                 'id' => new external_value(PARAM_INT, 'example id'),
                 'name' => new external_value(PARAM_TEXT, 'example name', VALUE_OPTIONAL),
                 'checked' => new external_value(PARAM_INT, 'example checked state'),
-            ], 'example information'
+            ],
+            'example information'
         );
     }
 
@@ -381,7 +384,6 @@ class mod_checkmark_external extends external_api {
     private static function export_examples($examples, $exportchecked = false) {
         $resultexamples = [];
         foreach ($examples as $example) {
-
             $resultexample = new stdClass();
             $resultexample->id = $example->get_id();
             $resultexample->name = $example->get_name();
@@ -413,5 +415,4 @@ class mod_checkmark_external extends external_api {
 
         return $resultfeedback;
     }
-
 }
