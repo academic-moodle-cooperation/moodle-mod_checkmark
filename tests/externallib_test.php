@@ -40,9 +40,9 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  */
 final class externallib_test extends \externallib_advanced_testcase {
     /** @var \stdClass Variable that holds instance of the current course */
-    private $_course;
+    private $currentcourse;
     /**  @var \checkmark Variable that holds instance of the current checkmark */
-    private $_checkmark;
+    private $currentcheckmark;
 
     public function setUp(): void {
         global $CFG;
@@ -120,7 +120,7 @@ final class externallib_test extends \externallib_advanced_testcase {
         $this->assertEquals('Checkmark Module', $result->checkmark->name);
 
         // Course id in checkmark should be equal to the id of the course.
-        $this->assertEquals($this->_course->id, $result->checkmark->course);
+        $this->assertEquals($this->currentcourse->id, $result->checkmark->course);
     }
 
     /**
@@ -166,26 +166,26 @@ final class externallib_test extends \externallib_advanced_testcase {
             $submissionexamples[] = ['id' => $example->id, 'checked' => $example->id % 2];
         }
 
-        $result = \mod_checkmark_external::submit($this->_checkmark->cmid, $submissionexamples);
+        $result = \mod_checkmark_external::submit($this->currentcheckmark->cmid, $submissionexamples);
 
         // Checkmark name should be equal to 'Checkmark Module'!
         $this->assertEquals('Checkmark Module', $result->checkmark->name);
 
         // Course id in checkmark should be equal to the id of the course!
-        $this->assertEquals($this->_course->id, $result->checkmark->course);
+        $this->assertEquals($this->currentcourse->id, $result->checkmark->course);
 
         // Check the examples checked status of the result object!
         for ($i = 0; $i < 10; $i++) {
             $this->assertEquals($result->checkmark->examples[$i]->id % 2, $result->checkmark->examples[$i]->checked);
         }
 
-        $result = \mod_checkmark_external::get_checkmark($this->_checkmark->cmid);
+        $result = \mod_checkmark_external::get_checkmark($this->currentcheckmark->cmid);
 
         // Checkmark name should be equal to 'Checkmark Module'!
         $this->assertEquals('Checkmark Module', $result->checkmark->name);
 
         // Course id in checkmark should be equal to the id of the course!
-        $this->assertEquals($this->_course->id, $result->checkmark->course);
+        $this->assertEquals($this->currentcourse->id, $result->checkmark->course);
 
         // Check the examples checked status was correctly saved!
         for ($i = 0; $i < 10; $i++) {
@@ -258,8 +258,8 @@ final class externallib_test extends \externallib_advanced_testcase {
         $this->setUser($user);
 
         $result = \mod_checkmark_external::get_checkmark($checkmark->cmid);
-        $this->_course = $course;
-        $this->_checkmark = $checkmark;
+        $this->currentcourse = $course;
+        $this->currentcheckmark = $checkmark;
         return $result;
     }
 }

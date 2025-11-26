@@ -546,7 +546,8 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
         }
         $params = ['userid' => $user->id] + $cparams;
 
-        if ($subids = $DB->get_fieldset_select('checkmark_submissions', 'id', 'userid = :userid AND checkmarkid ' . $csql, $params)) {
+        $subids = $DB->get_fieldset_select('checkmark_submissions', 'id', 'userid = :userid AND checkmarkid ' . $csql, $params);
+        if (!empty($subids)) {
             $DB->delete_records_list('checkmark_checks', 'submissionid', $subids);
         }
 

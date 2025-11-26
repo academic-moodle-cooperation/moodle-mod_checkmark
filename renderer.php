@@ -32,6 +32,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_checkmark\checkmark_files;
 use mod_checkmark\output\override_actionmenu;
 use mod_checkmark\output\checkmark_header;
 
@@ -534,47 +535,5 @@ class mod_checkmark_renderer extends plugin_renderer_base {
 
         $o .= $this->output->container_end();
         return $o;
-    }
-}
-/**
- * A class that extends rendererable class and is used by the checkmark module.
- *
- * @package   mod_checkmark
- * @author    Daniel Binder (Based on the work of NetSpot {@link http://www.netspot.com.au})
- * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class checkmark_files implements renderable {
-    /** @var context $context */
-    public $context;
-    /** @var string $context */
-    public $dir;
-    /** @var stdClass $cm course module */
-    public $cm;
-    /** @var stdClass $course */
-    public $course;
-    /** @var string $filearea */
-    public $filearea;
-    /** @var string $component */
-    public $component;
-
-    /**
-     * The constructor
-     *
-     * @param context $context
-     * @param int $sid
-     * @param string $filearea
-     * @param string $component
-     */
-    public function __construct(context $context, $sid, $filearea, $component) {
-        global $CFG;
-        $this->context = $context;
-        $this->filearea = $filearea;
-        $this->component = $component;
-        [$context, $course, $cm] = get_context_info_array($context->id);
-        $this->cm = $cm;
-        $this->course = $course;
-        $fs = get_file_storage();
-        $this->dir = $fs->get_area_tree($context->id, $component, $filearea, $sid);
     }
 }

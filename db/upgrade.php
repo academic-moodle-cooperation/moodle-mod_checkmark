@@ -483,7 +483,8 @@ function xmldb_checkmark_upgrade($oldversion) {
                                              :name' . $checkmarkid . '_' . $key . ',
                                              :grade' . $checkmarkid . '_' . $key . ')';
                     } else {
-                        $sql .= ', (:id' . $checkmarkid . '_' . $key . ', :name' . $checkmarkid . '_' . $key . ', :grade' . $checkmarkid . '_' . $key . ')';
+                        $sql .= ', (:id' . $checkmarkid . '_' . $key . ', :name' .
+                            $checkmarkid . '_' . $key . ', :grade' . $checkmarkid . '_' . $key . ')';
                     }
                 }
             } else {
@@ -507,7 +508,8 @@ function xmldb_checkmark_upgrade($oldversion) {
                                              :name' . $checkmarkid . '_' . $i . ',
                                              :grade' . $checkmarkid . '_' . $i . ')';
                     } else {
-                        $sql .= ', (:id' . $checkmarkid . '_' . $i . ', :name' . $checkmarkid . '_' . $i . ', :grade' . $checkmarkid . '_' . $i . ')';
+                        $sql .= ', (:id' . $checkmarkid . '_' . $i . ', :name' .
+                            $checkmarkid . '_' . $i . ', :grade' . $checkmarkid . '_' . $i . ')';
                     }
                 }
             }
@@ -1291,8 +1293,8 @@ function xmldb_checkmark_upgrade($oldversion) {
         } catch (Exception $e) {
             echo 'While trying to add a (propably) missing key, due to a bug, we failed. It may be the case, you\'re one of the ' .
                 'lucky ones, not affected by the bug. Otherwise please add a foreign key for field ' .
-                $DB->get_prefix() . 'checkmark_overrides.modifierid targeting ' . $DB->get_prefix() . 'user.id! Thank you and sorry ' .
-                'for the inconveniences!';
+                $DB->get_prefix() . 'checkmark_overrides.modifierid targeting ' . $DB->get_prefix() .
+                'user.id! Thank you and sorry ' . 'for the inconveniences!';
         }
 
         // Checkmark savepoint reached.
