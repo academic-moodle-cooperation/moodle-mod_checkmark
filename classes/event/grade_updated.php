@@ -57,10 +57,10 @@ class grade_updated extends \core\event\base {
         $data['type'] = 'manual';
         $data['instance'] = $cm->instance;
         $event = self::create([
-            'objectid'    => $data['feedbackid'],
-            'context'     => \context_module::instance($cm->id),
+            'objectid' => $data['feedbackid'],
+            'context' => \context_module::instance($cm->id),
             'relateduserid' => $data['userid'],
-            'other'       => $data,
+            'other' => $data,
         ]);
         return $event;
     }
@@ -76,10 +76,10 @@ class grade_updated extends \core\event\base {
         $data['type'] = 'automatic';
         $data['instance'] = $cm->instance;
         $event = self::create([
-            'objectid'    => $data['feedbackid'],
-            'context'     => \context_module::instance($cm->id),
+            'objectid' => $data['feedbackid'],
+            'context' => \context_module::instance($cm->id),
             'relateduserid' => $data['userid'],
-            'other'       => $data,
+            'other' => $data,
         ]);
         return $event;
     }
@@ -90,15 +90,14 @@ class grade_updated extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        switch($this->data['other']['type']) {
+        switch ($this->data['other']['type']) {
             case 'manual':
-                return "The user with id '".$this->userid."' updated the grade for user with id '".$this->data['relateduserid'].
-                       "' in checkmark module with course module id '$this->contextinstanceid'.";
-            break;
+                return "The user with id '" . $this->userid . "' updated the grade for user with id '"
+                    . $this->data['relateduserid'] . "' in checkmark module with course module id '$this->contextinstanceid'.";
             case 'automatic':
-                return "The user with id '".$this->userid."' updated the grade for user with id '".$this->data['relateduserid']."'".
-                       " using autograding in checkmark module with course module id '$this->contextinstanceid'.";
-            break;
+                return "The user with id '" . $this->userid . "' updated the grade for user with id '"
+                    . $this->data['relateduserid'] . "'"
+                    . " using autograding in checkmark module with course module id '$this->contextinstanceid'.";
         }
     }
 

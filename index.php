@@ -25,7 +25,7 @@
 
 require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
-require_once($CFG->libdir.'/gradelib.php');
+require_once($CFG->libdir . '/gradelib.php');
 
 $id = required_param('id', PARAM_INT);   // We need a course!
 
@@ -45,7 +45,7 @@ $event->trigger();
 
 $strcheckmarks = get_string('modulenameplural', 'checkmark');
 $strcheckmark = get_string('modulename', 'checkmark');
-$strsectionname  = get_string('sectionname', 'format_'.$course->format);
+$strsectionname  = get_string('sectionname', 'format_' . $course->format);
 $strname = get_string('name');
 $strduedate = get_string('duedate', 'checkmark');
 $strsubmitted = get_string('submitted', 'checkmark');
@@ -89,7 +89,7 @@ foreach ($modinfo->instances['checkmark'] as $cm) {
     // Show dimmed if the mod is hidden!
     $class = $cm->visible ? '' : 'dimmed';
 
-    $link = html_writer::tag('a', format_string($cm->name), ['href'  => 'view.php?id='.$cm->id,
+    $link = html_writer::tag('a', format_string($cm->name), ['href'  => 'view.php?id=' . $cm->id,
                                                                   'class' => $class,
                                                                 ]);
 
@@ -111,8 +111,10 @@ foreach ($modinfo->instances['checkmark'] as $cm) {
     $submitted = $checkmarkinstance->submittedlink(true);
 
     $gradinginfo = grade_get_grades($course->id, 'mod', 'checkmark', $cm->instance, $USER->id);
-    if (isset($gradinginfo->items[CHECKMARK_GRADE_ITEM])
-        && !$gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$USER->id]->hidden ) {
+    if (
+        isset($gradinginfo->items[CHECKMARK_GRADE_ITEM])
+        && !$gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$USER->id]->hidden
+    ) {
         $grade = $gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$USER->id]->str_grade;
     } else {
         $grade = '-';
@@ -121,8 +123,10 @@ foreach ($modinfo->instances['checkmark'] as $cm) {
     $due = !empty($cms[$cm->id]) && !empty($cms[$cm->id]->timedue) ? userdate($cms[$cm->id]->timedue) : '-';
     $overridden = checkmark_get_overridden_dates($cm->instance, $USER->id, $course->id);
     if (!empty($overridden) && !empty($overridden->timedue)) {
-        $due .= html_writer::div(get_string('extended_until', 'checkmark', userdate($overridden->timedue)),
-                'small alert-info');
+        $due .= html_writer::div(
+            get_string('extended_until', 'checkmark', userdate($overridden->timedue)),
+            'small alert-info'
+        );
     }
 
 

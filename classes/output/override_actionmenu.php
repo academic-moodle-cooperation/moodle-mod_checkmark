@@ -38,8 +38,7 @@ use single_button;
  * @copyright based on assign/classes/output/override_actionmenu.php by 2021 Adrian Greeve <adrian@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class override_actionmenu implements templatable, renderable {
-
+class override_actionmenu implements renderable, templatable {
     /** @var moodle_url The current url for this page. */
     protected $currenturl;
     /** @var \cm_info course module information */
@@ -108,7 +107,7 @@ class override_actionmenu implements templatable, renderable {
             $users = get_enrolled_users($context, '', 0, 'u.id');
         } else if ($this->groups) {
             $enrolledjoin = get_enrolled_join($context, 'u.id');
-            list($ingroupsql, $ingroupparams) = $DB->get_in_or_equal(array_keys($this->groups), SQL_PARAMS_NAMED);
+            [$ingroupsql, $ingroupparams] = $DB->get_in_or_equal(array_keys($this->groups), SQL_PARAMS_NAMED);
             $params = $enrolledjoin->params + $ingroupparams;
             $sql = "SELECT u.id
                       FROM {user} u

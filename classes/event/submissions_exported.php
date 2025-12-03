@@ -57,8 +57,8 @@ class submissions_exported extends \core\event\base {
     public static function exported(\stdClass $cm, \mod_checkmark\export $exportsettings) {
         $event = static::create([
             'objectid' => $cm->instance,
-            'context'  => \context_module::instance($cm->id),
-            'other'    => $exportsettings->get_event_data(),
+            'context' => \context_module::instance($cm->id),
+            'other' => $exportsettings->get_event_data(),
         ]);
 
         return $event;
@@ -71,21 +71,21 @@ class submissions_exported extends \core\event\base {
      */
     public function get_description() {
         if ($this->data['other']['groupmode'] != NOGROUPS) {
-            $group = ' for group with id \''.$this->data['other']['groupid'].'\'';
+            $group = ' for group with id \'' . $this->data['other']['groupid'] . '\'';
         } else {
             $group = '';
         }
 
         if (key_exists('template', $this->data['other'])) {
-            $templatestr = " using template '".
-                get_string('exporttemplate_'.$this->data['other']['template'], 'checkmark')."'";
+            $templatestr = " using template '" .
+                get_string('exporttemplate_' . $this->data['other']['template'], 'checkmark') . "'";
         } else {
             $templatestr = '';
         }
 
-        return "The user with id '$this->userid' exported the submissions for '{$this->objecttable}' with the ".
-            "course module id '$this->contextinstanceid'".$group.$templatestr." as '".
-            $this->data['other']['format_readable']."'.";
+        return "The user with id '$this->userid' exported the submissions for '{$this->objecttable}' with the " .
+            "course module id '$this->contextinstanceid'" . $group . $templatestr . " as '" .
+            $this->data['other']['format_readable'] . "'.";
     }
 
     /**
@@ -111,7 +111,7 @@ class submissions_exported extends \core\event\base {
             'datafilter' => $this->data['other']['filter'],
         ];
         foreach ($this->data['other']['selected'] as $cur) {
-            $params['selected['.$cur.']'] = $cur;
+            $params['selected[' . $cur . ']'] = $cur;
         }
         if ($this->data['other']['format'] == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
             $params['pageorientation'] = $this->data['other']['orientation'];

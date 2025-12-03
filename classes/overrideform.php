@@ -74,8 +74,16 @@ class overrideform extends \moodleform {
      * @param bool $editable
      * @param null $ajaxformdata
      */
-    public function __construct($type, $action = null, $customdata = null, $method = 'post', $target = '', $attributes = null,
-                                $editable = true, $ajaxformdata = null) {
+    public function __construct(
+        $type,
+        $action = null,
+        $customdata = null,
+        $method = 'post',
+        $target = '',
+        $attributes = null,
+        $editable = true,
+        $ajaxformdata = null
+    ) {
         if (!in_array($type, [self::USER, self::GROUP])) {
             throw new coding_exception('invalidformdata');
         }
@@ -178,8 +186,11 @@ class overrideform extends \moodleform {
         $mform->setDefault('cutoffdate', $checkmark->cutoffdate);
 
         // Submit buttons.
-        $mform->addElement('submit', 'resetbutton',
-            get_string('reverttodefaults', 'checkmark'));
+        $mform->addElement(
+            'submit',
+            'resetbutton',
+            get_string('reverttodefaults', 'checkmark')
+        );
 
         $btngrp = [];
         $btngrp[] = $mform->createElement('submit', 'override', get_string('override', 'checkmark'));
@@ -234,8 +245,10 @@ class overrideform extends \moodleform {
         }
         if ($this->_customdata['checkmark']) {
             $checkmark = $this->_customdata['checkmark'];
-            if ($data['timeavailable'] == $checkmark->timeavailable &&
-                    $data['timedue'] == $checkmark->timedue && $data['cutoffdate'] == $checkmark->cutoffdate) {
+            if (
+                $data['timeavailable'] == $checkmark->timeavailable &&
+                    $data['timedue'] == $checkmark->timedue && $data['cutoffdate'] == $checkmark->cutoffdate
+            ) {
                 $errors['timeavailable'] = get_string('nochangeviolation', 'checkmark');
             }
         }

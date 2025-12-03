@@ -30,4 +30,3 @@ $plugin->requires  = 2025041400;
 $plugin->component = 'mod_checkmark';
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->release   = "v5.0.0";
-

@@ -32,6 +32,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_checkmark\checkmark_files;
 use mod_checkmark\output\override_actionmenu;
 use mod_checkmark\output\checkmark_header;
 
@@ -49,7 +50,6 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_checkmark_renderer extends plugin_renderer_base {
-
     /** @var string a unique ID. */
     public $htmlid;
 
@@ -100,10 +100,12 @@ class mod_checkmark_renderer extends plugin_renderer_base {
 
         $result = '<ul>';
         foreach ($dir['subdirs'] as $subdir) {
-            $image = $this->output->pix_icon(file_folder_icon(),
-                    $subdir['dirname'],
-                    'moodle',
-                    ['class' => 'icon']);
+            $image = $this->output->pix_icon(
+                file_folder_icon(),
+                $subdir['dirname'],
+                'moodle',
+                ['class' => 'icon']
+            );
             $result .= '<li yuiConfig=\'' . json_encode($yuiconfig) . '\'>' .
                     '<div>' . $image . ' ' . s($subdir['dirname']) . '</div> ' .
                     $this->htmllize_tree($tree, $subdir) .
@@ -112,18 +114,27 @@ class mod_checkmark_renderer extends plugin_renderer_base {
 
         foreach ($dir['files'] as $file) {
             $filename = $file->get_filename();
-            $image = $this->output->pix_icon(file_file_icon($file),
-                    $filename,
-                    'moodle',
-                    ['class' => 'icon']);
+            $image = $this->output->pix_icon(
+                file_file_icon($file),
+                $filename,
+                'moodle',
+                ['class' => 'icon']
+            );
             // Preprocess the date displayed.
             $timemodified = userdate(
                 $file->get_timemodified(),
                 get_string('strftimedatetime', 'langconfig')
             );
             // Create the URL for the file.
-            $url = moodle_url::make_pluginfile_url($tree->context->id, $tree->component, $tree->filearea, $file->get_itemid(),
-                    $file->get_filepath(), $filename, true);
+            $url = moodle_url::make_pluginfile_url(
+                $tree->context->id,
+                $tree->component,
+                $tree->filearea,
+                $file->get_itemid(),
+                $file->get_filepath(),
+                $filename,
+                true
+            );
             $fileurl = html_writer::link($url, $filename, [
                     'target' => '_blank',
             ]);
@@ -178,8 +189,13 @@ class mod_checkmark_renderer extends plugin_renderer_base {
      * @param array $secondattributes The second column attributes (optional)
      * @return void
      */
-    private function add_table_row_tuple(html_table $table, $first, $second, $firstattributes = [],
-            $secondattributes = []) {
+    private function add_table_row_tuple(
+        html_table $table,
+        $first,
+        $second,
+        $firstattributes = [],
+        $secondattributes = []
+    ) {
         $row = new html_table_row();
         $cell1 = new html_table_cell($first);
         $cell1->header = true;
@@ -209,8 +225,11 @@ class mod_checkmark_renderer extends plugin_renderer_base {
         $o = '';
         $o .= $this->output->container_start('header-maxwidth', 'gradingsummary');
         $o .= $this->output->heading(get_string('gradingsummary', 'checkmark'), 3);
-        $o .= groups_print_activity_menu($cm,
-            $CFG->wwwroot . '/mod/checkmark/view.php?id=' . $cm->id, true);
+        $o .= groups_print_activity_menu(
+            $cm,
+            $CFG->wwwroot . '/mod/checkmark/view.php?id=' . $cm->id,
+            true
+        );
         $o .= $this->output->box_start('boxaligncenter gradingsummarytable');
         $t = new html_table();
 
@@ -231,7 +250,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
             $cell2content = $summary->submissionssubmittedcount;
             $linkcell2 = html_writer::tag('a', $cell2content, [
                 'class' => 'link',
-                'href' => $urlbase . $cm->id. '&updatepref=1' . '&filter=2',
+                'href' => $urlbase . $cm->id . '&updatepref=1' . '&filter=2',
             ]);
             $this->add_table_row_tuple($t, $cell1content, $linkcell2);
             $cell1content = get_string('numberofsubmissionsneedgrading', 'checkmark');
@@ -317,7 +336,7 @@ class mod_checkmark_renderer extends plugin_renderer_base {
             $cell2content = $summary->needattendanceentrycount;
             $linkcell2 = html_writer::tag('a', $cell2content, [
                 'class' => 'link',
-                'href' => $CFG->wwwroot . '/mod/checkmark/submissions.php?id=' . $cm->id. '&updatepref=1' . '&filter=7',
+                'href' => $CFG->wwwroot . '/mod/checkmark/submissions.php?id=' . $cm->id . '&updatepref=1' . '&filter=7',
             ]);
             $this->add_table_row_tuple($table, $cell1content, $linkcell2);
         }
@@ -350,12 +369,16 @@ class mod_checkmark_renderer extends plugin_renderer_base {
 
         $links = [];
         if ($counts['group']) {
-            $links[] = html_writer::link(new moodle_url($baseurl, ['mode' => 'group']),
-                get_string('overridessummarygroup', 'checkmark', $counts['group']));
+            $links[] = html_writer::link(
+                new moodle_url($baseurl, ['mode' => 'group']),
+                get_string('overridessummarygroup', 'checkmark', $counts['group'])
+            );
         }
         if ($counts['user']) {
-            $links[] = html_writer::link(new moodle_url($baseurl, ['mode' => 'user']),
-                get_string('overridessummaryuser', 'checkmark', $counts['user']));
+            $links[] = html_writer::link(
+                new moodle_url($baseurl, ['mode' => 'user']),
+                get_string('overridessummaryuser', 'checkmark', $counts['user'])
+            );
         }
 
         if (!$links) {
@@ -512,47 +535,5 @@ class mod_checkmark_renderer extends plugin_renderer_base {
 
         $o .= $this->output->container_end();
         return $o;
-    }
-}
-/**
- * A class that extends rendererable class and is used by the checkmark module.
- *
- * @package   mod_checkmark
- * @author    Daniel Binder (Based on the work of NetSpot {@link http://www.netspot.com.au})
- * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class checkmark_files implements renderable {
-    /** @var context $context */
-    public $context;
-    /** @var string $context */
-    public $dir;
-    /** @var stdClass $cm course module */
-    public $cm;
-    /** @var stdClass $course */
-    public $course;
-    /** @var string $filearea */
-    public $filearea;
-    /** @var string $component */
-    public $component;
-
-    /**
-     * The constructor
-     *
-     * @param context $context
-     * @param int $sid
-     * @param string $filearea
-     * @param string $component
-     */
-    public function __construct(context $context, $sid, $filearea, $component) {
-        global $CFG;
-        $this->context = $context;
-        $this->filearea = $filearea;
-        $this->component = $component;
-        list($context, $course, $cm) = get_context_info_array($context->id);
-        $this->cm = $cm;
-        $this->course = $course;
-        $fs = get_file_storage();
-        $this->dir = $fs->get_area_tree($context->id, $component, $filearea, $sid);
     }
 }

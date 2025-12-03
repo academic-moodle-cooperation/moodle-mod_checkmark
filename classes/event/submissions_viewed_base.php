@@ -50,8 +50,8 @@ abstract class submissions_viewed_base extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '".$this->userid."' viewed ".$this->data['other'].
-               " for ".$this->objecttable." with course module id '$this->contextinstanceid'.";
+        return "The user with id '" . $this->userid . "' viewed " . $this->data['other'] .
+            " for " . $this->objecttable . " with course module id '$this->contextinstanceid'.";
     }
 
     /**

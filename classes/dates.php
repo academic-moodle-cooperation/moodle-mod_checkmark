@@ -35,7 +35,6 @@ use core\activity_dates;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class dates extends activity_dates {
-
     /**
      * Returns a list of important dates in mod_checkmak
      *
@@ -52,7 +51,7 @@ class dates extends activity_dates {
         $timeavailable = $this->cm->customdata['timeavailable'] ?? null;
         $timedue = $this->cm->customdata['timedue'] ?? null;
 
-        list($overrideopen, $overridedue) = $checkmark->get_avail_due_times();
+        [$overrideopen, $overridedue] = $checkmark->get_avail_due_times();
         if ($overrideopen) {
             $timeavailable = $overrideopen;
         }

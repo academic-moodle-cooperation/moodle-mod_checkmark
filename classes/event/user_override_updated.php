@@ -40,7 +40,6 @@ use mod_checkmark\overrideform;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user_override_updated extends user_override {
-
     /**
      *  Initializes the event
      */

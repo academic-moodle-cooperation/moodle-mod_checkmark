@@ -41,7 +41,6 @@ use mod_checkmark\overrideform;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class group_override_deleted extends group_override {
-
     /**
      * Init method.
      */

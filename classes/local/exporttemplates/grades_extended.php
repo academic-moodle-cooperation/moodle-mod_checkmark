@@ -23,8 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_checkmark\local\exporttemplates;
-use mod_checkmark\basetemplate as basetemplate;
-use mod_checkmark\MTablePDF as MTablePDF;
+use mod_checkmark\basetemplate;
+use mod_checkmark\MTablePDF;
 
 /**
  * Template table-class exported with specific settings!
@@ -71,10 +71,10 @@ class grades_extended extends basetemplate {
         // Dynamically add examples!
         foreach ($this->checkmark->checkmark->examples as $key => $example) {
             $width = strlen($example->shortname) + strlen($example->grade) + 4;
-            $this->tableheaders[] = $example->shortname." (".$example->grade.'P)';
-            $this->tablecolumns[] = 'example'.$key;
+            $this->tableheaders[] = $example->shortname . " (" . $example->grade . 'P)';
+            $this->tablecolumns[] = 'example' . $key;
             $this->cellwidth[] = ['mode' => 'Fixed', 'value' => $width];
-            $this->columnformat['example'.$key] = ['align' => 'C'];
+            $this->columnformat['example' . $key] = ['align' => 'C'];
         }
 
         $this->tableheaders[] = get_string('checkmarks', 'checkmark');

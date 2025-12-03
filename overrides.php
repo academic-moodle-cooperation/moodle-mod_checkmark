@@ -31,9 +31,9 @@ $cmid = required_param('id', PARAM_INT);
 $mode = optional_param('mode', '', PARAM_ALPHA); // One of 'user' or 'group', default is 'group'.
 
 $action   = optional_param('action', '', PARAM_ALPHA);
-$redirect = $CFG->wwwroot.'/mod/checkmark/overrides.php?id=' . $cmid . '&amp;mode=group';
+$redirect = $CFG->wwwroot . '/mod/checkmark/overrides.php?id=' . $cmid . '&amp;mode=group';
 
-list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'checkmark');
+[$course, $cm] = get_course_and_cm_from_cmid($cmid, 'checkmark');
 $checkmark = $DB->get_record('checkmark', ['id' => $cm->instance], '*', MUST_EXIST);
 
 require_login($course, false, $cm);
@@ -118,7 +118,7 @@ if ($groupmode) {
     // To filter the result by the list of groups that the current user has access to.
     if ($groups) {
         $params = ['checkmarkid' => $cm->instance];
-        list($insql, $inparams) = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
+        [$insql, $inparams] = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
         $params += $inparams;
 
         $sql = "SELECT o.*, g.name
@@ -131,7 +131,7 @@ if ($groupmode) {
     }
 } else {
     $colname = get_string('user');
-    list($sort, $params) = users_order_by_sql('u');
+    [$sort, $params] = users_order_by_sql('u');
     $params['checkmarkid'] = $cm->instance;
     $namefields = core_user\fields::for_name()->get_sql('u')->selects;
 
@@ -144,7 +144,7 @@ if ($groupmode) {
 
         $overrides = $DB->get_records_sql($sql, $params);
     } else if ($groups) {
-        list($insql, $inparams) = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
+        [$insql, $inparams] = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
         $params += $inparams;
 
         $sql = 'SELECT o.* ' . $namefields . '
@@ -178,7 +178,6 @@ $type = $groupmode ? \mod_checkmark\overrideform::GROUP : \mod_checkmark\overrid
 $hasinactive = false; // Whether there are any inactive overrides.
 
 foreach ($overrides as $override) {
-
     $fields = [];
     $values = [];
     $active = true;
@@ -197,8 +196,10 @@ foreach ($overrides as $override) {
     // Format allowsubmissionsfromdate.
     if (isset($override->timeavailable) && $override->timeavailable != $checkmark->timeavailable) {
         $fields[] = get_string('open', 'checkmark');
-        $values[] = $override->timeavailable > 0 ? userdate($override->timeavailable) : get_string('noopen',
-                'checkmark');
+        $values[] = $override->timeavailable > 0 ? userdate($override->timeavailable) : get_string(
+            'noopen',
+            'checkmark'
+        );
     }
 
     // Format duedate.
@@ -220,7 +221,7 @@ foreach ($overrides as $override) {
         $editurlstr = $overrideediturl->out(true, ['id' => $cmid, 'type' => $type,
                 'mode' => \mod_checkmark\overrideform::EDIT, 'users' => $id,
             ]);
-        $iconstr = '<a title="' . get_string('edit') . '" href="'. $editurlstr . '">' .
+        $iconstr = '<a title="' . get_string('edit') . '" href="' . $editurlstr . '">' .
                 $OUTPUT->pix_icon('t/edit', get_string('edit')) . '</a> ';
         // Duplicate.
         $copyurlstr = $overrideediturl->out(true, ['id' => $cmid, 'type' => $type,
@@ -237,15 +238,17 @@ foreach ($overrides as $override) {
             $OUTPUT->pix_icon('t/delete', get_string('delete')) . '</a> ';
 
     if ($groupmode) {
-        $usergroupstr = '<a href="' . $groupurl->out(true,
-                        ['group' => $override->groupid]) . '" >' . $override->name . '</a>';
+        $usergroupstr = '<a href="' . $groupurl->out(
+            true,
+            ['group' => $override->groupid]
+        ) . '" >' . $override->name . '</a>';
 
         // Move up.
         if ($override->grouppriority < $highestgrouppriority) {
             $moveupstr = $overrideediturl->out(true, ['id' => $cmid, 'type' => $type,
                     'mode' => \mod_checkmark\overrideform::UP, 'users' => $id,
                 ]);
-            $iconstr .= '<a title="'.get_string('moveup').'" href="' . $moveupstr . '">' .
+            $iconstr .= '<a title="' . get_string('moveup') . '" href="' . $moveupstr . '">' .
                     $OUTPUT->pix_icon('t/up', get_string('moveup')) . '</a> ';
         } else {
             $iconstr .= $OUTPUT->spacer() . ' ';
@@ -256,17 +259,19 @@ foreach ($overrides as $override) {
             $movedownstr = $overrideediturl->out(true, ['id' => $cmid, 'type' => $type,
                     'mode' => \mod_checkmark\overrideform::DOWN, 'users' => $id,
                 ]);
-            $iconstr .= '<a title="'.get_string('movedown').'" href="' . $movedownstr . '">' .
+            $iconstr .= '<a title="' . get_string('movedown') . '" href="' . $movedownstr . '">' .
                     $OUTPUT->pix_icon('t/down', get_string('movedown')) . '</a> ';
         } else {
             $iconstr .= $OUTPUT->spacer() . ' ';
         }
-
-
     } else {
-        $usergroupstr = html_writer::link($userurl->out(false,
-                ['id' => $override->userid, 'course' => $course->id]),
-                fullname($override));
+        $usergroupstr = html_writer::link(
+            $userurl->out(
+                false,
+                ['id' => $override->userid, 'course' => $course->id]
+            ),
+            fullname($override)
+        );
     }
 
     $class = '';
@@ -335,7 +340,7 @@ if ($groupmode) {
         $nousermessage = get_string('usersnone', 'checkmark');
     } else if ($groups) {
         $enrolledjoin = get_enrolled_join($context, 'u.id');
-        list($ingroupsql, $ingroupparams) = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
+        [$ingroupsql, $ingroupparams] = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
         $params = $enrolledjoin->params + $ingroupparams;
         $sql = "SELECT u.id
                   FROM {user} u

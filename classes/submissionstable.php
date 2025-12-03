@@ -48,7 +48,6 @@ require_once($CFG->libdir . '/gradelib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class submissionstable extends \table_sql {
-
     /**
      * formated cells contain tags for colors
      */
@@ -238,7 +237,7 @@ class submissionstable extends \table_sql {
                 $this->initialbars(($grandtotal > $pagesize) || empty($pagesize));
             }
 
-            list ($wsql, $wparams) = $this->get_sql_where();
+             [$wsql, $wparams] = $this->get_sql_where();
             if ($wsql) {
                 $this->countsql .= ' AND ' . $wsql;
                 $this->countparams = array_merge($this->countparams, $wparams);
@@ -519,7 +518,7 @@ class submissionstable extends \table_sql {
                 $tableheaders[] = get_string('presentationgrade_table', 'checkmark');
                 $tablecolumns[] = 'presentationgrade';
                 $helpicons[] = null;
-                $span ++;
+                $span++;
             }
             $tableheaders[] = get_string('presentationfeedback_table', 'checkmark');
             $tablecolumns[] = 'presentationfeedback';
@@ -621,7 +620,7 @@ class submissionstable extends \table_sql {
         $params['checkmarkid2'] = $table->checkmark->checkmark->id;
 
         $users = $table->get_userids($filter);
-        list ($sqluserids, $userparams) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'user');
+         [$sqluserids, $userparams] = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'user');
         $params = array_merge_recursive($params, $userparams);
         $params = array_merge_recursive($params, $useridentity->params);
 
@@ -654,8 +653,13 @@ class submissionstable extends \table_sql {
         $table->set_sql($fields, $from, $where, $params, $groupby);
         $table->set_count_sql("SELECT COUNT(u.id) FROM " . $from . " WHERE " . $where, $params);
 
-        $table->gradinginfo = grade_get_grades($table->checkmark->course->id, 'mod', 'checkmark',
-            $table->checkmark->checkmark->id, $users);
+        $table->gradinginfo = grade_get_grades(
+            $table->checkmark->course->id,
+            'mod',
+            'checkmark',
+            $table->checkmark->checkmark->id,
+            $users
+        );
         $table->strupdate = get_string('update');
         $table->strgrade = get_string('modgrade', 'grades');
         $table->grademenu = make_grades_menu($table->checkmark->checkmark->grade);
@@ -943,7 +947,7 @@ class submissionstable extends \table_sql {
                 $table->columnformat['presentationgrade'] = [
                     'align' => 'R',
                 ];
-                $span ++;
+                $span++;
             }
             $tableheaders[] = get_string('presentationfeedback_table', 'checkmark');
             $helpicons[] = null;
@@ -1054,7 +1058,7 @@ class submissionstable extends \table_sql {
         $params['checkmarkid2'] = $table->checkmark->checkmark->id;
 
         $users = $table->get_userids($filter, $ids);
-        list ($sqluserids, $userparams) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'user');
+         [$sqluserids, $userparams] = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED, 'user');
         $params = array_merge_recursive($params, $userparams);
         $params = array_merge_recursive($params, $useridentity->params);
 
@@ -1095,8 +1099,13 @@ class submissionstable extends \table_sql {
         $table->set_sql($fields, $from, $where, $params, $groupby);
         $table->set_count_sql("SELECT COUNT(DISTINCT u.id) FROM " . $from . " WHERE " . $where, $params);
 
-        $table->gradinginfo = grade_get_grades($table->checkmark->course->id, 'mod', 'checkmark',
-            $table->checkmark->checkmark->id, $users);
+        $table->gradinginfo = grade_get_grades(
+            $table->checkmark->course->id,
+            'mod',
+            'checkmark',
+            $table->checkmark->checkmark->id,
+            $users
+        );
 
         return $table;
     }
@@ -1141,7 +1150,7 @@ class submissionstable extends \table_sql {
                     'class' => $colgrp->class,
                     'span' => $colgrp->span,
                 ]);
-                for ($i = 0; $i < $colgrp->span; $i ++) {
+                for ($i = 0; $i < $colgrp->span; $i++) {
                     echo \html_writer::empty_tag('col');
                 }
                 echo \html_writer::end_tag('colgroup');
@@ -1197,12 +1206,12 @@ class submissionstable extends \table_sql {
         global $DB;
 
         // Get all ppl that are allowed to submit checkmarks!
-        list ($esql, $params) = get_enrolled_sql($context, 'mod/checkmark:submit', $currentgroup);
+         [$esql, $params] = get_enrolled_sql($context, 'mod/checkmark:submit', $currentgroup);
         if (! empty($ids) && is_array($ids)) {
             $usrlst = $ids;
         }
         if (! empty($usrlst)) {
-            list ($sqluserids, $userparams) = $DB->get_in_or_equal($usrlst, SQL_PARAMS_NAMED, 'user');
+             [$sqluserids, $userparams] = $DB->get_in_or_equal($usrlst, SQL_PARAMS_NAMED, 'user');
             $params = array_merge_recursive($params, $userparams);
             $sqluserids = " AND u.id " . $sqluserids;
         } else {
@@ -1500,7 +1509,7 @@ class submissionstable extends \table_sql {
                 }
             } else if ($this->quickgrade && ! $this->use_no_html()) {
                 $attributes = [];
-                $attributes['tabindex'] = $this->tabindex ++;
+                $attributes['tabindex'] = $this->tabindex++;
                 $menu = \html_writer::select($this->grademenu, 'menu[' . $values->id . ']', (int) $values->grade, [
                     - 1 => get_string('nograde'),
                 ], $attributes);
@@ -1537,7 +1546,7 @@ class submissionstable extends \table_sql {
             } else if ($this->quickgrade && ! $this->use_no_html()) {
                 // Allow editing!
                 $attributes = [];
-                $attributes['tabindex'] = $this->tabindex ++;
+                $attributes['tabindex'] = $this->tabindex++;
                 $menu = \html_writer::select($this->grademenu, 'menu[' . $values->id . ']', $values->grade, [
                     - 1 => get_string('nograde'),
                 ], $attributes);
@@ -1592,7 +1601,7 @@ class submissionstable extends \table_sql {
                 ];
                 $oldfeedback = \html_writer::empty_tag('input', $inputarr);
                 $content = \html_writer::tag('textarea', $feedbackclean, [
-                    'tabindex' => $this->tabindex ++,
+                    'tabindex' => $this->tabindex++,
                     'name' => 'feedback[' . $values->id . ']',
                     'id' => 'feedback' . $values->id,
                     'rows' => 2,
@@ -1637,7 +1646,7 @@ class submissionstable extends \table_sql {
                 $oldfeedback = \html_writer::empty_tag('input', $inputarr);
 
                 $content = \html_writer::tag('textarea', $values->feedback, [
-                    'tabindex' => $this->tabindex ++,
+                    'tabindex' => $this->tabindex++,
                     'name' => 'feedback[' . $values->id . ']',
                     'id' => 'feedback' . $values->id,
                     'rows' => '2',
@@ -1771,7 +1780,7 @@ class submissionstable extends \table_sql {
             $displaystatus = 'submitted';
         }
 
-        $o .= $OUTPUT->container($values->status, 'submissionstatus' .$displaystatus);
+        $o .= $OUTPUT->container($values->status, 'submissionstatus' . $displaystatus);
 
         // If overridden dates are present for this user, we display an icon with popup!
         if ($this->hasoverrides && $overrides) {
@@ -1912,10 +1921,15 @@ class submissionstable extends \table_sql {
                     $attributes = [];
                     $attributes['id'] = 'outcome_' . $n . '_' . $values->id;
                     $usr = $values->id;
-                    $outcomes .= ' ' . \html_writer::select($options, 'outcome_' . $n . '[' . $usr . ']',
-                        $outcome->grades[$usr]->grade, [
+                    $outcomes .= ' ' . \html_writer::select(
+                        $options,
+                        'outcome_' . $n . '[' . $usr . ']',
+                        $outcome->grades[$usr]->grade,
+                        [
                         get_string('nooutcome', 'grades'),
-                    ], $attributes);
+                        ],
+                        $attributes
+                    );
                 }
                 $outcomes .= \html_writer::end_tag('div');
             }
@@ -1990,7 +2004,7 @@ class submissionstable extends \table_sql {
             ];
             $oldattendance = \html_writer::empty_tag('input', $inputarr);
             $attr = [
-                'tabindex' => $this->tabindex ++,
+                'tabindex' => $this->tabindex++,
                 'id' => 'attendance' . $values->id,
             ];
             $options = [
@@ -2065,11 +2079,16 @@ class submissionstable extends \table_sql {
                 $values->presentationgrade = - 1;
             }
             $attributes = [];
-            $attributes['tabindex'] = $this->tabindex ++;
-            $menu = \html_writer::select($this->presentationgrademenu, 'presentationgrade[' . $values->id . ']',
-                (int) $values->presentationgrade, [
+            $attributes['tabindex'] = $this->tabindex++;
+            $menu = \html_writer::select(
+                $this->presentationgrademenu,
+                'presentationgrade[' . $values->id . ']',
+                (int) $values->presentationgrade,
+                [
                 - 1 => get_string('nograde'),
-            ], $attributes);
+                ],
+                $attributes
+            );
             $oldgradeattr = [
                 'type' => 'hidden',
                 'name' => 'oldpresentationgrade[' . $values->id . ']',
@@ -2088,8 +2107,10 @@ class submissionstable extends \table_sql {
                 }
             } else {
                 if ($values->feedbackid) {
-                    return \html_writer::tag('div', $this->checkmark->display_grade($values->presentationgrade,
-                        CHECKMARK_PRESENTATION_ITEM), [
+                    return \html_writer::tag('div', $this->checkmark->display_grade(
+                        $values->presentationgrade,
+                        CHECKMARK_PRESENTATION_ITEM
+                    ), [
                         'id' => 'pg' . $values->id,
                     ]);
                 } else {
@@ -2141,7 +2162,7 @@ class submissionstable extends \table_sql {
             ];
             $oldfeedback = \html_writer::empty_tag('input', $inputarr);
             $attr = [
-                'tabindex' => $this->tabindex ++,
+                'tabindex' => $this->tabindex++,
                 'name' => 'presentationfeedback[' . $values->id . ']',
                 'id' => 'presentationfeedback' . $values->id,
                 'rows' => 2,
@@ -2222,8 +2243,13 @@ class submissionstable extends \table_sql {
                     'name' => 'ex[' . $values->id . '_' . $match[1] . ']',
                     'value' => '0',
                 ]);
-                $cb = $cbhidden . \html_writer::checkbox('ex[' . $values->id . '_' . $match[1] . ']', $values->id,
-                    $example->is_checked(), null, $attributes);
+                $cb = $cbhidden . \html_writer::checkbox(
+                    'ex[' . $values->id . '_' . $match[1] . ']',
+                    $values->id,
+                    $example->is_checked(),
+                    null,
+                    $attributes
+                );
                 $oldcb = \html_writer::tag('input', '', [
                     'type' => 'hidden',
                     'name' => 'oldex[' . $values->id . '_' . $match[1] . ']',

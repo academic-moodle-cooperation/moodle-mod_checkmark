@@ -118,8 +118,8 @@ final class formvalidation_test extends \basic_testcase {
         $a->namecount = 2;
         $this->assertEquals($errors['grade'], get_string('gradesum_mismatch', 'checkmark', $a));
         $this->assertEquals($errors['examplenames'], get_string('count_individuals_mismatch', 'checkmark', $a));
-        $this->assertEquals($errors['examplegrades'], get_string('count_individuals_mismatch', 'checkmark', $a).
-                                                      \html_writer::empty_tag('br').
+        $this->assertEquals($errors['examplegrades'], get_string('count_individuals_mismatch', 'checkmark', $a) .
+                                                      \html_writer::empty_tag('br') .
                                                       get_string('gradesum_mismatch', 'checkmark', $a));
 
         // Teardown fixture!

@@ -116,4 +116,3 @@ class group_override_priority_changed extends group_override {
         ]);
     }
 }
-

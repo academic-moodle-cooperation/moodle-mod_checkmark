@@ -35,8 +35,7 @@ use moodle_url;
  * @copyright based on assign/classes/output/actionmenu.php 2021 Adrian Greeve <adrian@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class actionmenu implements templatable, renderable {
-
+class actionmenu implements renderable, templatable {
     /** @var int The course module ID. */
     private $cmid;
 
@@ -66,5 +65,4 @@ class actionmenu implements templatable, renderable {
             'gradelink' => (new moodle_url('/mod/checkmark/view.php', ['id' => $this->cmid, 'action' => 'grader']))->out(false),
         ];
     }
-
 }

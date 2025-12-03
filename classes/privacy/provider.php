@@ -31,7 +31,7 @@ use core_privacy\local\metadata\collection;
 use core_privacy\local\metadata\provider as metadataprovider;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\plugin\provider as pluginprovider;
-use core_privacy\local\request\user_preference_provider as user_preference_provider;
+use core_privacy\local\request\user_preference_provider;
 use core_privacy\local\request\writer;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\transform;
@@ -52,7 +52,7 @@ if (isset($CFG)) {
  * @copyright  2018 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements metadataprovider, pluginprovider, user_preference_provider, core_userlist_provider {
+class provider implements core_userlist_provider, metadataprovider, pluginprovider, user_preference_provider {
     /**
      * Provides meta data that is stored about a user with mod_checkmark
      *
@@ -229,22 +229,35 @@ class provider implements metadataprovider, pluginprovider, user_preference_prov
                     return;
                 }
 
-                list($usersql, $userparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'usr');
-                list($usersql2, $userparams2) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'usr2_');
+                [$usersql, $userparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'usr');
+                [$usersql2, $userparams2] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'usr2_');
                 // Get all checkmark submissions, feedbacks and extensions to delete them!
-                if ($submissions = $DB->get_records_select('checkmark_submissions', "checkmark = :id AND userid ".$usersql,
-                        ['id' => $id] + $userparams)) {
+                if (
+                    $submissions = $DB->get_records_select(
+                        'checkmark_submissions',
+                        "checkmark = :id AND userid " . $usersql,
+                        ['id' => $id] + $userparams
+                    )
+                ) {
                     $DB->delete_records_list('checkmark_checks', 'submissionid', array_keys($submissions));
                 }
 
-                $DB->delete_records_select('checkmark_submissions', "checkmarkid = :id AND userid ".$usersql,
-                        ['id' => $id] + $userparams);
-                $DB->delete_records_select('checkmark_feedbacks', "checkmarkid = :id AND (userid ".$usersql." OR graderid "
-                        .$usersql2.")",
-                        ['id' => $id] + $userparams + $userparams2);
-                $DB->delete_records('checkmark_overrides',
-                        "checkmarkid = :id AND (userid ".$usersql." OR modifierid ".$usersql2.")",
-                        ['id' => $id] + $userparams + $userparams2);
+                $DB->delete_records_select(
+                    'checkmark_submissions',
+                    "checkmarkid = :id AND userid " . $usersql,
+                    ['id' => $id] + $userparams
+                );
+                $DB->delete_records_select(
+                    'checkmark_feedbacks',
+                    "checkmarkid = :id AND (userid " . $usersql . " OR graderid "
+                        . $usersql2 . ")",
+                    ['id' => $id] + $userparams + $userparams2
+                );
+                $DB->delete_records(
+                    'checkmark_overrides',
+                    "checkmarkid = :id AND (userid " . $usersql . " OR modifierid " . $usersql2 . ")",
+                    ['id' => $id] + $userparams + $userparams2
+                );
             }
         }
     }
@@ -266,7 +279,7 @@ class provider implements metadataprovider, pluginprovider, user_preference_prov
             return;
         }
 
-        list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
+        [$contextsql, $contextparams] = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
 
         $sql = "SELECT
                     ctx.id AS contextid,
@@ -311,7 +324,6 @@ class provider implements metadataprovider, pluginprovider, user_preference_prov
                 static::export_feedback($context, $checkmark, $feedback);
             }
             static::export_extensions($context, $checkmark, $user);
-
         }
     }
 
@@ -341,8 +353,12 @@ class provider implements metadataprovider, pluginprovider, user_preference_prov
         foreach ($prefs as $key => $text) {
             $value = get_user_preferences('checkmark_' . $key, null, $userid);
             if ($value !== null) {
-                writer::with_context($context)->export_user_preference('mod_checkmark', 'checkmark_'.$key, $value,
-                        get_string($text, 'mod_checkmark'));
+                writer::with_context($context)->export_user_preference(
+                    'mod_checkmark',
+                    'checkmark_' . $key,
+                    $value,
+                    get_string($text, 'mod_checkmark')
+                );
             }
         }
     }
@@ -405,8 +421,11 @@ class provider implements metadataprovider, pluginprovider, user_preference_prov
             $data->presentationgrade = $c->display_grade($feedback->presentationgrade, CHECKMARK_PRESENTATION_ITEM);
         }
         if ($feedback->presentationfeedback !== "") {
-            $data->presentationfeedback = format_text($feedback->presentationfeedback, $feedback->presentationformat,
-                    ['context' => $context]);
+            $data->presentationfeedback = format_text(
+                $feedback->presentationfeedback,
+                $feedback->presentationformat,
+                ['context' => $context]
+            );
         }
         $data->timegraded = transform::datetime($feedback->timecreated);
         $data->timemodified = transform::datetime($feedback->timemodified);
@@ -493,7 +512,7 @@ class provider implements metadataprovider, pluginprovider, user_preference_prov
             return;
         }
 
-        list($ctxsql, $ctxparams) = $DB->get_in_or_equal($contextids, SQL_PARAMS_NAMED, 'ctx');
+        [$ctxsql, $ctxparams] = $DB->get_in_or_equal($contextids, SQL_PARAMS_NAMED, 'ctx');
 
         // Apparently we can't trust anything that comes via the context.
         // Go go mega query to find out it we have an checkmark context that matches an existing checkmark.
@@ -502,7 +521,7 @@ class provider implements metadataprovider, pluginprovider, user_preference_prov
                     JOIN {course_modules} cm ON c.id = cm.instance AND c.course = cm.course
                     JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
                     JOIN {context} ctx ON ctx.instanceid = cm.id AND ctx.contextlevel = :contextmodule
-                    WHERE ctx.id ".$ctxsql;
+                    WHERE ctx.id " . $ctxsql;
         $params = ['modulename' => 'checkmark', 'contextmodule' => CONTEXT_MODULE];
 
         if (!$records = $DB->get_records_sql($sql, $params + $ctxparams)) {
@@ -520,19 +539,20 @@ class provider implements metadataprovider, pluginprovider, user_preference_prov
         }
 
         if (count($cids) > 0) {
-            list($csql, $cparams) = $DB->get_in_or_equal($cids, SQL_PARAMS_NAMED, 'checkmark');
+            [$csql, $cparams] = $DB->get_in_or_equal($cids, SQL_PARAMS_NAMED, 'checkmark');
         } else {
             $csql = ' = :checkmark';
             $cparams = ['checkmark' => -1];
         }
         $params = ['userid' => $user->id] + $cparams;
 
-        if ($subids = $DB->get_fieldset_select('checkmark_submissions', 'id', 'userid = :userid AND checkmarkid '.$csql, $params)) {
+        $subids = $DB->get_fieldset_select('checkmark_submissions', 'id', 'userid = :userid AND checkmarkid ' . $csql, $params);
+        if (!empty($subids)) {
             $DB->delete_records_list('checkmark_checks', 'submissionid', $subids);
         }
 
-        $DB->delete_records_select('checkmark_submissions', 'userid = :userid AND checkmarkid '.$csql, $params);
-        $DB->delete_records_select('checkmark_feedbacks', 'userid = :userid AND checkmarkid '.$csql, $params);
-        $DB->delete_records_select('checkmark_overrides', 'userid = :userid AND checkmarkid '.$csql, $params);
+        $DB->delete_records_select('checkmark_submissions', 'userid = :userid AND checkmarkid ' . $csql, $params);
+        $DB->delete_records_select('checkmark_feedbacks', 'userid = :userid AND checkmarkid ' . $csql, $params);
+        $DB->delete_records_select('checkmark_overrides', 'userid = :userid AND checkmarkid ' . $csql, $params);
     }
 }

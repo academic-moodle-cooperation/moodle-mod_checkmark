@@ -124,7 +124,7 @@ class example {
      * @param string $prefix Prefix of the example to create
      * @param null|int $state State of the example to create
      */
-    public function __construct($id, $name, $grade, $prefix, $state=null) {
+    public function __construct($id, $name, $grade, $prefix, $state = null) {
         $this->id = $id;
         $this->name = $name;
         $this->grade = $grade;
@@ -147,7 +147,7 @@ class example {
      * @throws \coding_exception
      */
     public function __get($name) {
-        switch($name) {
+        switch ($name) {
             case 'id':
             case 'grade':
             case 'state':
@@ -174,13 +174,14 @@ class example {
         }
         return null;
     }
+
     /**
      * Returns a stdCass consisting of all dynamic values of the present example
      *
      * @return \stdClass Snapshot of the present example
      */
     public function export_for_snapshot() {
-        $record = new \stdClass;
+        $record = new \stdClass();
         $record->id = $this->id;
         $record->name = $this->name;
         $record->grade = $this->grade;
@@ -188,6 +189,7 @@ class example {
         $record->state = $this->state;
         return $record;
     }
+
     /**
      * Sets the state of the present example
      *
@@ -195,8 +197,10 @@ class example {
      * @throws \coding_exception
      */
     public function set_state($state) {
-        if ($state != self::UNCHECKED && $state != self::CHECKED && $state != self::UNCHECKED_OVERWRITTEN &&
-                $state != self::CHECKED_OVERWRITTEN) {
+        if (
+            $state != self::UNCHECKED && $state != self::CHECKED && $state != self::UNCHECKED_OVERWRITTEN &&
+            $state != self::CHECKED_OVERWRITTEN
+        ) {
             throw new \coding_exception('State can only be UNCHECKED, CHECKED, UNCHECKED_OVERWRITTEN or CHECKED_OVERWRITTEN');
         }
         $this->state = $state;
@@ -270,6 +274,7 @@ class example {
         return get_string('forced', 'checkmark');
     }
 
+
     /**
      * Queries the DB for an example with a given id and returns a new example instance with its data
      *
@@ -279,7 +284,7 @@ class example {
      * @return example
      * @throws \dml_exception
      */
-    public static function from_id($id, $userid=false) {
+    public static function from_id($id, $userid = false) {
         global $DB;
 
         if ($userid > 0) {
@@ -294,7 +299,7 @@ class example {
         }
 
         $sql = "SELECT ex.id, ex.checkmarkid, ex.name AS shortname, ex.grade,
-                       ".$DB->sql_concat('c.exampleprefix', 'ex.name')." AS name
+                       " . $DB->sql_concat('c.exampleprefix', 'ex.name') . " AS name
                        $checkfields
                   FROM {checkmark_examples} ex
                   JOIN {checkmark} c ON ex.checkmarkid = c.id
@@ -348,7 +353,7 @@ class example {
             $this->state = self::CHECKED_OVERWRITTEN;
         } else if ($this->state == self::UNCHECKED && $overwrittenexamplestate == self::CHECKED) {
             $this->state = self::UNCHECKED_OVERWRITTEN;
-        } else if ( $this->state == self::CHECKED_OVERWRITTEN && $overwrittenexamplestate == self::CHECKED) {
+        } else if ($this->state == self::CHECKED_OVERWRITTEN && $overwrittenexamplestate == self::CHECKED) {
             $this->state = self::CHECKED;
         } else if ($this->state == self::UNCHECKED_OVERWRITTEN && $overwrittenexamplestate == self::UNCHECKED) {
             $this->state = self::UNCHECKED;
@@ -396,9 +401,9 @@ class example {
      * @return bool: TRUE if checked, FALSE if unchecked
      */
     public static function static_is_checked($state) {
-        return (bool)(($state & self::BITMASK_FORCED) ?
-                ($state & self::BITMASK_TEACHER) :
-                ($state & self::BITMASK_USER));
+        return (bool) (($state & self::BITMASK_FORCED) ?
+            ($state & self::BITMASK_TEACHER) :
+            ($state & self::BITMASK_USER));
     }
 
     /**
@@ -409,7 +414,7 @@ class example {
      * @return bool: TRUE if overwritten, FALSE if not overwritten
      */
     public static function static_is_forced($state) {
-        return (bool)($state & self::BITMASK_FORCED);
+        return (bool) ($state & self::BITMASK_FORCED);
     }
 
     /**
@@ -420,7 +425,7 @@ class example {
      * @return bool: TRUE if OVERWRITTEN_CHECKED, FALSE if not OVERWRITTEN_CHECKED
      */
     public static function static_is_forced_checked($state) {
-        return (bool)($state & self::BITMASK_FORCED) && ($state & self::BITMASK_TEACHER);
+        return (bool) ($state & self::BITMASK_FORCED) && ($state & self::BITMASK_TEACHER);
     }
 
     /**
@@ -431,7 +436,7 @@ class example {
      * @return bool: TRUE if OVERWRITTEN_UNCHECKED, FALSE if not OVERWRITTEN_UNCHECKED
      */
     public function static_is_forced_unchecked($state) {
-        return (bool)($state & self::BITMASK_FORCED) & !($state & self::BITMASK_TEACHER);
+        return (bool) ($state & self::BITMASK_FORCED) & !($state & self::BITMASK_TEACHER);
     }
 
     /**
@@ -477,11 +482,9 @@ class example {
         switch ($grade) {
             case '1':
                 return get_string('strpoint', 'checkmark');
-                break;
             case '2':
             default:
                 return get_string('strpoints', 'checkmark');
-                break;
         }
     }
 }

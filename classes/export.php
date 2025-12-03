@@ -153,8 +153,14 @@ class export {
      * @param bool $singlelinenames
      * @param bool $sequentialnumbering
      */
-    public function set_pdf_data($orientation, $headerfooter, $fontsize, $perpage,
-                                 $singlelinenames, $sequentialnumbering) {
+    public function set_pdf_data(
+        $orientation,
+        $headerfooter,
+        $fontsize,
+        $perpage,
+        $singlelinenames,
+        $sequentialnumbering
+    ) {
         $this->orientation = $orientation;
         $this->headerfooter = $headerfooter;
         $this->fontsize = $fontsize;

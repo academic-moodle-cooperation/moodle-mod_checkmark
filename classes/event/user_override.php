@@ -40,7 +40,6 @@ use mod_checkmark\overrideform;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class user_override extends \core\event\base {
-
     /**
      * Get objectid mapping
      */

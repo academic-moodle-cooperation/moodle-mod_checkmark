@@ -26,45 +26,59 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
-
-    $settings->add(new admin_setting_configtext('checkmark/stdexamplecount',
-                                                get_string('strstdexamplecount', 'checkmark'),
-                                                get_string('strstdexamplecountdesc', 'checkmark'),
-                                                '10'));
-    $settings->add(new admin_setting_configtext('checkmark/stdexamplestart',
-                                                get_string('strstdexamplestart', 'checkmark'),
-                                                get_string('strstdexamplestartdesc', 'checkmark'),
-                                                '1'));
+    $settings->add(new admin_setting_configtext(
+        'checkmark/stdexamplecount',
+        get_string('strstdexamplecount', 'checkmark'),
+        get_string('strstdexamplecountdesc', 'checkmark'),
+        '10'
+    ));
+    $settings->add(new admin_setting_configtext(
+        'checkmark/stdexamplestart',
+        get_string('strstdexamplestart', 'checkmark'),
+        get_string('strstdexamplestartdesc', 'checkmark'),
+        '1'
+    ));
     /*
      * TODO tscpr: instead of having the default values hardcoded, you can "calculate" them with
      * the delimiter set in the checkmark class.. just in case :)
      */
-    $settings->add(new admin_setting_configtext('checkmark/stdnames',
-                                                get_string('strstdnames', 'checkmark'),
-                                                get_string('strstdnamesdesc', 'checkmark'),
-                                                'a,b,c,d,e,f'));
-    $settings->add(new admin_setting_configtext('checkmark/stdgrades',
-                                                get_string('strstdgrades', 'checkmark'),
-                                                get_string('strstdgradesdesc', 'checkmark'),
-                                                '10,10,20,20,20,20'));
-    $settings->add(new admin_setting_configtext('checkmark/validmsgtime',
-                                                get_string('strvalidmsgtime', 'checkmark'),
-                                                get_string('strvalidmsgtimedesc', 'checkmark'),
-                                                '2'));
+    $settings->add(new admin_setting_configtext(
+        'checkmark/stdnames',
+        get_string('strstdnames', 'checkmark'),
+        get_string('strstdnamesdesc', 'checkmark'),
+        'a,b,c,d,e,f'
+    ));
+    $settings->add(new admin_setting_configtext(
+        'checkmark/stdgrades',
+        get_string('strstdgrades', 'checkmark'),
+        get_string('strstdgradesdesc', 'checkmark'),
+        '10,10,20,20,20,20'
+    ));
+    $settings->add(new admin_setting_configtext(
+        'checkmark/validmsgtime',
+        get_string('strvalidmsgtime', 'checkmark'),
+        get_string('strvalidmsgtimedesc', 'checkmark'),
+        '2'
+    ));
 
-    $settings->add(new admin_setting_configcheckbox('checkmark/showrecentsubmissions',
-                                                    get_string('showrecentsubmissions', 'checkmark'),
-                                                    get_string('configshowrecentsubmissions', 'checkmark'), 0));
+    $settings->add(new admin_setting_configcheckbox(
+        'checkmark/showrecentsubmissions',
+        get_string('showrecentsubmissions', 'checkmark'),
+        get_string('configshowrecentsubmissions', 'checkmark'),
+        0
+    ));
 
     // Determines the amount of examples in a checkmark instance over which a export warning will be displayed!
     /* Trial'n'error determined maximum amount of standard examples without other columns: 48,
      * so we should have some place left for everything else!*/
     $options = [0 => get_string('cfg_nowarning', 'checkmark')] + array_combine(range(10, 50, 1), range(10, 50, 1));
-    $settings->add(new admin_setting_configselect('checkmark/pdfexampleswarning',
-                                                  get_string('cfg_pdfexampleswarning', 'checkmark'),
-                                                  get_string('cfg_pdfexampleswarning_desc', 'checkmark'),
-                                                  25,
-                                                  $options));
+    $settings->add(new admin_setting_configselect(
+        'checkmark/pdfexampleswarning',
+        get_string('cfg_pdfexampleswarning', 'checkmark'),
+        get_string('cfg_pdfexampleswarning_desc', 'checkmark'),
+        25,
+        $options
+    ));
 
     /*
      * Default settings for availability
@@ -75,46 +89,55 @@ if ($ADMIN->fulltree) {
 
     $name = new lang_string('alwaysshowdescription', 'checkmark');
     $description = new lang_string('alwaysshowdescription_help', 'checkmark');
-    $setting = new admin_setting_configcheckbox('checkmark/alwaysshowdescription',
-            $name,
-            $description,
-            1);
+    $setting = new admin_setting_configcheckbox(
+        'checkmark/alwaysshowdescription',
+        $name,
+        $description,
+        1
+    );
     $settings->add($setting);
 
     $name = new lang_string('allowsubmissionsfromdate', 'checkmark');
     $description = new lang_string('allowsubmissionsfromdate_help', 'checkmark');
-    $setting = new admin_setting_configduration('checkmark/allowsubmissionsfromdate',
-            $name,
-            $description,
-            0);
+    $setting = new admin_setting_configduration(
+        'checkmark/allowsubmissionsfromdate',
+        $name,
+        $description,
+        0
+    );
     $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, true);
     $settings->add($setting);
 
     $name = new lang_string('duedate', 'checkmark');
     $description = new lang_string('duedate_help', 'checkmark');
-    $setting = new admin_setting_configduration('checkmark/duedate',
-            $name,
-            $description,
-            604800);
+    $setting = new admin_setting_configduration(
+        'checkmark/duedate',
+        $name,
+        $description,
+        604800
+    );
     $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, true);
     $settings->add($setting);
 
     $name = new lang_string('cutoffdate', 'checkmark');
     $description = new lang_string('cutoffdate_help', 'checkmark');
-    $setting = new admin_setting_configduration('checkmark/cutoffdate',
-            $name,
-            $description,
-            604800);
+    $setting = new admin_setting_configduration(
+        'checkmark/cutoffdate',
+        $name,
+        $description,
+        604800
+    );
     $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, false);
     $settings->add($setting);
 
     $name = new lang_string('gradingdue', 'checkmark');
     $description = new lang_string('gradingdue_help', 'checkmark');
-    $setting = new admin_setting_configduration('checkmark/gradingduedate',
-            $name,
-            $description,
-            3024000);
+    $setting = new admin_setting_configduration(
+        'checkmark/gradingduedate',
+        $name,
+        $description,
+        3024000
+    );
     $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, false);
     $settings->add($setting);
-
 }

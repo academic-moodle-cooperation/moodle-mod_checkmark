@@ -50,7 +50,6 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php'); // Include the code
  * @covers    \checkmark::override_dates
  */
 final class overridedates_test extends \advanced_testcase {
-
     /**
      * @var \checkmark Checkmark object used for testing
      */
@@ -99,13 +98,20 @@ final class overridedates_test extends \advanced_testcase {
         global $DB;
         $timedueoverride = time() + 1209600; // 2 weeks after now.
         $sink = $this->redirectEvents();
-        $this->checkmark->override_dates([$this->testuser->id], $this->checkmark->checkmark->timeavailable,
-                $timedueoverride, $this->checkmark->checkmark->cutoffdate);
+        $this->checkmark->override_dates(
+            [$this->testuser->id],
+            $this->checkmark->checkmark->timeavailable,
+            $timedueoverride,
+            $this->checkmark->checkmark->cutoffdate
+        );
         $this->assertEquals(1, $DB->count_records('checkmark_overrides'));
         $expect = ['timeavailable' => null, 'timedue' => $timedueoverride, 'cutoffdate' => null, 'groupid' => null,
                 'grouppriority' => null, ];
-        $result = $DB->get_record('checkmark_overrides', ['userid' => $this->testuser->id],
-                'timeavailable, timedue, cutoffdate, groupid, grouppriority');
+        $result = $DB->get_record(
+            'checkmark_overrides',
+            ['userid' => $this->testuser->id],
+            'timeavailable, timedue, cutoffdate, groupid, grouppriority'
+        );
         $result = ['timeavailable' => $result->timeavailable, 'timedue' => (int)($result->timedue),
                 'cutoffdate' => $result->cutoffdate, 'groupid' => $result->groupid, 'grouppriority' => $result->grouppriority, ];
         $this->assertTrue(self::arrays_are_similar($expect, $result));
@@ -125,13 +131,21 @@ final class overridedates_test extends \advanced_testcase {
         global $DB;
         $timedueoverride = time() + 1209600; // 2 weeks after now.
         $sink = $this->redirectEvents();
-        $this->checkmark->override_dates([$this->testgroup1->id], $this->checkmark->checkmark->timeavailable,
-                $timedueoverride, $this->checkmark->checkmark->cutoffdate, \mod_checkmark\overrideform::GROUP);
+        $this->checkmark->override_dates(
+            [$this->testgroup1->id],
+            $this->checkmark->checkmark->timeavailable,
+            $timedueoverride,
+            $this->checkmark->checkmark->cutoffdate,
+            \mod_checkmark\overrideform::GROUP
+        );
         $this->assertEquals(1, $DB->count_records('checkmark_overrides'));
         $expect = ['timeavailable' => null, 'timedue' => $timedueoverride, 'cutoffdate' => null,
                 'userid' => null, 'grouppriority' => 1, ];
-        $result = $DB->get_record('checkmark_overrides', ['groupid' => $this->testgroup1->id],
-                'timeavailable, timedue, cutoffdate, userid, grouppriority');
+        $result = $DB->get_record(
+            'checkmark_overrides',
+            ['groupid' => $this->testgroup1->id],
+            'timeavailable, timedue, cutoffdate, userid, grouppriority'
+        );
         $result = ['timeavailable' => $result->timeavailable, 'timedue' => (int)($result->timedue),
                 'cutoffdate' => $result->cutoffdate, 'userid' => $result->userid,
                 'grouppriority' => (int)($result->grouppriority),
@@ -149,19 +163,30 @@ final class overridedates_test extends \advanced_testcase {
 
         // Create a user override as tested above.
         $timedueoverride = time() + 1209600; // 2 weeks after now.
-        $this->checkmark->override_dates([$this->testuser->id], $this->checkmark->checkmark->timeavailable,
-                $timedueoverride, $this->checkmark->checkmark->cutoffdate);
+        $this->checkmark->override_dates(
+            [$this->testuser->id],
+            $this->checkmark->checkmark->timeavailable,
+            $timedueoverride,
+            $this->checkmark->checkmark->cutoffdate
+        );
 
         $sink = $this->redirectEvents();
         $timedueoverride = time() + 2419200; // 4 weeks after now.
         $timeavaliableoverride = time() + 1209600;
         $cutoffoverride = time() + 2419200;
-        $this->checkmark->override_dates([$this->testuser->id], $timeavaliableoverride,
-                $timedueoverride, $cutoffoverride);
+        $this->checkmark->override_dates(
+            [$this->testuser->id],
+            $timeavaliableoverride,
+            $timedueoverride,
+            $cutoffoverride
+        );
         $expect = ['timeavailable' => $timeavaliableoverride, 'timedue' => $timedueoverride, 'cutoffdate' => $cutoffoverride,
                 'groupid' => null, 'grouppriority' => null, ];
-        $result = $DB->get_record('checkmark_overrides', ['userid' => $this->testuser->id],
-                'timeavailable, timedue, cutoffdate, groupid, grouppriority');
+        $result = $DB->get_record(
+            'checkmark_overrides',
+            ['userid' => $this->testuser->id],
+            'timeavailable, timedue, cutoffdate, groupid, grouppriority'
+        );
         $result = ['timeavailable' => (int)$result->timeavailable, 'timedue' => (int)($result->timedue),
                 'cutoffdate' => (int)$result->cutoffdate, 'groupid' => $result->groupid,
                 'grouppriority' => $result->grouppriority,
@@ -179,27 +204,43 @@ final class overridedates_test extends \advanced_testcase {
 
         // Create a group override as tested above.
         $timedueoverride = time() + 1209600; // 2 weeks after now.
-        $this->checkmark->override_dates([$this->testgroup1->id], $this->checkmark->checkmark->timeavailable,
-                $timedueoverride, $this->checkmark->checkmark->cutoffdate, \mod_checkmark\overrideform::GROUP);
+        $this->checkmark->override_dates(
+            [$this->testgroup1->id],
+            $this->checkmark->checkmark->timeavailable,
+            $timedueoverride,
+            $this->checkmark->checkmark->cutoffdate,
+            \mod_checkmark\overrideform::GROUP
+        );
 
         $sink = $this->redirectEvents();
         $timedueoverride = time() + 2419200; // 4 weeks after now.
         $timeavaliableoverride = time() + 1209600;
         $cutoffoverride = time() + 2419200;
-        $this->checkmark->override_dates([$this->testgroup1->id], $timeavaliableoverride,
-                $timedueoverride, $cutoffoverride, \mod_checkmark\overrideform::GROUP);
+        $this->checkmark->override_dates(
+            [$this->testgroup1->id],
+            $timeavaliableoverride,
+            $timedueoverride,
+            $cutoffoverride,
+            \mod_checkmark\overrideform::GROUP
+        );
         $expect = ['timeavailable' => $timeavaliableoverride, 'timedue' => $timedueoverride, 'cutoffdate' => $cutoffoverride,
                 'userid' => null, 'grouppriority' => 1, ];
-        $result = $DB->get_record('checkmark_overrides', ['groupid' => $this->testgroup1->id],
-                'timeavailable, timedue, cutoffdate, userid, grouppriority');
+        $result = $DB->get_record(
+            'checkmark_overrides',
+            ['groupid' => $this->testgroup1->id],
+            'timeavailable, timedue, cutoffdate, userid, grouppriority'
+        );
         $result = ['timeavailable' => (int)$result->timeavailable, 'timedue' => (int)($result->timedue),
                 'cutoffdate' => (int)$result->cutoffdate, 'userid' => $result->userid,
                 'grouppriority' => (int)($result->grouppriority), ];
         $this->assertTrue(self::arrays_are_similar($expect, $result));
 
         // Assert calendar and log event.
-        $this->check_events($sink->get_events(), group_override_updated::class,
-                calendar_event_updated::class);
+        $this->check_events(
+            $sink->get_events(),
+            group_override_updated::class,
+            calendar_event_updated::class
+        );
         $sink->close();
     }
 
@@ -213,9 +254,13 @@ final class overridedates_test extends \advanced_testcase {
     public function test_add_identical_overwrite(): void {
         global $DB;
         $sink = $this->redirectEvents();
-        $this->checkmark->override_dates([$this->testgroup1->id], $this->checkmark->checkmark->timeavailable,
-                $this->checkmark->checkmark->timedue, $this->checkmark->checkmark->cutoffdate,
-                \mod_checkmark\overrideform::GROUP);
+        $this->checkmark->override_dates(
+            [$this->testgroup1->id],
+            $this->checkmark->checkmark->timeavailable,
+            $this->checkmark->checkmark->timedue,
+            $this->checkmark->checkmark->cutoffdate,
+            \mod_checkmark\overrideform::GROUP
+        );
         $this->assertEquals(0, $DB->count_records('checkmark_overrides'));
         $events = $sink->get_events();
         $this->assertCount(0, $events);
@@ -232,15 +277,18 @@ final class overridedates_test extends \advanced_testcase {
 
         // Create a user override as tested above.
         $timedueoverride = time() + 1209600; // 2 weeks after now.
-        $this->checkmark->override_dates([$this->testuser->id], $this->checkmark->checkmark->timeavailable,
-                $timedueoverride, $this->checkmark->checkmark->cutoffdate);
+        $this->checkmark->override_dates(
+            [$this->testuser->id],
+            $this->checkmark->checkmark->timeavailable,
+            $timedueoverride,
+            $this->checkmark->checkmark->cutoffdate
+        );
         $this->assertEquals(1, $DB->count_records('checkmark_overrides'));
 
         $sink = $this->redirectEvents();
         $this->checkmark->delete_override($this->testuser->id);
         $this->assertEquals(0, $DB->count_records('checkmark_overrides'));
         $this->check_events($sink->get_events(), user_override_deleted::class, calendar_event_deleted::class);
-
     }
 
     /**
@@ -253,8 +301,13 @@ final class overridedates_test extends \advanced_testcase {
 
         // Create a group override as tested above.
         $timedueoverride = time() + 1209600; // 2 weeks after now.
-        $this->checkmark->override_dates([$this->testgroup1->id], $this->checkmark->checkmark->timeavailable,
-                $timedueoverride, $this->checkmark->checkmark->cutoffdate, \mod_checkmark\overrideform::GROUP);
+        $this->checkmark->override_dates(
+            [$this->testgroup1->id],
+            $this->checkmark->checkmark->timeavailable,
+            $timedueoverride,
+            $this->checkmark->checkmark->cutoffdate,
+            \mod_checkmark\overrideform::GROUP
+        );
         $this->assertEquals(1, $DB->count_records('checkmark_overrides'));
 
         $sink = $this->redirectEvents();
@@ -273,16 +326,32 @@ final class overridedates_test extends \advanced_testcase {
         $timedueoverride1 = time() + 1209600; // 2 weeks after now.
         $timedueoverride2 = time() + 2419200; // 4 weeks after now.
 
-        $this->checkmark->override_dates([$this->testgroup1->id], $this->checkmark->checkmark->timeavailable,
-                $timedueoverride1, $this->checkmark->checkmark->cutoffdate, \mod_checkmark\overrideform::GROUP);
-        $this->checkmark->override_dates([$this->testgroup2->id], $this->checkmark->checkmark->timeavailable,
-                $timedueoverride2, $this->checkmark->checkmark->cutoffdate, \mod_checkmark\overrideform::GROUP);
+        $this->checkmark->override_dates(
+            [$this->testgroup1->id],
+            $this->checkmark->checkmark->timeavailable,
+            $timedueoverride1,
+            $this->checkmark->checkmark->cutoffdate,
+            \mod_checkmark\overrideform::GROUP
+        );
+        $this->checkmark->override_dates(
+            [$this->testgroup2->id],
+            $this->checkmark->checkmark->timeavailable,
+            $timedueoverride2,
+            $this->checkmark->checkmark->cutoffdate,
+            \mod_checkmark\overrideform::GROUP
+        );
         $expected1 = (object) ['groupid' => $this->testgroup1->id, 'grouppriority' => '1'];
         $expected2 = (object) ['groupid' => $this->testgroup2->id, 'grouppriority' => '2'];
-        $result1 = $DB->get_record('checkmark_overrides', ['groupid' => $this->testgroup1->id],
-                'groupid, grouppriority');
-        $result2 = $DB->get_record('checkmark_overrides', ['groupid' => $this->testgroup2->id],
-                'groupid, grouppriority');
+        $result1 = $DB->get_record(
+            'checkmark_overrides',
+            ['groupid' => $this->testgroup1->id],
+            'groupid, grouppriority'
+        );
+        $result2 = $DB->get_record(
+            'checkmark_overrides',
+            ['groupid' => $this->testgroup2->id],
+            'groupid, grouppriority'
+        );
 
         $this->assertEquals(2, $DB->count_records('checkmark_overrides'));
         $this->assertEquals($expected1, $result1);
@@ -290,17 +359,27 @@ final class overridedates_test extends \advanced_testcase {
 
         $sink = $this->redirectEvents();
         $this->checkmark->reorder_group_overrides($this->testgroup1->id);
-        $this->check_events($sink->get_events(), group_override_priority_changed::class,
-                calendar_event_updated::class, calendar_event_updated::class);
+        $this->check_events(
+            $sink->get_events(),
+            group_override_priority_changed::class,
+            calendar_event_updated::class,
+            calendar_event_updated::class
+        );
         $sink->clear();
 
         $expected1 = (object) ['groupid' => $this->testgroup1->id, 'grouppriority' => '2'];
         $expected2 = (object) ['groupid' => $this->testgroup2->id, 'grouppriority' => '1'];
 
-        $result1 = $DB->get_record('checkmark_overrides', ['groupid' => $this->testgroup1->id],
-                'groupid, grouppriority');
-        $result2 = $DB->get_record('checkmark_overrides', ['groupid' => $this->testgroup2->id],
-                'groupid, grouppriority');
+        $result1 = $DB->get_record(
+            'checkmark_overrides',
+            ['groupid' => $this->testgroup1->id],
+            'groupid, grouppriority'
+        );
+        $result2 = $DB->get_record(
+            'checkmark_overrides',
+            ['groupid' => $this->testgroup2->id],
+            'groupid, grouppriority'
+        );
 
         $this->assertEquals(2, $DB->count_records('checkmark_overrides'));
         $this->assertEquals($expected1, $result1);
@@ -308,22 +387,31 @@ final class overridedates_test extends \advanced_testcase {
 
         $this->checkmark->reorder_group_overrides($this->testgroup1->id, true);
 
-        $this->check_events($sink->get_events(), group_override_priority_changed::class,
-                calendar_event_updated::class, calendar_event_updated::class);
+        $this->check_events(
+            $sink->get_events(),
+            group_override_priority_changed::class,
+            calendar_event_updated::class,
+            calendar_event_updated::class
+        );
         $sink->close();
 
         $expected1 = (object) ['groupid' => $this->testgroup1->id, 'grouppriority' => '1'];
         $expected2 = (object) ['groupid' => $this->testgroup2->id, 'grouppriority' => '2'];
 
-        $result1 = $DB->get_record('checkmark_overrides', ['groupid' => $this->testgroup1->id],
-                'groupid, grouppriority');
-        $result2 = $DB->get_record('checkmark_overrides', ['groupid' => $this->testgroup2->id],
-                'groupid, grouppriority');
+        $result1 = $DB->get_record(
+            'checkmark_overrides',
+            ['groupid' => $this->testgroup1->id],
+            'groupid, grouppriority'
+        );
+        $result2 = $DB->get_record(
+            'checkmark_overrides',
+            ['groupid' => $this->testgroup2->id],
+            'groupid, grouppriority'
+        );
 
         $this->assertEquals(2, $DB->count_records('checkmark_overrides'));
         $this->assertEquals($expected1, $result1);
         $this->assertEquals($expected2, $result2);
-
     }
 
     /**

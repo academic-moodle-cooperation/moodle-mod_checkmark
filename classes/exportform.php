@@ -75,7 +75,7 @@ class exportform extends \moodleform {
         $mform->setType('updatepref', PARAM_BOOL);
 
         $mform->addElement('header', 'data_settings_header', get_string('datasettingstitle', 'checkmark'));
-        $mform->addElement('select', 'datafilter', get_string('filter'),  $filters);
+        $mform->addElement('select', 'datafilter', get_string('filter'), $filters);
         $mform->setDefault('datafilter', $filter);
 
         $this->add_groupselect();
@@ -122,7 +122,7 @@ class exportform extends \moodleform {
         $templatenames = self::get_templates();
         $templates = [];
         foreach ($templatenames as $cur) {
-            $templates[$cur] = get_string('exporttemplate_'.$cur, 'checkmark');
+            $templates[$cur] = get_string('exporttemplate_' . $cur, 'checkmark');
         }
         $templates[''] = get_string('custom_settings', 'checkmark');
         $mform->addElement('select', 'template', get_string('exporttemplates', 'checkmark'), $templates);
@@ -178,7 +178,6 @@ class exportform extends \moodleform {
         $mform->addHelpButton('data_preview_header', 'data_preview', 'checkmark');
         $mform->setExpanded('data_preview_header');
         $mform->addElement('html', $this->table);
-
     }
 
     /**
@@ -245,14 +244,14 @@ class exportform extends \moodleform {
     public static function get_templates() {
         global $CFG;
 
-        $dir = scandir($CFG->dirroot.'/mod/checkmark/classes/local/exporttemplates');
+        $dir = scandir($CFG->dirroot . '/mod/checkmark/classes/local/exporttemplates');
         $templates = [];
         foreach ($dir as $cur) {
             if (in_array($cur, ['.', '..'])) {
                 continue;
             }
             $cur = str_replace('.php', '', $cur);
-            $classname = '\\mod_checkmark\\local\\exporttemplates\\'.$cur;
+            $classname = '\\mod_checkmark\\local\\exporttemplates\\' . $cur;
             if (class_exists($classname)) {
                 $templates[] = $cur;
             }

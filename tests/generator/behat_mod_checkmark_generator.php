@@ -34,7 +34,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_mod_checkmark_generator extends behat_generator_base {
-
     /**
      * Defines objects that can be generated via "and the following 'x' exists"
      * @return Structure of objects that can be generated

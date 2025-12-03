@@ -34,8 +34,10 @@ $type = required_param('type', PARAM_ALPHA);
 $mode = optional_param('mode', \mod_checkmark\overrideform::ADD, PARAM_TEXT);
 $confirm = optional_param('confirm', 0, PARAM_INT);
 $return = optional_param('return', false, PARAM_RAW);
-$return = !empty($return) ? urldecode($return) : (new moodle_url('/mod/checkmark/overrides.php',
-        ['id' => $id, 'mode' => $type === \mod_checkmark\overrideform::USER ? 'user' : 'group']))->out();
+$return = !empty($return) ? urldecode($return) : (new moodle_url(
+    '/mod/checkmark/overrides.php',
+    ['id' => $id, 'mode' => $type === \mod_checkmark\overrideform::USER ? 'user' : 'group']
+))->out();
 $users = optional_param('users', false, PARAM_RAW);
 
 try {
@@ -47,7 +49,7 @@ try {
     $url = new moodle_url('/mod/checkmark/extend.php');
     $url->param('id', $id);
     $url->param('type', $type);
-    list($cm, $checkmark, $course) = \checkmark::init_checks($id, 0, $url);
+    [$cm, $checkmark, $course] = \checkmark::init_checks($id, 0, $url);
     $context = context_module::instance($id);
     require_capability('mod/checkmark:manageoverrides', $context);
 
@@ -101,8 +103,13 @@ try {
             if ($type === \mod_checkmark\overrideform::GROUP) {
                 $data->userids = [];
                 if (!empty($data->groups)) {
-                    $instance->override_dates($data->groups, $data->timeavailable, $data->timedue,
-                        $data->cutoffdate, \mod_checkmark\overrideform::GROUP);
+                    $instance->override_dates(
+                        $data->groups,
+                        $data->timeavailable,
+                        $data->timedue,
+                        $data->cutoffdate,
+                        \mod_checkmark\overrideform::GROUP
+                    );
                 }
             } else if (!empty($data->userids)) {
                 $instance->override_dates($data->userids, $data->timeavailable, $data->timedue, $data->cutoffdate);
@@ -122,8 +129,10 @@ try {
             if ($mode == \mod_checkmark\overrideform::EDIT || $mode == \mod_checkmark\overrideform::COPY) {
                 $dates = [];
                 if ($type === \mod_checkmark\overrideform::USER) {
-                    $dates = checkmark_get_overridden_dates($checkmark->id,
-                            $firstentity);
+                    $dates = checkmark_get_overridden_dates(
+                        $checkmark->id,
+                        $firstentity
+                    );
                 } else {
                     $dates = checkmark_get_override_dates_for_group($checkmark->id, $firstentity);
                 }
@@ -153,7 +162,6 @@ try {
                 } else {
                     $data['groups'] = $entities;
                 }
-
             }
         }
             $form->set_data($data);
@@ -179,8 +187,11 @@ try {
             $confirmstr = null;
             if ($type === \mod_checkmark\overrideform::USER) {
                 $namefields = core_user\fields::for_name()->get_sql()->selects;
-                $user = $DB->get_record('user', ['id' => $users],
-                        'id ' . $namefields);
+                $user = $DB->get_record(
+                    'user',
+                    ['id' => $users],
+                    'id ' . $namefields
+                );
                 $confirmstr = get_string('overridedeleteusersure', 'checkmark', fullname($user));
             } else {
                 $groupname = groups_get_group_name($entities);
@@ -194,10 +205,9 @@ try {
 } catch (dml_exception $d) {
     throw $d;
 } catch (Throwable $t) {
-    redirect($return, $t->getFile().'#'.$t->getLine().': '.$t->getMessage().html_writer::empty_tag('br').
+    redirect($return, $t->getFile() . '#' . $t->getLine() . ': ' . $t->getMessage() . html_writer::empty_tag('br') .
                       nl2br($t->getTraceAsString()), null, \core\output\notification::NOTIFY_ERROR);
 } catch (\Exception $e) {
-    redirect($return, $e->getFile().'#'.$e->getLine().': '.$e->getMessage().html_writer::empty_tag('br').
+    redirect($return, $e->getFile() . '#' . $e->getLine() . ': ' . $e->getMessage() . html_writer::empty_tag('br') .
                       nl2br($e->getTraceAsString()), null, \core\output\notification::NOTIFY_ERROR);
 }
-

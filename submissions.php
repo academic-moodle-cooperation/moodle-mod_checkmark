@@ -36,14 +36,16 @@ $mode = optional_param('mode', 'all', PARAM_ALPHANUM);  // What mode are we in?
 
 // Sets url with params and performs require_login!
 $url = new moodle_url('/mod/checkmark/submissions.php');
-list($cm, $checkmark, $course) = \checkmark::init_checks($id, $c, $url);
+[$cm, $checkmark, $course] = \checkmark::init_checks($id, $c, $url);
 $context = context_module::instance($cm->id);
 
 if (optional_param('tab', false, PARAM_ALPHANUM) == 'printpreview') {
     // Legacy link redirect!
     redirect(new moodle_url('/mod/checkmark/export.php', ['id' => $cm->id]));
-} else if (optional_param('bulk', false, PARAM_BOOL) && optional_param('bulkaction', null, PARAM_ALPHA) === 'extend'
-        && has_capability('mod/checkmark:manageoverrides', $context)) {
+} else if (
+    optional_param('bulk', false, PARAM_BOOL) && optional_param('bulkaction', null, PARAM_ALPHA) === 'extend'
+        && has_capability('mod/checkmark:manageoverrides', $context)
+) {
     $url = new moodle_url('/mod/checkmark/extend.php', [
             'id' => $cm->id,
             'type' => \mod_checkmark\overrideform::USER,
@@ -62,7 +64,7 @@ if ($mode !== 'all') {
     $url->param('mode', $mode);
 }
 
-$pagetitle = $course->shortname.': '.get_string('modulename', 'checkmark').': '.format_string($checkmark->name, true);
+$pagetitle = $course->shortname . ': ' . get_string('modulename', 'checkmark') . ': ' . format_string($checkmark->name, true);
 $PAGE->set_title(strip_tags($pagetitle));
 $PAGE->set_heading($course->fullname);
 $PAGE->force_settings_menu(true);

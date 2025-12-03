@@ -40,7 +40,7 @@ class send_notifications extends \core\task\scheduled_task {
      */
     public function get_name() {
         // Shown in admin screens!
-        return get_string('modulename', 'checkmark').' | '.get_string('sendnotifications', 'mod_checkmark');
+        return get_string('modulename', 'checkmark') . ' | ' . get_string('sendnotifications', 'mod_checkmark');
     }
 
     /**
@@ -51,7 +51,7 @@ class send_notifications extends \core\task\scheduled_task {
     public function execute() {
         global $CFG, $DB;
 
-        require_once($CFG->dirroot.'/mod/checkmark/lib.php');
+        require_once($CFG->dirroot . '/mod/checkmark/lib.php');
 
         /*
          * Notices older than 2 days will not be mailed.  This is to avoid the problem where
@@ -68,20 +68,18 @@ class send_notifications extends \core\task\scheduled_task {
                 $starttime = $endtime - 2 * 24 * 3600;   // Two days earlier?
         }
         if ($feedbacks = \checkmark_get_unmailed_feedbacks($starttime, $endtime)) {
-
             $timenow = time();
 
             foreach ($feedbacks as $feedback) {
-
-                echo 'Processing checkmark feedback '.$feedback->id."\n";
+                echo 'Processing checkmark feedback ' . $feedback->id . "\n";
 
                 if (!$user = $DB->get_record('user', ['id' => $feedback->userid])) {
-                    echo 'Could not find user '.$user->id."\n";
+                    echo 'Could not find user ' . $user->id . "\n";
                     continue;
                 }
 
                 if (!$course = $DB->get_record('course', ['id' => $feedback->course])) {
-                    echo 'Could not find course '.$feedback->course."\n";
+                    echo 'Could not find course ' . $feedback->course . "\n";
                     continue;
                 }
 
@@ -92,19 +90,24 @@ class send_notifications extends \core\task\scheduled_task {
                 \core\cron::setup_user($user, $course);
 
                 if (!\is_enrolled(\context_course::instance($feedback->course), $user->id)) {
-                    echo fullname($user).' isn\'t an active participant in ' .
+                    echo fullname($user) . ' isn\'t an active participant in ' .
                          format_string($course->shortname) . "\n";
                     continue;
                 }
 
                 if (!$grader = $DB->get_record('user', ['id' => $feedback->graderid])) {
-                    echo 'Could not find teacher '.$feedback->graderid."\n";
+                    echo 'Could not find teacher ' . $feedback->graderid . "\n";
                     continue;
                 }
 
-                if (!$mod = \get_coursemodule_from_instance('checkmark', $feedback->checkmarkid,
-                                                            $course->id)) {
-                    echo 'Could not find course module for checkmark id '.$feedback->checkmarkid."\n";
+                if (
+                    !$mod = \get_coursemodule_from_instance(
+                        'checkmark',
+                        $feedback->checkmarkid,
+                        $course->id
+                    )
+                ) {
+                    echo 'Could not find course module for checkmark id ' . $feedback->checkmarkid . "\n";
                     continue;
                 }
 
@@ -117,24 +120,24 @@ class send_notifications extends \core\task\scheduled_task {
                 $checkmarkinfo = new \stdClass();
                 $checkmarkinfo->grader = \fullname($grader);
                 $checkmarkinfo->checkmark = \format_string($feedback->name, true);
-                $checkmarkinfo->url = $CFG->wwwroot.'/mod/checkmark/view.php?id='.$mod->id;
+                $checkmarkinfo->url = $CFG->wwwroot . '/mod/checkmark/view.php?id=' . $mod->id;
 
-                $postsubject = $course->shortname.': '.$strcheckmarks.': '.
+                $postsubject = $course->shortname . ': ' . $strcheckmarks . ': ' .
                                \format_string($feedback->name, true);
-                $posttext  = $course->shortname.' -> '.$strcheckmarks.' -> '.
-                             \format_string($feedback->name, true)."\n".
-                             "---------------------------------------------------------------------\n".
-                             \get_string('checkmarkmail', 'checkmark', $checkmarkinfo)."\n".
+                $posttext  = $course->shortname . ' -> ' . $strcheckmarks . ' -> ' .
+                             \format_string($feedback->name, true) . "\n" .
+                             "---------------------------------------------------------------------\n" .
+                             \get_string('checkmarkmail', 'checkmark', $checkmarkinfo) . "\n" .
                              "---------------------------------------------------------------------\n";
 
                 if ($user->mailformat == 1) {  // HTML!
-                    $posthtml = '<p><font face="sans-serif">'.
-                    '<a href="'.$CFG->wwwroot.'/course/view.php?id='.$course->id.'">'.$course->shortname.'</a> '.
-                    '-><a href="'.$CFG->wwwroot.'/mod/checkmark/index.php?id='.$course->id.'">'.$strcheckmarks.'</a> '.
-                    '-><a href="'.$CFG->wwwroot.'/mod/checkmark/view.php?id='.$mod->id.'">'.
-                    \format_string($feedback->name, true).'</a></font></p>'.
-                    '<hr /><font face="sans-serif">'.
-                    '<p>'.\get_string('checkmarkmailhtml', 'checkmark', $checkmarkinfo).'</p>'.
+                    $posthtml = '<p><font face="sans-serif">' .
+                    '<a href="' . $CFG->wwwroot . '/course/view.php?id=' . $course->id . '">' . $course->shortname . '</a> ' .
+                    '-><a href="' . $CFG->wwwroot . '/mod/checkmark/index.php?id=' . $course->id . '">' . $strcheckmarks . '</a> ' .
+                    '-><a href="' . $CFG->wwwroot . '/mod/checkmark/view.php?id=' . $mod->id . '">' .
+                    \format_string($feedback->name, true) . '</a></font></p>' .
+                    '<hr /><font face="sans-serif">' .
+                    '<p>' . \get_string('checkmarkmailhtml', 'checkmark', $checkmarkinfo) . '</p>' .
                     '</font><hr />';
                 } else {
                     // We don't need HTML-Text if mailformat is plain text. (Plain text is in stdClass::fullmessage)!

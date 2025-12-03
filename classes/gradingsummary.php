@@ -80,10 +80,22 @@ class gradingsummary implements renderable {
      * @param int $needattendanceentrycount
      * @param int $presentationgradingcount
      */
-    public function __construct(int $participantcount, int $timeavailable, int $submissionssubmittedcount,
-            int $submissionsneedgradingcount, int $duedate, int $cutoffdate, int $coursemoduleid, int $coursestartdate,
-            bool $cangrade, bool $isvisible, int $attendantcount, int $absencecount, int $needattendanceentrycount,
-            int $presentationgradingcount) {
+    public function __construct(
+        int $participantcount,
+        int $timeavailable,
+        int $submissionssubmittedcount,
+        int $submissionsneedgradingcount,
+        int $duedate,
+        int $cutoffdate,
+        int $coursemoduleid,
+        int $coursestartdate,
+        bool $cangrade,
+        bool $isvisible,
+        int $attendantcount,
+        int $absencecount,
+        int $needattendanceentrycount,
+        int $presentationgradingcount
+    ) {
         $this->participantcount = $participantcount;
         $this->timeavailable = $timeavailable;
         $this->submissionssubmittedcount = $submissionssubmittedcount;
@@ -99,5 +111,4 @@ class gradingsummary implements renderable {
         $this->needattendanceentrycount = $needattendanceentrycount;
         $this->presentationgradingcount = $presentationgradingcount;
     }
-
 }
