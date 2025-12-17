@@ -29,12 +29,11 @@ require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
  * @copyright   2025 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class locallib_test extends \advanced_testcase {
-
+final class locallib_test extends \advanced_testcase {
     /**
      * Ensure defaults are returned when no preferences are set and no form submission occurs.
      */
-    public function test_print_preferences_defaults() {
+    public function test_print_preferences_defaults(): void {
         $this->resetAfterTest(true);
         $this->setAdminUser();
 
@@ -62,7 +61,7 @@ class locallib_test extends \advanced_testcase {
 
         $instance = new \checkmark('staticonly');
 
-        list(
+        [
             $filter,
             $sumabs,
             $sumrel,
@@ -78,7 +77,7 @@ class locallib_test extends \advanced_testcase {
             $sequentialnumbering,
             $coursetitle,
             $template
-        ) = $instance->print_preferences();
+        ] = $instance->print_preferences();
 
         $this->assertEquals(\checkmark::FILTER_ALL, $filter);
         $this->assertEquals(1, $sumabs);
@@ -104,7 +103,7 @@ class locallib_test extends \advanced_testcase {
     /**
      * Ensure submitted preferences are written and returned when updatepref and sesskey are valid (PDF format path).
      */
-    public function test_print_preferences_update_pref_pdf() {
+    public function test_print_preferences_update_pref_pdf(): void {
         $this->resetAfterTest(true);
         $this->setAdminUser();
 
@@ -134,7 +133,7 @@ class locallib_test extends \advanced_testcase {
 
         $instance = new \checkmark('staticonly');
 
-        list(
+        [
             $filter,
             $sumabs,
             $sumrel,
@@ -150,7 +149,7 @@ class locallib_test extends \advanced_testcase {
             $sequentialnumbering,
             $coursetitle,
             $template
-        ) = $instance->print_preferences();
+        ] = $instance->print_preferences();
 
         $this->assertEquals(\checkmark::FILTER_ALL, $filter);
         $this->assertEquals(0, $sumabs);
