@@ -2329,6 +2329,22 @@ function checkmark_extend_settings_navigation(settings_navigation $settings, nav
         );
         $checkmarknode->add_node($node, $beforekey);
     }
+
+    if (file_exists($CFG->dirroot . '/local/checkmarkreport/lib.php') && has_capability('local/checkmarkreport:view', context_course::instance($PAGE->course->id))) {
+        $url = new moodle_url('/local/checkmarkreport/index.php', [
+            'id' => $PAGE->course->id,
+            'instances' => [$PAGE->cm->instance],
+        ]);
+        $node = navigation_node::create(
+            get_string('pluginname', 'local_checkmarkreport'),
+            $url,
+            navigation_node::TYPE_SETTING,
+            null,
+            'checkmarkreport'
+        );
+        $node->forceintomoremenu = true;
+        $checkmarknode->add_node($node);
+    }
 }
 
 /**
