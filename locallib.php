@@ -1661,38 +1661,15 @@ class checkmark {
     }
 
     /**
-     * grades submissions from this checkmark-instance (either all or those which require grading)
+     * Helper to get list of users for auto grading based on filter.
      *
-     * @param int $filter (optional) which entrys to filter (self::FILTER_ALL, self::FILTER_REQUIRE_GRADING)
-     * @param int[] $selected (optional) selected users, used if filter equals self::FILTER_SELECTED
-     * @param bool $countonly (optional) defaults to false, should we only count the submissions or grade them?
-     * @return int|array 0 if everything's ok, otherwise error code
-     * @throws coding_exception
-     * @throws dml_exception
+     * @param int $filter which entrys to filter
+     * @param int[] $selected selected users
+     * @param bool $ignoreattendance (optional) ignore attendance status
+     * @return array users array
      */
-    public function autograde_submissions($filter = self::FILTER_ALL, $selected = [], $countonly = false) {
+    private function get_users_to_autograde($filter, $selected = [], $ignoreattendance = false) {
         global $DB, $USER;
-
-        $result = [];
-        $result['status'] = false;
-        $result['updated'] = '0';
-
-        $params = ['itemname' => $this->checkmark->name,
-                'idnumber' => $this->checkmark->cmidnumber,
-            ];
-
-        if ($this->checkmark->grade > 0) {
-            $params['gradetype'] = GRADE_TYPE_VALUE;
-            $params['grademax'] = $this->checkmark->grade;
-            $params['grademin'] = 0;
-        } else {
-            $result['status'] = GRADE_UPDATE_FAILED;
-            if ($countonly) {
-                return 0;
-            } else {
-                return $result;
-            }
-        }
 
         // Get all ppl that are allowed to submit checkmarks!
         $context = context_module::instance($this->cm->id);
@@ -1711,13 +1688,13 @@ class checkmark {
             $activegroup = 0;
         }
 
+        $params = [];
         [$esql, $params] = get_enrolled_sql($context, 'mod/checkmark:submit', $activegroup);
         switch ($filter) {
             case self::FILTER_SELECTED:
                 // Prepare list with selected users!
                 if (empty($selected)) {
-                    $result['status'] = GRADE_UPDATE_FAILED;
-                    return $result;
+                    return [];
                 }
                 $usrlst = $selected;
 
@@ -1733,7 +1710,7 @@ class checkmark {
             case self::FILTER_SELECTED_GRADED:
                 // Prepare list with selected users!
                 if (empty($selected)) {
-                    return 0;
+                    return [];
                 }
                 $usrlst = $selected;
 
@@ -1786,7 +1763,7 @@ class checkmark {
             $attendanceitem = false;
         }
 
-        if ($attendancecoupled) {
+        if ($attendancecoupled && !$ignoreattendance) {
             // Filter all users with undefined attendance state!
             foreach ($users as $user) {
                 if (
@@ -1806,94 +1783,145 @@ class checkmark {
                 }
             }
         }
+        return $users;
+    }
 
-        if (empty($users) || count($users) == 0 || $users == null) {
-            $result['status'] = GRADE_UPDATE_OK;
+    /**
+     * grades submissions from this checkmark-instance (either all or those which require grading)
+     *
+     * @param int $filter (optional) which entrys to filter (self::FILTER_ALL, self::FILTER_REQUIRE_GRADING)
+     * @param int[] $selected (optional) selected users, used if filter equals self::FILTER_SELECTED
+     * @param bool $countonly (optional) defaults to false, should we only count the submissions or grade them?
+     * @param bool $ignoreattendance (optional) ignore attendance status
+     * @return int|array 0 if everything's ok, otherwise error code
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    public function autograde_submissions($filter = self::FILTER_ALL, $selected = [], $countonly = false, $ignoreattendance = false) {
+        global $USER, $DB;
+        $users = $this->get_users_to_autograde($filter, $selected, $ignoreattendance);
+
+        // Just pass through result if we got an empty array.
+        if (empty($users)) {
+            if ($countonly === 'list') {
+                return [];
+            }
             if ($countonly) {
                 return 0;
             } else {
-                return $result;
+                return ['status' => GRADE_UPDATE_FAILED, 'updated' => 0];
             }
+        }
+
+        if ($countonly === 'list') {
+            return $users;
+        }
+
+        if ($countonly) {
+            return count($users);
+        }
+
+        $result = [];
+        $result['status'] = false;
+        $result['updated'] = '0';
+
+        $params = ['itemname' => $this->checkmark->name,
+            'idnumber' => $this->checkmark->cmidnumber,
+        ];
+
+        if ($this->checkmark->grade <= 0) {
+            $result['status'] = GRADE_UPDATE_FAILED;
+            return $result;
+        }
+
+        $params['gradetype'] = GRADE_TYPE_VALUE;
+        $params['grademax'] = $this->checkmark->grade;
+        $params['grademin'] = 0;
+
+        // Fetch attendance items again if needed for grading.
+        // If the attendance is linked to the grades!
+        $attendancecoupled = $this->checkmark->trackattendance && $this->checkmark->attendancegradelink;
+        $attendancegradebook = $this->checkmark->trackattendance && $this->checkmark->attendancegradebook;
+        if ($attendancegradebook) {
+            $gradinginfo = grade_get_grades($this->course->id, 'mod', 'checkmark', $this->checkmark->id, array_keys($users));
+            $attendanceitem = $gradinginfo->items[CHECKMARK_ATTENDANCE_ITEM];
         } else {
-            if ($countonly) {
-                return count($users);
-            } else {
+            $attendanceitem = false;
+        }
                 $mailinfo = get_user_preferences('checkmark_mailinfo', 0);
                 // Do this for each user enrolled in course!
-                if (empty($grades) || !is_array($grades)) {
-                    $grades = [];
-                }
+        if (empty($grades) || !is_array($grades)) {
+            $grades = [];
+        }
                 $timemarked = time();
-                foreach ($users as $currentuser) {
-                    $feedback = $this->get_feedback($currentuser->id); // Get feedback!
-                    if ($feedback === false) { // Or make a new feedback!
-                        $feedback = $this->prepare_new_feedback($currentuser->id);
-                        $feedback->timecreated = $timemarked;
-                    }
-
-                    $feedback->timemodified = $timemarked;
-                    if ($attendanceitem) {
-                        $lockedoroverridden = $attendanceitem->grades[$currentuser->id]->locked
-                                || $attendanceitem->grades[$currentuser->id]->overridden;
-                    } else {
-                        $lockedoroverridden = false;
-                    }
-                    if (
-                        $attendancecoupled && ((!$lockedoroverridden && $feedback->attendance == 0)
-                                    || ($lockedoroverridden && $attendanceitem->grades[$currentuser->id]->grade == 0))
-                    ) {
-                        // We set grade to 0 if it's coupled with attendance and the user was absent!
-                        $calculatedgrade = 0;
-                    } else {
-                        $calculatedgrade = $this->calculate_grade($currentuser->id);
-                    }
-                    $feedback->grade = $calculatedgrade;
-                    if ($feedback->feedback == null) {
-                        $feedback->feedback = get_string('strautograded', 'checkmark');
-                    } else if (!strstr($feedback->feedback, get_string('strautograded', 'checkmark'))) {
-                        $feedback->feedback .= get_string('strautograded', 'checkmark');
-                    }
-                    $feedback->graderid = $USER->id;
-                    $feedback->timemodified = $timemarked;
-                    if (!isset($grades[$currentuser->id])) { // Prevent strict standard warning!
-                        $grades[$currentuser->id] = new stdClass();
-                    }
-                    $grades[$currentuser->id]->userid = $currentuser->id;
-                    $grades[$currentuser->id]->rawgrade = $calculatedgrade;
-                    $grades[$currentuser->id]->dategraded = $timemarked;
-                    $grades[$currentuser->id]->feedback = $feedback->feedback;
-                    $grades[$currentuser->id]->feedbackformat = $feedback->format;
-                    if (!$mailinfo) {
-                        $feedback->mailed = 1;       // Treat as already mailed!
-                    } else {
-                        $feedback->mailed = 0;       // Make sure mail goes out (again, even)!
-                    }
-
-                    $DB->update_record('checkmark_feedbacks', $feedback);
-                    $result['updated']++;
-
-                    // Trigger the event!
-                    \mod_checkmark\event\grade_updated::automatic($this->cm, ['userid' => $currentuser->id,
-                            'feedbackid' => $feedback->id, ])->trigger();
-                }
+        foreach ($users as $currentuser) {
+            $feedback = $this->get_feedback($currentuser->id); // Get feedback!
+            if ($feedback === false) { // Or make a new feedback!
+                $feedback = $this->prepare_new_feedback($currentuser->id);
+                $feedback->timecreated = $timemarked;
             }
 
-            if (!empty($grades)) {
-                $result['status'] = grade_update(
-                    'mod/checkmark',
-                    $this->checkmark->course,
-                    'mod',
-                    'checkmark',
-                    $this->checkmark->id,
-                    0,
-                    $grades,
-                    $params
-                );
-                return $result;
+            $feedback->timemodified = $timemarked;
+            if ($attendanceitem) {
+                $lockedoroverridden = $attendanceitem->grades[$currentuser->id]->locked
+                        || $attendanceitem->grades[$currentuser->id]->overridden;
             } else {
-                $result['status'] = GRADE_UPDATE_OK;
-                return $result;
+                $lockedoroverridden = false;
             }
+            if (
+                $attendancecoupled && ((!$lockedoroverridden && $feedback->attendance == 0)
+                            || ($lockedoroverridden && $attendanceitem->grades[$currentuser->id]->grade == 0))
+            ) {
+                // We set grade to 0 if it's coupled with attendance and the user was absent!
+                $calculatedgrade = 0;
+            } else {
+                $calculatedgrade = $this->calculate_grade($currentuser->id);
+            }
+            $feedback->grade = $calculatedgrade;
+            if ($feedback->feedback == null) {
+                $feedback->feedback = get_string('strautograded', 'checkmark');
+            } else if (!strstr($feedback->feedback, get_string('strautograded', 'checkmark'))) {
+                $feedback->feedback .= get_string('strautograded', 'checkmark');
+            }
+            $feedback->graderid = $USER->id;
+            $feedback->timemodified = $timemarked;
+            if (!isset($grades[$currentuser->id])) { // Prevent strict standard warning!
+                $grades[$currentuser->id] = new stdClass();
+            }
+            $grades[$currentuser->id]->userid = $currentuser->id;
+            $grades[$currentuser->id]->rawgrade = $calculatedgrade;
+            $grades[$currentuser->id]->dategraded = $timemarked;
+            $grades[$currentuser->id]->feedback = $feedback->feedback;
+            $grades[$currentuser->id]->feedbackformat = $feedback->format;
+            if (!$mailinfo) {
+                $feedback->mailed = 1;       // Treat as already mailed!
+            } else {
+                $feedback->mailed = 0;       // Make sure mail goes out (again, even)!
+            }
+
+            $DB->update_record('checkmark_feedbacks', $feedback);
+            $result['updated']++;
+
+            // Trigger the event!
+            \mod_checkmark\event\grade_updated::automatic($this->cm, ['userid' => $currentuser->id,
+                    'feedbackid' => $feedback->id, ])->trigger();
+        }
+
+        if (!empty($grades)) {
+            $result['status'] = grade_update(
+                'mod/checkmark',
+                $this->checkmark->course,
+                'mod',
+                'checkmark',
+                $this->checkmark->id,
+                0,
+                $grades,
+                $params
+            );
+            return $result;
+        } else {
+            $result['status'] = GRADE_UPDATE_OK;
+            return $result;
         }
     }
 
@@ -2110,6 +2138,60 @@ class checkmark {
     }
 
     /**
+     * Get a table with details about the users that will be overwritten
+     *
+     * @param array $users users arrays as returned by autograde_submissions
+     * @param string $bulkaction The current bulk action
+     * @param array $selected The original selected users
+     * @return string
+     */
+    private function get_overwrite_confirmation_table($users, $bulkaction = '', $selected = []) {
+        global $DB;
+
+        $userids = array_keys($users);
+        if (empty($userids)) {
+            return '';
+        }
+
+        $table = new \mod_checkmark\overwrite_confirmation_table('mod_checkmark_overwrite_confirm', $this);
+
+        $table->define_columns(['fullname', 'grade', 'feedback', 'grademodified']);
+        $table->define_headers([
+            get_string('firstname') . ' / ' . get_string('lastname'),
+            get_string('grades'),
+            get_string('feedback', 'checkmark'),
+                get_string('lastmodified') . ' (' . get_string('grades') . ')',
+            ]);
+
+        [$usql, $params] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+        $params['checkmarkid'] = $this->checkmark->id;
+
+        $fullname = $DB->sql_fullname('u.firstname', 'u.lastname');
+        $fields = "u.*, $fullname AS fullname, f.grade, f.feedback, f.format as feedbackformat, f.timemodified as grademodified";
+        $from = '{user} u LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid';
+        $where = "u.id $usql";
+
+        $table->set_sql($fields, $from, $where, $params);
+        $baseurl = new moodle_url('/mod/checkmark/submissions.php', [
+            'id' => $this->cm->id,
+            'bulk' => 1,
+            'bulkaction' => $bulkaction,
+            'selected' => $selected,
+        ]);
+
+        $table->define_baseurl($baseurl);
+        $table->sortable(true, 'fullname');
+        $table->collapsible(false);
+        $table->pageable(false);
+
+        ob_start();
+        $table->out(count($userids), false);
+        $output = ob_get_clean();
+
+        return $output;
+    }
+
+    /**
      * Top-level function for handling of submissions called by submissions.php
      *
      * This is for handling the teacher interaction with the grading interface
@@ -2174,11 +2256,13 @@ class checkmark {
                 $selected = optional_param_array('selected', [], PARAM_INT);
                 $confirm = optional_param('confirm', 0, PARAM_BOOL);
                 $result = $this->autograde_submissions(self::FILTER_SELECTED, $selected, true);
-                $resultgraded = $this->autograde_submissions(
+                $gradedusers = $this->autograde_submissions(
                     self::FILTER_SELECTED_GRADED,
                     $selected,
-                    true
+                    'list'
                 );
+                $resultgraded = count($gradedusers);
+
                 if ($selected == [] && $confirm) {
                     $selected = $SESSION->checkmark->autograde->selected;
                 }
@@ -2247,9 +2331,15 @@ class checkmark {
                                         (count($selected) - $result)
                                     );
                                 } else if (in_array($bulkaction, ['setattendantandgrade', 'setabsentandgrade'])) {
-                                    $amount = count($selected);
+                                    $amount = $this->autograde_submissions(self::FILTER_SELECTED, $selected, true, true);
                                 }
                                     echo $OUTPUT->header();
+
+                                    $overwritetable = '';
+                                if ($resultgraded > 0) {
+                                    $overwritetable = $this->get_overwrite_confirmation_table($gradedusers, $bulkaction, $selected);
+                                }
+
                                     $confirmboxcontent =
                                             $OUTPUT->notification(get_string(
                                                 'autograde_confirm',
@@ -2257,6 +2347,7 @@ class checkmark {
                                                 ['total' => $amount, 'graded' => $resultgraded]
                                             ) .
                                                     html_writer::empty_tag('br') . $amountinfo, 'info') .
+                                            $overwritetable .
                                             $OUTPUT->confirm(
                                                 get_string('autograde_confirm_continue', 'checkmark'),
                                                 'submissions.php?id=' . $this->cm->id . '&bulk=1&bulkaction=' .
