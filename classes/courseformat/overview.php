@@ -253,11 +253,4 @@ class overview extends activityoverviewbase {
         }
         return groups_get_activity_group($this->cm, true) ?? 0;
     }
-
-    /**
-     * Never hide the overview row; fall back to showing items even if no groups are available.
-     */
-    public function has_error(): bool {
-        return false;
-    }
 }
