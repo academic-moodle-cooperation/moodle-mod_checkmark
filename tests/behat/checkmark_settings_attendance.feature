@@ -65,7 +65,8 @@ Feature: Use attendance tracking and auto-grading linked to attendance
       | chmrk_selectallcb | 1     |
       | bulkaction        | grade |
     And I press "Start"
-    Then I should see "Auto-grading successful! 0 submissions updated."
+    Then I should see "ATTENTION: 1 submissions could NOT be graded automatically due to unknown attendance status!"
+    Then I should see "Auto-grading failed!"
     And I follow "Update"
     And I set the following fields to these values:
       | id_attendance | 1 |

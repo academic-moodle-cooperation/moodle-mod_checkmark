@@ -1822,7 +1822,7 @@ class checkmark {
         }
 
         $result = [];
-        $result['status'] = false;
+        $result['status'] = GRADE_UPDATE_OK;
         $result['updated'] = '0';
 
         $params = ['itemname' => $this->checkmark->name,
@@ -2310,6 +2310,7 @@ class checkmark {
                                 $SESSION->checkmark->autograde = new stdClass();
                             }
                             $SESSION->checkmark->autograde->selected = $selected;
+                            $potentialresult = $this->autograde_submissions(self::FILTER_SELECTED, $selected, true, true);
                             if ($result == 1) {
                                 $amount = get_string('autograde_stronesubmission', 'checkmark');
                             } else {
@@ -2322,16 +2323,16 @@ class checkmark {
                             } else {
                                 if (
                                     $this->checkmark->trackattendance && $this->checkmark->attendancegradelink
-                                        && (count($selected) != $result)
+                                        && ($potentialresult != $result)
                                         && !in_array($bulkaction, ['setattendantandgrade', 'setabsentandgrade'])
                                 ) {
                                     $amountinfo = get_string(
                                         'autograde_users_with_unknown_attendance',
                                         'checkmark',
-                                        (count($selected) - $result)
+                                        ($potentialresult - $result)
                                     );
                                 } else if (in_array($bulkaction, ['setattendantandgrade', 'setabsentandgrade'])) {
-                                    $amount = $this->autograde_submissions(self::FILTER_SELECTED, $selected, true, true);
+                                    $amount = $potentialresult;
                                 }
                                     echo $OUTPUT->header();
 
@@ -2386,6 +2387,16 @@ class checkmark {
                                         'notifysuccess'
                                     );
                                 } else {
+                                    $potentialresult = $this->autograde_submissions(self::FILTER_SELECTED, $selected, true, true);
+                                    if (
+                                        $potentialresult > 0 && $this->checkmark->trackattendance
+                                        && $this->checkmark->attendancegradelink
+                                    ) {
+                                        $message .= $OUTPUT->notification(
+                                            get_string('autograde_users_with_unknown_attendance', 'checkmark', $potentialresult),
+                                            'notifyproblem'
+                                        );
+                                    }
                                     $message .= $OUTPUT->notification(
                                         get_string('autograde_failed', 'checkmark'),
                                         'notifyproblem'
