@@ -3365,6 +3365,8 @@ class checkmark {
             set_user_preference('checkmark_seperatenamecolumns', $seperatenamecolumns);
             $coursetitle = optional_param('coursetitle', '', PARAM_TEXT);
             set_user_preference('checkmark_coursetitle', $coursetitle);
+            $template = optional_param('template', '', PARAM_TEXT);
+            set_user_preference('checkmark_exporttemplate', $template);
             if ($format == \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF) {
                 $printperpage = optional_param('printperpage', 0, PARAM_INT);
                 $printoptimum = optional_param('printoptimum', 0, PARAM_INT);
@@ -3392,6 +3394,7 @@ class checkmark {
             $seperatenamecolumns = get_user_preferences('checkmark_seperatenamecolumns', 0);
             $format = get_user_preferences('checkmark_format', \mod_checkmark\MTablePDF::OUTPUT_FORMAT_PDF);
             $coursetitle = get_user_preferences('checkmark_coursetitle', '');
+            $template = get_user_preferences('checkmark_exporttemplate', '');
         }
 
         if (
@@ -3434,6 +3437,7 @@ class checkmark {
                 $zipped,
                 $sequentialnumbering,
                 $coursetitle,
+                $template,
         ];
     }
 
@@ -3454,7 +3458,8 @@ class checkmark {
              * to request user_preference updates!
              */
             [$filter, $sumabs, $sumrel, $seperatenamecolumns, $format, $printperpage, $printoptimum, $textsize,
-                    $pageorientation, $printheader, $forcesinglelinenames, $zipped] = $this->print_preferences();
+                    $pageorientation, $printheader, $forcesinglelinenames, $zipped, $sequentialnumbering, $coursetitle,
+                    $template] = $this->print_preferences();
 
             ob_start();
             $this->get_print_data($filter);
@@ -3495,6 +3500,9 @@ class checkmark {
                     'printheader' => $printheader,
                     'forcesinglelinenames' => $forcesinglelinenames,
                     'zipped' => $zipped,
+                    'sequentialnumbering' => $sequentialnumbering,
+                    'coursetitle' => $coursetitle,
+                    'template' => $template,
             ];
             $mform->set_data($data);
         }
