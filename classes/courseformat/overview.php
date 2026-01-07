@@ -188,7 +188,7 @@ class overview extends activityoverviewbase {
 
         $items = [];
 
-        $ticks = checkmark_count_real_submissions($this->cm, $groupid);
+        $submissions = checkmark_count_real_submissions($this->cm, $groupid);
         $total = submissionstable::count_userids(
             $this->context,
             $this->checkmark->checkmark->id,
@@ -196,10 +196,10 @@ class overview extends activityoverviewbase {
             \checkmark::FILTER_ALL,
         );
 
-        $items['ticks'] = new overviewitem(
-            name: get_string('studentswithticks', 'checkmark'),
-            value: $ticks,
-            content: get_string('count_of_total', 'moodle', ['count' => $ticks, 'total' => $total]),
+        $items['submissions'] = new overviewitem(
+            name: get_string('submissions', 'checkmark'),
+            value: $submissions,
+            content: get_string('count_of_total', 'moodle', ['count' => $submissions, 'total' => $total]),
             textalign: text_align::CENTER,
         );
 

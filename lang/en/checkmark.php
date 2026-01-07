@@ -460,7 +460,6 @@ $string['strsum'] = 'Sum';
 $string['strvalidmsgtime'] = 'Duration of message validity';
 $string['strvalidmsgtimedesc'] = 'Amount of days after which grading notifications to users won\'t be sent any more.';
 $string['studentpreview'] = 'Student preview';
-$string['studentswithticks'] = 'Students with ticks';
 $string['submission'] = 'Submission';
 $string['submissionattachments'] = 'Only show files during submission';
 $string['submissionattachments_help'] = 'Tick the box to only show files on the submission page. Otherwise, files will be shown on both the assignment and submission pages.';
