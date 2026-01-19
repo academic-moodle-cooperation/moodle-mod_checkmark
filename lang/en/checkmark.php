@@ -47,7 +47,6 @@ $string['alwaysshowdescription_help'] = 'If disabled, the Assignment Description
 $string['attendance'] = 'Attendance';
 $string['attendance_help'] = 'The colum status represents the students attendance:<br /><ul><li>? - unknown</li><li>✓ - present</li><li>✖ - absent</li></ul>';
 $string['attendance_not_set_grade_locked'] = 'The attendance for {$a} couldn\'t be set, because the grade is locked or overridden in gradebook.';
-$string['attendanceactionnone'] = 'No attendance recorded';
 $string['attendancegradebook'] = 'Record attendance in gradebook';
 $string['attendancegradebook_help'] = 'If you activate this feature, attendances will be visible in gradebook as separate grade item: <ul><li>Empty grade - status unknown</li><li>Grade 0 - if absent</li><li>Grade 1 - if attendant</li></ul>';
 $string['attendancegradelink'] = 'Link attendance to automatic calculation of submission-grades';
