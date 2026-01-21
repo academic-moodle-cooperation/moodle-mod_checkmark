@@ -29,17 +29,23 @@ require_once(__DIR__ . '/../../config.php');
 
 require_login();
 
-$columns = optional_param_array('columns', false, PARAM_ALPHANUMEXT);
+$columns = optional_param_array('columns', [], PARAM_ALPHANUMEXT);
 $hide = optional_param('hide', false, PARAM_BOOL);
 
 $uniqueid = 'mod-checkmark-submissions';
 
 $prefs = json_decode(get_user_preferences('flextable_' . $uniqueid), true);
+if (!is_array($prefs)) {
+    $prefs = [
+        'collapse' => [],
+        'sortby' => [],
+    ];
+}
 
 foreach ($columns as $col) {
     if ($hide) {
         $prefs['collapse'][$col] = true;
-        if (array_key_exists($prefs['sortby'], $col)) {
+        if (array_key_exists($col, $prefs['sortby'])) {
             unset($prefs['sortby'][$col]);
         }
     } else {
