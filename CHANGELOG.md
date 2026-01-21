@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+5.1.0 (2026-01-06)
+------------------
+* Moodle 5.1 compatible version
+* [FEATURE] #8526 Save export settings as user preferences for future exports
+* [FEATURE] #8527 Show details of users when overwriting grades and comments in bulk automatic grading
+* [FEATURE] #8531 Add direct link to checkmark report in the activity navigation block
+* [FEATURE] #8615 Implement checkmark overview block for activity dashboard
+
 5.0.0 (2025-05-22)
 ------------------
 * Moodle 5.0 compatible version
