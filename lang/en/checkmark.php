@@ -391,6 +391,7 @@ $string['privacy:path:feedback'] = 'Comment';
 $string['privacy:path:submission'] = 'Submission';
 $string['quickgrade'] = 'Quick grading';
 $string['quickgrade_help'] = 'If enabled, multiple checkmarks can be graded on one page. Add grades and comments then click the "Save all grading changes" button to save all changes for that page.';
+$string['recordattendance'] = 'Record attendance';
 $string['remembertoupdategrades'] = 'You\'ve got automatically graded submissions in this checkmark. We highly recommend to update or regrade the submissions if you changed the examples\' grades!';
 $string['remove_grade'] = 'Remove grade';
 $string['remove_grade_error'] = 'Error while bulk removing grades';
