@@ -39,6 +39,7 @@ Feature: In a course, a teacher should be able to filter users in the "Submissio
     And I am on "Course 1" course homepage
     And I follow "Checkmark 1"
     And I navigate to "Submissions" in current page administration
+    Then "Save preferences" "button" should not be visible
     And I set the following fields to these values:
       | chmrk_selectallcb | 1     |
       | bulkaction        | grade |
@@ -46,7 +47,6 @@ Feature: In a course, a teacher should be able to filter users in the "Submissio
     Then I should see "Auto-grading successful! 3 submissions updated."
     And I set the following fields to these values:
       | filter | 12 |
-    And I press "Save preferences"
     Then I should see "student1"
 
   @javascript
@@ -96,7 +96,6 @@ Feature: In a course, a teacher should be able to filter users in the "Submissio
     And I navigate to "Submissions" in current page administration
     And I set the following fields to these values:
       | filter | 8 |
-    And I press "Save preferences"
     Then I should see "student1"
 
   @javascript
@@ -107,7 +106,6 @@ Feature: In a course, a teacher should be able to filter users in the "Submissio
     And I navigate to "Submissions" in current page administration
     And I set the following fields to these values:
       | filter | 9 |
-    And I press "Save preferences"
     Then I should see "student1"
     And I log in as "student1"
     And I am on "Course 1" course homepage
@@ -127,7 +125,6 @@ Feature: In a course, a teacher should be able to filter users in the "Submissio
     And I navigate to "Submissions" in current page administration
     And I set the following fields to these values:
       | filter | 9 |
-    And I press "Save preferences"
     Then I should not see "student1"
 
   @javascript
@@ -150,7 +147,6 @@ Feature: In a course, a teacher should be able to filter users in the "Submissio
     And I navigate to "Submissions" in current page administration
     And I set the following fields to these values:
       | filter | 3 |
-    And I press "Save preferences"
     Then I should see "student1"
     And I set the following fields to these values:
       | chmrk_selectallcb | 1 |
@@ -159,7 +155,6 @@ Feature: In a course, a teacher should be able to filter users in the "Submissio
     Then I should see "Auto-grading successful! 1 submission updated."
     And I set the following fields to these values:
       | filter | 3 |
-    And I press "Save preferences"
     Then I should not see "student1"
 
   @javascript
@@ -182,7 +177,6 @@ Feature: In a course, a teacher should be able to filter users in the "Submissio
     And I navigate to "Submissions" in current page administration
     And I set the following fields to these values:
       | filter | 2 |
-    And I press "Save preferences"
     Then I should see "student1"
     And I set the following fields to these values:
       | chmrk_selectallcb | 1 |
@@ -191,5 +185,4 @@ Feature: In a course, a teacher should be able to filter users in the "Submissio
     Then I should see "Auto-grading successful! 1 submission updated."
     And I set the following fields to these values:
       | filter | 2 |
-    And I press "Save preferences"
     Then I should see "student1"

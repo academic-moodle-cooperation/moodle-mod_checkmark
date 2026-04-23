@@ -3196,6 +3196,7 @@ class checkmark {
             $tablehtml = ob_get_contents();
             ob_end_clean();
             $mform->addElement('html', $tablehtml);
+            $mform->addElement('html', html_writer::div('', 'submissionstable-actions-gap', ['aria-hidden' => 'true']));
 
             $mform->addElement('select', 'mailinfo', get_string('notifystudent', 'checkmark'), [
                             '1' => get_string('yes'),
@@ -3327,12 +3328,16 @@ class checkmark {
 
         // Mini form for setting user preference!
         $formaction = new moodle_url('/mod/checkmark/submissions.php', ['id' => $this->cm->id]);
+        $autosubmit = [
+            'onchange' => 'this.form.dataset.formSubmitted = "true"; ' .
+                'if (this.form.requestSubmit) { this.form.requestSubmit(); } else { this.form.submit(); }',
+        ];
 
         $mform = new MoodleQuickForm('optionspref', 'post', $formaction, '', ['class' => 'optionspref']);
         $mform->addElement('hidden', 'updatepref');
         $mform->setDefault('updatepref', 1);
         $mform->addElement('header', 'qgprefs', get_string('optionalsettings', 'checkmark'));
-        $mform->addElement('select', 'filter', get_string('show'), $filters);
+        $mform->addElement('select', 'filter', get_string('show'), $filters, $autosubmit);
         $mform->addElement('hidden', 'sesskey');
         $mform->setDefault('sesskey', sesskey());
 
@@ -3344,7 +3349,7 @@ class checkmark {
                 50 => 50,
                 100 => 100,
                 0 => get_string('all'),
-        ]);
+        ], $autosubmit);
         $mform->setDefault('perpage', $perpage);
 
         $mform->addElement(
@@ -3352,13 +3357,11 @@ class checkmark {
             'quickgrade',
             get_string('quickgrade', 'checkmark'),
             0,
-            ['onchange' => "this.form.submit();"]
+            $autosubmit
         );
 
         $mform->setDefault('quickgrade', $quickgrade);
         $mform->addHelpButton('quickgrade', 'quickgrade', 'checkmark');
-
-        $mform->addElement('submit', 'savepreferences', get_string('savepreferences'));
 
         $mform->display();
 
