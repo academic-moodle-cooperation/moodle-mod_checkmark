@@ -73,6 +73,10 @@
     text-align: right;
 }
 
+#page-mod-checkmark-submissions .submissionstable-actions-gap {
+    height: 1.5rem;
+}
+
 /** Styles for view.php **/
 #page-mod-checkmark-view #dates {
     margin: 10px auto;
