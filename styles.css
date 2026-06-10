@@ -77,6 +77,15 @@
     height: 1.5rem;
 }
 
+#page-mod-checkmark-submissions #fgroup_id_actiongrp .felement fieldset > .d-flex {
+    gap: 0.25rem;
+}
+
+#page-mod-checkmark-submissions #fgroup_id_actiongrp select[name="bulkaction"] {
+    min-width: 12rem;
+    width: auto;
+}
+
 /** Styles for view.php **/
 #page-mod-checkmark-view #dates {
     margin: 10px auto;

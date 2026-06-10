@@ -1797,7 +1797,12 @@ class checkmark {
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function autograde_submissions($filter = self::FILTER_ALL, $selected = [], $countonly = false, $ignoreattendance = false) {
+    public function autograde_submissions(
+        $filter = self::FILTER_ALL,
+        $selected = [],
+        $countonly = false,
+        $ignoreattendance = false
+    ) {
         global $USER, $DB;
         $users = $this->get_users_to_autograde($filter, $selected, $ignoreattendance);
 
@@ -3215,8 +3220,52 @@ class checkmark {
             }
 
             $grp = [];
-            $grp[] =& $mform->createElement('select', 'bulkaction', '');
+            $bulkselect =& $mform->createElement(
+                'selectgroups',
+                'bulkaction',
+                ''
+            );
+            $grp[] =& $bulkselect;
             $enablebulk = false;
+            $defaultbulkaction = null;
+            $bulkactiongroups = [
+                get_string('bulk_general', 'checkmark') => [],
+                get_string('bulk_attendance', 'checkmark') => [],
+                get_string('bulk_presentation', 'checkmark') => [],
+                get_string('bulk_grading', 'checkmark') => [],
+            ];
+            $addbulkaction = function (
+                $group,
+                $label,
+                $value,
+                $attributes = []
+            ) use (
+                &$bulkactiongroups,
+                &$defaultbulkaction,
+                &$enablebulk
+            ) {
+                $bulkactiongroups[$group][] = [
+                    'label' => $label,
+                    'value' => $value,
+                    'attributes' => $attributes,
+                ];
+
+                if (empty($attributes['disabled'])) {
+                    $enablebulk = true;
+                    if ($defaultbulkaction === null) {
+                        $defaultbulkaction = $value;
+                    }
+                }
+            };
+
+            $generalgroup = get_string('bulk_general', 'checkmark');
+            $attendancegroup = get_string('bulk_attendance', 'checkmark');
+            $presentationgroup = get_string('bulk_presentation', 'checkmark');
+            $gradinggroup = get_string('bulk_grading', 'checkmark');
+
+            if (has_capability('mod/checkmark:manageoverrides', $this->context)) {
+                $addbulkaction($generalgroup, get_string('grant_extension', 'checkmark'), 'extend');
+            }
 
             if (($this->checkmark->grade <= 0)) {
                 // No autograde possible if no numeric grades are selected!
@@ -3224,20 +3273,23 @@ class checkmark {
                     get_string('autograde_non_numeric_grades', 'checkmark'),
                     'alert alert-error'
                 ));
-                $grp[0]->addOption(get_string('grade_automatically', 'checkmark'), 'grade', ['disabled' => 'disabled']);
+                $addbulkaction(
+                    $gradinggroup,
+                    get_string('grade_automatically', 'checkmark'),
+                    'grade',
+                    ['disabled' => 'disabled']
+                );
             } else {
-                $grp[0]->addOption(get_string('grade_automatically', 'checkmark'), 'grade');
-                $enablebulk = true;
+                $addbulkaction($gradinggroup, get_string('grade_automatically', 'checkmark'), 'grade');
+                $defaultbulkaction = 'grade';
             }
 
             if (
                 $this->checkmark->trackattendance
                     && has_capability('mod/checkmark:trackattendance', $this->context)
             ) {
-                $grp[0]->addOption('---', '', ['disabled' => 'disabled']);
-                $grp[0]->addOption(get_string('setattendant', 'checkmark'), 'setattendant');
-                $grp[0]->addOption(get_string('setabsent', 'checkmark'), 'setabsent');
-                $enablebulk = true;
+                $addbulkaction($attendancegroup, get_string('setattendant', 'checkmark'), 'setattendant');
+                $addbulkaction($attendancegroup, get_string('setabsent', 'checkmark'), 'setabsent');
             }
 
             if (
@@ -3254,21 +3306,40 @@ class checkmark {
                     $attr = ['disabled' => 'disabled'];
                 } else {
                     $attr = [];
-                    $enablebulk = true;
                 }
-                $grp[0]->addOption(get_string('setattendantandgrade', 'checkmark'), 'setattendantandgrade', $attr);
-                $grp[0]->addOption(get_string('setabsentandgrade', 'checkmark'), 'setabsentandgrade', $attr);
+                $addbulkaction(
+                    $attendancegroup,
+                    get_string('setattendantandgrade', 'checkmark'),
+                    'setattendantandgrade',
+                    $attr
+                );
+                $addbulkaction($attendancegroup, get_string('setabsentandgrade', 'checkmark'), 'setabsentandgrade', $attr);
             }
 
-            $grp[0]->addOption(get_string('remove_grade', 'checkmark'), 'removegrade');
             if ($this->checkmark->presentationgrading) {
-                $grp[0]->addOption(get_string('remove_presentation_grade', 'checkmark'), 'removepresentationgrade');
+                $addbulkaction(
+                    $presentationgroup,
+                    get_string('remove_presentation_grade', 'checkmark'),
+                    'removepresentationgrade'
+                );
             }
 
-            if (has_capability('mod/checkmark:manageoverrides', $this->context)) {
-                $grp[0]->addOption('---', '', ['disabled' => 'disabled']);
-                $grp[0]->addOption(get_string('grant_extension', 'checkmark'), 'extend');
-                $enablebulk = true;
+            $addbulkaction($gradinggroup, get_string('remove_grade', 'checkmark'), 'removegrade');
+
+            $groupindex = 0;
+            foreach ($bulkactiongroups as $group => $actions) {
+                if (empty($actions)) {
+                    continue;
+                }
+                $bulkselect->addOptGroup($group, []);
+                foreach ($actions as $action) {
+                    $bulkselect->addOption($groupindex, $action['label'], $action['value'], $action['attributes']);
+                }
+                $groupindex++;
+            }
+
+            if ($defaultbulkaction !== null) {
+                $bulkselect->setSelected($defaultbulkaction);
             }
 
             $attr = [];
