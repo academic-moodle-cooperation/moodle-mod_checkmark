@@ -35,6 +35,27 @@ Installation
 Furthermore there is an additional report available [Checkmark report](https://moodle.org/plugins/local_checkmarkreport), which provides teachers and students with an overview of the details of all checkmark activites in a course.
 
 
+Subplugins
+----------
+
+Checkmark supports add-on subplugins. Add-ons are installed in `mod/checkmark/addon/<name>` and use the Frankenstyle component name `checkmarkaddon_<name>`.
+
+A minimal add-on requires at least:
+
+```text
+mod/checkmark/addon/example/version.php
+mod/checkmark/addon/example/lang/en/checkmarkaddon_example.php
+```
+
+The `version.php` file must declare the matching component:
+
+```php
+$plugin->component = 'checkmarkaddon_example';
+```
+
+Add-ons may provide their own `settings.php`. Installed add-ons and their settings are available in the Moodle site administration under the Checkmark administration area.
+
+
 Privacy API
 -------------
 

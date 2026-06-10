@@ -153,6 +153,9 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
             );
         }
 
+        // Allow add-ons to back up data at checkmark activity level.
+        $this->add_subplugin_structure('checkmarkaddon', $checkmark, true);
+
         // Define id annotations!
         $checkmark->annotate_ids('scale', 'grade');
         $checkmark->annotate_ids('scale', 'presentationgrade');

@@ -1,0 +1,8 @@
+{
+    "subplugintypes": {
+        "checkmarkaddon": "addon"
+    },
+    "plugintypes": {
+        "checkmarkaddon": "mod/checkmark/addon"
+    }
+}
