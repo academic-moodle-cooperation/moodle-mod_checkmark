@@ -237,6 +237,7 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
             unset($data->mailed);
             $feedback->timecreated = $data->timemarked;
             $feedback->timemodified = $data->timemarked;
+            $feedback->presentationtimemodified = 0;
             unset($data->timemarked);
             // Process feedback restore here!
             $this->process_checkmark_feedback($feedback);
@@ -293,6 +294,11 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
         $data->graderid = $this->get_mappingid('user', $data->graderid);
         $data->timecreated = $this->apply_date_offset($data->timecreated);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
+        if (isset($data->presentationtimemodified)) {
+            $data->presentationtimemodified = $this->apply_date_offset($data->presentationtimemodified);
+        } else {
+            $data->presentationtimemodified = 0;
+        }
 
         $newitemid = $DB->insert_record('checkmark_feedbacks', $data);
         $this->set_mapping('checkmark_feedback', $oldid, $newitemid, true);

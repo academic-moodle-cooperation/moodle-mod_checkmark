@@ -767,7 +767,8 @@ function checkmark_get_user_presentation_grades($checkmark, $userid = 0) {
     $params['aid'] = $checkmark->id;
 
     $sql = 'SELECT u.id, u.id AS userid, f.presentationgrade AS rawgrade, f.presentationfeedback AS feedback,
-                   f.presentationformat AS format, f.graderid AS usermodified, f.timemodified AS dategraded
+                   f.presentationformat AS format, f.graderid AS usermodified,
+                   f.presentationtimemodified AS dategraded
               FROM {user} u, {checkmark_feedbacks} f
              WHERE u.id = f.userid AND f.checkmarkid = :aid' .
         $user;
