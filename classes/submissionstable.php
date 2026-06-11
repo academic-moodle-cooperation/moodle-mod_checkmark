@@ -523,7 +523,7 @@ class submissionstable extends \table_sql {
             $tableheaders[] = get_string('presentationfeedback_table', 'checkmark');
             $tablecolumns[] = 'presentationfeedback';
             $helpicons[] = null;
-            $table->add_colgroup('presentationgrade', $span);
+            $table->add_colgroup('presentation presentationgrade', $span);
         }
 
         $table->define_columns($tablecolumns);
@@ -959,7 +959,7 @@ class submissionstable extends \table_sql {
             $table->columnformat['presentationfeedback'] = [
                 'align' => 'L',
             ];
-            $table->add_colgroup('presentationgrade', $span);
+            $table->add_colgroup('presentation presentationgrade', $span);
         }
 
         $tableheaders[] = get_string('signature', 'checkmark');
