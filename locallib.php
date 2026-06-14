@@ -2485,6 +2485,7 @@ class checkmark {
                 $attendance = false;
                 $presgrading = false;
                 $prescommenting = false;
+                $presstatusediting = false;
                 $grading = false;
                 $commenting = false;
                 $col = false;
@@ -2493,11 +2494,13 @@ class checkmark {
                 $feedbacks = optional_param_array('feedback', [], PARAM_TEXT);
                 $attendances = optional_param_array('attendance', [], PARAM_INT);
                 $checks = optional_param_array('ex', [], PARAM_BOOL);
+                $presentationstatuses = optional_param_array('presentationstatus', [], PARAM_INT);
                 $presgrades = optional_param_array('presentationgrade', [], PARAM_INT);
                 $presfeedbacks = optional_param_array('presentationfeedback', [], PARAM_TEXT);
                 $oldgrades = optional_param_array('oldgrade', [], PARAM_INT);
                 $oldfeedbacks = optional_param_array('oldfeedback', [], PARAM_TEXT);
                 $oldattendances = optional_param_array('oldattendance', [], PARAM_INT);
+                $oldpresentationstatuses = optional_param_array('oldpresentationstatus', [], PARAM_INT);
                 $oldpresgrades = optional_param_array('oldpresentationgrade', [], PARAM_INT);
                 $oldpresfeedbacks = optional_param_array('oldpresentationfeedback', [], PARAM_TEXT);
                 $oldchecks = optional_param_array('oldex', [], PARAM_BOOL);
@@ -2511,6 +2514,12 @@ class checkmark {
                     $col = 'attendance';
                     $attendance = true;
                     $ids = array_unique(array_merge($ids, array_keys($attendances)));
+                }
+
+                if (!empty($presentationstatuses) && $this->checkmark->presentationgrading && $cangradepres) {
+                    $col = 'presentationstatus';
+                    $presstatusediting = true;
+                    $ids = array_unique(array_merge($ids, array_keys($presentationstatuses)));
                 }
 
                 if (
@@ -2588,6 +2597,9 @@ class checkmark {
                     if (!isset($oldattendances[$id])) {
                         $oldattendances[$id] = null;
                     }
+                    if (!isset($oldpresentationstatuses[$id])) {
+                        $oldpresentationstatuses[$id] = CHECKMARK_PRESENTATION_STATUS_NO;
+                    }
                     if (!isset($oldpresgrades[$id])) {
                         $oldpresgrades[$id] = -1;
                     }
@@ -2615,6 +2627,23 @@ class checkmark {
                     }
 
                     if (
+                        $presstatusediting && key_exists($id, $presentationstatuses)
+                            && ($oldpresentationstatuses[$id] != $presentationstatuses[$id])
+                    ) {
+                        $presentationstatus = $presentationstatuses[$id];
+                        if (!array_key_exists($presentationstatus, submissionstable::get_presentation_status_menu())) {
+                            $presentationstatus = CHECKMARK_PRESENTATION_STATUS_NO;
+                        }
+                        $updatedb = $updatedb || ($oldpresentationstatuses[$id] != $presentationstatus);
+                        if ($feedback === false) {
+                            $feedback = $this->prepare_new_feedback($id);
+                        }
+                        $feedback->presentationstatus = $presentationstatus;
+                    } else {
+                        unset($feedback->presentationstatus);
+                    }
+
+                    if (
                         $presgrading && key_exists($id, $presgrades) && (($oldpresgrades[$id] != $presgrades[$id])
                                     && !($oldpresgrades[$id] === null && $presgrades[$id] == -1))
                     ) {
@@ -2627,6 +2656,9 @@ class checkmark {
                             $feedback = $this->prepare_new_feedback($id);
                         }
                         $feedback->presentationgrade = $presgrade;
+                        if ($presgrade !== null) {
+                            $feedback->presentationstatus = CHECKMARK_PRESENTATION_STATUS_YES;
+                        }
                     } else {
                         unset($feedback->presentationgrade);
                     }
@@ -4318,6 +4350,9 @@ class checkmark {
                     // Normalize the presentationgrade!
                     $feedback->presentationgrade = null;
                 }
+                if ($feedback->presentationgrade !== null) {
+                    $feedback->presentationstatus = CHECKMARK_PRESENTATION_STATUS_YES;
+                }
             }
             $feedback->presentationfeedback = $formdata->presentationfeedback_editor['text'];
             $feedback->presentationformat = $formdata->presentationfeedback_editor['format'];
@@ -4457,6 +4492,7 @@ class checkmark {
         $feedback->feedback = '';
         $feedback->format = 0;
         $feedback->attendance = null;
+        $feedback->presentationstatus = CHECKMARK_PRESENTATION_STATUS_NO;
         $feedback->graderid = $USER->id;
         $feedback->mailed = 1;
         $feedback->timecreated = time();

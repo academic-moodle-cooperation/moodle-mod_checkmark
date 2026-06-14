@@ -1601,5 +1601,28 @@ function xmldb_checkmark_upgrade($oldversion) {
         }
     }
 
+    if ($oldversion < 2026061000) {
+        // Define field presentationstatus to be added to checkmark_feedbacks.
+        $table = new xmldb_table('checkmark_feedbacks');
+        $field = new xmldb_field(
+            'presentationstatus',
+            XMLDB_TYPE_INTEGER,
+            '2',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'attendance'
+        );
+
+        // Conditionally launch add field presentationstatus.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2026061000, 'checkmark');
+    }
+
     return true;
 }

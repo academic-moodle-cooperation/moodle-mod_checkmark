@@ -171,4 +171,59 @@ final class locallib_test extends \advanced_testcase {
         $_POST = $oldpost;
         $_GET = $oldget;
     }
+
+    /**
+     * Ensure a saved presentation grade marks the presentation status as done.
+     */
+    public function test_process_feedback_sets_presentation_status_to_yes_with_presentation_grade(): void {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $student = $generator->create_user();
+        $generator->enrol_user($student->id, $course->id, 'student');
+
+        $checkmarkrecord = $generator->create_module('checkmark', [
+            'course' => $course->id,
+            'presentationgrading' => 1,
+            'presentationgrade' => 100,
+            'presentationgradebook' => 0,
+        ]);
+        $checkmark = new \checkmark($checkmarkrecord->cmid);
+
+        $oldpost = $_POST;
+        $_POST = [
+            'sesskey' => sesskey(),
+            'saveuserid' => -1,
+            'userid' => $student->id,
+            'xgrade' => -1,
+            'feedback_editor' => [
+                'text' => '',
+                'format' => FORMAT_HTML,
+            ],
+            'presentationgrade' => 50,
+            'presentationfeedback_editor' => [
+                'text' => '',
+                'format' => FORMAT_HTML,
+            ],
+            'mailinfo' => 0,
+        ];
+
+        try {
+            $checkmark->process_feedback();
+        } finally {
+            $_POST = $oldpost;
+        }
+
+        $feedback = $DB->get_record('checkmark_feedbacks', [
+            'checkmarkid' => $checkmarkrecord->id,
+            'userid' => $student->id,
+        ], '*', MUST_EXIST);
+
+        $this->assertEquals(CHECKMARK_PRESENTATION_STATUS_YES, $feedback->presentationstatus);
+        $this->assertEquals(50, $feedback->presentationgrade);
+    }
 }

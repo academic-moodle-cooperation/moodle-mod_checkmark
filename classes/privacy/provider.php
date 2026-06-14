@@ -72,6 +72,7 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
                 'feedback' => 'privacy:metadata:feedback',
                 'format' => 'privacy:metadata:format',
                 'attendance' => 'privacy:metadata:attendance',
+                'presentationstatus' => 'privacy:metadata:presentationstatus',
                 'presentationgrade' => 'privacy:metadata:presentationgrade',
                 'presentationfeedback' => 'privacy:metadata:presentationfeedback',
                 'presentationformat' => 'privacy:metadata:presentationformat',
@@ -424,6 +425,14 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
         }
         if (!empty($c->checkmark->presentationgrade)) {
             $data->presentationgrade = $c->display_grade($feedback->presentationgrade, CHECKMARK_PRESENTATION_ITEM);
+        }
+        if ($c->checkmark->presentationgrading) {
+            $presentationstatusmenu = \mod_checkmark\submissionstable::get_presentation_status_menu();
+            $presentationstatus = $feedback->presentationstatus ?? CHECKMARK_PRESENTATION_STATUS_NO;
+            if (!array_key_exists($presentationstatus, $presentationstatusmenu)) {
+                $presentationstatus = CHECKMARK_PRESENTATION_STATUS_NO;
+            }
+            $data->presentationstatus = $presentationstatusmenu[$presentationstatus];
         }
         if ($feedback->presentationfeedback !== "") {
             $data->presentationfeedback = format_text(

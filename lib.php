@@ -30,6 +30,13 @@ define('CHECKMARK_ATTENDANCE_ITEM', 1);
 /** PRESENTATIONGRADE ITEM */
 define('CHECKMARK_PRESENTATION_ITEM', 2);
 
+/** Presentation status: no presentation is planned or done. */
+define('CHECKMARK_PRESENTATION_STATUS_NO', 0);
+/** Presentation status: presentation is marked/planned. */
+define('CHECKMARK_PRESENTATION_STATUS_MARKED', 1);
+/** Presentation status: presentation is done. */
+define('CHECKMARK_PRESENTATION_STATUS_YES', 2);
+
 /** EVENT TYPE DUE - deadline for student's submissions */
 define('CHECKMARK_EVENT_TYPE_DUE', 'due'); // Is backwards compatible to former events!
 

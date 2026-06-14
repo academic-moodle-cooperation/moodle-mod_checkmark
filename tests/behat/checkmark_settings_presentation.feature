@@ -36,6 +36,7 @@ Feature: Track presentations and grade them
       | id_presentationgrade_modgrade_type | none |
     And I press "Save and display"
     And I follow "Submissions"
+    Then I should see "Presentation"
     Then I should see "Comment (presentation)"
     Then I should not see "Grade (presentation)"
     And I follow "Settings"
@@ -44,6 +45,7 @@ Feature: Track presentations and grade them
       | id_presentationgrade_modgrade_type | point |
     And I press "Save and display"
     And I follow "Submissions"
+    Then I should see "Presentation"
     Then I should see "Comment (presentation)"
     Then I should see "Grade (presentation)"
     And I follow "Settings"
@@ -52,6 +54,7 @@ Feature: Track presentations and grade them
       | id_presentationgrade_modgrade_type | scale |
     And I press "Save and display"
     And I follow "Submissions"
+    Then I should see "Presentation"
     Then I should see "Comment (presentation)"
     Then I should see "Grade (presentation)"
 
