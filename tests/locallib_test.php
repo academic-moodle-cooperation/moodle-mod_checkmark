@@ -275,6 +275,123 @@ final class locallib_test extends \advanced_testcase {
     }
 
     /**
+     * Ensure presentation filters are returned in the expected order and use status-based labels.
+     */
+    public function test_get_possible_filters_contains_presentation_status_filters_in_order(): void {
+        $filters = \checkmark::get_possible_filters(false, true);
+
+        $this->assertSame(
+            [
+                \checkmark::FILTER_PRESENTATIONGRADING,
+                \checkmark::FILTER_PRESENTATION_MARKED,
+                \checkmark::FILTER_NO_PRESENTATIONGRADING,
+            ],
+            array_values(
+                array_intersect(
+                    array_keys($filters),
+                    [
+                        \checkmark::FILTER_PRESENTATIONGRADING,
+                        \checkmark::FILTER_PRESENTATION_MARKED,
+                        \checkmark::FILTER_NO_PRESENTATIONGRADING,
+                    ]
+                )
+            )
+        );
+        $this->assertSame('All participants with a presentation', $filters[\checkmark::FILTER_PRESENTATIONGRADING]);
+        $this->assertSame('All participants marked for a presentation', $filters[\checkmark::FILTER_PRESENTATION_MARKED]);
+        $this->assertSame('All participants without a presentation', $filters[\checkmark::FILTER_NO_PRESENTATIONGRADING]);
+    }
+
+    /**
+     * Ensure presentation filters select users by presentation status.
+     */
+    public function test_presentation_filters_use_presentation_status(): void {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator();
+        $plugingenerator = $generator->get_plugin_generator('mod_checkmark');
+        $course = $generator->create_course();
+        $students = [
+            'yes' => $generator->create_user(),
+            'marked' => $generator->create_user(),
+            'explicitno' => $generator->create_user(),
+            'defaultno' => $generator->create_user(),
+        ];
+
+        foreach ($students as $student) {
+            $generator->enrol_user($student->id, $course->id, 'student');
+        }
+
+        $checkmarkrecord = $generator->create_module('checkmark', [
+            'course' => $course->id,
+            'presentationgrading' => 1,
+            'presentationgrade' => 100,
+            'presentationgradebook' => 0,
+        ]);
+        $context = \context_module::instance($checkmarkrecord->cmid);
+
+        $plugingenerator->create_feedback([
+            'checkmark' => $checkmarkrecord->id,
+            'userid' => $students['yes']->id,
+            'presentationstatus' => CHECKMARK_PRESENTATION_STATUS_YES,
+        ]);
+        $plugingenerator->create_feedback([
+            'checkmark' => $checkmarkrecord->id,
+            'userid' => $students['marked']->id,
+            'presentationstatus' => CHECKMARK_PRESENTATION_STATUS_MARKED,
+        ]);
+        $plugingenerator->create_feedback([
+            'checkmark' => $checkmarkrecord->id,
+            'userid' => $students['explicitno']->id,
+            'presentationstatus' => CHECKMARK_PRESENTATION_STATUS_NO,
+        ]);
+
+        $this->assert_same_userids(
+            [$students['yes']->id],
+            submissionstable::get_userids_static(
+                $context,
+                $checkmarkrecord->id,
+                null,
+                \checkmark::FILTER_PRESENTATIONGRADING
+            )
+        );
+        $this->assert_same_userids(
+            [$students['marked']->id],
+            submissionstable::get_userids_static(
+                $context,
+                $checkmarkrecord->id,
+                null,
+                \checkmark::FILTER_PRESENTATION_MARKED
+            )
+        );
+        $this->assert_same_userids(
+            [$students['explicitno']->id, $students['defaultno']->id],
+            submissionstable::get_userids_static(
+                $context,
+                $checkmarkrecord->id,
+                null,
+                \checkmark::FILTER_NO_PRESENTATIONGRADING
+            )
+        );
+    }
+
+    /**
+     * Assert two user id lists contain the same ids.
+     *
+     * @param int[] $expected Expected user ids.
+     * @param int[] $actual Actual user ids.
+     */
+    private function assert_same_userids(array $expected, array $actual): void {
+        $expected = array_map('intval', $expected);
+        $actual = array_map('intval', $actual);
+        sort($expected);
+        sort($actual);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
      * Submit feedback form data to process_feedback().
      *
      * @param \checkmark $instance Checkmark instance.

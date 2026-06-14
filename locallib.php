@@ -62,14 +62,16 @@ class checkmark {
     const FILTER_EXTENSION = 8;
     /** FILER NOT SUBMITTED */
     const FILTER_NOT_SUBMITTED = 9;
-    /** FILER PRESENTATIONGRADING */
+    /** FILTER PRESENTATION YES */
     const FILTER_PRESENTATIONGRADING = 10;
-    /** FILER NO PRESENTATIONGRADING */
+    /** FILTER PRESENTATION NO */
     const FILTER_NO_PRESENTATIONGRADING = 11;
     /** FILER NO PRESENTATIONGRADING */
     const FILTER_GRADED = 12;
     /** FILTER_SELECTED_GRADED */
     const FILTER_SELECTED_GRADED = 13;
+    /** FILTER PRESENTATION MARKED */
+    const FILTER_PRESENTATION_MARKED = 14;
 
 
     /** DELIMITER Used to connect example-names, example-grades, submission-examplenumbers! */
@@ -3870,6 +3872,10 @@ class checkmark {
         if ($presentationgrading) {
             $filters[self::FILTER_PRESENTATIONGRADING] = get_string(
                 'all_with_presentationgrading',
+                'checkmark'
+            );
+            $filters[self::FILTER_PRESENTATION_MARKED] = get_string(
+                'all_marked_presentation',
                 'checkmark'
             );
             $filters[self::FILTER_NO_PRESENTATIONGRADING] = get_string(

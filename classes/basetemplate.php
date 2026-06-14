@@ -207,9 +207,14 @@ abstract class basetemplate extends submissionstable {
         } else if ($filter == \checkmark::FILTER_NOT_SUBMITTED) {
             $where .= " AND (s.timemodified <= 0 OR s.timemodified IS NULL)";
         } else if ($filter == \checkmark::FILTER_PRESENTATIONGRADING) {
-            $where .= " AND presentationgrade IS NOT NULL OR presentationfeedback IS NOT NULL";
+            $where .= " AND COALESCE(f.presentationstatus, " . CHECKMARK_PRESENTATION_STATUS_NO . ") = " .
+                CHECKMARK_PRESENTATION_STATUS_YES;
+        } else if ($filter == \checkmark::FILTER_PRESENTATION_MARKED) {
+            $where .= " AND COALESCE(f.presentationstatus, " . CHECKMARK_PRESENTATION_STATUS_NO . ") = " .
+                CHECKMARK_PRESENTATION_STATUS_MARKED;
         } else if ($filter == \checkmark::FILTER_NO_PRESENTATIONGRADING) {
-            $where .= " AND presentationgrade IS NULL AND presentationfeedback IS NULL";
+            $where .= " AND COALESCE(f.presentationstatus, " . CHECKMARK_PRESENTATION_STATUS_NO . ") = " .
+                CHECKMARK_PRESENTATION_STATUS_NO;
         } else if ($filter == \checkmark::FILTER_GRADED) {
             $where .= " AND COALESCE(f.gradetimemodified,0) >= COALESCE(s.timemodified,0)
                         AND f.gradetimemodified IS NOT NULL";
