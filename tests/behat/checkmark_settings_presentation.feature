@@ -100,10 +100,13 @@ Feature: Track presentations and grade them
       | bulkaction        | grade |
     And I press "Start"
     And I follow "Update"
+    Then I should see "Presentation grading"
     And I set the following fields to these values:
-      | id_presentationgrade | 50 |
+      | id_presentationstatus | 0  |
+      | id_presentationgrade  | 50 |
     And I press "Save changes"
     Then I should see "50 / 100"
+    And "Student 1" row "Presentation" column of "generaltable" table should contain "Yes"
 
   @javascript
   Scenario: Update only the presentation modification time when the presentation status changes

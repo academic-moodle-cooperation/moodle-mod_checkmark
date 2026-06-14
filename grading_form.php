@@ -77,6 +77,8 @@ class mod_checkmark_grading_form extends moodleform {
 
         $this->add_feedback_section();
 
+        $this->add_presentation_section();
+
         if ($this->_customdata->feedbackobj !== false) {
             $datestring = userdate($this->_customdata->feedbackobj->timemodified) . '&nbsp; (' .
                 format_time(time() - $this->_customdata->feedbackobj->timemodified) .
@@ -139,9 +141,6 @@ class mod_checkmark_grading_form extends moodleform {
 
         // Attendance elements!
         $this->add_attendance_elements();
-
-        // Presentation grade elements!
-        $this->add_presentation_grade_elements();
 
         $mform->addElement('hidden', 'mailinfo_h', '0');
         $mform->setType('mailinfo_h', PARAM_INT);
@@ -267,14 +266,53 @@ class mod_checkmark_grading_form extends moodleform {
     }
 
     /**
-     * Adds the presentation grade elements to the form!
+     * Add the presentation section to the form.
+     */
+    public function add_presentation_section() {
+        if (empty($this->_customdata->presentationgrading)) {
+            return;
+        }
+
+        $mform =& $this->_form;
+        $mform->addElement('header', 'presentationheader', get_string('presentationheader', 'checkmark'));
+        $mform->setExpanded('presentationheader');
+
+        $this->add_presentation_grade_elements();
+    }
+
+    /**
+     * Adds the presentation elements to the form!
      */
     public function add_presentation_grade_elements() {
         $mform =& $this->_form;
         $context = context_module::instance($this->_customdata->cm->id);
+        $cangradepresentation = has_capability('mod/checkmark:gradepresentation', $context);
 
         // Presentation grade section!
         if (!empty($this->_customdata->presentationgrading)) {
+            $presentationstatusmenu = \mod_checkmark\submissionstable::get_presentation_status_menu();
+            $presentationstatus = (int)($this->_customdata->presentationstatus ?? CHECKMARK_PRESENTATION_STATUS_NO);
+            if (!array_key_exists($presentationstatus, $presentationstatusmenu)) {
+                $presentationstatus = CHECKMARK_PRESENTATION_STATUS_NO;
+            }
+            if ($cangradepresentation) {
+                $mform->addElement(
+                    'select',
+                    'presentationstatus',
+                    get_string('presentationstatus', 'checkmark'),
+                    $presentationstatusmenu
+                );
+                $mform->setType('presentationstatus', PARAM_INT);
+                $mform->setDefault('presentationstatus', $presentationstatus);
+            } else {
+                $mform->addElement(
+                    'static',
+                    'presentationstatus',
+                    get_string('presentationstatus', 'checkmark'),
+                    $presentationstatusmenu[$presentationstatus]
+                );
+            }
+
             if ($this->_customdata->presentationgradebook) {
                 $presentationitem = $this->_customdata->grading_info->items[CHECKMARK_PRESENTATION_ITEM];
                 if ($this->_customdata->instance_presentationgrade) {
@@ -291,7 +329,7 @@ class mod_checkmark_grading_form extends moodleform {
             }
             if (
                 $this->_customdata->presentationgradebook &&
-                ($this->_customdata->presgradedisabled || !has_capability('mod/checkmark:gradepresentation', $context))
+                ($this->_customdata->presgradedisabled || !$cangradepresentation)
             ) {
                 $mform->addElement(
                     'static',
