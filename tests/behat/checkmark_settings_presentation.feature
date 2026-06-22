@@ -100,7 +100,7 @@ Feature: Track presentations and grade them
       | bulkaction        | grade |
     And I press "Start"
     And I follow "Update"
-    Then I should see "Presentation grading"
+    Then I should see "Presentation"
     And I set the following fields to these values:
       | id_presentationstatus | 0  |
       | id_presentationgrade  | 50 |

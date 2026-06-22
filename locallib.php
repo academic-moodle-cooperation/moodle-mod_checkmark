@@ -3284,7 +3284,7 @@ class checkmark {
             $bulkactiongroups = [
                 get_string('bulk_general', 'checkmark') => [],
                 get_string('bulk_attendance', 'checkmark') => [],
-                get_string('bulk_presentation', 'checkmark') => [],
+                get_string('presentationheader', 'checkmark') => [],
                 get_string('bulk_grading', 'checkmark') => [],
             ];
             $addbulkaction = function (
@@ -3313,7 +3313,7 @@ class checkmark {
 
             $generalgroup = get_string('bulk_general', 'checkmark');
             $attendancegroup = get_string('bulk_attendance', 'checkmark');
-            $presentationgroup = get_string('bulk_presentation', 'checkmark');
+            $presentationgroup = get_string('presentationheader', 'checkmark');
             $gradinggroup = get_string('bulk_grading', 'checkmark');
 
             if (has_capability('mod/checkmark:manageoverrides', $this->context)) {

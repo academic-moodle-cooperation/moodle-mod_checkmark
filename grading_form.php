@@ -299,7 +299,7 @@ class mod_checkmark_grading_form extends moodleform {
                 $mform->addElement(
                     'select',
                     'presentationstatus',
-                    get_string('presentationstatus', 'checkmark'),
+                    get_string('presentationheader', 'checkmark'),
                     $presentationstatusmenu
                 );
                 $mform->setType('presentationstatus', PARAM_INT);
@@ -308,7 +308,7 @@ class mod_checkmark_grading_form extends moodleform {
                 $mform->addElement(
                     'static',
                     'presentationstatus',
-                    get_string('presentationstatus', 'checkmark'),
+                    get_string('presentationheader', 'checkmark'),
                     $presentationstatusmenu[$presentationstatus]
                 );
             }
