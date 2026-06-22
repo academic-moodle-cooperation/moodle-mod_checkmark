@@ -2587,6 +2587,7 @@ class checkmark {
 
                     // For fast grade, we need to check if any changes take place!
                     $updatedb = false;
+                    $presentationupdated = false;
 
                     if (!isset($oldgrades[$id])) {
                         $oldgrades[$id] = -1;
@@ -2639,6 +2640,7 @@ class checkmark {
                             $feedback = $this->prepare_new_feedback($id);
                         }
                         $feedback->presentationstatus = $presentationstatus;
+                        $presentationupdated = true;
                     } else {
                         unset($feedback->presentationstatus);
                     }
@@ -2659,6 +2661,7 @@ class checkmark {
                         if ($presgrade !== null) {
                             $feedback->presentationstatus = CHECKMARK_PRESENTATION_STATUS_YES;
                         }
+                        $presentationupdated = true;
                     } else {
                         unset($feedback->presentationgrade);
                     }
@@ -2673,6 +2676,7 @@ class checkmark {
                             $feedback = $this->prepare_new_feedback($id);
                         }
                         $feedback->presentationfeedback = submissionstable::convert_text_to_html($presfeedbackvalue);
+                        $presentationupdated = true;
                     } else {
                         unset($feedback->presentationfeedback);  // Don't need to update this.
                     }
@@ -2717,7 +2721,11 @@ class checkmark {
                      */
 
                     if ($updatedb) {
-                        $feedback->timemodified = time();
+                        $now = time();
+                        $feedback->timemodified = $now;
+                        if ($presentationupdated) {
+                            $feedback->presentationtimemodified = $now;
+                        }
 
                         $DB->update_record('checkmark_feedbacks', $feedback);
 
@@ -4300,11 +4308,17 @@ class checkmark {
         $feedback = $this->get_feedback($formdata->userid); // Get or make one!
         if ($feedback === false) {
             $feedback = $this->prepare_new_feedback($formdata->userid);
-        } else {
-            $feedback->timemodified = time();
         }
 
         $update = false;
+        $presentationupdated = false;
+        $oldpresentationgrade = $feedback->presentationgrade ?? null;
+        if ($oldpresentationgrade == -1) {
+            $oldpresentationgrade = null;
+        }
+        $oldpresentationfeedback = (string)($feedback->presentationfeedback ?? '');
+        $oldpresentationformat = (int)($feedback->presentationformat ?? FORMAT_HTML);
+        $oldpresentationstatus = (int)($feedback->presentationstatus ?? CHECKMARK_PRESENTATION_STATUS_NO);
 
         if (
             !($gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$formdata->userid]->locked
@@ -4344,23 +4358,39 @@ class checkmark {
             $this->checkmark->presentationgrading && has_capability('mod/checkmark:gradepresentation', $this->context)
                 && !$presgradedisabled
         ) {
+            $newpresentationgrade = null;
             if ($this->checkmark->presentationgrade) {
-                $feedback->presentationgrade = $formdata->presentationgrade;
+                $newpresentationgrade = $formdata->presentationgrade;
                 if ($formdata->presentationgrade == -1) {
                     // Normalize the presentationgrade!
-                    $feedback->presentationgrade = null;
+                    $newpresentationgrade = null;
                 }
-                if ($feedback->presentationgrade !== null) {
+                $feedback->presentationgrade = $newpresentationgrade;
+                if ($newpresentationgrade !== null) {
                     $feedback->presentationstatus = CHECKMARK_PRESENTATION_STATUS_YES;
                 }
             }
-            $feedback->presentationfeedback = $formdata->presentationfeedback_editor['text'];
-            $feedback->presentationformat = $formdata->presentationfeedback_editor['format'];
+            $newpresentationfeedback = (string)($formdata->presentationfeedback_editor['text'] ?? '');
+            $newpresentationformat = (int)($formdata->presentationfeedback_editor['format'] ?? FORMAT_HTML);
+            $feedback->presentationfeedback = $newpresentationfeedback;
+            $feedback->presentationformat = $newpresentationformat;
             $feedback->graderid = $USER->id;
+            $presentationupdated = ($oldpresentationfeedback !== $newpresentationfeedback)
+                    || (!empty($newpresentationfeedback) && $oldpresentationformat !== $newpresentationformat);
+            if ($this->checkmark->presentationgrade) {
+                $presentationupdated = $presentationupdated || ($oldpresentationgrade != $newpresentationgrade);
+            }
+            $presentationupdated = $presentationupdated
+                    || ($oldpresentationstatus !== (int)$feedback->presentationstatus);
             $update = true;
         }
 
         if ($update) {
+            $now = time();
+            $feedback->timemodified = $now;
+            if ($presentationupdated) {
+                $feedback->presentationtimemodified = $now;
+            }
             if (!empty($formdata->mailinfo)) {
                 $feedback->mailed = 0;       // Make sure mail goes out (again, even)!
             } else {
@@ -4497,6 +4527,7 @@ class checkmark {
         $feedback->mailed = 1;
         $feedback->timecreated = time();
         $feedback->timemodified = $feedback->timecreated;
+        $feedback->presentationtimemodified = 0;
 
         $feedback->id = $DB->insert_record('checkmark_feedbacks', $feedback);
 
@@ -5113,11 +5144,15 @@ class checkmark {
 
         // Reset time so that the status changes back to "Submitted for grading".
         $resettime = 0;
+        $presentationresettime = time();
         foreach ($users as $user) {
             $feedback = $this->get_feedback($user->id);
             if ($feedback) {
                 $feedback->$gradetype = -1;
                 $feedback->timemodified = $resettime;
+                if ($gradetype == 'presentationgrade') {
+                    $feedback->presentationtimemodified = $presentationresettime;
+                }
                 // We update the feedback instead of deleting it to keep the feedback comment.
                 $DB->update_record('checkmark_feedbacks', $feedback);
                 $result['updated']++;

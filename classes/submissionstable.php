@@ -529,6 +529,10 @@ class submissionstable extends \table_sql {
             $tableheaders[] = get_string('presentationfeedback_table', 'checkmark');
             $tablecolumns[] = 'presentationfeedback';
             $helpicons[] = null;
+            $tableheaders[] = get_string('presentationtimemodified', 'checkmark');
+            $tablecolumns[] = 'presentationtimemodified';
+            $helpicons[] = null;
+            $span++;
             $table->add_colgroup('presentationgrade', $span);
         }
 
@@ -571,6 +575,7 @@ class submissionstable extends \table_sql {
                 $table->column_class('presentationgrade', 'presentationgrade');
             }
             $table->column_class('presentationfeedback', 'presentationfeedback');
+            $table->column_class('presentationtimemodified', 'presentationtimemodified');
         }
 
         $table->no_sorting('selection');
@@ -619,7 +624,8 @@ class submissionstable extends \table_sql {
             if ($table->checkmark->checkmark->presentationgrade) {
                 $fields .= ", f.presentationgrade AS presentationgrade";
             }
-            $fields .= ", f.presentationfeedback AS presentationfeedback";
+            $fields .= ", f.presentationfeedback AS presentationfeedback,
+                         f.presentationtimemodified AS presentationtimemodified";
         }
         if ($table->groupmode != NOGROUPS) {
             $fields .= ", groupname";
@@ -980,6 +986,17 @@ class submissionstable extends \table_sql {
             $table->columnformat['presentationfeedback'] = [
                 'align' => 'L',
             ];
+            $tableheaders[] = get_string('presentationtimemodified', 'checkmark');
+            $helpicons[] = null;
+            $tablecolumns[] = 'presentationtimemodified';
+            $table->cellwidth[] = [
+                'mode' => 'Fixed',
+                'value' => '30',
+            ];
+            $table->columnformat['presentationtimemodified'] = [
+                'align' => 'L',
+            ];
+            $span++;
             $table->add_colgroup('presentationgrade', $span);
         }
 
@@ -1034,6 +1051,7 @@ class submissionstable extends \table_sql {
                 $table->column_class('presentationgrade', 'presentationgrade');
             }
             $table->column_class('presentationfeedback', 'presentationfeedback');
+            $table->column_class('presentationtimemodified', 'presentationtimemodified');
         }
 
         $table->column_class('signature', 'signature');
@@ -1072,7 +1090,8 @@ class submissionstable extends \table_sql {
             if ($table->checkmark->checkmark->presentationgrade) {
                 $fields .= ", f.presentationgrade AS presentationgrade";
             }
-            $fields .= ", f.presentationfeedback AS presentationfeedback";
+            $fields .= ", f.presentationfeedback AS presentationfeedback,
+                         MAX(f.presentationtimemodified) AS presentationtimemodified";
         }
         if ($table->groupmode != NOGROUPS) {
             $fields .= ", MAX(groupname) AS groupname";
@@ -2281,6 +2300,52 @@ class submissionstable extends \table_sql {
                 }
             }
         }
+    }
+
+    /**
+     * This function is called for each data row to allow processing of the
+     * user's time of presentation grading.
+     *
+     * @param object $values Contains object with all the values of record.
+     * @return string Return user's time of presentation grading.
+     * @throws coding_exception
+     */
+    public function col_presentationtimemodified($values) {
+        if (!$this->checkmark->checkmark->presentationgrading) {
+            return '';
+        }
+
+        if ($this->use_no_html()) {
+            $timeformat = get_string('strftimedatetimeshort');
+        } else {
+            $timeformat = get_string('strftimedatetime');
+        }
+
+        $date = null;
+        if ($this->checkmark->checkmark->presentationgradebook) {
+            $finalgrade = $this->gradinginfo->items[CHECKMARK_PRESENTATION_ITEM]->grades[$values->id];
+            if (($finalgrade->locked || $finalgrade->overridden) && !empty($finalgrade->dategraded)) {
+                $date = $finalgrade->dategraded;
+            }
+        }
+
+        if ($date === null && $values->feedbackid && $values->presentationtimemodified > 0) {
+            $date = $values->presentationtimemodified;
+        }
+
+        if ($date === null) {
+            $content = '-';
+        } else {
+            $content = userdate($date, $timeformat);
+        }
+
+        if ($this->use_no_html()) {
+            return $content;
+        }
+
+        return \html_writer::tag('div', $content, [
+            'id' => 'ptt' . $values->id,
+        ]);
     }
 
     /**

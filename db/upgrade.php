@@ -1602,6 +1602,29 @@ function xmldb_checkmark_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026061000) {
+        // Define field presentationtimemodified to be added to checkmark_feedbacks.
+        $table = new xmldb_table('checkmark_feedbacks');
+        $field = new xmldb_field(
+            'presentationtimemodified',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'timemodified'
+        );
+
+        // Conditionally launch add field presentationtimemodified.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2026061000, 'checkmark');
+    }
+
+    if ($oldversion < 2026061400) {
         // Define field presentationstatus to be added to checkmark_feedbacks.
         $table = new xmldb_table('checkmark_feedbacks');
         $field = new xmldb_field(
@@ -1621,7 +1644,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         }
 
         // Checkmark savepoint reached.
-        upgrade_mod_savepoint(true, 2026061000, 'checkmark');
+        upgrade_mod_savepoint(true, 2026061400, 'checkmark');
     }
 
     return true;

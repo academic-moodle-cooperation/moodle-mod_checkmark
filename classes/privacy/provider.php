@@ -76,6 +76,7 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
                 'presentationgrade' => 'privacy:metadata:presentationgrade',
                 'presentationfeedback' => 'privacy:metadata:presentationfeedback',
                 'presentationformat' => 'privacy:metadata:presentationformat',
+                'presentationtimemodified' => 'privacy:metadata:presentationtimemodified',
                 'graderid' => 'privacy:metadata:graderid',
                 'mailed' => 'privacy:metadata:mailed',
                 'timecreated' => 'privacy:metadata:feedback:timecreated',
@@ -440,6 +441,9 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
                 $feedback->presentationformat,
                 ['context' => $context]
             );
+        }
+        if (!empty($feedback->presentationtimemodified)) {
+            $data->presentationtimemodified = transform::datetime($feedback->presentationtimemodified);
         }
         $data->timegraded = transform::datetime($feedback->timecreated);
         $data->timemodified = transform::datetime($feedback->timemodified);
