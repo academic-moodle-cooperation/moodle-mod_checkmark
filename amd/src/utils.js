@@ -54,13 +54,14 @@ define(['jquery', 'core/str'], function($, str) {
         return allexamples;
     };
     Utils.prototype.getPresentationSelectors = function() {
-        return ['presentationgrade', 'presentationfeedback'];
+        return ['presentationgrade', 'presentationfeedback', 'presentationtimemodified'];
     };
     Utils.prototype.allExamplesCollapsed = function() {
         return $('th.colexample > .commands').length === 0;
     };
     Utils.prototype.allPresentationCollapsed = function() {
-        return $('th.presentationgrade > .commands, th.presentationfeedback > .commands').length === 0;
+        return $('th.presentationgrade > .commands, th.presentationfeedback > .commands, ' +
+            'th.presentationtimemodified > .commands').length === 0;
     };
     Utils.prototype.getBaseUrl = function() {
         return this.baseurl;
@@ -148,7 +149,8 @@ define(['jquery', 'core/str'], function($, str) {
                 hidepresentationContainer += '<a id="hidepresentation" href="javascript:void(0);">';
                 hidepresentationContainer += '<i class="icon fa fa-minus fa-fw " id="hidepresentationtoggle"></i></a>';
                 hidepresentationContainer += '</div>';
-                $('th.presentationgrade, th.presentationfeedback').first().prepend(hidepresentationContainer);
+                $('th.presentationgrade, th.presentationfeedback, th.presentationtimemodified')
+                    .first().prepend(hidepresentationContainer);
 
                 var showpresentationColgroup = '<colgroup class="showpresentation" span="1"><col></colgroup>';
                 $('colgroup.status_and_gradebook').after(showpresentationColgroup);
@@ -198,13 +200,14 @@ define(['jquery', 'core/str'], function($, str) {
             }
 
             if (hasPresentation) {
-                if ($("th.presentationgrade, th.presentationfeedback").length > 0 && !utils.allPresentationCollapsed()) {
+                if ($("th.presentationgrade, th.presentationfeedback, th.presentationtimemodified").length > 0 &&
+                        !utils.allPresentationCollapsed()) {
                     $('#hidepresentationcontainer').show();
                     $('.showpresentationcolumn').hide();
                     $('colgroup.showpresentation').hide();
                 } else {
                     $('#hidepresentationcontainer').hide();
-                    $(".presentationgrade, .presentationfeedback").hide();
+                    $(".presentationgrade, .presentationfeedback, .presentationtimemodified").hide();
                     $('.showpresentationcolumn').show();
                     $('colgroup.presentation').hide();
                 }

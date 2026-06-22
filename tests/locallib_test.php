@@ -171,4 +171,92 @@ final class locallib_test extends \advanced_testcase {
         $_POST = $oldpost;
         $_GET = $oldget;
     }
+
+    /**
+     * Ensure presentation modification time is only updated when presentation fields change.
+     */
+    public function test_process_feedback_tracks_presentation_modified_time(): void {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $student = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+        $checkmark = $this->getDataGenerator()->create_module('checkmark', [
+            'course' => $course->id,
+            'presentationgrading' => 1,
+            'presentationgrade' => 100,
+            'presentationgradebook' => 0,
+        ]);
+        $instance = new \checkmark($checkmark->cmid);
+
+        $oldpost = $_POST;
+        $oldget = $_GET;
+        $_GET = [];
+
+        $this->submit_feedback_form($instance, $student->id, 25, 'Initial presentation feedback', 10);
+
+        $feedback = $DB->get_record('checkmark_feedbacks', [
+            'checkmarkid' => $checkmark->id,
+            'userid' => $student->id,
+        ], '*', MUST_EXIST);
+        $this->assertGreaterThan(0, $feedback->presentationtimemodified);
+
+        $fixedtime = 123456789;
+        $feedback->presentationtimemodified = $fixedtime;
+        $feedback->timemodified = $fixedtime;
+        $DB->update_record('checkmark_feedbacks', $feedback);
+
+        $this->submit_feedback_form($instance, $student->id, 25, 'Initial presentation feedback', 20);
+
+        $feedback = $DB->get_record('checkmark_feedbacks', ['id' => $feedback->id], '*', MUST_EXIST);
+        $this->assertEquals($fixedtime, $feedback->presentationtimemodified);
+        $this->assertGreaterThan($fixedtime, $feedback->timemodified);
+
+        $this->submit_feedback_form($instance, $student->id, 30, 'Updated presentation feedback', 20);
+
+        $feedback = $DB->get_record('checkmark_feedbacks', ['id' => $feedback->id], '*', MUST_EXIST);
+        $this->assertGreaterThan($fixedtime, $feedback->presentationtimemodified);
+
+        $_POST = $oldpost;
+        $_GET = $oldget;
+    }
+
+    /**
+     * Submit feedback form data to process_feedback().
+     *
+     * @param \checkmark $instance Checkmark instance.
+     * @param int $userid User id.
+     * @param int $presentationgrade Presentation grade.
+     * @param string $presentationfeedback Presentation feedback text.
+     * @param int $grade Submission grade.
+     */
+    private function submit_feedback_form(
+        \checkmark $instance,
+        int $userid,
+        int $presentationgrade,
+        string $presentationfeedback,
+        int $grade
+    ): void {
+        $_POST = [
+            'sesskey' => sesskey(),
+            'saveuserid' => -1,
+            'userid' => $userid,
+            'mailinfo' => 0,
+            'xgrade' => $grade,
+            'feedback_editor' => [
+                'text' => '',
+                'format' => FORMAT_HTML,
+            ],
+            'presentationgrade' => $presentationgrade,
+            'presentationfeedback_editor' => [
+                'text' => $presentationfeedback,
+                'format' => FORMAT_HTML,
+            ],
+        ];
+
+        $instance->process_feedback();
+    }
 }
