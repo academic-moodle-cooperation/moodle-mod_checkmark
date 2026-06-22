@@ -1624,7 +1624,7 @@ function xmldb_checkmark_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026061000, 'checkmark');
     }
 
-    if ($oldversion < 2026061400) {
+    if ($oldversion < 2026062200) {
         // Define field presentationstatus to be added to checkmark_feedbacks.
         $table = new xmldb_table('checkmark_feedbacks');
         $field = new xmldb_field(
@@ -1643,8 +1643,28 @@ function xmldb_checkmark_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
+        // Define field gradetimemodified to be added to checkmark_feedbacks.
+        $field = new xmldb_field(
+            'gradetimemodified',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'timemodified'
+        );
+
+        // Conditionally launch add field gradetimemodified.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Existing timemodified values represented the main grade date before this field existed.
+        $DB->execute('UPDATE {checkmark_feedbacks} SET gradetimemodified = timemodified');
+
         // Checkmark savepoint reached.
-        upgrade_mod_savepoint(true, 2026061400, 'checkmark');
+        upgrade_mod_savepoint(true, 2026062200, 'checkmark');
     }
 
     return true;

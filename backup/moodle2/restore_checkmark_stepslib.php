@@ -237,6 +237,7 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
             unset($data->mailed);
             $feedback->timecreated = $data->timemarked;
             $feedback->timemodified = $data->timemarked;
+            $feedback->gradetimemodified = $data->timemarked;
             $feedback->presentationtimemodified = 0;
             unset($data->timemarked);
             // Process feedback restore here!
@@ -294,6 +295,11 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
         $data->graderid = $this->get_mappingid('user', $data->graderid);
         $data->timecreated = $this->apply_date_offset($data->timecreated);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
+        if (isset($data->gradetimemodified)) {
+            $data->gradetimemodified = $this->apply_date_offset($data->gradetimemodified);
+        } else {
+            $data->gradetimemodified = $data->timemodified;
+        }
         if (isset($data->presentationtimemodified)) {
             $data->presentationtimemodified = $this->apply_date_offset($data->presentationtimemodified);
         } else {

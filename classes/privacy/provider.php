@@ -81,6 +81,7 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
                 'mailed' => 'privacy:metadata:mailed',
                 'timecreated' => 'privacy:metadata:feedback:timecreated',
                 'timemodified' => 'privacy:metadata:feedback:timemodified',
+                'gradetimemodified' => 'privacy:metadata:gradetimemodified',
         ];
         $overrides = [
                 'timeavailable' => 'privacy:metadata:timeavailable',
@@ -444,6 +445,9 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
         }
         if (!empty($feedback->presentationtimemodified)) {
             $data->presentationtimemodified = transform::datetime($feedback->presentationtimemodified);
+        }
+        if (!empty($feedback->gradetimemodified)) {
+            $data->gradetimemodified = transform::datetime($feedback->gradetimemodified);
         }
         $data->timegraded = transform::datetime($feedback->timecreated);
         $data->timemodified = transform::datetime($feedback->timemodified);

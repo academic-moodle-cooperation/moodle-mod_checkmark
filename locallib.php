@@ -1722,11 +1722,12 @@ class checkmark {
                      LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid
                      LEFT JOIN {checkmark_submissions} s ON (u.id = s.userid) AND s.checkmarkid = f.checkmarkid
                          WHERE u.deleted = 0 AND u.id " . $sqluserids .
-                        " AND COALESCE(f.timemodified,0) >= COALESCE(s.timemodified,0) AND f.timemodified IS NOT NULL";
+                        " AND COALESCE(f.gradetimemodified,0) >= COALESCE(s.timemodified,0)
+                           AND f.gradetimemodified IS NOT NULL";
                 $params['checkmarkid'] = $this->checkmark->id;
                 break;
             case self::FILTER_REQUIRE_GRADING:
-                $wherefilter = ' AND (COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0)) ';
+                $wherefilter = ' AND (COALESCE(f.gradetimemodified,0) < COALESCE(s.timemodified,0)) ';
                 $sql = "  SELECT u.id, f.attendance
                             FROM {user} u
                        LEFT JOIN (" . $esql . ") eu ON eu.id=u.id
@@ -1867,6 +1868,7 @@ class checkmark {
             }
 
             $feedback->timemodified = $timemarked;
+            $feedback->gradetimemodified = $timemarked;
             if ($attendanceitem) {
                 $lockedoroverridden = $attendanceitem->grades[$currentuser->id]->locked
                         || $attendanceitem->grades[$currentuser->id]->overridden;
@@ -2172,7 +2174,8 @@ class checkmark {
         $params['checkmarkid'] = $this->checkmark->id;
 
         $fullname = $DB->sql_fullname('u.firstname', 'u.lastname');
-        $fields = "u.*, $fullname AS fullname, f.grade, f.feedback, f.format as feedbackformat, f.timemodified as grademodified";
+        $fields = "u.*, $fullname AS fullname, f.grade, f.feedback, f.format as feedbackformat,
+                   f.gradetimemodified as grademodified";
         $from = '{user} u LEFT JOIN {checkmark_feedbacks} f ON u.id = f.userid AND f.checkmarkid = :checkmarkid';
         $where = "u.id $usql";
 
@@ -2587,6 +2590,7 @@ class checkmark {
 
                     // For fast grade, we need to check if any changes take place!
                     $updatedb = false;
+                    $gradeupdated = false;
                     $presentationupdated = false;
 
                     if (!isset($oldgrades[$id])) {
@@ -2691,6 +2695,7 @@ class checkmark {
                             $feedback = $this->prepare_new_feedback($id);
                         }
                         $feedback->grade = $grade;
+                        $gradeupdated = true;
                     } else {
                         unset($feedback->grade);  // Don't need to update this.
                     }
@@ -2705,6 +2710,7 @@ class checkmark {
                             $feedback = $this->prepare_new_feedback($id);
                         }
                         $feedback->feedback = submissionstable::convert_text_to_html($feedbackvalue);
+                        $gradeupdated = true;
                     } else {
                         unset($feedback->feedback);  // Don't need to update this.
                     }
@@ -2723,6 +2729,9 @@ class checkmark {
                     if ($updatedb) {
                         $now = time();
                         $feedback->timemodified = $now;
+                        if ($gradeupdated) {
+                            $feedback->gradetimemodified = $now;
+                        }
                         if ($presentationupdated) {
                             $feedback->presentationtimemodified = $now;
                         }
@@ -4311,7 +4320,11 @@ class checkmark {
         }
 
         $update = false;
+        $gradeupdated = false;
         $presentationupdated = false;
+        $oldgrade = $feedback->grade ?? null;
+        $oldfeedback = (string)($feedback->feedback ?? '');
+        $oldformat = (int)($feedback->format ?? FORMAT_HTML);
         $oldpresentationgrade = $feedback->presentationgrade ?? null;
         if ($oldpresentationgrade == -1) {
             $oldpresentationgrade = null;
@@ -4324,9 +4337,16 @@ class checkmark {
             !($gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$formdata->userid]->locked
                 || $gradinginfo->items[CHECKMARK_GRADE_ITEM]->grades[$formdata->userid]->overridden)
         ) {
-            $feedback->grade = $formdata->xgrade;
-            $feedback->feedback = $formdata->feedback_editor['text'];
+            $newgrade = $formdata->xgrade;
+            $newfeedback = (string)($formdata->feedback_editor['text'] ?? '');
+            $newformat = (int)($formdata->feedback_editor['format'] ?? FORMAT_HTML);
+            $feedback->grade = $newgrade;
+            $feedback->feedback = $newfeedback;
+            $feedback->format = $newformat;
             $feedback->graderid = $USER->id;
+            $gradeupdated = ($oldgrade != $newgrade)
+                    || ($oldfeedback !== $newfeedback)
+                    || (!empty($newfeedback) && $oldformat !== $newformat);
             $update = true;
         }
         if ($this->checkmark->attendancegradebook) {
@@ -4388,6 +4408,9 @@ class checkmark {
         if ($update) {
             $now = time();
             $feedback->timemodified = $now;
+            if ($gradeupdated) {
+                $feedback->gradetimemodified = $now;
+            }
             if ($presentationupdated) {
                 $feedback->presentationtimemodified = $now;
             }
@@ -4527,6 +4550,7 @@ class checkmark {
         $feedback->mailed = 1;
         $feedback->timecreated = time();
         $feedback->timemodified = $feedback->timecreated;
+        $feedback->gradetimemodified = 0;
         $feedback->presentationtimemodified = 0;
 
         $feedback->id = $DB->insert_record('checkmark_feedbacks', $feedback);
@@ -5142,16 +5166,17 @@ class checkmark {
             return $result;
         }
 
-        // Reset time so that the status changes back to "Submitted for grading".
-        $resettime = 0;
-        $presentationresettime = time();
+        $now = time();
         foreach ($users as $user) {
             $feedback = $this->get_feedback($user->id);
             if ($feedback) {
                 $feedback->$gradetype = -1;
-                $feedback->timemodified = $resettime;
+                $feedback->timemodified = $now;
                 if ($gradetype == 'presentationgrade') {
-                    $feedback->presentationtimemodified = $presentationresettime;
+                    $feedback->presentationtimemodified = $now;
+                } else {
+                    // Reset grade time so that the status changes back to "Submitted for grading".
+                    $feedback->gradetimemodified = 0;
                 }
                 // We update the feedback instead of deleting it to keep the feedback comment.
                 $DB->update_record('checkmark_feedbacks', $feedback);

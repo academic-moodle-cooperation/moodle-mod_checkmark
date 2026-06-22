@@ -608,9 +608,9 @@ class submissionstable extends \table_sql {
         // Case statement to determine the status of the submission. With this the status column can be sorted.
         $fields = "u.id, ' ' AS selection, ' ' AS picture " . $ufields . " " . $useridentity->selects . ",
                     s.id AS submissionid, f.id AS feedbackid, f.grade, f.feedback,
-                    s.timemodified AS timesubmitted, f.timemodified AS timemarked,
+                    s.timemodified AS timesubmitted, f.gradetimemodified AS timemarked,
                     CASE
-                        WHEN f.timemodified IS NOT NULL AND f.timemodified <> 0
+                        WHEN f.gradetimemodified IS NOT NULL AND f.gradetimemodified <> 0
                             THEN '$stringgraded'
                         WHEN s.timemodified IS NOT NULL
                             THEN '$stringsubmitted'
@@ -646,7 +646,7 @@ class submissionstable extends \table_sql {
         if ($filter == \checkmark::FILTER_SUBMITTED) {
             $where .= 's.timemodified > 0 AND ';
         } else if ($filter == \checkmark::FILTER_REQUIRE_GRADING) {
-            $where .= 'COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0) AND ';
+            $where .= 'COALESCE(f.gradetimemodified,0) < COALESCE(s.timemodified,0) AND ';
         } else if ($filter == \checkmark::FILTER_ATTENDANT) {
             $where .= 'f.attendance = 1 AND ';
         } else if ($filter == \checkmark::FILTER_ABSENT) {
@@ -1083,7 +1083,7 @@ class submissionstable extends \table_sql {
         $fields = "u.id, ' ' AS selection " . $ufields . " " . $useridentity->selects . ",
                   MAX(s.id) AS submissionid, MAX(f.id) AS feedbackid, MAX(f.grade) AS grade,
                   MAX(f.feedback) AS feedback, MAX(s.timemodified) AS timesubmitted,
-                  MAX(f.timemodified) AS timemarked, 100 * COUNT( DISTINCT cchks.id ) / :examplecount AS summary,
+                  MAX(f.gradetimemodified) AS timemarked, 100 * COUNT( DISTINCT cchks.id ) / :examplecount AS summary,
                   COUNT( DISTINCT cchks.id ) AS checks, f.attendance AS attendance";
         if ($table->checkmark->checkmark->presentationgrading) {
             $fields .= ", COALESCE(f.presentationstatus, " . CHECKMARK_PRESENTATION_STATUS_NO . ") AS presentationstatus";
@@ -1117,7 +1117,7 @@ class submissionstable extends \table_sql {
         if ($filter == checkmark::FILTER_SUBMITTED) {
             $where .= ' AND s.timemodified > 0';
         } else if ($filter == checkmark::FILTER_REQUIRE_GRADING) {
-            $where .= ' AND COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0)';
+            $where .= ' AND COALESCE(f.gradetimemodified,0) < COALESCE(s.timemodified,0)';
         } else if ($filter == checkmark::FILTER_ATTENDANT) {
             $where .= ' AND attendance = 1';
         } else if ($filter == checkmark::FILTER_ABSENT) {
@@ -1129,7 +1129,8 @@ class submissionstable extends \table_sql {
         } else if ($filter == checkmark::FILTER_NO_PRESENTATIONGRADING) {
             $where .= " AND presentationgrade IS NULL AND presentationfeedback IS NULL";
         } else if ($filter == checkmark::FILTER_GRADED) {
-            $where .= " AND COALESCE(f.timemodified,0) >= COALESCE(s.timemodified,0) AND f.timemodified IS NOT NULL";
+            $where .= " AND COALESCE(f.gradetimemodified,0) >= COALESCE(s.timemodified,0)
+                        AND f.gradetimemodified IS NOT NULL";
         }
 
         $groupby = "u.id, s.id, f.id" . $ufields;
@@ -1287,7 +1288,7 @@ class submissionstable extends \table_sql {
             } else if ($filter == checkmark::FILTER_NOT_SUBMITTED) {
                 $wherefilter = " AND (s.timemodified <= 0 OR s.timemodified IS NULL)";
             } else if ($filter == checkmark::FILTER_REQUIRE_GRADING) {
-                $wherefilter = " AND COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0) ";
+                $wherefilter = " AND COALESCE(f.gradetimemodified,0) < COALESCE(s.timemodified,0) ";
             } else if ($filter == checkmark::FILTER_EXTENSION) {
                 $wherefilter = " AND o.id IS NOT NULL";
             } else if ($filter == checkmark::FILTER_ATTENDANT) {
@@ -1301,7 +1302,8 @@ class submissionstable extends \table_sql {
             } else if ($filter == checkmark::FILTER_NO_PRESENTATIONGRADING) {
                 $wherefilter .= " AND presentationgrade IS NULL AND presentationfeedback IS NULL";
             } else if ($filter == checkmark::FILTER_GRADED) {
-                $wherefilter .= " AND COALESCE(f.timemodified,0) >= COALESCE(s.timemodified,0) AND f.timemodified IS NOT NULL";
+                $wherefilter .= " AND COALESCE(f.gradetimemodified,0) >= COALESCE(s.timemodified,0)
+                                   AND f.gradetimemodified IS NOT NULL";
             }
             $params['checkmarkid'] = $checkmarkid;
             $params['checkmarkid2'] = $checkmarkid;

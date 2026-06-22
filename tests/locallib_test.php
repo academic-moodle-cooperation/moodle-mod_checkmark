@@ -203,9 +203,11 @@ final class locallib_test extends \advanced_testcase {
             'userid' => $student->id,
         ], '*', MUST_EXIST);
         $this->assertGreaterThan(0, $feedback->presentationtimemodified);
+        $this->assertGreaterThan(0, $feedback->gradetimemodified);
 
         $fixedtime = 123456789;
         $feedback->presentationtimemodified = $fixedtime;
+        $feedback->gradetimemodified = $fixedtime;
         $feedback->timemodified = $fixedtime;
         $DB->update_record('checkmark_feedbacks', $feedback);
 
@@ -213,12 +215,19 @@ final class locallib_test extends \advanced_testcase {
 
         $feedback = $DB->get_record('checkmark_feedbacks', ['id' => $feedback->id], '*', MUST_EXIST);
         $this->assertEquals($fixedtime, $feedback->presentationtimemodified);
+        $this->assertGreaterThan($fixedtime, $feedback->gradetimemodified);
         $this->assertGreaterThan($fixedtime, $feedback->timemodified);
+        $gradetimemodified = $feedback->gradetimemodified;
+
+        $feedback->timemodified = $fixedtime;
+        $DB->update_record('checkmark_feedbacks', $feedback);
 
         $this->submit_feedback_form($instance, $student->id, 30, 'Updated presentation feedback', 20);
 
         $feedback = $DB->get_record('checkmark_feedbacks', ['id' => $feedback->id], '*', MUST_EXIST);
         $this->assertGreaterThan($fixedtime, $feedback->presentationtimemodified);
+        $this->assertEquals($gradetimemodified, $feedback->gradetimemodified);
+        $this->assertGreaterThan($fixedtime, $feedback->timemodified);
 
         $_POST = $oldpost;
         $_GET = $oldget;
