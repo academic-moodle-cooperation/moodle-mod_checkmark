@@ -102,6 +102,7 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
             'mailed',
             'timecreated',
             'timemodified',
+            'presentationtimemodified',
         ]);
 
         $examples = new backup_nested_element('examples');
