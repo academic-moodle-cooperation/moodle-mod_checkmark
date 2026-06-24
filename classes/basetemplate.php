@@ -177,7 +177,7 @@ abstract class basetemplate extends submissionstable {
         $fields = "u.id " . $ufields . ", u.idnumber,
                   MAX(s.id) AS submissionid, MAX(f.id) AS feedbackid, MAX(f.grade) AS grade,
                   MAX(f.feedback) AS feedback, MAX(s.timemodified) AS timesubmitted,
-                  MAX(f.timemodified) AS timemarked, 100 * COUNT( DISTINCT cchks.id ) / :examplecount AS summary,
+                  MAX(f.gradetimemodified) AS timemarked, 100 * COUNT( DISTINCT cchks.id ) / :examplecount AS summary,
                   COUNT( DISTINCT cchks.id ) AS checks, f.attendance AS attendance";
         $params['checkmarkid'] = $table->checkmark->checkmark->id;
         $params['checkmarkid2'] = $table->checkmark->checkmark->id;
@@ -197,7 +197,7 @@ abstract class basetemplate extends submissionstable {
         if ($filter == \checkmark::FILTER_SUBMITTED) {
             $where .= ' AND s.timemodified > 0';
         } else if ($filter == \checkmark::FILTER_REQUIRE_GRADING) {
-            $where .= ' AND COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0)';
+            $where .= ' AND COALESCE(f.gradetimemodified,0) < COALESCE(s.timemodified,0)';
         } else if ($filter == \checkmark::FILTER_ATTENDANT) {
             $where .= ' AND attendance = 1';
         } else if ($filter == \checkmark::FILTER_ABSENT) {
@@ -211,7 +211,8 @@ abstract class basetemplate extends submissionstable {
         } else if ($filter == \checkmark::FILTER_NO_PRESENTATIONGRADING) {
             $where .= " AND presentationgrade IS NULL AND presentationfeedback IS NULL";
         } else if ($filter == \checkmark::FILTER_GRADED) {
-            $where .= " AND COALESCE(f.timemodified,0) >= COALESCE(s.timemodified,0) AND f.timemodified IS NOT NULL";
+            $where .= " AND COALESCE(f.gradetimemodified,0) >= COALESCE(s.timemodified,0)
+                        AND f.gradetimemodified IS NOT NULL";
         }
 
         $groupby = " u.id, s.id, f.id " . $ufields . ", u.idnumber, f.attendance";

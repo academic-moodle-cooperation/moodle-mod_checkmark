@@ -30,6 +30,13 @@ define('CHECKMARK_ATTENDANCE_ITEM', 1);
 /** PRESENTATIONGRADE ITEM */
 define('CHECKMARK_PRESENTATION_ITEM', 2);
 
+/** Presentation status: no presentation is planned or done. */
+define('CHECKMARK_PRESENTATION_STATUS_NO', 0);
+/** Presentation status: presentation is marked/planned. */
+define('CHECKMARK_PRESENTATION_STATUS_MARKED', 1);
+/** Presentation status: presentation is done. */
+define('CHECKMARK_PRESENTATION_STATUS_YES', 2);
+
 /** EVENT TYPE DUE - deadline for student's submissions */
 define('CHECKMARK_EVENT_TYPE_DUE', 'due'); // Is backwards compatible to former events!
 
@@ -692,7 +699,7 @@ function checkmark_get_user_grades($checkmark, $userid = 0) {
 
     $sql = 'SELECT u.id, u.id AS userid, f.grade AS rawgrade, f.feedback AS feedback,
                    f.format AS feedbackformat, f.graderid AS usermodified,
-                   f.timemodified AS dategraded
+                   f.gradetimemodified AS dategraded
               FROM {user} u, {checkmark_feedbacks} f
              WHERE u.id = f.userid AND f.checkmarkid = :aid' .
         $user;
@@ -1930,8 +1937,7 @@ function checkmark_count_real_ungraded_submissions($cm) {
     return $DB->count_records_sql('SELECT COUNT(1)
                                     FROM {checkmark_submissions} s
                                LEFT JOIN {checkmark_feedbacks} f ON s.userid = f.userid AND s.checkmarkid = f.checkmarkid
-                                   WHERE graderid IS NULL
-                                     AND f.timemodified IS NULL
+                                   WHERE COALESCE(f.gradetimemodified, 0) = 0
                                      AND s.checkmarkid = ?', [$cm->instance]);
 }
 

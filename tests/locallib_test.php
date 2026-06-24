@@ -203,9 +203,11 @@ final class locallib_test extends \advanced_testcase {
             'userid' => $student->id,
         ], '*', MUST_EXIST);
         $this->assertGreaterThan(0, $feedback->presentationtimemodified);
+        $this->assertGreaterThan(0, $feedback->gradetimemodified);
 
         $fixedtime = 123456789;
         $feedback->presentationtimemodified = $fixedtime;
+        $feedback->gradetimemodified = $fixedtime;
         $feedback->timemodified = $fixedtime;
         $DB->update_record('checkmark_feedbacks', $feedback);
 
@@ -213,15 +215,63 @@ final class locallib_test extends \advanced_testcase {
 
         $feedback = $DB->get_record('checkmark_feedbacks', ['id' => $feedback->id], '*', MUST_EXIST);
         $this->assertEquals($fixedtime, $feedback->presentationtimemodified);
+        $this->assertGreaterThan($fixedtime, $feedback->gradetimemodified);
         $this->assertGreaterThan($fixedtime, $feedback->timemodified);
+        $gradetimemodified = $feedback->gradetimemodified;
+
+        $feedback->timemodified = $fixedtime;
+        $DB->update_record('checkmark_feedbacks', $feedback);
 
         $this->submit_feedback_form($instance, $student->id, 30, 'Updated presentation feedback', 20);
 
         $feedback = $DB->get_record('checkmark_feedbacks', ['id' => $feedback->id], '*', MUST_EXIST);
         $this->assertGreaterThan($fixedtime, $feedback->presentationtimemodified);
+        $this->assertEquals($gradetimemodified, $feedback->gradetimemodified);
+        $this->assertGreaterThan($fixedtime, $feedback->timemodified);
 
         $_POST = $oldpost;
         $_GET = $oldget;
+    }
+
+    /**
+     * Ensure a saved presentation grade marks the presentation status as done.
+     */
+    public function test_process_feedback_sets_presentation_status_to_yes_with_presentation_grade(): void {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $student = $generator->create_user();
+        $generator->enrol_user($student->id, $course->id, 'student');
+        $checkmarkrecord = $generator->create_module('checkmark', [
+            'course' => $course->id,
+            'presentationgrading' => 1,
+            'presentationgrade' => 100,
+            'presentationgradebook' => 0,
+        ]);
+        $instance = new \checkmark($checkmarkrecord->cmid);
+
+        $oldpost = $_POST;
+        $oldget = $_GET;
+        $_GET = [];
+
+        try {
+            $this->submit_feedback_form($instance, $student->id, 50, '', -1);
+        } finally {
+            $_POST = $oldpost;
+            $_GET = $oldget;
+        }
+
+        $feedback = $DB->get_record('checkmark_feedbacks', [
+            'checkmarkid' => $checkmarkrecord->id,
+            'userid' => $student->id,
+        ], '*', MUST_EXIST);
+
+        $this->assertEquals(CHECKMARK_PRESENTATION_STATUS_YES, $feedback->presentationstatus);
+        $this->assertEquals(50, $feedback->presentationgrade);
     }
 
     /**

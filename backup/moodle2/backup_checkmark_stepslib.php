@@ -95,6 +95,7 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
             'feedback',
             'format',
             'attendance',
+            'presentationstatus',
             'presentationgrade',
             'presentationfeedback',
             'presentationformat',
@@ -102,6 +103,7 @@ class backup_checkmark_activity_structure_step extends backup_activity_structure
             'mailed',
             'timecreated',
             'timemodified',
+            'gradetimemodified',
             'presentationtimemodified',
         ]);
 

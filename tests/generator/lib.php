@@ -127,9 +127,11 @@ class mod_checkmark_generator extends testing_module_generator {
         $feedback = $checkmark->prepare_new_feedback($userid);
         if (isset($data['grade'])) {
             $feedback->grade = $data['grade'];
+            $feedback->gradetimemodified = time();
         }
         if (isset($data['feedback'])) {
             $feedback->feedback = $data['feedback'];
+            $feedback->gradetimemodified = time();
         }
         if (isset($data['attendance']) && $checkmark->checkmark->trackattendance) {
             $feedback->attendance = $data['attendance'];
@@ -139,9 +141,19 @@ class mod_checkmark_generator extends testing_module_generator {
         }
         if (isset($data['presentationgrade']) && $checkmark->checkmark->presentationgrading) {
             $feedback->presentationgrade = $data['presentationgrade'];
+            if (!isset($data['presentationstatus']) && $data['presentationgrade'] !== null && $data['presentationgrade'] != -1) {
+                $feedback->presentationstatus = CHECKMARK_PRESENTATION_STATUS_YES;
+            }
             $feedback->presentationtimemodified = time();
         } else if (isset($data['presentationgrade'])) {
             throw new coding_exception('Presentation grade cannot be set because the current checkmark activity
+            does not have presentation grading enabled.');
+        }
+        if (isset($data['presentationstatus']) && $checkmark->checkmark->presentationgrading) {
+            $feedback->presentationstatus = $data['presentationstatus'];
+            $feedback->presentationtimemodified = time();
+        } else if (isset($data['presentationstatus'])) {
+            throw new coding_exception('Presentation status cannot be set because the current checkmark activity
             does not have presentation grading enabled.');
         }
         if (isset($data['presentationfeedback']) && $checkmark->checkmark->presentationgrading) {

@@ -104,3 +104,20 @@ Feature: Track presentations and grade them
       | id_presentationgrade | 50 |
     And I press "Save changes"
     Then I should see "50 / 100"
+
+  @javascript
+  Scenario: Update only the presentation modification time when the presentation status changes
+    When I am on the "CM1" Activity page logged in as teacher1
+    And I follow "Settings"
+    And I press "Expand all"
+    And I set the following fields to these values:
+      | id_presentationgrading             | 1    |
+      | id_presentationgrade_modgrade_type | none |
+    And I press "Save and display"
+    And I follow "Submissions"
+    And I click on "Quick grading" "checkbox"
+    And I set the field with xpath "//tr[contains(normalize-space(.), 'Student 1')]//select[contains(@name, 'presentationstatus')]" to "Marked"
+    And I press "Save all grading changes"
+    Then "Student 1" row "Presentation" column of "generaltable" table should contain "Marked"
+    And "Student 1" row "Last modified (Grade)" column of "generaltable" table should contain "-"
+    And "Student 1" row "Last modified (Presentation)" column of "generaltable" table should not contain "-"

@@ -154,6 +154,9 @@ class submissionstable extends \table_sql {
     /** @var array  */
     protected $presentationgrademenu = [];
 
+    /** @var array  */
+    protected $presentationstatusmenu = [];
+
     /** @var string  */
     protected $strupdate = '';
 
@@ -513,7 +516,10 @@ class submissionstable extends \table_sql {
             $table->add_colgroup('status_and_gradebook', 1);
         }
         if ($table->checkmark->checkmark->presentationgrading) {
-            $span = 1;
+            $span = 2;
+            $tableheaders[] = get_string('presentationstatus', 'checkmark');
+            $tablecolumns[] = 'presentationstatus';
+            $helpicons[] = null;
             if ($table->checkmark->checkmark->presentationgrade) {
                 $tableheaders[] = get_string('presentationgrade_table', 'checkmark');
                 $tablecolumns[] = 'presentationgrade';
@@ -564,6 +570,7 @@ class submissionstable extends \table_sql {
             $table->column_class('outcome', 'outcome');
         }
         if ($table->checkmark->checkmark->presentationgrading) {
+            $table->column_class('presentationstatus', 'presentationstatus');
             if ($table->checkmark->checkmark->presentationgrade) {
                 $table->column_class('presentationgrade', 'presentationgrade');
             }
@@ -601,9 +608,9 @@ class submissionstable extends \table_sql {
         // Case statement to determine the status of the submission. With this the status column can be sorted.
         $fields = "u.id, ' ' AS selection, ' ' AS picture " . $ufields . " " . $useridentity->selects . ",
                     s.id AS submissionid, f.id AS feedbackid, f.grade, f.feedback,
-                    s.timemodified AS timesubmitted, f.timemodified AS timemarked,
+                    s.timemodified AS timesubmitted, f.gradetimemodified AS timemarked,
                     CASE
-                        WHEN f.timemodified IS NOT NULL AND f.timemodified <> 0
+                        WHEN f.gradetimemodified IS NOT NULL AND f.gradetimemodified <> 0
                             THEN '$stringgraded'
                         WHEN s.timemodified IS NOT NULL
                             THEN '$stringsubmitted'
@@ -613,6 +620,7 @@ class submissionstable extends \table_sql {
             $fields .= ", f.attendance AS attendance";
         }
         if ($table->checkmark->checkmark->presentationgrading) {
+            $fields .= ", COALESCE(f.presentationstatus, " . CHECKMARK_PRESENTATION_STATUS_NO . ") AS presentationstatus";
             if ($table->checkmark->checkmark->presentationgrade) {
                 $fields .= ", f.presentationgrade AS presentationgrade";
             }
@@ -638,7 +646,7 @@ class submissionstable extends \table_sql {
         if ($filter == \checkmark::FILTER_SUBMITTED) {
             $where .= 's.timemodified > 0 AND ';
         } else if ($filter == \checkmark::FILTER_REQUIRE_GRADING) {
-            $where .= 'COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0) AND ';
+            $where .= 'COALESCE(f.gradetimemodified,0) < COALESCE(s.timemodified,0) AND ';
         } else if ($filter == \checkmark::FILTER_ATTENDANT) {
             $where .= 'f.attendance = 1 AND ';
         } else if ($filter == \checkmark::FILTER_ABSENT) {
@@ -671,6 +679,9 @@ class submissionstable extends \table_sql {
         $table->grademenu = make_grades_menu($table->checkmark->checkmark->grade);
         if ($table->checkmark->checkmark->presentationgrading && $table->checkmark->checkmark->presentationgrade) {
             $table->presentationgrademenu = make_grades_menu($table->checkmark->checkmark->presentationgrade);
+        }
+        if ($table->checkmark->checkmark->presentationgrading) {
+            $table->presentationstatusmenu = self::get_presentation_status_menu();
         }
 
         return $table;
@@ -941,7 +952,17 @@ class submissionstable extends \table_sql {
             $table->add_colgroup('attendance', 1);
         }
         if ($table->checkmark->checkmark->presentationgrading) {
-            $span = 1;
+            $span = 2;
+            $tableheaders[] = get_string('presentationstatus', 'checkmark');
+            $helpicons[] = null;
+            $tablecolumns[] = 'presentationstatus';
+            $table->cellwidth[] = [
+                'mode' => 'Fixed',
+                'value' => '20',
+            ];
+            $table->columnformat['presentationstatus'] = [
+                'align' => 'L',
+            ];
             if ($table->checkmark->checkmark->presentationgrade) {
                 $tableheaders[] = get_string('presentationgrade_table', 'checkmark');
                 $helpicons[] = null;
@@ -1025,6 +1046,7 @@ class submissionstable extends \table_sql {
             $table->no_sorting('outcome');
         }
         if ($table->checkmark->checkmark->presentationgrading) {
+            $table->column_class('presentationstatus', 'presentationstatus');
             if ($table->checkmark->checkmark->presentationgrade) {
                 $table->column_class('presentationgrade', 'presentationgrade');
             }
@@ -1061,9 +1083,10 @@ class submissionstable extends \table_sql {
         $fields = "u.id, ' ' AS selection " . $ufields . " " . $useridentity->selects . ",
                   MAX(s.id) AS submissionid, MAX(f.id) AS feedbackid, MAX(f.grade) AS grade,
                   MAX(f.feedback) AS feedback, MAX(s.timemodified) AS timesubmitted,
-                  MAX(f.timemodified) AS timemarked, 100 * COUNT( DISTINCT cchks.id ) / :examplecount AS summary,
+                  MAX(f.gradetimemodified) AS timemarked, 100 * COUNT( DISTINCT cchks.id ) / :examplecount AS summary,
                   COUNT( DISTINCT cchks.id ) AS checks, f.attendance AS attendance";
         if ($table->checkmark->checkmark->presentationgrading) {
+            $fields .= ", COALESCE(f.presentationstatus, " . CHECKMARK_PRESENTATION_STATUS_NO . ") AS presentationstatus";
             if ($table->checkmark->checkmark->presentationgrade) {
                 $fields .= ", f.presentationgrade AS presentationgrade";
             }
@@ -1094,7 +1117,7 @@ class submissionstable extends \table_sql {
         if ($filter == checkmark::FILTER_SUBMITTED) {
             $where .= ' AND s.timemodified > 0';
         } else if ($filter == checkmark::FILTER_REQUIRE_GRADING) {
-            $where .= ' AND COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0)';
+            $where .= ' AND COALESCE(f.gradetimemodified,0) < COALESCE(s.timemodified,0)';
         } else if ($filter == checkmark::FILTER_ATTENDANT) {
             $where .= ' AND attendance = 1';
         } else if ($filter == checkmark::FILTER_ABSENT) {
@@ -1106,7 +1129,8 @@ class submissionstable extends \table_sql {
         } else if ($filter == checkmark::FILTER_NO_PRESENTATIONGRADING) {
             $where .= " AND presentationgrade IS NULL AND presentationfeedback IS NULL";
         } else if ($filter == checkmark::FILTER_GRADED) {
-            $where .= " AND COALESCE(f.timemodified,0) >= COALESCE(s.timemodified,0) AND f.timemodified IS NOT NULL";
+            $where .= " AND COALESCE(f.gradetimemodified,0) >= COALESCE(s.timemodified,0)
+                        AND f.gradetimemodified IS NOT NULL";
         }
 
         $groupby = "u.id, s.id, f.id" . $ufields;
@@ -1125,8 +1149,24 @@ class submissionstable extends \table_sql {
             $table->checkmark->checkmark->id,
             $users
         );
+        if ($table->checkmark->checkmark->presentationgrading) {
+            $table->presentationstatusmenu = self::get_presentation_status_menu();
+        }
 
         return $table;
+    }
+
+    /**
+     * Returns the selectable presentation statuses.
+     *
+     * @return string[] Status labels indexed by database value.
+     */
+    public static function get_presentation_status_menu() {
+        return [
+            CHECKMARK_PRESENTATION_STATUS_NO => get_string('presentationstatus_no', 'checkmark'),
+            CHECKMARK_PRESENTATION_STATUS_MARKED => get_string('presentationstatus_marked', 'checkmark'),
+            CHECKMARK_PRESENTATION_STATUS_YES => get_string('presentationstatus_yes', 'checkmark'),
+        ];
     }
 
     /**
@@ -1248,7 +1288,7 @@ class submissionstable extends \table_sql {
             } else if ($filter == checkmark::FILTER_NOT_SUBMITTED) {
                 $wherefilter = " AND (s.timemodified <= 0 OR s.timemodified IS NULL)";
             } else if ($filter == checkmark::FILTER_REQUIRE_GRADING) {
-                $wherefilter = " AND COALESCE(f.timemodified,0) < COALESCE(s.timemodified,0) ";
+                $wherefilter = " AND COALESCE(f.gradetimemodified,0) < COALESCE(s.timemodified,0) ";
             } else if ($filter == checkmark::FILTER_EXTENSION) {
                 $wherefilter = " AND o.id IS NOT NULL";
             } else if ($filter == checkmark::FILTER_ATTENDANT) {
@@ -1262,7 +1302,8 @@ class submissionstable extends \table_sql {
             } else if ($filter == checkmark::FILTER_NO_PRESENTATIONGRADING) {
                 $wherefilter .= " AND presentationgrade IS NULL AND presentationfeedback IS NULL";
             } else if ($filter == checkmark::FILTER_GRADED) {
-                $wherefilter .= " AND COALESCE(f.timemodified,0) >= COALESCE(s.timemodified,0) AND f.timemodified IS NOT NULL";
+                $wherefilter .= " AND COALESCE(f.gradetimemodified,0) >= COALESCE(s.timemodified,0)
+                                   AND f.gradetimemodified IS NOT NULL";
             }
             $params['checkmarkid'] = $checkmarkid;
             $params['checkmarkid2'] = $checkmarkid;
@@ -2053,6 +2094,57 @@ class submissionstable extends \table_sql {
                 ]);
             }
         }
+    }
+
+    /**
+     * This function is called for each data row to allow processing of the
+     * user's presentation status.
+     *
+     * @param object $values
+     *            Contains object with all the values of record.
+     * @return string Return user's presentation status.
+     * @throws coding_exception
+     */
+    public function col_presentationstatus($values) {
+        if (!$this->checkmark->checkmark->presentationgrading) {
+            return '';
+        }
+
+        $status = (int)($values->presentationstatus ?? CHECKMARK_PRESENTATION_STATUS_NO);
+        if (!array_key_exists($status, $this->presentationstatusmenu)) {
+            $status = CHECKMARK_PRESENTATION_STATUS_NO;
+        }
+
+        if ($this->use_no_html()) {
+            return $this->presentationstatusmenu[$status];
+        }
+
+        if ($this->quickgrade && has_capability('mod/checkmark:gradepresentation', $this->context)) {
+            $attributes = [
+                'tabindex' => $this->tabindex++,
+                'id' => 'presentationstatus' . $values->id,
+            ];
+            $content = \html_writer::select(
+                $this->presentationstatusmenu,
+                'presentationstatus[' . $values->id . ']',
+                $status,
+                false,
+                $attributes
+            );
+            $oldstatus = \html_writer::empty_tag('input', [
+                'type' => 'hidden',
+                'name' => 'oldpresentationstatus[' . $values->id . ']',
+                'value' => $status,
+            ]);
+
+            return \html_writer::tag('div', $content . $oldstatus, [
+                'id' => 'ps' . $values->id,
+            ]);
+        }
+
+        return \html_writer::tag('div', $this->presentationstatusmenu[$status], [
+            'id' => 'ps' . $values->id,
+        ]);
     }
 
     /**

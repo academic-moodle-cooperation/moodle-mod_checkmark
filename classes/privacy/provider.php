@@ -72,6 +72,7 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
                 'feedback' => 'privacy:metadata:feedback',
                 'format' => 'privacy:metadata:format',
                 'attendance' => 'privacy:metadata:attendance',
+                'presentationstatus' => 'privacy:metadata:presentationstatus',
                 'presentationgrade' => 'privacy:metadata:presentationgrade',
                 'presentationfeedback' => 'privacy:metadata:presentationfeedback',
                 'presentationformat' => 'privacy:metadata:presentationformat',
@@ -80,6 +81,7 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
                 'mailed' => 'privacy:metadata:mailed',
                 'timecreated' => 'privacy:metadata:feedback:timecreated',
                 'timemodified' => 'privacy:metadata:feedback:timemodified',
+                'gradetimemodified' => 'privacy:metadata:gradetimemodified',
         ];
         $overrides = [
                 'timeavailable' => 'privacy:metadata:timeavailable',
@@ -426,6 +428,14 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
         if (!empty($c->checkmark->presentationgrade)) {
             $data->presentationgrade = $c->display_grade($feedback->presentationgrade, CHECKMARK_PRESENTATION_ITEM);
         }
+        if ($c->checkmark->presentationgrading) {
+            $presentationstatusmenu = \mod_checkmark\submissionstable::get_presentation_status_menu();
+            $presentationstatus = $feedback->presentationstatus ?? CHECKMARK_PRESENTATION_STATUS_NO;
+            if (!array_key_exists($presentationstatus, $presentationstatusmenu)) {
+                $presentationstatus = CHECKMARK_PRESENTATION_STATUS_NO;
+            }
+            $data->presentationstatus = $presentationstatusmenu[$presentationstatus];
+        }
         if ($feedback->presentationfeedback !== "") {
             $data->presentationfeedback = format_text(
                 $feedback->presentationfeedback,
@@ -435,6 +445,9 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
         }
         if (!empty($feedback->presentationtimemodified)) {
             $data->presentationtimemodified = transform::datetime($feedback->presentationtimemodified);
+        }
+        if (!empty($feedback->gradetimemodified)) {
+            $data->gradetimemodified = transform::datetime($feedback->gradetimemodified);
         }
         $data->timegraded = transform::datetime($feedback->timecreated);
         $data->timemodified = transform::datetime($feedback->timemodified);
