@@ -260,7 +260,17 @@ $string['manycolumnsinpdfwarning'] = 'Attention: due to a high example-count and
 $string['maximumgrade'] = 'Maximum grade';
 $string['messageprovider:checkmark_updates'] = 'Checkmark notifications';
 $string['modulename'] = 'Checkmark';
-$string['modulename_help'] = 'Checkmarks enable the teacher to specify an assignment where students have to check marks which can then be graded.<p><a href="https://academic-moodle-cooperation.org/anleitungen/kreuzerlubung-verwenden/?lng=en" target="_blank">Checkmark: Use the checkmark module</a></p><p><a href="https://academic-moodle-cooperation.org/anleitungen/kreuzerlubung-anwesenheit-erfassen/?lng=en" target="_blank">Checkmark: track attendance</a></p><p><a href="https://academic-moodle-cooperation.org/anleitungen/kreuzerlubung-tafelleistung-erfassen/?lng=en" target="_blank">Checkmark: track presentation grading</a></p><p><a href="https://academic-moodle-cooperation.org/anleitungen/kreuzerlubung-bericht-einsehen/?lng=en" target="_blank">Checkmark: review the Checkmark Report</a></p>';
+$string['modulename_help'] = '###### Key Features
+* Student self-assessment: Students indicate in advance in Moodle which examples they have prepared and are ready to present at the board.
+* Integrated performance assessment: Instructors can evaluate students directly based on their preparation (checkmarks) as well as their actual board presentation.
+* Attendance tracking: The tool allows instructors to document student attendance and absences in real time during the session.
+
+###### Applications scenarios
+* Preparation checks for regular exercises: Ideal for weekly courses with practical exercises and grading.
+* Targeted selection for board presentations: Efficient selection of students during the in-person session based on the checkmarks they submitted in advance.
+* Combined performance and attendance documentation: Use as a central tool after a class session to enter points for board performance and maintain the attendance list.';
+$string['modulename_summary'] = 'Checkmark activities allow lecturers to design activities in which participants must mark examples, which again can then be graded.';
+$string['modulename_tip'] = 'Instructors can assign both the names of the examples for the checkmarks and the corresponding points individually.<p><a href="https://academic-moodle-cooperation.org/anleitungen/kreuzerlubung-verwenden/?lng=en" target="_blank"><i class="icon fa fa-info-circle"></i>Guide: "Use the Checkmark module"</a></p><p><a href="https://academic-moodle-cooperation.org/anleitungen/kreuzerlubung-anwesenheit-erfassen/?lng=en" target="_blank"><i class="icon fa fa-info-circle"></i>Guide: "Checkmark: track attendance"</a></p><p><a href="https://academic-moodle-cooperation.org/anleitungen/kreuzerlubung-tafelleistung-erfassen/?lng=en" target="_blank"><i class="icon fa fa-info-circle"></i>Guide: "Checkmark: track presentation grading"</a></p><p><a href="https://academic-moodle-cooperation.org/anleitungen/kreuzerlubung-bericht-einsehen/?lng=en" target="_blank"><i class="icon fa fa-info-circle"></i>Guide: "Review the Checkmark Report"</a></p>';
 $string['modulenameplural'] = 'Checkmarks';
 $string['needattendanceentrycount'] = 'Needs attendance record';
 $string['newsubmissions'] = 'Checkmarks submitted';
