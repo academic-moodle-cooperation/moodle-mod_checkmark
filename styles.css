@@ -64,8 +64,30 @@
     display: none;
 }
 
-#page-mod-checkmark-submissions .submissions colgroup.presentationgrade {
+#page-mod-checkmark-submissions .submissions th.checkmark-first-example {
+    position: relative;
+}
+
+#page-mod-checkmark-submissions .checkmark-examples-toggle {
+    position: absolute;
+    white-space: nowrap;
+    z-index: 1;
+}
+
+#page-mod-checkmark-submissions .checkmark-examples-toggle span {
+    margin-right: 5px;
+}
+
+#page-mod-checkmark-submissions .submissions colgroup.presentation {
     border-left: 2px solid rgba(153, 153, 153, 0.95);
+}
+
+#page-mod-checkmark-submissions .checkmark-presentation-toggle {
+    white-space: nowrap;
+}
+
+#page-mod-checkmark-submissions .checkmark-presentation-toggle span {
+    margin-right: 5px;
 }
 
 #page-mod-checkmark-submissions .qgprefs #optiontable {
