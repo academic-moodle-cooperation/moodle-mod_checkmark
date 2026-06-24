@@ -527,7 +527,7 @@ class submissionstable extends \table_sql {
             $tablecolumns[] = 'presentationtimemodified';
             $helpicons[] = null;
             $span++;
-            $table->add_colgroup('presentationgrade', $span);
+            $table->add_colgroup('presentation presentationgrade', $span);
         }
 
         $table->define_columns($tablecolumns);
@@ -976,7 +976,7 @@ class submissionstable extends \table_sql {
                 'align' => 'L',
             ];
             $span++;
-            $table->add_colgroup('presentationgrade', $span);
+            $table->add_colgroup('presentation presentationgrade', $span);
         }
 
         $tableheaders[] = get_string('signature', 'checkmark');

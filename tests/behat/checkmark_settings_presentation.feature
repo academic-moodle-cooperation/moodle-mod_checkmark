@@ -36,24 +36,34 @@ Feature: Track presentations and grade them
       | id_presentationgrade_modgrade_type | none |
     And I press "Save and display"
     And I follow "Submissions"
-    Then I should see "Comment (presentation)"
-    Then I should not see "Grade (presentation)"
+    Then I should see "Presentation"
+    And I should see "Comment (Presentation)"
+    And I should not see "Grade (Presentation)"
     And I follow "Settings"
     And I set the following fields to these values:
       | id_presentationgrading             | 1     |
       | id_presentationgrade_modgrade_type | point |
     And I press "Save and display"
     And I follow "Submissions"
-    Then I should see "Comment (presentation)"
-    Then I should see "Grade (presentation)"
+    Then I should see "Comment (Presentation)"
+    And I should see "Grade (Presentation)"
+    And I click on "#hidepresentation" "css_element"
+    And I wait until the page is ready
+    Then I should see "Presentation"
+    And I should not see "Comment (Presentation)"
+    And I should not see "Grade (Presentation)"
+    And I click on "#showpresentation" "css_element"
+    And I wait until the page is ready
+    Then I should see "Comment (Presentation)"
+    And I should see "Grade (Presentation)"
     And I follow "Settings"
     And I set the following fields to these values:
       | id_presentationgrading             | 1     |
       | id_presentationgrade_modgrade_type | scale |
     And I press "Save and display"
     And I follow "Submissions"
-    Then I should see "Comment (presentation)"
-    Then I should see "Grade (presentation)"
+    Then I should see "Comment (Presentation)"
+    And I should see "Grade (Presentation)"
 
   @javascript
   Scenario: Grade presentation by using the scale type
