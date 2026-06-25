@@ -1125,9 +1125,14 @@ class submissionstable extends \table_sql {
         } else if ($filter == checkmark::FILTER_UNKNOWN) {
             $where .= ' AND attendance IS NULL';
         } else if ($filter == checkmark::FILTER_PRESENTATIONGRADING) {
-            $where .= " AND presentationgrade IS NOT NULL OR presentationfeedback IS NOT NULL";
+            $where .= " AND COALESCE(f.presentationstatus, " . CHECKMARK_PRESENTATION_STATUS_NO . ") = " .
+                CHECKMARK_PRESENTATION_STATUS_YES;
+        } else if ($filter == checkmark::FILTER_PRESENTATION_MARKED) {
+            $where .= " AND COALESCE(f.presentationstatus, " . CHECKMARK_PRESENTATION_STATUS_NO . ") = " .
+                CHECKMARK_PRESENTATION_STATUS_MARKED;
         } else if ($filter == checkmark::FILTER_NO_PRESENTATIONGRADING) {
-            $where .= " AND presentationgrade IS NULL AND presentationfeedback IS NULL";
+            $where .= " AND COALESCE(f.presentationstatus, " . CHECKMARK_PRESENTATION_STATUS_NO . ") = " .
+                CHECKMARK_PRESENTATION_STATUS_NO;
         } else if ($filter == checkmark::FILTER_GRADED) {
             $where .= " AND COALESCE(f.gradetimemodified,0) >= COALESCE(s.timemodified,0)
                         AND f.gradetimemodified IS NOT NULL";
@@ -1298,9 +1303,14 @@ class submissionstable extends \table_sql {
             } else if ($filter == checkmark::FILTER_UNKNOWN) {
                 $wherefilter .= " AND attendance IS NULL";
             } else if ($filter == checkmark::FILTER_PRESENTATIONGRADING) {
-                $wherefilter .= " AND presentationgrade IS NOT NULL OR presentationfeedback IS NOT NULL";
+                $wherefilter .= " AND COALESCE(f.presentationstatus, " . CHECKMARK_PRESENTATION_STATUS_NO . ") = " .
+                    CHECKMARK_PRESENTATION_STATUS_YES;
+            } else if ($filter == checkmark::FILTER_PRESENTATION_MARKED) {
+                $wherefilter .= " AND COALESCE(f.presentationstatus, " . CHECKMARK_PRESENTATION_STATUS_NO . ") = " .
+                    CHECKMARK_PRESENTATION_STATUS_MARKED;
             } else if ($filter == checkmark::FILTER_NO_PRESENTATIONGRADING) {
-                $wherefilter .= " AND presentationgrade IS NULL AND presentationfeedback IS NULL";
+                $wherefilter .= " AND COALESCE(f.presentationstatus, " . CHECKMARK_PRESENTATION_STATUS_NO . ") = " .
+                    CHECKMARK_PRESENTATION_STATUS_NO;
             } else if ($filter == checkmark::FILTER_GRADED) {
                 $wherefilter .= " AND COALESCE(f.gradetimemodified,0) >= COALESCE(s.timemodified,0)
                                    AND f.gradetimemodified IS NOT NULL";
