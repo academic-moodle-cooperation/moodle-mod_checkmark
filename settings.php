@@ -25,6 +25,18 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+$ADMIN->add(
+    'modsettings',
+    new admin_category('modcheckmarkfolder', new lang_string('pluginname', 'checkmark'), $module->is_enabled() === false)
+);
+
+$settings = new admin_settingpage(
+    $section,
+    get_string('settings', 'checkmark'),
+    'moodle/site:config',
+    $module->is_enabled() === false
+);
+
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext(
         'checkmark/stdexamplecount',
@@ -140,4 +152,19 @@ if ($ADMIN->fulltree) {
     );
     $setting->set_enabled_flag_options(admin_setting_flag::ENABLED, false);
     $settings->add($setting);
+}
+
+$ADMIN->add('modcheckmarkfolder', $settings);
+$settings = null;
+
+require_once($CFG->dirroot . '/mod/checkmark/adminlib.php');
+
+$ADMIN->add(
+    'modcheckmarkfolder',
+    new admin_category('checkmarkaddonplugins', new lang_string('checkmarkaddons', 'checkmark'), !$module->is_enabled())
+);
+$ADMIN->add('checkmarkaddonplugins', new checkmark_admin_page_manage_checkmark_plugins('checkmarkaddon'));
+
+foreach (core_plugin_manager::instance()->get_plugins_of_type('checkmarkaddon') as $plugin) {
+    $plugin->load_settings($ADMIN, 'checkmarkaddonplugins', $hassiteconfig);
 }
