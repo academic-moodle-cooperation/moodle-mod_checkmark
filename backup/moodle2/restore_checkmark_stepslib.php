@@ -25,6 +25,10 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/mod/checkmark/lib.php');
+
 /**
  * Structure step to restore one checkmark activity
  *
@@ -307,9 +311,28 @@ class restore_checkmark_activity_structure_step extends restore_activity_structu
         } else {
             $data->presentationtimemodified = 0;
         }
+        if (!isset($data->presentationstatus) && $this->has_legacy_presentation_grading($data)) {
+            $data->presentationstatus = CHECKMARK_PRESENTATION_STATUS_YES;
+        }
 
         $newitemid = $DB->insert_record('checkmark_feedbacks', $data);
         $this->set_mapping('checkmark_feedback', $oldid, $newitemid, true);
+    }
+
+    /**
+     * Checks if a restored legacy feedback record contains saved presentation grading.
+     *
+     * @param stdClass $data Feedback data to restore.
+     * @return bool Whether legacy presentation grading exists.
+     */
+    private function has_legacy_presentation_grading(stdClass $data): bool {
+        $presentationgrade = $data->presentationgrade ?? null;
+        if ($presentationgrade !== null && $presentationgrade !== '' && $presentationgrade != -1) {
+            return true;
+        }
+
+        $presentationfeedback = trim((string)($data->presentationfeedback ?? ''));
+        return $presentationfeedback !== '';
     }
 
     /**

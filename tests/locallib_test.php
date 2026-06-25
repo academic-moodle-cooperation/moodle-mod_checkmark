@@ -20,6 +20,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
+require_once($CFG->dirroot . '/mod/checkmark/tests/fixtures/testable_checkmark.php');
 
 /**
  * Unit tests for locallib.php
@@ -435,6 +436,112 @@ final class locallib_test extends \advanced_testcase {
                 \checkmark::FILTER_NO_PRESENTATIONGRADING
             )
         );
+    }
+
+    /**
+     * Ensure a saved presentation comment marks the presentation status as done.
+     */
+    public function test_process_feedback_sets_presentation_status_to_yes_with_presentation_feedback(): void {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $student = $generator->create_user();
+        $generator->enrol_user($student->id, $course->id, 'student');
+        $checkmarkrecord = $generator->create_module('checkmark', [
+            'course' => $course->id,
+            'presentationgrading' => 1,
+            'presentationgrade' => 0,
+            'presentationgradebook' => 0,
+        ]);
+        $instance = new \checkmark($checkmarkrecord->cmid);
+
+        $oldpost = $_POST;
+        $oldget = $_GET;
+        $_GET = [];
+
+        try {
+            $this->submit_feedback_form(
+                $instance,
+                $student->id,
+                -1,
+                'Presentation feedback',
+                -1,
+                CHECKMARK_PRESENTATION_STATUS_NO
+            );
+        } finally {
+            $_POST = $oldpost;
+            $_GET = $oldget;
+        }
+
+        $feedback = $DB->get_record('checkmark_feedbacks', [
+            'checkmarkid' => $checkmarkrecord->id,
+            'userid' => $student->id,
+        ], '*', MUST_EXIST);
+
+        $this->assertEquals(CHECKMARK_PRESENTATION_STATUS_YES, $feedback->presentationstatus);
+        $this->assertSame('Presentation feedback', $feedback->presentationfeedback);
+    }
+
+    /**
+     * Ensure fast grading cannot set status below done while a presentation grade remains saved.
+     */
+    public function test_fastgrade_keeps_presentation_status_yes_when_grade_exists(): void {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $student = $generator->create_user();
+        $generator->enrol_user($student->id, $course->id, 'student');
+        $checkmarkrecord = $generator->create_module('checkmark', [
+            'course' => $course->id,
+            'presentationgrading' => 1,
+            'presentationgrade' => 100,
+            'presentationgradebook' => 0,
+        ]);
+        $instance = new testable_checkmark($checkmarkrecord->cmid);
+        $feedback = $instance->prepare_new_feedback($student->id);
+        $feedback->presentationstatus = CHECKMARK_PRESENTATION_STATUS_YES;
+        $feedback->presentationgrade = 50;
+        $DB->update_record('checkmark_feedbacks', $feedback);
+
+        $oldpost = $_POST;
+        $oldget = $_GET;
+        $_GET = [];
+        $_POST = [
+            'sesskey' => sesskey(),
+            'mailinfo' => 0,
+            'presentationstatus' => [
+                $student->id => CHECKMARK_PRESENTATION_STATUS_NO,
+            ],
+            'oldpresentationstatus' => [
+                $student->id => CHECKMARK_PRESENTATION_STATUS_YES,
+            ],
+            'oldpresentationgrade' => [
+                $student->id => 50,
+            ],
+            'oldpresentationfeedback' => [
+                $student->id => '',
+            ],
+        ];
+
+        try {
+            $instance->submissions('fastgrade');
+        } finally {
+            $_POST = $oldpost;
+            $_GET = $oldget;
+        }
+
+        $feedback = $DB->get_record('checkmark_feedbacks', ['id' => $feedback->id], '*', MUST_EXIST);
+
+        $this->assertEquals(CHECKMARK_PRESENTATION_STATUS_YES, $feedback->presentationstatus);
+        $this->assertEquals(50, $feedback->presentationgrade);
     }
 
     /**

@@ -43,6 +43,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->dirroot . '/calendar/lib.php');
+require_once($CFG->dirroot . '/mod/checkmark/lib.php');
 
 /**
  * Handles changes in the DB and similar during upgrades.
@@ -1665,6 +1666,28 @@ function xmldb_checkmark_upgrade($oldversion) {
 
         // Checkmark savepoint reached.
         upgrade_mod_savepoint(true, 2026062200, 'checkmark');
+    }
+
+    if ($oldversion < 2026062201) {
+        // Legacy feedback rows had no explicit presentation status. A saved presentation grade/feedback means done.
+        $presentationfeedbacksql = 'TRIM(' . $DB->sql_compare_text('presentationfeedback') . ')'
+            . ' <> :emptypresentationfeedback';
+        $DB->set_field_select(
+            'checkmark_feedbacks',
+            'presentationstatus',
+            CHECKMARK_PRESENTATION_STATUS_YES,
+            'presentationstatus = :presentationstatusno
+                AND ((presentationgrade IS NOT NULL AND presentationgrade <> :nopresentationgrade)
+                    OR (presentationfeedback IS NOT NULL AND ' . $presentationfeedbacksql . '))',
+            [
+                'presentationstatusno' => CHECKMARK_PRESENTATION_STATUS_NO,
+                'nopresentationgrade' => -1,
+                'emptypresentationfeedback' => '',
+            ]
+        );
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2026062201, 'checkmark');
     }
 
     return true;

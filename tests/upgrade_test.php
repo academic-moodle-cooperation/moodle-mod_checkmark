@@ -100,7 +100,104 @@ final class upgrade_test extends \advanced_testcase {
         $this->assertEquals(222222222, $secondfeedback->gradetimemodified);
         $this->assertEquals(CHECKMARK_PRESENTATION_STATUS_YES, $secondfeedback->presentationstatus);
         $this->assertEquals(333333333, $secondfeedback->presentationtimemodified);
-        $this->assertEquals(2026062200, get_config('mod_checkmark', 'version'));
+    }
+
+    /**
+     * Ensure legacy presentation grading data gets an explicit done status.
+     */
+    public function test_upgrade_backfills_legacy_presentation_status(): void {
+        global $DB, $USER;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $checkmark = $generator->create_module('checkmark', [
+            'course' => $course->id,
+            'presentationgrading' => 1,
+            'presentationgrade' => 100,
+        ]);
+
+        $gradedstudent = $generator->create_user();
+        $feedbackstudent = $generator->create_user();
+        $whitespacestudent = $generator->create_user();
+        $nogradestudent = $generator->create_user();
+        $emptystudent = $generator->create_user();
+        $markedstudent = $generator->create_user();
+
+        $gradedid = $this->create_legacy_feedback(
+            $checkmark->id,
+            $gradedstudent->id,
+            $USER->id,
+            111111111,
+            CHECKMARK_PRESENTATION_STATUS_NO,
+            0,
+            null
+        );
+        $feedbackid = $this->create_legacy_feedback(
+            $checkmark->id,
+            $feedbackstudent->id,
+            $USER->id,
+            222222222,
+            CHECKMARK_PRESENTATION_STATUS_NO,
+            null,
+            'Existing presentation feedback'
+        );
+        $whitespaceid = $this->create_legacy_feedback(
+            $checkmark->id,
+            $whitespacestudent->id,
+            $USER->id,
+            333333333,
+            CHECKMARK_PRESENTATION_STATUS_NO,
+            null,
+            '   '
+        );
+        $nogradeid = $this->create_legacy_feedback(
+            $checkmark->id,
+            $nogradestudent->id,
+            $USER->id,
+            444444444,
+            CHECKMARK_PRESENTATION_STATUS_NO,
+            -1,
+            null
+        );
+        $emptyid = $this->create_legacy_feedback(
+            $checkmark->id,
+            $emptystudent->id,
+            $USER->id,
+            555555555,
+            CHECKMARK_PRESENTATION_STATUS_NO,
+            null,
+            ''
+        );
+        $markedid = $this->create_legacy_feedback(
+            $checkmark->id,
+            $markedstudent->id,
+            $USER->id,
+            666666666,
+            CHECKMARK_PRESENTATION_STATUS_MARKED,
+            75,
+            null
+        );
+
+        set_config('version', 2026062200, 'mod_checkmark');
+
+        $this->assertTrue(\xmldb_checkmark_upgrade(2026062200));
+
+        $gradedfeedback = $DB->get_record('checkmark_feedbacks', ['id' => $gradedid], '*', MUST_EXIST);
+        $feedbackonly = $DB->get_record('checkmark_feedbacks', ['id' => $feedbackid], '*', MUST_EXIST);
+        $whitespacefeedback = $DB->get_record('checkmark_feedbacks', ['id' => $whitespaceid], '*', MUST_EXIST);
+        $nogradefeedback = $DB->get_record('checkmark_feedbacks', ['id' => $nogradeid], '*', MUST_EXIST);
+        $emptyfeedback = $DB->get_record('checkmark_feedbacks', ['id' => $emptyid], '*', MUST_EXIST);
+        $markedfeedback = $DB->get_record('checkmark_feedbacks', ['id' => $markedid], '*', MUST_EXIST);
+
+        $this->assertEquals(CHECKMARK_PRESENTATION_STATUS_YES, $gradedfeedback->presentationstatus);
+        $this->assertEquals(CHECKMARK_PRESENTATION_STATUS_YES, $feedbackonly->presentationstatus);
+        $this->assertEquals(CHECKMARK_PRESENTATION_STATUS_NO, $whitespacefeedback->presentationstatus);
+        $this->assertEquals(CHECKMARK_PRESENTATION_STATUS_NO, $nogradefeedback->presentationstatus);
+        $this->assertEquals(CHECKMARK_PRESENTATION_STATUS_NO, $emptyfeedback->presentationstatus);
+        $this->assertEquals(CHECKMARK_PRESENTATION_STATUS_MARKED, $markedfeedback->presentationstatus);
     }
 
     /**
@@ -111,6 +208,8 @@ final class upgrade_test extends \advanced_testcase {
      * @param int $graderid Grader id.
      * @param int $timemodified Legacy modification time.
      * @param int $presentationstatus Presentation status.
+     * @param int|null $presentationgrade Presentation grade.
+     * @param string|null $presentationfeedback Presentation feedback.
      * @return int Feedback record id.
      */
     private function create_legacy_feedback(
@@ -118,7 +217,9 @@ final class upgrade_test extends \advanced_testcase {
         int $userid,
         int $graderid,
         int $timemodified,
-        int $presentationstatus
+        int $presentationstatus,
+        ?int $presentationgrade = 75,
+        ?string $presentationfeedback = 'Existing presentation feedback'
     ): int {
         global $DB;
 
@@ -130,8 +231,8 @@ final class upgrade_test extends \advanced_testcase {
             'format' => FORMAT_HTML,
             'attendance' => null,
             'presentationstatus' => $presentationstatus,
-            'presentationgrade' => 75,
-            'presentationfeedback' => 'Existing presentation feedback',
+            'presentationgrade' => $presentationgrade,
+            'presentationfeedback' => $presentationfeedback,
             'presentationformat' => FORMAT_HTML,
             'graderid' => $graderid,
             'mailed' => 1,
