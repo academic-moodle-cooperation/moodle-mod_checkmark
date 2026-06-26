@@ -2614,6 +2614,19 @@ class checkmark {
                         $oldpresfeedbacks[$id] = null;
                     }
 
+                    $finalpresentationgrade = $oldpresgrades[$id];
+                    if ($finalpresentationgrade == -1) {
+                        $finalpresentationgrade = null;
+                    }
+                    $finalpresentationfeedback = trim($oldpresfeedbacks[$id] ?? '');
+                    if ($presgrading && key_exists($id, $presgrades)) {
+                        $finalpresentationgrade = ($presgrades[$id] == -1) ? null : $presgrades[$id];
+                    }
+                    if ($prescommenting && key_exists($id, $presfeedbacks)) {
+                        $finalpresentationfeedback = trim($presfeedbacks[$id] ?? '');
+                    }
+                    $haspresentationdata = ($finalpresentationgrade !== null) || ($finalpresentationfeedback !== '');
+
                     // So we have unknown attendance stati included!
                     if ($attendance && $cantrackattendances && (!key_exists($id, $attendances) || $attendances[$id] == -1)) {
                         $attendances[$id] = null;
@@ -2641,6 +2654,9 @@ class checkmark {
                         if (!array_key_exists($presentationstatus, submissionstable::get_presentation_status_menu())) {
                             $presentationstatus = CHECKMARK_PRESENTATION_STATUS_NO;
                         }
+                        if ($haspresentationdata) {
+                            $presentationstatus = CHECKMARK_PRESENTATION_STATUS_YES;
+                        }
                         $updatedb = $updatedb || ($oldpresentationstatuses[$id] != $presentationstatus);
                         if ($feedback === false) {
                             $feedback = $this->prepare_new_feedback($id);
@@ -2653,12 +2669,9 @@ class checkmark {
 
                     if (
                         $presgrading && key_exists($id, $presgrades) && (($oldpresgrades[$id] != $presgrades[$id])
-                                    && !($oldpresgrades[$id] === null && $presgrades[$id] == -1))
+                        && !($oldpresgrades[$id] === null && $presgrades[$id] == -1))
                     ) {
-                        $presgrade = $presgrades[$id];
-                        if ($presgrade == -1) {
-                            $presgrade = null;
-                        }
+                        $presgrade = $finalpresentationgrade;
                         $updatedb = $updatedb || ($oldpresgrades[$id] != $presgrade);
                         if ($feedback === false) {
                             $feedback = $this->prepare_new_feedback($id);
@@ -2676,15 +2689,30 @@ class checkmark {
                         $prescommenting && key_exists($id, $presfeedbacks)
                         && (trim($oldpresfeedbacks[$id] ?? '') != trim($presfeedbacks[$id] ?? ''))
                     ) {
-                            $presfeedbackvalue = trim($presfeedbacks[$id] ?? '');
-                            $updatedb = $updatedb || (trim($oldpresfeedbacks[$id] ?? '') != $presfeedbackvalue);
+                        $presfeedbackvalue = $finalpresentationfeedback;
+                        $updatedb = $updatedb || (trim($oldpresfeedbacks[$id] ?? '') != $presfeedbackvalue);
                         if ($feedback === false) {
                             $feedback = $this->prepare_new_feedback($id);
                         }
                         $feedback->presentationfeedback = submissionstable::convert_text_to_html($presfeedbackvalue);
+                        if ($presfeedbackvalue !== '') {
+                            $feedback->presentationstatus = CHECKMARK_PRESENTATION_STATUS_YES;
+                        }
                         $presentationupdated = true;
                     } else {
                         unset($feedback->presentationfeedback);  // Don't need to update this.
+                    }
+
+                    if (
+                        ($presstatusediting || $presgrading || $prescommenting) && $feedback !== false
+                            && $haspresentationdata
+                    ) {
+                        $currentpresentationstatus = (int)($feedback->presentationstatus ?? $oldpresentationstatuses[$id]);
+                        if ($currentpresentationstatus !== CHECKMARK_PRESENTATION_STATUS_YES) {
+                            $updatedb = true;
+                            $presentationupdated = true;
+                        }
+                        $feedback->presentationstatus = CHECKMARK_PRESENTATION_STATUS_YES;
                     }
 
                     if (
@@ -3040,6 +3068,8 @@ class checkmark {
             $mformdata->presentationgrade = ($feedback !== false) ? $feedback->presentationgrade : -1;
             $mformdata->presentationfeedback = ($feedback !== false) ? $feedback->presentationfeedback : '';
             $mformdata->presentationformat = ($feedback !== false) ? $feedback->presentationformat : FORMAT_HTML;
+            $mformdata->presentationstatus = ($feedback !== false) ? $feedback->presentationstatus
+                : CHECKMARK_PRESENTATION_STATUS_NO;
             $mformdata->presgradedisabled = $presgradedisabled;
             if ($mformdata->presgradedisabled) {
                 // Overwrite with gradebook value!
@@ -3282,7 +3312,7 @@ class checkmark {
             $bulkactiongroups = [
                 get_string('bulk_general', 'checkmark') => [],
                 get_string('bulk_attendance', 'checkmark') => [],
-                get_string('bulk_presentation', 'checkmark') => [],
+                get_string('presentationheader', 'checkmark') => [],
                 get_string('bulk_grading', 'checkmark') => [],
             ];
             $addbulkaction = function (
@@ -3311,7 +3341,7 @@ class checkmark {
 
             $generalgroup = get_string('bulk_general', 'checkmark');
             $attendancegroup = get_string('bulk_attendance', 'checkmark');
-            $presentationgroup = get_string('bulk_presentation', 'checkmark');
+            $presentationgroup = get_string('presentationheader', 'checkmark');
             $gradinggroup = get_string('bulk_grading', 'checkmark');
 
             if (has_capability('mod/checkmark:manageoverrides', $this->context)) {
@@ -4382,33 +4412,46 @@ class checkmark {
         }
         if (
             $this->checkmark->presentationgrading && has_capability('mod/checkmark:gradepresentation', $this->context)
-                && !$presgradedisabled
         ) {
-            $newpresentationgrade = null;
-            if ($this->checkmark->presentationgrade) {
-                $newpresentationgrade = $formdata->presentationgrade;
-                if ($formdata->presentationgrade == -1) {
-                    // Normalize the presentationgrade!
-                    $newpresentationgrade = null;
+            if (isset($formdata->presentationstatus)) {
+                $presentationstatus = (int)$formdata->presentationstatus;
+                if (!array_key_exists($presentationstatus, \mod_checkmark\submissionstable::get_presentation_status_menu())) {
+                    $presentationstatus = CHECKMARK_PRESENTATION_STATUS_NO;
                 }
-                $feedback->presentationgrade = $newpresentationgrade;
-                if ($newpresentationgrade !== null) {
+                $feedback->presentationstatus = $presentationstatus;
+                $feedback->graderid = $USER->id;
+                $presentationupdated = $oldpresentationstatus !== $presentationstatus;
+                $update = true;
+            }
+
+            if (!$presgradedisabled) {
+                $newpresentationgrade = null;
+                if ($this->checkmark->presentationgrade) {
+                    $newpresentationgrade = $formdata->presentationgrade;
+                    if ($formdata->presentationgrade == -1) {
+                        // Normalize the presentationgrade!
+                        $newpresentationgrade = null;
+                    }
+                    $feedback->presentationgrade = $newpresentationgrade;
+                }
+                $newpresentationfeedback = (string)($formdata->presentationfeedback_editor['text'] ?? '');
+                $newpresentationformat = (int)($formdata->presentationfeedback_editor['format'] ?? FORMAT_HTML);
+                $feedback->presentationfeedback = $newpresentationfeedback;
+                $feedback->presentationformat = $newpresentationformat;
+                if (($newpresentationgrade !== null) || ($newpresentationfeedback !== '')) {
                     $feedback->presentationstatus = CHECKMARK_PRESENTATION_STATUS_YES;
                 }
+                $feedback->graderid = $USER->id;
+                $presentationupdated = $presentationupdated
+                        || ($oldpresentationfeedback !== $newpresentationfeedback)
+                        || (!empty($newpresentationfeedback) && $oldpresentationformat !== $newpresentationformat);
+                if ($this->checkmark->presentationgrade) {
+                    $presentationupdated = $presentationupdated || ($oldpresentationgrade != $newpresentationgrade);
+                }
+                $presentationupdated = $presentationupdated
+                        || ($oldpresentationstatus !== (int)$feedback->presentationstatus);
+                $update = true;
             }
-            $newpresentationfeedback = (string)($formdata->presentationfeedback_editor['text'] ?? '');
-            $newpresentationformat = (int)($formdata->presentationfeedback_editor['format'] ?? FORMAT_HTML);
-            $feedback->presentationfeedback = $newpresentationfeedback;
-            $feedback->presentationformat = $newpresentationformat;
-            $feedback->graderid = $USER->id;
-            $presentationupdated = ($oldpresentationfeedback !== $newpresentationfeedback)
-                    || (!empty($newpresentationfeedback) && $oldpresentationformat !== $newpresentationformat);
-            if ($this->checkmark->presentationgrade) {
-                $presentationupdated = $presentationupdated || ($oldpresentationgrade != $newpresentationgrade);
-            }
-            $presentationupdated = $presentationupdated
-                    || ($oldpresentationstatus !== (int)$feedback->presentationstatus);
-            $update = true;
         }
 
         if ($update) {

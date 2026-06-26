@@ -20,6 +20,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/mod/checkmark/locallib.php');
+require_once($CFG->dirroot . '/mod/checkmark/tests/fixtures/testable_checkmark.php');
 
 /**
  * Unit tests for locallib.php
@@ -234,6 +235,60 @@ final class locallib_test extends \advanced_testcase {
     }
 
     /**
+     * Ensure a saved presentation status is stored from the single grading view.
+     */
+    public function test_process_feedback_saves_presentation_status_from_single_view(): void {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $student = $generator->create_user();
+        $generator->enrol_user($student->id, $course->id, 'student');
+
+        $checkmarkrecord = $generator->create_module('checkmark', [
+            'course' => $course->id,
+            'presentationgrading' => 1,
+            'presentationgrade' => 0,
+            'presentationgradebook' => 0,
+        ]);
+        $checkmark = new \checkmark($checkmarkrecord->cmid);
+
+        $oldpost = $_POST;
+        $_POST = [
+            'sesskey' => sesskey(),
+            'saveuserid' => -1,
+            'userid' => $student->id,
+            'xgrade' => -1,
+            'feedback_editor' => [
+                'text' => '',
+                'format' => FORMAT_HTML,
+            ],
+            'presentationstatus' => CHECKMARK_PRESENTATION_STATUS_MARKED,
+            'presentationfeedback_editor' => [
+                'text' => '',
+                'format' => FORMAT_HTML,
+            ],
+            'mailinfo' => 0,
+        ];
+
+        try {
+            $checkmark->process_feedback();
+        } finally {
+            $_POST = $oldpost;
+        }
+
+        $feedback = $DB->get_record('checkmark_feedbacks', [
+            'checkmarkid' => $checkmarkrecord->id,
+            'userid' => $student->id,
+        ], '*', MUST_EXIST);
+
+        $this->assertEquals(CHECKMARK_PRESENTATION_STATUS_MARKED, $feedback->presentationstatus);
+    }
+
+    /**
      * Ensure a saved presentation grade marks the presentation status as done.
      */
     public function test_process_feedback_sets_presentation_status_to_yes_with_presentation_grade(): void {
@@ -259,7 +314,14 @@ final class locallib_test extends \advanced_testcase {
         $_GET = [];
 
         try {
-            $this->submit_feedback_form($instance, $student->id, 50, '', -1);
+            $this->submit_feedback_form(
+                $instance,
+                $student->id,
+                50,
+                '',
+                -1,
+                CHECKMARK_PRESENTATION_STATUS_NO
+            );
         } finally {
             $_POST = $oldpost;
             $_GET = $oldget;
@@ -377,6 +439,112 @@ final class locallib_test extends \advanced_testcase {
     }
 
     /**
+     * Ensure a saved presentation comment marks the presentation status as done.
+     */
+    public function test_process_feedback_sets_presentation_status_to_yes_with_presentation_feedback(): void {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $student = $generator->create_user();
+        $generator->enrol_user($student->id, $course->id, 'student');
+        $checkmarkrecord = $generator->create_module('checkmark', [
+            'course' => $course->id,
+            'presentationgrading' => 1,
+            'presentationgrade' => 0,
+            'presentationgradebook' => 0,
+        ]);
+        $instance = new \checkmark($checkmarkrecord->cmid);
+
+        $oldpost = $_POST;
+        $oldget = $_GET;
+        $_GET = [];
+
+        try {
+            $this->submit_feedback_form(
+                $instance,
+                $student->id,
+                -1,
+                'Presentation feedback',
+                -1,
+                CHECKMARK_PRESENTATION_STATUS_NO
+            );
+        } finally {
+            $_POST = $oldpost;
+            $_GET = $oldget;
+        }
+
+        $feedback = $DB->get_record('checkmark_feedbacks', [
+            'checkmarkid' => $checkmarkrecord->id,
+            'userid' => $student->id,
+        ], '*', MUST_EXIST);
+
+        $this->assertEquals(CHECKMARK_PRESENTATION_STATUS_YES, $feedback->presentationstatus);
+        $this->assertSame('Presentation feedback', $feedback->presentationfeedback);
+    }
+
+    /**
+     * Ensure fast grading cannot set status below done while a presentation grade remains saved.
+     */
+    public function test_fastgrade_keeps_presentation_status_yes_when_grade_exists(): void {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $student = $generator->create_user();
+        $generator->enrol_user($student->id, $course->id, 'student');
+        $checkmarkrecord = $generator->create_module('checkmark', [
+            'course' => $course->id,
+            'presentationgrading' => 1,
+            'presentationgrade' => 100,
+            'presentationgradebook' => 0,
+        ]);
+        $instance = new testable_checkmark($checkmarkrecord->cmid);
+        $feedback = $instance->prepare_new_feedback($student->id);
+        $feedback->presentationstatus = CHECKMARK_PRESENTATION_STATUS_YES;
+        $feedback->presentationgrade = 50;
+        $DB->update_record('checkmark_feedbacks', $feedback);
+
+        $oldpost = $_POST;
+        $oldget = $_GET;
+        $_GET = [];
+        $_POST = [
+            'sesskey' => sesskey(),
+            'mailinfo' => 0,
+            'presentationstatus' => [
+                $student->id => CHECKMARK_PRESENTATION_STATUS_NO,
+            ],
+            'oldpresentationstatus' => [
+                $student->id => CHECKMARK_PRESENTATION_STATUS_YES,
+            ],
+            'oldpresentationgrade' => [
+                $student->id => 50,
+            ],
+            'oldpresentationfeedback' => [
+                $student->id => '',
+            ],
+        ];
+
+        try {
+            $instance->submissions('fastgrade');
+        } finally {
+            $_POST = $oldpost;
+            $_GET = $oldget;
+        }
+
+        $feedback = $DB->get_record('checkmark_feedbacks', ['id' => $feedback->id], '*', MUST_EXIST);
+
+        $this->assertEquals(CHECKMARK_PRESENTATION_STATUS_YES, $feedback->presentationstatus);
+        $this->assertEquals(50, $feedback->presentationgrade);
+    }
+
+    /**
      * Assert two user id lists contain the same ids.
      *
      * @param int[] $expected Expected user ids.
@@ -399,13 +567,15 @@ final class locallib_test extends \advanced_testcase {
      * @param int $presentationgrade Presentation grade.
      * @param string $presentationfeedback Presentation feedback text.
      * @param int $grade Submission grade.
+     * @param int|null $presentationstatus Presentation status, if supplied.
      */
     private function submit_feedback_form(
         \checkmark $instance,
         int $userid,
         int $presentationgrade,
         string $presentationfeedback,
-        int $grade
+        int $grade,
+        ?int $presentationstatus = null
     ): void {
         $_POST = [
             'sesskey' => sesskey(),
@@ -423,6 +593,9 @@ final class locallib_test extends \advanced_testcase {
                 'format' => FORMAT_HTML,
             ],
         ];
+        if ($presentationstatus !== null) {
+            $_POST['presentationstatus'] = $presentationstatus;
+        }
 
         $instance->process_feedback();
     }

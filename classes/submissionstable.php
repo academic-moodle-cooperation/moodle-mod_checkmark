@@ -517,7 +517,7 @@ class submissionstable extends \table_sql {
         }
         if ($table->checkmark->checkmark->presentationgrading) {
             $span = 2;
-            $tableheaders[] = get_string('presentationstatus', 'checkmark');
+            $tableheaders[] = get_string('presentationheader', 'checkmark');
             $tablecolumns[] = 'presentationstatus';
             $helpicons[] = null;
             if ($table->checkmark->checkmark->presentationgrade) {
@@ -953,7 +953,7 @@ class submissionstable extends \table_sql {
         }
         if ($table->checkmark->checkmark->presentationgrading) {
             $span = 2;
-            $tableheaders[] = get_string('presentationstatus', 'checkmark');
+            $tableheaders[] = get_string('presentationheader', 'checkmark');
             $helpicons[] = null;
             $tablecolumns[] = 'presentationstatus';
             $table->cellwidth[] = [
